@@ -4,6 +4,7 @@ import cleanup from 'rollup-plugin-cleanup';
 import typescript from 'rollup-plugin-typescript2';
 import license from 'rollup-plugin-license';
 import multiInput from 'rollup-plugin-multi-input';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import pkg from './package.json';
 
 const path = require('path');
@@ -12,7 +13,8 @@ const makeExternalPredicate = (env) => {
   const externalArr = [
     ...Object.keys(pkg.peerDependencies || {}),
     ...Object.keys(pkg.dependencies || {}),
-  ];
+  ].filter(n => n !== 'broadcast-channel');
+
   if (env === 'node') {
     externalArr.push('crypto');
   }
@@ -29,12 +31,17 @@ const output = {
   exports: 'named',
   sourcemap: true,
   preserveModules: true,
+  preserveModulesRoot: 'lib',
   // not using .mjs extension because it causes issues with Vite
   // entryFileNames: '[name].mjs'
 };
 
 const getPlugins = (env) => {
   return [
+    nodeResolve({
+      browser: true,
+      resolveOnly: ['broadcast-channel']
+    }),
     replace({
       'SDK_VERSION': JSON.stringify(pkg.version),
       'global.': 'window.',

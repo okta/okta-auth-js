@@ -95,6 +95,9 @@ function removeBuildDir(val) {
   packageJSON[key] = removeBuildDir(packageJSON[key]);
 });
 
+// TODO: testing, included in bundle, do not require installation
+delete packageJSON.dependencies['broadcast-channel'];
+
 fs.writeFileSync(`${BUILD_DIR}/package.json`, JSON.stringify(packageJSON, null, 4));
 
 // Add an extra package.json underneath ESM to indicate module type
