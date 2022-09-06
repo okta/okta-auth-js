@@ -4,6 +4,7 @@ import cleanup from 'rollup-plugin-cleanup';
 import typescript from 'rollup-plugin-typescript2';
 import license from 'rollup-plugin-license';
 import multiInput from 'rollup-plugin-multi-input';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import pkg from './package.json';
@@ -18,7 +19,12 @@ let entries = {
   'idx': 'lib/exports/idx.ts',
   'myaccount': 'lib/exports/myaccount.ts'
 };
-let preserveModules = true;
+
+const preserveModuleOptions = {
+  preserveModules: true,
+
+}
+
 const combinedOutputDir = true; // all entries share an output dir
 function getOuptutDir(entryName, env) {
   return combinedOutputDir ? `build/esm/${env}` : `build/esm/${entryName}/${env}`;
@@ -38,14 +44,18 @@ if (process.env.PLATFORM) {
 
 // if ANALZYE env var is passed, output analyzer html (must output single bundle)
 if (process.env.ANALYZE) {
-  preserveModules = false;
+  preserveModuleOptions.preserveModules = false;
+}
+else {
+  preserveModuleOptions.preserveModulesRoot = 'lib';
 }
 
 const makeExternalPredicate = (env) => {
   const externalArr = [
     ...Object.keys(pkg.peerDependencies || {}),
     ...Object.keys(pkg.dependencies || {}),
-  ];
+  ].filter(n => n !== 'broadcast-channel');
+
   if (env === 'node') {
     externalArr.push('crypto');
   }
@@ -61,7 +71,7 @@ const output = {
   format: 'es',
   exports: 'named',
   sourcemap: true,
-  preserveModules,
+  ...preserveModuleOptions
   // not using .mjs extension because it causes issues with Vite
   // entryFileNames: '[name].mjs'
 };
@@ -87,6 +97,10 @@ function createPackageJson(dirName) {
 const getPlugins = (env, entryName) => {
   const outputDir = getOuptutDir(entryName, env);
   let plugins = [
+    nodeResolve({
+      browser: true,
+      resolveOnly: ['broadcast-channel']
+    }),
     replace({
       'SDK_VERSION': JSON.stringify(pkg.version),
       'global.': 'window.',
