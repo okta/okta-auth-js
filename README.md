@@ -471,8 +471,9 @@ Defaults to 300 (five minutes). This is the maximum difference allowed between a
 
 #### `ignoreLifetime`
 
-Token lifetimes are validated using the `maxClockSkew`.
-To override this and disable token lifetime validation, set this value to `true`. 
+> :warning: This option disables token lifetime validation, which can introduce security vulnerability issues. This option should be used for testing purpose. Please handle the error in your own app for production environment.
+
+Token lifetimes are validated using the [maxClockSkew](#maxClockSkew). To override this and disable token lifetime validation, set this value to `true`. 
 
 #### `transformAuthState`
 
