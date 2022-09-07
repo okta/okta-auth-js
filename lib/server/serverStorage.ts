@@ -95,8 +95,6 @@ class ServerStorage implements StorageUtil {
       setItem: (key, value) => {
         this.nodeCache.set(key, value, '2200-01-01T00:00:00.000Z');
       },
-      // TODO: remove - https://oktainc.atlassian.net/browse/OKTA-529631
-      isSharedStorage: () => true
     };
   }
 }
