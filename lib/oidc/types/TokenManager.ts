@@ -65,7 +65,6 @@ export interface TokenManagerInterface {
   updateRefreshToken(token: RefreshToken);
   removeRefreshToken(): void;
   
-  hasSharedStorage(): boolean;
   getOptions(): TokenManagerOptions;
   getStorage(): StorageProvider;
 

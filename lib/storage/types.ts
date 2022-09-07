@@ -34,8 +34,6 @@ export interface SimpleStorage {
   getItem(key: string): any;
   setItem(key: string, value: any): void;
   removeItem?: (key: string) => void;
-  // TODO: remove - https://oktainc.atlassian.net/browse/OKTA-529631
-  isSharedStorage?(): boolean;
 }
 
 export interface StorageProvider extends SimpleStorage {
@@ -43,8 +41,6 @@ export interface StorageProvider extends SimpleStorage {
   getStorage(): any;
   clearStorage(key?: string): void;
   updateStorage(key: string, value: any): void;
-  // TODO: remove - https://oktainc.atlassian.net/browse/OKTA-529631
-  isSharedStorage(): boolean;
 }
 
 export type StorageType = 'memory' | 'sessionStorage' | 'localStorage' | 'cookie' | 'custom' | 'auto';
