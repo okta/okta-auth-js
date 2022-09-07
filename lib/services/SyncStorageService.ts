@@ -63,20 +63,21 @@ export class SyncStorageService implements ServiceInterface {
     }
 
     await this.stop();
+    
     const { syncChannelName } = this.options;
-
     try {
       // BroadcastChannel throws if no supported method can be found
       this.channel = new BroadcastChannel(syncChannelName as string);
-      this.tokenManager.on(EVENT_ADDED, this.onTokenAddedHandler);
-      this.tokenManager.on(EVENT_REMOVED, this.onTokenRemovedHandler);
-      this.tokenManager.on(EVENT_RENEWED, this.onTokenRenewedHandler);
-      this.tokenManager.on(EVENT_SET_STORAGE, this.onSetStorageHandler);
-      this.channel.addEventListener('message', this.onSyncMessageHandler);
-      this.started = true;
     } catch (err) {
       throw new AuthSdkError('SyncStorageService is not supported in current browser.');
     }
+
+    this.tokenManager.on(EVENT_ADDED, this.onTokenAddedHandler);
+    this.tokenManager.on(EVENT_REMOVED, this.onTokenRemovedHandler);
+    this.tokenManager.on(EVENT_RENEWED, this.onTokenRenewedHandler);
+    this.tokenManager.on(EVENT_SET_STORAGE, this.onSetStorageHandler);
+    this.channel.addEventListener('message', this.onSyncMessageHandler);
+    this.started = true;
   }
 
   async stop() {
