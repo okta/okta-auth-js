@@ -17,9 +17,18 @@ import tokens from '@okta/test.support/tokens';
 import { TokenManager } from '../../../lib/oidc/TokenManager';
 import { SyncStorageService } from '../../../lib/services/SyncStorageService';
 import * as features from '../../../lib/features';
+import { AuthSdkError } from '../../../lib/errors';
 import { BroadcastChannel } from 'broadcast-channel';
 
 const Emitter = require('tiny-emitter');
+
+jest.mock('broadcast-channel', () => {
+  const actual = jest.requireActual('broadcast-channel');
+  return { ...actual };
+});
+const mocked = {
+  broadcastChannel: require('broadcast-channel')
+};
 
 describe('SyncStorageService', () => {
   let sdkMock;
@@ -44,8 +53,6 @@ describe('SyncStorageService', () => {
       clearStorage: jest.fn().mockImplementation(() => {
         storage = {};
       }),
-      // TODO: remove - https://oktainc.atlassian.net/browse/OKTA-529631
-      isSharedStorage: jest.fn().mockReturnValue(true),
     };
     sdkMock = {
       options: {},
@@ -55,7 +62,6 @@ describe('SyncStorageService', () => {
       },
       emitter
     };
-    jest.spyOn(features, 'isLocalhost').mockReturnValue(true);
   });
   afterEach(() => {
     if (tokenManager) {
@@ -92,6 +98,16 @@ describe('SyncStorageService', () => {
       expect(service.isStarted()).toBeTruthy();
       expect(oldChannel.close).toHaveBeenCalledTimes(1);
       expect(newChannel).not.toStrictEqual(oldChannel);
+    });
+
+    it('throws AuthSdkError when no sync method is supported in browser', async () => {
+      await createInstance();
+      jest.spyOn(mocked.broadcastChannel, 'BroadcastChannel').mockImplementationOnce(() => {
+        throw new Error('Not supported');
+      });
+      await expect(async () => {
+        await service.start();
+      }).rejects.toThrowError(new AuthSdkError('SyncStorageService is not supported in current browser.'));
     });
   });
 

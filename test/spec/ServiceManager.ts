@@ -66,44 +66,6 @@ describe('ServiceManager', () => {
     jest.useRealTimers();
   });
 
-  describe('syncStorage', () => {
-    it('allows syncStorage for storage type "cookie"', async () => {
-      const options = { tokenManager: { syncStorage: true, storage: 'cookie' } };
-      util.disableLeaderElection();
-      const client = createAuth(options);
-      await client.serviceManager.start();
-      expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
-      await client.serviceManager.stop();
-    });
-  
-    it('allows syncStorage for storage type "localStorage"', async () => {
-      const options = { tokenManager: { syncStorage: true, storage: 'localStorage' } };
-      util.disableLeaderElection();
-      const client = createAuth(options);
-      await client.serviceManager.start();
-      expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
-      await client.serviceManager.stop();
-    });
-  
-    it('NOT allows syncStorage for storage type "sessionStorage"', async () => {
-      const options = { tokenManager: { syncStorage: true, storage: 'sessionStorage' } };
-      util.disableLeaderElection();
-      const client = createAuth(options);
-      await client.serviceManager.start();
-      expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
-      await client.serviceManager.stop();
-    });
-  
-    it('NOT allows syncStorage for storage type "memory"', async () => {
-      const options = { tokenManager: { syncStorage: true, storage: 'memory' } };
-      util.disableLeaderElection();
-      const client = createAuth(options);
-      await client.serviceManager.start();
-      expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeFalsy();
-      await client.serviceManager.stop();
-    });
-  });
-
   describe('leaderElection', () => {
     it('doesn\'t start leaderElection service if other services don\'t require leadership', async () => {
       const options = { tokenManager: { syncStorage: false, autoRenew: true } };
