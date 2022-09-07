@@ -34,11 +34,6 @@ export function mixinCore
       // AuthStateManager
       this.authStateManager = new AuthStateManager<M, S, O>(this);
 
-      // Enable `syncStorage` only if token storage is shared across tabs (type is `localStorage` or `cookie`)
-      if (!this.tokenManager.hasSharedStorage()) {
-        this.options.services = { ...this.options.services, syncStorage: false };
-      }
-
       // ServiceManager
       this.serviceManager = new ServiceManager<M, S, O>(this, this.options.services);
     }

@@ -12,7 +12,6 @@
  */
 
 import AuthSdkError from '../errors/AuthSdkError';
-import { isLocalStorageAvailable } from '../util/storage';
 import { StorageProvider, SimpleStorage } from './types';
 
 // formerly known as "storageBuilder". Represents an object saved under a key/name.
@@ -52,12 +51,6 @@ export class SavedObject implements StorageProvider {
   //
   // StorageProvider interface
   //
-
-  // TODO: remove - https://oktainc.atlassian.net/browse/OKTA-529631
-  isSharedStorage() {
-    return isLocalStorageAvailable() && this.storageProvider === localStorage as any 
-      || !!this.storageProvider.isSharedStorage?.();
-  }
 
   getStorage() {
     var storageString = this.storageProvider.getItem(this.storageName);

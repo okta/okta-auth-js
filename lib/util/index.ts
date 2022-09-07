@@ -17,4 +17,3 @@ export * from './object';
 export * from './PromiseQueue';
 export * from './types';
 export * from './url';
-export * from './storage';
