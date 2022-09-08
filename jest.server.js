@@ -27,7 +27,8 @@ const config = Object.assign({}, baseConfig, {
     'TokenManager/browser',
     'SyncStorageService',
     'LeaderElectionService',
-    'ServiceManager'
+    'ServiceManager',
+    'services/'
   ])
 });
 
