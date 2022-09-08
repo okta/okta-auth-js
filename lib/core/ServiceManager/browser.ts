@@ -14,7 +14,7 @@
 import {
   OAuthTransactionMeta,
   OAuthStorageManagerInterface,
-} from '../oidc';
+} from '../../oidc';
 
 import {
   ServiceManagerInterface,
@@ -22,9 +22,9 @@ import {
   ServiceManagerOptions,
   OktaAuthCoreInterface,
   OktaAuthCoreOptions
-} from './types';
-import { AutoRenewService, SyncStorageService, LeaderElectionService } from '../services';
-import { removeNils } from '../util';
+} from '../types';
+import { AutoRenewService, SyncStorageService, LeaderElectionService } from '../../services';
+import { removeNils } from '../../util';
 
 const AUTO_RENEW = 'autoRenew';
 const SYNC_STORAGE = 'syncStorage';
