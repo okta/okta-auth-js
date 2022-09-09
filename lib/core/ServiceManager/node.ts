@@ -54,6 +54,7 @@ implements ServiceManagerInterface
   async stop() {
   }
 
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   getService(name: string): ServiceInterface | undefined {
     return undefined;
   }
