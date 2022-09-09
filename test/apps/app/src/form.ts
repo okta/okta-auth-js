@@ -52,6 +52,9 @@ const Form = `
   <label for="scopes">Scopes (comma separated)</label><input id="f_scopes" name="scopes" type="text" />
   </div>
   <div class="pure-control-group">
+  <label for="acrValues">acr_values (space separated)</label><input id="f_acrValues" name="acrValues" type="text" />
+  </div>
+  <div class="pure-control-group">
   <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="f_postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" />
   </div>
   <div class="pure-control-group">
@@ -140,6 +143,7 @@ export function updateForm(origConfig: Config): void {
   (document.getElementById('f_redirectUri') as HTMLInputElement).value = config.redirectUri;
   (document.getElementById('f_responseType') as HTMLInputElement).value = config.responseType.join(',');
   (document.getElementById('f_scopes') as HTMLInputElement).value = config.scopes.join(',');
+  (document.getElementById('f_acrValues') as HTMLInputElement).value = config.acrValues;
   (document.getElementById('f_postLogoutRedirectUri') as HTMLInputElement).value = config.postLogoutRedirectUri;
   (document.getElementById('f_clientId') as HTMLInputElement).value = config.clientId;
   (document.getElementById('f_clientSecret') as HTMLInputElement).value = config.clientSecret;

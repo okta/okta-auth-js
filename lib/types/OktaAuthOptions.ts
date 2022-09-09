@@ -55,6 +55,7 @@ export interface TokenParams extends CustomUrls {
   state?: string;
   nonce?: string;
   scopes?: string[];
+  acrValues?: string;
   display?: string;
   ignoreSignature?: boolean;
   codeVerifier?: string;
@@ -87,7 +88,9 @@ export interface OktaAuthOptions extends
     'pkce' |
     'ignoreSignature' |
     'codeChallenge' |
-    'codeChallengeMethod'
+    'codeChallengeMethod' |
+    'maxAge' |
+    'acrValues'
   >,
   Pick<IdxTransactionMeta,
     'flow' |
