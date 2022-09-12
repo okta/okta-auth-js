@@ -4,10 +4,12 @@ import cleanup from 'rollup-plugin-cleanup';
 import typescript from 'rollup-plugin-typescript2';
 import license from 'rollup-plugin-license';
 import multiInput from 'rollup-plugin-multi-input';
+import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import pkg from './package.json';
+import bcPkgJson from './node_modules/broadcast-channel/package.json';
 
 const path = require('path');
 
@@ -49,11 +51,13 @@ else {
   preserveModuleOptions.preserveModulesRoot = 'lib';
 }
 
+const bundledPackages = ['broadcast-channel', ...(Object.keys(bcPkgJson.dependencies))];
+
 const makeExternalPredicate = (env) => {
   const externalArr = [
     ...Object.keys(pkg.peerDependencies || {}),
     ...Object.keys(pkg.dependencies || {}),
-  ].filter(n => n !== 'broadcast-channel');
+  ].filter(n => !bundledPackages.includes(n));
 
   if (env === 'node') {
     externalArr.push('crypto');
@@ -96,9 +100,11 @@ function createPackageJson(dirName) {
 const getPlugins = (env, entryName) => {
   const outputDir = getOuptutDir(entryName, env);
   let plugins = [
+    commonjs(),
     nodeResolve({
       browser: true,
-      resolveOnly: ['broadcast-channel']
+      // resolveOnly: ['broadcast-channel']
+      resolveOnly: [...bundledPackages]
     }),
     replace({
       'SDK_VERSION': JSON.stringify(pkg.version),
