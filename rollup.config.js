@@ -22,7 +22,7 @@ let entries = {
 
 const preserveModuleOptions = {
   preserveModules: true,
-};
+}; 
 
 const combinedOutputDir = true; // all entries share an output dir
 function getOuptutDir(entryName, env) {
