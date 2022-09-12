@@ -9,7 +9,6 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import pkg from './package.json';
-import bcPkgJson from './node_modules/broadcast-channel/package.json';
 
 const path = require('path');
 
@@ -51,7 +50,8 @@ else {
   preserveModuleOptions.preserveModulesRoot = 'lib';
 }
 
-const bundledPackages = ['broadcast-channel', ...(Object.keys(bcPkgJson.dependencies))];
+// oblivious-set/unload used by broadcast-channel, detect-node is used by unload
+const bundledPackages = ['broadcast-channel', 'oblivious-set', 'unload', 'detect-node'];
 
 const makeExternalPredicate = (env) => {
   const externalArr = [
@@ -103,7 +103,6 @@ const getPlugins = (env, entryName) => {
     commonjs(),
     nodeResolve({
       browser: true,
-      // resolveOnly: ['broadcast-channel']
       resolveOnly: [...bundledPackages]
     }),
     replace({
