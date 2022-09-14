@@ -95,9 +95,6 @@ function removeBuildDir(val) {
   packageJSON[key] = removeBuildDir(packageJSON[key]);
 });
 
-// TODO: (OKTA-532370) remove this line
-delete packageJSON.dependencies['broadcast-channel'];
-
 fs.writeFileSync(`${BUILD_DIR}/package.json`, JSON.stringify(packageJSON, null, 4));
 
 shell.echo(chalk.green('End building'));

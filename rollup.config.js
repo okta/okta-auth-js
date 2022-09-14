@@ -4,9 +4,6 @@ import cleanup from 'rollup-plugin-cleanup';
 import typescript from 'rollup-plugin-typescript2';
 import license from 'rollup-plugin-license';
 import multiInput from 'rollup-plugin-multi-input';
-// TODO: (OKTA-532370) remove commonjs and nodeResolve
-import commonjs from '@rollup/plugin-commonjs';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import pkg from './package.json';
@@ -21,11 +18,7 @@ let entries = {
   'idx': 'lib/exports/idx.ts',
   'myaccount': 'lib/exports/myaccount.ts'
 };
-
-const preserveModuleOptions = {
-  preserveModules: true,
-}; 
-
+let preserveModules = true;
 const combinedOutputDir = true; // all entries share an output dir
 function getOuptutDir(entryName, env) {
   return combinedOutputDir ? `build/esm/${env}` : `build/esm/${entryName}/${env}`;
@@ -45,23 +38,14 @@ if (process.env.PLATFORM) {
 
 // if ANALZYE env var is passed, output analyzer html (must output single bundle)
 if (process.env.ANALYZE) {
-  preserveModuleOptions.preserveModules = false;
+  preserveModules = false;
 }
-// TODO: (OKTA-532370) remove else clause
-else {
-  preserveModuleOptions.preserveModulesRoot = 'lib';
-}
-
-// TODO: (OKTA-532370) remove this line
-// oblivious-set/unload used by broadcast-channel, detect-node is used by unload
-const bundledPackages = ['broadcast-channel', 'oblivious-set', 'unload', 'detect-node'];
 
 const makeExternalPredicate = (env) => {
   const externalArr = [
     ...Object.keys(pkg.peerDependencies || {}),
     ...Object.keys(pkg.dependencies || {}),
-  ].filter(n => !bundledPackages.includes(n));    // TODO: (OKTA-532370) remove .filter
-
+  ];
   if (env === 'node') {
     externalArr.push('crypto');
   }
@@ -77,7 +61,7 @@ const output = {
   format: 'es',
   exports: 'named',
   sourcemap: true,
-  ...preserveModuleOptions
+  preserveModules,
   // not using .mjs extension because it causes issues with Vite
   // entryFileNames: '[name].mjs'
 };
@@ -103,12 +87,6 @@ function createPackageJson(dirName) {
 const getPlugins = (env, entryName) => {
   const outputDir = getOuptutDir(entryName, env);
   let plugins = [
-    // TODO: (OKTA-532370) remove commonjs and nodeResolve
-    (env === 'browser' && commonjs()),
-    (env === 'browser' && nodeResolve({
-      browser: true,
-      resolveOnly: [...bundledPackages]
-    })),
     replace({
       'SDK_VERSION': JSON.stringify(pkg.version),
       'global.': 'window.',
