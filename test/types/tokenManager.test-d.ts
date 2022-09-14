@@ -49,6 +49,8 @@ const authClient = new OktaAuth({});
   expectType<boolean>(tokenManager.hasExpired(accessToken));
   expectType<Token | undefined>(await tokenManager.renew('idToken'));
 
+  expectType<void>(tokenManager.clearPendingRemoveTokens());
+
   // Events
   tokenManager.on('expired', function (key, expiredToken) {
     expectType<string>(key);
