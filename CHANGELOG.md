@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.8.1
+
+### Fixes
+
+- [#1305](https://github.com/okta/okta-auth-js/pull/1305) Bumps version of `broadcast-channel` to 4.17, removing `microtime` sub dependency
+
 ## 6.8.0
 
 ### Other
