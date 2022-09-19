@@ -43,6 +43,9 @@ import getSecretFromQrCode from '../support/action/getSecretFromQrCode';
 import getSecretFromSharedSecret from '../support/action/getSecretFromSharedSecret';
 import enterCorrectGoogleAuthenticatorCode from '../support/action/context-enabled/enterCorrectGoogleAuthenticatorCode';
 import openEmailMagicLink from '../support/action/context-enabled/live-user/openEmailMagicLink';
+import openEmailMagicLinkForUnlock from '../support/action/context-enabled/live-user/openEmailMagicLinkForUnlock';
+import openEmailMagicLinkForEmailVerification 
+  from '../support/action/context-enabled/live-user/openEmailMagicLinkForEmailVerification';
 import ActionContext from '../support/context';
 import noop from '../support/action/noop';
 import clickButton from '../support/action/clickButton';
@@ -315,6 +318,16 @@ When(
 When(
   /^she clicks the Email magic link$/,
   openEmailMagicLink
+);
+
+When(
+  /^she clicks the Email magic link for unlock$/,
+  openEmailMagicLinkForUnlock
+);
+
+When(
+  /^she clicks the Email magic link for email verification$/,
+  openEmailMagicLinkForEmailVerification
 );
 
 When(
