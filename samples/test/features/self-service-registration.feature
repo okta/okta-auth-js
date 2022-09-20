@@ -2,6 +2,7 @@ Feature: Self Service Registration with Email Activation and optional SMS
 
 Background:
   Given an App that assigned to a test group
+    And the app has Email Verification callback uri defined
     And a Policy that defines "Profile Enrollment"
     And with a Policy Rule that defines "collecting default attributes"
     And a user named "Mary"
@@ -96,3 +97,25 @@ Scenario: Mary signs up for an account with Password, sets up required Email fac
   And she inputs an invalid phone number
   And she submits the form
   Then she should see an error message "Invalid Phone Number."
+
+Scenario: Mary signs up for an account with Password, setups up required Email factor using email magic link
+  When she clicks the 'signup' button
+  Then she is redirected to the "Self Service Registration" page
+  When she fills out her First Name
+  And she fills out her Last Name
+  And she fills out her Email
+  And she submits the form
+  Then she is redirected to the "Select Authenticator" page
+  When she selects the "Password" factor
+  And she submits the form
+  Then she sees the set new password form
+  And she fills out her Password
+  And she confirms her Password
+  And she submits the form
+  Then she sees a page to input a code for email authenticator enrollment
+  When she clicks the Email magic link for email verification
+  Then she is redirected to the "Select Authenticator" page
+  When she selects "Skip" on SMS
+  Then she is redirected to the "Root" page
+  And she sees a table with her profile info
+  And the cell for the value of "email" is shown and contains her "email"
