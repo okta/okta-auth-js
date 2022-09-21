@@ -121,6 +121,7 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
     recoveryToken,
     activationToken,
     maxAge,
+    nonce,
   } = options;
 
   let idxResponse;
@@ -140,6 +141,7 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
         activationToken,
         recoveryToken,
         maxAge,
+        nonce,
       }); 
       interactionHandle = interactResponse.interactionHandle;
       meta = interactResponse.meta;

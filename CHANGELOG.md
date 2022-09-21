@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.9
+
+- [#1307](https://github.com/okta/okta-auth-js/pull/1307) Adds `nonce` param to `idx.interact` (and `idx.start`)
+
 ## 6.8.1
 
 ### Fixes
