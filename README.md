@@ -41,7 +41,8 @@ This library uses semantic versioning and follows Okta's [library version policy
 
 | Version   | Status                           |
 | -------   | -------------------------------- |
-| `6.x`     | :heavy_check_mark: Stable        |
+| `7.x`     | :heavy_check_mark: Stable        |
+| `6.x`     | :warning: Retiring on 2023-09-30 |
 | `5.x`     | :warning: Retiring on 2022-10-31 |
 | `4.x`     | :x: Retired                      |
 | `3.x`     | :x: Retired                      |
@@ -94,7 +95,7 @@ require('@okta/okta-auth-js/polyfill');
 The built polyfill bundle is also available on our global CDN. Include the following script in your HTML file to load before any other scripts:
 
 ```html
-<script src="https://global.oktacdn.com/okta-auth-js/5.2.2/okta-auth-js.polyfill.js" type="text/javascript"></script>
+<script src="https://global.oktacdn.com/okta-auth-js/7.0.0/okta-auth-js.polyfill.js" type="text/javascript"></script>
 ```
 
 > :warning: The version shown in this sample may be older than the current version. We recommend using the highest version available
@@ -169,7 +170,7 @@ If you are using the JS on a web page from the browser, you can copy the `node_m
 The built library bundle is also available on our global CDN. Include the following script in your HTML file to load before your application script:
 
 ```html
-<script src="https://global.oktacdn.com/okta-auth-js/5.2.2/okta-auth-js.min.js" type="text/javascript"></script>
+<script src="https://global.oktacdn.com/okta-auth-js/7.0.0/okta-auth-js.min.js" type="text/javascript"></script>
 ```
 
 > :warning: The version shown in this sample may be older than the current version. We recommend using the highest version available
@@ -182,7 +183,7 @@ const oktaAuth = new OktaAuth({
 })
 ```
 
-However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import the module or require using CommonJS.
+However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Rollup](https://rollupjs.org/) you can simply import or require the module.
 
 ```javascript
 // ES module
@@ -198,7 +199,7 @@ var authClient = new OktaAuth(/* configOptions */);
 
 ## Usage guide
 
-For an overview of the client's features and authentication flows, check out [our developer docs](https://developer.okta.com/code/javascript/okta_auth_sdk). There, you will learn how to use the Auth SDK on a simple static page to:
+For an overview of the client's features and authentication flows, check out [our developer docs](https://developer.okta.com/docs/guides/auth-js/main/). There, you will learn how to use the Auth SDK on a simple static page to:
 
 * Retrieve and store an OpenID Connect (OIDC) token
 * Get an Okta session
@@ -213,20 +214,9 @@ You can also browse the full [API reference documentation](#api-reference).
 
 ```javascript
 var config = {
-  // Required config
   issuer: 'https://{yourOktaDomain}/oauth2/default',
-
-  // Required for login flow using getWithRedirect()
   clientId: 'GHtf9iJdr60A9IYrR0jw',
   redirectUri: 'https://acme.com/oauth2/callback/home',
-
-  // Parse authorization code from hash fragment instead of search query
-  responseMode: 'fragment',
-
-  // Configure TokenManager to use sessionStorage instead of localStorage
-  tokenManager: {
-    storage: 'sessionStorage'
-  }
 };
 
 var authClient = new OktaAuth(config);
@@ -242,37 +232,37 @@ By default, creating a new instance of `OktaAuth` will not create any asynchrono
   await authClient.stop(); // stop the service
 ```
 
-Starting the service will also call [authStateManager.updateAuthState](#authstatemanagerupdateauthstate).
+> **Note:** Starting the service will also call [authStateManager.updateAuthState](#authstatemanagerupdateauthstate).
 
 ### Usage with Typescript
 
-Types are implicitly provided by this library through the `types` entry in `package.json`. Types can also be referenced explicitly by importing them.
+Type definitions are provided implicitly through the `types` entry in `package.json`. Types can also be referenced explicitly by importing them.
 
 ```typescript
 import {
   OktaAuth,
   OktaAuthOptions,
-  TokenManager,
+  TokenManagerInterface,
   AccessToken,
   IDToken,
   UserClaims,
   TokenParams
-} from '@okta/okta-auth-js'
+} from '@okta/okta-auth-js';
 
 const config: OktaAuthOptions = {
   issuer: 'https://{yourOktaDomain}'
-}
+};
 
-const authClient: OktaAuth = new OktaAuth(config)
-const tokenManager: TokenManager = authClient.tokenManager;
+const authClient: OktaAuth = new OktaAuth(config);
+const tokenManager: TokenManagerInterface = authClient.tokenManager;
 const accessToken: AccessToken = await tokenManager.get('accessToken') as AccessToken;
 const idToken: IDToken = await tokenManager.get('idToken') as IDToken;
-const userInfo: UserClaims = await authClient.getUserInfo(accessToken, idToken);
+const userInfo: UserClaims = await authClient.token.getUserInfo(accessToken, idToken);
 
 if (!userInfo) {
   const tokenParams: TokenParams = {
     scopes: ['openid', 'email', 'custom_scope'],
-  }
+  };
   authClient.token.getWithRedirect(tokenParams);
 }
 ```
@@ -280,14 +270,14 @@ if (!userInfo) {
 #### Usage with Typescript < 3.6
 
 Typescript versions prior to 3.6 have no type definitions for WebAuthn. 
-Support for WebAuthn in IDX API was introduced in `OktaAuth 6.1.0`. 
+Support for WebAuthn in IDX API was introduced in `@okta/okta-auth-js@6.1.0`. 
 To solve this issue please install package `@types/webappsec-credential-management` version `^0.5.1`. 
 
 ### Strategies for Obtaining Tokens
 
 #### Authorization Code flow for web and native client types
 
-Web and native clients can obtain tokens using the `authorization_code` flow which uses a client secret stored in a secure location. SPA applications should use the `PKCE` flow which does not use a client secret. To use the `authorization_code` flow, set `responseType` to `"code"` and `pkce` to `false`:
+Web and native clients can obtain tokens using the `authorization_code` flow which uses a client secret stored in a secure location. (SPA applications should use the `PKCE` flow which does not use a client secret) To use the `authorization_code` flow, set `responseType` to `"code"` and `pkce` to `false`:
 
 ```javascript
 var config = {
@@ -306,13 +296,15 @@ var authClient = new OktaAuth(config);
 
 #### PKCE OAuth 2.0 flow
 
-The PKCE OAuth flow will be used by default. This library includes built-in support for Node applications. PKCE is widely supported by most modern browsers when running on an HTTPS connection. PKCE requires that the browser implements `crypto.subtle` (also known as `webcrypto`). [Most modern browsers provide this](https://caniuse.com/#feat=cryptography) when running in a secure context (on an HTTPS connection). PKCE also requires the [TextEncoder](https://caniuse.com/#feat=textencoder) object. This is available on all major browsers except IE Edge. In this case, we recommend using a polyfill/shim such as [text-encoding](https://www.npmjs.com/package/text-encoding).
+The PKCE OAuth flow will be used by default. This library supports PKCE for both browser and NodeJS applications. PKCE is widely supported by most modern browsers when running on an HTTPS connection. PKCE requires that the browser implements `crypto.subtle` (also known as `webcrypto`). [Most modern browsers provide this](https://caniuse.com/#feat=cryptography) when running in a secure context (on an HTTPS connection). PKCE also requires the [TextEncoder](https://caniuse.com/#feat=textencoder) object. This is [available on all major browsers except IE 11 and Edge < v79](https://caniuse.com/textencoder). To add support, we recommend using a polyfill/shim such as [text-encoding](https://www.npmjs.com/package/text-encoding).
 
 If the user's browser does not support PKCE, an exception will be thrown. You can test if a browser supports PKCE before construction with this static method:
 
 `OktaAuth.features.isPKCESupported()`
 
 #### Implicit OAuth 2.0 flow
+
+> :warning: We strongly discourage using the implicit flow. Use PKCE and/or client credentials if possible.
 
 Implicit OAuth flow is available as an option if PKCE flow cannot be supported in your deployment. It is widely supported by most browsers, and can work over an insecure HTTP connection. Note that implicit flow is less secure than PKCE flow, even over HTTPS, since raw tokens are exposed in the browser's history. For this reason, we highly recommending using the PKCE flow if possible.
 
@@ -332,7 +324,6 @@ var authClient = new OktaAuth(config);
 
 ### Redirects and Routing
 
-**!** Routing is **optional** for the callback portion of the redirect strategy. Instead you can use [popup](#tokengetwithpopupoptions) or [sign widget](https://github.com/okta/okta-signin-widget).
 
 To sign a user in, your application must redirect the browser to the Okta-hosted sign-in page.
 > **Note:** Initial redirect to Okta-hosted sign-in page starts a transaction with a stateToken lifetime set to one hour.
@@ -342,10 +333,46 @@ Depending on your preferences it is possible to use the following callback strat
 
 #### Handling the callback without routing
 
+Most applications will handle an OAuth callback using a special route/page, separate from the signin page. However some SPA applications have no routing logic and will want to handle everything in a single page.
+
+
 1. Create / configure your auth-js instance
-2. Before making **any other calls with auth-js** at the VERY BEGINNING of the app call *token.isLoginRedirect* - if this returns true, call *parseFromUrl* and save tokens in storage manager.
+2. Before starting the OktaAuth service, or making **any other API calls with auth-js** , call *token.isLoginRedirect* - if this returns true, call *token.parseFromUrl* and save tokens using *tokenManager.setTokens*.
       **It’s important that no other app logic runs until the async parseFromUrl / token manager logic is complete**
-3. After continue normal app logic
+3. After this, continue normal app logic
+
+```
+
+async function main() {
+  // create OktaAuth instance
+  var config = {
+    issuer: 'https://{yourOktaDomain}/oauth2/default',
+    clientId: 'GHtf9iJdr60A9IYrR0jw',
+    redirectUri: 'https://acme.com/oauth2/callback/home',
+  };
+  authClient = new OktaAuth(config);
+
+  // Subscribe to authState change event.
+  authClient.authStateManager.subscribe(function(authState) {
+    // Logic based on authState is done here.
+    if (!authState.isAuthenticated) {
+      // render unathenticated view
+      return;
+    }
+
+    // Render authenticated view
+  });
+
+  // Handle callback
+  if (authClient.token.isLoginRedirect()) {
+    const { tokens } = await authClient.token.parseFromUrl(); // remember to "await" this async call
+    authClient.tokenManager.setTokens(tokens);
+  }
+
+  // normal app startup
+  authClient.start(); // will update auth state and call event listeners
+}
+```
 
 #### Handling the callback with hash routing
 
@@ -356,11 +383,14 @@ Additionally, if using hash routing, we recommend using PKCE and responseMode "q
 
 #### Handling the callback with path routing (on a dedicated route)
 
-1. Right before redirect, save the route you are on (we recommend sessionStorage)
-2. Do the redirect to okta
-3. Redirect back to a dedicated route
-4. Call *parseFromUrl()*, retrieve tokens, add to `tokenManager`
-5. Read saved route and redirect to it
+1. Define a [redirectUri](#redirecturi) that maps to a dedicated route in your app
+2. Before redirect, save the current route: [setOriginalUri](#setoriginaluriuri)
+3. Do the redirect to okta: [token.getWithRedirect](#tokengetwithredirectoptions)
+4. After successful authentication, Okta will redirect back to the configured [redirectUri](#redirecturi), your app should load on the dedicated callback route
+5. On this callback page:
+   1. call [token.parseFromUrl](#tokenparsefromurloptions) to retrieve tokens
+   2. Add tokens to the  `TokenManager`: [tokenManager.setTokens](#tokenmanagersettokenstokens)
+6. Read saved route and redirect to it: [getOriginalUri](#getoriginaluristate)
 
 ## Configuration reference
 
@@ -1885,6 +1915,15 @@ We have implemented a small SPA app, located at `./test/app/` which is used inte
 ## Migrating from previous versions
 
 The [CHANGELOG](CHANGELOG.md) contains details for all changes and links to the original PR.
+
+### From 6.x to 7.x
+
+* Requires Node version 14 or higher.
+* If using OIDC redirect flows with an embedded or Okta-hosted [Okta Sign-in Widget](https://github.com/okta/okta-signin-widget) widget version 5.4.0 or greater is required. [#1181](https://github.com/okta/okta-auth-js/pull/1181)
+* If using direct authentication with the IDX API:
+  * Server responses with a non-200 status code will not be thrown as exceptions. If a request results in an error response from the server, the `requestDidSucceed` property on the returned `IdxTransaction` will be set to `false`. [#1205](https://github.com/okta/okta-auth-js/pull/1205)
+  * `options` field is removed from the `nextStep` property of `IdxTransaction`. [#1271](https://github.com/okta/okta-auth-js/pull/1271)
+  * `shoudldProceedWithEmailAuthenticator` option is removed. [#1274](https://github.com/okta/okta-auth-js/pull/1274)
 
 ### From 5.x to 6.x
 
