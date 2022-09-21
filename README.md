@@ -42,7 +42,7 @@ This library uses semantic versioning and follows Okta's [library version policy
 | Version   | Status                           |
 | -------   | -------------------------------- |
 | `7.x`     | :heavy_check_mark: Stable        |
-| `6.x`     | :heavy_check_mark: Stable        |
+| `6.x`     | :warning: Retiring on 2023-09-30 |
 | `5.x`     | :warning: Retiring on 2022-10-31 |
 | `4.x`     | :x: Retired                      |
 | `3.x`     | :x: Retired                      |
@@ -183,7 +183,7 @@ const oktaAuth = new OktaAuth({
 })
 ```
 
-However, if you're using a bundler like [Webpack](https://webpack.github.io/), [Rollup](https://rollupjs.org/), or [Vite](https://vitejs.dev/) you can simply import or require the module.
+However, if you're using a bundler like [Webpack](https://webpack.github.io/) or [Rollup](https://rollupjs.org/) you can simply import or require the module.
 
 ```javascript
 // ES module
@@ -296,7 +296,7 @@ var authClient = new OktaAuth(config);
 
 #### PKCE OAuth 2.0 flow
 
-The PKCE OAuth flow will be used by default. This library supports PKCE for both browser and NodeJS applications. PKCE is widely supported by most modern browsers when running on an HTTPS connection. PKCE requires that the browser implements `crypto.subtle` (also known as `webcrypto`). [Most modern browsers provide this](https://caniuse.com/#feat=cryptography) when running in a secure context (on an HTTPS connection). PKCE also requires the [TextEncoder](https://caniuse.com/#feat=textencoder) object. This is available on all major browsers except IE Edge. In this case, we recommend using a polyfill/shim such as [text-encoding](https://www.npmjs.com/package/text-encoding).
+The PKCE OAuth flow will be used by default. This library supports PKCE for both browser and NodeJS applications. PKCE is widely supported by most modern browsers when running on an HTTPS connection. PKCE requires that the browser implements `crypto.subtle` (also known as `webcrypto`). [Most modern browsers provide this](https://caniuse.com/#feat=cryptography) when running in a secure context (on an HTTPS connection). PKCE also requires the [TextEncoder](https://caniuse.com/#feat=textencoder) object. This is [available on all major browsers except IE 11 and Edge < v79](https://caniuse.com/textencoder). To add support, we recommend using a polyfill/shim such as [text-encoding](https://www.npmjs.com/package/text-encoding).
 
 If the user's browser does not support PKCE, an exception will be thrown. You can test if a browser supports PKCE before construction with this static method:
 
@@ -384,7 +384,7 @@ Additionally, if using hash routing, we recommend using PKCE and responseMode "q
 #### Handling the callback with path routing (on a dedicated route)
 
 1. Define a [redirectUri](#redirecturi) that maps to a dedicated route in your app
-2. Beefore redirect, save the current route: [setOriginalUri](#setoriginaluriuri)
+2. Before redirect, save the current route: [setOriginalUri](#setoriginaluriuri)
 3. Do the redirect to okta: [token.getWithRedirect](#tokengetwithredirectoptions)
 4. After successful authentication, Okta will redirect back to the configured [redirectUri](#redirecturi), your app should load on the dedicated callback route
 5. On this callback page:
@@ -1920,7 +1920,7 @@ The [CHANGELOG](CHANGELOG.md) contains details for all changes and links to the 
 
 * Requires Node version 14 or higher.
 * If using OIDC redirect flows with an embedded or Okta-hosted [Okta Sign-in Widget](https://github.com/okta/okta-signin-widget) widget version 5.4.0 or greater is required. [#1181](https://github.com/okta/okta-auth-js/pull/1181)
-* Is using direct authentication with the IDX API:
+* If using direct authentication with the IDX API:
   * Server responses with a non-200 status code will not be thrown as exceptions. If a request results in an error response from the server, the `requestDidSucceed` property on the returned `IdxTransaction` will be set to `false`. [#1205](https://github.com/okta/okta-auth-js/pull/1205)
   * `options` field is removed from the `nextStep` property of `IdxTransaction`. [#1271](https://github.com/okta/okta-auth-js/pull/1271)
   * `shoudldProceedWithEmailAuthenticator` option is removed. [#1274](https://github.com/okta/okta-auth-js/pull/1274)
