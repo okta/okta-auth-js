@@ -1,3 +1,4 @@
+import { expectAssignable } from 'tsd';
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -59,7 +60,8 @@ const config: OktaAuthOptions = {
       storageTypes: [
         'localStorage',
         'sessionStorage',
-        'cookie'
+        'cookie',
+        'memory',
       ]
     },
     transaction: {
@@ -74,11 +76,13 @@ const config: OktaAuthOptions = {
     autoRemove: false,
     secure: true,
     expireEarlySeconds: 120,
+    clearPendingRemoveTokens: false
   },
 
   cookies: {
     secure: true,
-    sameSite: 'none'
+    sameSite: 'none',
+    sessionCookie: true,
   },
   devMode: true,
 
@@ -107,6 +111,23 @@ const config2: OktaAuthOptions = {
   },
   responseType: ['id_token'],
 };
+
+const configServerSide: OktaAuthOptions = {
+  clientSecret: 'GHtf9iJdr60A9IYrR0jwGHtf9iJdr60A9IYrR0jw',
+  setLocation: function (_: string) {},
+};
+
+expectAssignable<OktaAuthOptions>(configServerSide);
+
+const servicesConfig: OktaAuthOptions = {
+  services: {
+    autoRenew: true,
+    autoRemove: false,
+    syncStorage: true,
+    syncChannelName: 'tincanphone'
+  }
+};
+expectAssignable<OktaAuthOptions>(servicesConfig);
 
 // OktaAuth
 const authClient = new OktaAuth(config);

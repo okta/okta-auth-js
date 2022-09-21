@@ -11,34 +11,21 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import {
-  AccessToken,
-  IDToken,
-  RefreshToken,
-  AuthState,
-  OktaAuth
-} from '@okta/okta-auth-js';
+import { OktaAuth, ServiceManagerInterface, ServiceInterface } from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
 const authClient = new OktaAuth({});
 
 (async () => {
-  const authStateManager = authClient.authStateManager;
+  // start/stop background services
+  expectType<void>(await authClient.start());
+  expectType<void>(await authClient.stop());
 
-  const handler = (authState: AuthState) => {};
-  authStateManager.subscribe(handler);
-  authStateManager.unsubscribe(handler);
-  authStateManager.unsubscribe();
+  expectType<ServiceManagerInterface>(authClient.serviceManager);
+  expectType<ServiceInterface|undefined>(authClient.serviceManager.getService('serviceName'));
+  expectType<boolean>(authClient.serviceManager.isLeader());
+  expectType<boolean>(authClient.serviceManager.isLeaderRequired());
+  expectType<void>(await authClient.serviceManager.start());
+  expectType<void>(await authClient.serviceManager.stop());
 
-  await authStateManager.updateAuthState();
-
-  const authState = authStateManager.getAuthState()!;
-
-  expectType<AuthState>(authStateManager.getPreviousAuthState()!);
-  expectType<AuthState>(authState);
-  expectType<AccessToken>(authState.accessToken!);
-  expectType<IDToken>(authState.idToken!);
-  expectType<RefreshToken>(authState.refreshToken!);
-  expectType<boolean>(authState.isAuthenticated!);
-  expectType<string>(authState.error!.message);
 })();
