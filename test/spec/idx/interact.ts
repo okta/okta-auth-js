@@ -774,6 +774,50 @@ describe('idx/interact', () => {
       });
     });
 
+    describe('nonce', () => {
+      it('passes `nonce` to /interact', async () => {
+        const { authClient, transactionMeta } = testContext;
+        jest.spyOn(mocked.transactionMeta, 'getSavedTransactionMeta').mockReturnValue(transactionMeta);
+        const res = await interact(authClient, { nonce: 'nonce-upon-a-time' });
+        expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+          url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          args: ({
+            client_id: 'authClient-clientId',
+            scope: 'meta',
+            redirect_uri: 'authClient-redirectUri',
+            code_challenge: 'meta-codeChallenge',
+            code_challenge_method: 'meta-codeChallengeMethod',
+            state: 'meta-state',
+            nonce: 'nonce-upon-a-time'
+          }),
+          withCredentials: true
+        });
+        expect(res).toEqual({
+          'interactionHandle': 'idx-interactionHandle',
+          'meta': {
+            'clientId': 'authClient-clientId',
+            'issuer': 'https://auth-js-test.okta.com',
+            'redirectUri': 'authClient-redirectUri',
+            'codeChallenge': 'meta-codeChallenge',
+            'codeChallengeMethod': 'meta-codeChallengeMethod',
+            'codeVerifier': 'meta-codeVerifier',
+            'interactionHandle': 'idx-interactionHandle',
+            'responseType': 'tp-responseType',
+            'scopes': [
+              'meta',
+            ],
+            'state': 'meta-state',
+            'withCredentials': true,
+            'nonce': 'nonce-upon-a-time',
+          },
+          'state': 'meta-state',
+        });
+      });
+    });
   });
 
   describe('with saved interactionHandle', () => {
