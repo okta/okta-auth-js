@@ -36,7 +36,8 @@ const idTokenExample = {
   idToken: 'TOKEN_JWT',
   claims: { /* token claims */ } as UserClaims,
   issuer: 'https://{yourOktaDomain}',
-  clientId: 'NPSfOkH5eZrTy8PMDlvx'
+  clientId: 'NPSfOkH5eZrTy8PMDlvx',
+  pendingRemove: true,
 };
 expectAssignable<IDToken>(idTokenExample);
 
@@ -47,7 +48,8 @@ const accessTokenExample = {
   accessToken: 'TOKEN_JWT',
   claims: { /* token claims */ } as UserClaims,
   tokenType: 'aud',
-  userinfoUrl: 'https://some.com/userinfo'
+  userinfoUrl: 'https://some.com/userinfo',
+  pendingRemove: true,
 };
 expectAssignable<AccessToken>(accessTokenExample);
 
@@ -57,7 +59,8 @@ const refreshTokenExample = {
   authorizeUrl: 'https://{yourOktaDomain}/oauth2/v1/authorize',
   refreshToken: 'TOKEN_JWT',
   tokenUrl: 'https://some.com/token',
-  issuer: 'https://{yourOktaDomain}'
+  issuer: 'https://{yourOktaDomain}',
+  pendingRemove: false,
 };
 expectAssignable<RefreshToken>(refreshTokenExample);
 

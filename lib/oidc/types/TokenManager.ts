@@ -64,7 +64,8 @@ export interface TokenManagerInterface {
   add(key: any, token: Token): void;
   updateRefreshToken(token: RefreshToken);
   removeRefreshToken(): void;
-  
+  clearPendingRemoveTokens(): void;
+
   getOptions(): TokenManagerOptions;
   getStorage(): StorageProvider;
 
