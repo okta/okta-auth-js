@@ -817,7 +817,7 @@ describe('idx/interact', () => {
           'state': 'meta-state',
         });
       });
-    })
+    });
   });
 
   describe('with saved interactionHandle', () => {
