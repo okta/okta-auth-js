@@ -32,6 +32,7 @@ import { htmlString, toQueryString, makeClickHandler } from './util';
 import { showConfigForm } from './form';
 import { tokensHTML } from './tokens';
 import { renderWidget } from './widget';
+import { cibaHTML, backChannelAuthenticationRequest } from './ciba';
 
 function homeLink(app: TestApp): string {
   return `<a id="return-home" href="${app.originalUrl}">Return Home</a>`;
@@ -167,6 +168,8 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     testConcurrentGetToken: testApp.testConcurrentGetToken.bind(testApp),
     testConcurrentLogin: testApp.testConcurrentLogin.bind(testApp),
     testConcurrentLoginViaTokenRenewFailure: testApp.testConcurrentLoginViaTokenRenewFailure.bind(testApp),
+    startCiba: testApp.startCiba.bind(testApp),
+    backChannelAuthenticationRequest: backChannelAuthenticationRequest.bind(testApp),
     subscribeToAuthState: testApp.subscribeToAuthState.bind(testApp),
     subscribeToTokenEvents: testApp.subscribeToTokenEvents.bind(testApp),
     simulateCrossTabTokenRenew: testApp.simulateCrossTabTokenRenew.bind(testApp),
@@ -880,6 +883,10 @@ class TestApp {
     }
   }
 
+  startCiba(): void {
+    document.getElementById('ciba').innerHTML = cibaHTML();
+  }
+
   configHTML(): string {
     const config = htmlString(this.config);
     return `
@@ -935,6 +942,9 @@ class TestApp {
                 <li class="pure-menu-item">
                   <a id="cross-tab-token-renew" onclick="simulateCrossTabTokenRenew(event)" class="pure-menu-link">Simulate cross-tab token renew</a>
                 </li>
+                <li class="pure-menu-item">
+                  <a id="start-ciba" onclick="startCiba(event)" class="pure-menu-link">CIBA</a>
+                </li>
                 ${protectedLink(this)}
               </ul>
             </div>
@@ -942,6 +952,7 @@ class TestApp {
           </div>
           <div class="right-column">
             <div id="user-info"></div>
+            <div id="ciba"></div>
             ${ tokensHTML({idToken, accessToken, refreshToken})}
           </div>
         </div>
