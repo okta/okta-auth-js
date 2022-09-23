@@ -34,6 +34,7 @@ export async function backChannelAuthenticationRequest() {
     }
   );
   // request not working, seems has issue with `Access-Control-Allow-Origin` header from server side
+  // JIRA for customerFed team: https://oktainc.atlassian.net/browse/OKTA-535163
   console.log('ciba resp', resp);
   const responseElem = document.querySelector('#ciba .response');
   responseElem.innerHTML = htmlString(resp);
