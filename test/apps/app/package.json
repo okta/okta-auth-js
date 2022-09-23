@@ -29,7 +29,10 @@
     "webpack": "^5.60.0",
     "webpack-cli": "^4.10.0",
     "webpack-dev-middleware": "^3.7.2",
-    "webpack-dev-server": "^4.9.2"
+    "webpack-dev-server": "^4.9.2",
+    "node-fetch": "2.6.1",
+    "njwt": "^1.2.0",
+    "rasha": "^1.2.5"
   },
   "devDependencies": {
     "@types/js-cookie": "^2.2.6",

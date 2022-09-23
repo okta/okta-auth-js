@@ -25,10 +25,23 @@
         <hr/>
         <a id="widget-link" href="/login">Use Sign-In Widget</a>
       </div>
+      <div id="form-ciba" class="box">
+        <strong>CIBA</strong>
+        <hr/>
+        <form method="POST" action="/ciba/bc-authorize">
+          <input id="config" type="hidden" name="config"/>
+          <label for="login_hint">Login Hint:</label><input name="login_hint" id="login_hint" placeholder="login_hint" type="text"/><br/>
+          <input id="submitBtn" type="submit"/>
+        </form>
+        <hr/>
+      </div>
       <div id="results">
         <div class="box">
           <span>Issuer:</span>&nbsp;
           <strong id="issuer"></strong>
+          <br/>
+          <span>ClientId:</span>&nbsp;
+          <strong id="clientId"></strong>
           <br/>
           <span>useInteractionCodeFlow:</span>&nbsp;
           <strong id="useInteractionCodeFlow"></strong>
@@ -42,6 +55,10 @@
           <div id="sessionToken" style="color: green"></div>
         </div>
         <div class="box">
+          <strong>Back channel authentication response</strong><br/>
+          <div id="bcResponse"></div>
+        </div>
+        <div class="box">
           <strong>Error</strong><br/>
           <div id="error" style="color: red"></div>
         </div>
@@ -51,7 +68,7 @@
       var query = new URL(window.location.href).searchParams;
       // config
       var config = window.getConfig();
-      document.getElementById('config').value = JSON.stringify(config);
+      document.querySelectorAll('[name="config"]').forEach(elem => elem.value = JSON.stringify(config));
 
       // form elements
       ['username', 'password'].forEach(function(param) {
@@ -60,7 +77,15 @@
         document.getElementById(param).value = value;
       });
       // display elements
-      ['issuer', 'useInteractionCodeFlow', 'status', 'sessionToken', 'error'].forEach(function(param) {
+      [
+        'issuer', 
+        'clientId', 
+        'useInteractionCodeFlow', 
+        'status', 
+        'sessionToken',
+        'bcResponse',
+        'error'
+      ].forEach(function(param) {
         var value = query.get(param);
         if (!value) return;
         document.getElementById(param).innerText = value;
