@@ -8,7 +8,9 @@
 
 ## Plan
 
-- [ ] move emitter to TokenManger
+- [x] move emitter to TokenManger
+  * mark top level emitter as deprecated
+  * create new instance in tokenManager
   * non breaking change
 - [ ] combine AuthStateManager & ServiceManager into TokenManager
   * we can keep the top level instance to avoid breaking change in current version
@@ -19,4 +21,6 @@
   * non-breaking change
 - [ ] add doc to explain how to use TokenManager in isolated mode
 - [ ] move TokenManager from oidc module to core, and remove direct use of tokenManager from oidc - tree shaking wise
+  * breaking change
+- [ ] remove named exports of `AuthStateManager`
   * breaking change

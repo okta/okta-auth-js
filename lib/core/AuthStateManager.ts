@@ -69,7 +69,7 @@ export class AuthStateManager
   _transformQueue: PromiseQueue;
 
   constructor(sdk: OktaAuthOAuthInterface<M, S, O>) {
-    if (!sdk.emitter) {
+    if (!sdk.tokenManager.emitter) {
       throw new AuthSdkError('Emitter should be initialized before AuthStateManager');
     }
 
@@ -129,7 +129,7 @@ export class AuthStateManager
       this._prevAuthState = this._authState;
       this._authState = authState;
       // emit new authState object
-      this._sdk.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
+      this._sdk.tokenManager.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
       devMode && log('emitted');
     };
 
@@ -214,10 +214,10 @@ export class AuthStateManager
   }
 
   subscribe(handler): void {
-    this._sdk.emitter.on(EVENT_AUTH_STATE_CHANGE, handler);
+    this._sdk.tokenManager.emitter.on(EVENT_AUTH_STATE_CHANGE, handler);
   }
 
   unsubscribe(handler?): void {
-    this._sdk.emitter.off(EVENT_AUTH_STATE_CHANGE, handler);
+    this._sdk.tokenManager.emitter.off(EVENT_AUTH_STATE_CHANGE, handler);
   }
 }

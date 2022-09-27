@@ -43,6 +43,7 @@ export interface OktaAuthOptionsConstructor<O extends OktaAuthBaseOptions = Okta
 // a "base" instance of AuthJS
 export interface OktaAuthBaseInterface<O extends OktaAuthBaseOptions = OktaAuthBaseOptions> {
   options: O;
+  /** @deprecated */
   emitter: EventEmitter;
   features: FeaturesAPI;
 }

@@ -2,6 +2,7 @@
 import { StorageProvider } from '../../storage/types';
 import { TokenManagerOptions } from './options';
 import { AccessToken, IDToken, RefreshToken, Token, Tokens, TokenType } from './Token';
+import { EventEmitter } from '../../base/types';
 
 export interface TokenManagerError {
   errorSummary: string;
@@ -32,6 +33,8 @@ export declare type TokenManagerAnyEvent = typeof EVENT_RENEWED | typeof EVENT_E
 
 // only add methods needed internally
 export interface TokenManagerInterface {
+  emitter: EventEmitter;
+
   on(event: typeof EVENT_RENEWED, handler: TokenManagerRenewEventHandler, context?: object): void;
   on(event: typeof EVENT_ERROR, handler: TokenManagerErrorEventHandler, context?: object): void;
   on(event: typeof EVENT_SET_STORAGE, handler: TokenManagerSetStorageEventHandler, context?: object): void;

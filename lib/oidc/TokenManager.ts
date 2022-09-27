@@ -46,6 +46,12 @@ import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from '../constants';
 import { EventEmitter } from '../base/types';
 import { StorageOptions, StorageProvider, StorageType } from '../storage/types';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore 
+// Do not use this type in code, so it won't be emitted in the declaration output
+import Emitter from 'tiny-emitter';
+
+
 const DEFAULT_OPTIONS = {
   // TODO: remove in next major version - OKTA-473815
   autoRenew: true,
@@ -69,9 +75,10 @@ function defaultState(): TokenManagerState {
   };
 }
 export class TokenManager implements TokenManagerInterface {
+  emitter: EventEmitter;
+  
   private sdk: OktaAuthOAuthInterface;
   private clock: SdkClock;
-  private emitter: EventEmitter;
   private storage: StorageProvider;
   private state: TokenManagerState;
   private options: TokenManagerOptions;
@@ -105,7 +112,7 @@ export class TokenManager implements TokenManagerInterface {
   // eslint-disable-next-line complexity
   constructor(sdk: OktaAuthOAuthInterface, options: TokenManagerOptions = {}) {
     this.sdk = sdk;
-    this.emitter = (sdk as any).emitter;
+    this.emitter = new Emitter();
     if (!this.emitter) {
       throw new AuthSdkError('Emitter should be initialized before TokenManager');
     }

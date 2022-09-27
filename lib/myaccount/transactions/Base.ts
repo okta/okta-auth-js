@@ -11,7 +11,7 @@ type TransactionOptions = {
   accessToken: string;
 };
 export default class BaseTransaction {
-  // Deprecated
+  /** @deprecated */
   headers?: Record<string, string>;
 
   constructor(oktaAuth: OktaAuthHttpInterface, options: TransactionOptions) {
