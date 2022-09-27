@@ -12,8 +12,12 @@
 
 
 import { AuthSdkError } from '../errors';
-import { ServiceInterface, ServiceManagerOptions } from '../core/types';
-import { EVENT_EXPIRED, TokenManagerInterface } from '../oidc/types';
+import { 
+  ServiceInterface, 
+  ServiceManagerOptions,
+  EVENT_EXPIRED, 
+  TokenManagerInterface,
+ } from '../core/types';
 import { isBrowser } from '../features';
 
 export class AutoRenewService implements ServiceInterface {

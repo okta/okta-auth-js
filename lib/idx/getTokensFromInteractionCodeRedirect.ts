@@ -14,12 +14,12 @@
 import { AuthSdkError, OAuthError } from '../errors';
 import { IdxTransactionMeta } from './types/meta';
 import { OktaAuthIdxInterface } from './types';
+import { Tokens } from '../oidc/types';
 
-// TODO: remove this function, use idx.getTokensFromInteractionCodeRedirect instead
-export async function handleInteractionCodeRedirect(
+export async function getTokensFromInteractionCodeRedirect(
   authClient: OktaAuthIdxInterface, 
   url: string
-): Promise<void> {
+): Promise<Tokens> {
   const meta = authClient.transactionManager.load() as IdxTransactionMeta;
   if (!meta) {
     throw new AuthSdkError('No transaction data was found in storage');
@@ -50,8 +50,6 @@ export async function handleInteractionCodeRedirect(
     throw new AuthSdkError('Unable to parse interaction_code from the url');
   }
   
-  // Save tokens to storage
   const { tokens } = await authClient.token.exchangeCodeForTokens({ interactionCode, codeVerifier });
-  // @ts-ignore
-  authClient.tokenManager.setTokens(tokens);
+  return tokens
 }

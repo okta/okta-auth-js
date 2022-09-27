@@ -17,7 +17,6 @@ export * from './options';
 export * from './proto';
 export * from './storage';
 export * from './Token';
-export * from './TokenManager';
 export * from './Transaction';
 export * from './TransactionManager';
 export * from './UserClaims';

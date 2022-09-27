@@ -39,6 +39,8 @@ export async function renewTokensWithRefresh(
     // Support rotating refresh tokens
     const { refreshToken } = tokens;
     if (refreshToken && !isSameRefreshToken(refreshToken, refreshTokenObject)) {
+      // TODO: remove tokenManager dependency
+      // @ts-ignore
       sdk.tokenManager.updateRefreshToken(refreshToken);
     }
 
@@ -47,6 +49,8 @@ export async function renewTokensWithRefresh(
   catch (err) {
     if (isRefreshTokenInvalidError(err)) {
       // if the refresh token is invalid, remove it from storage
+      // TODO: remove tokenManager dependency
+      // @ts-ignore
       sdk.tokenManager.removeRefreshToken();
     }
     throw err;

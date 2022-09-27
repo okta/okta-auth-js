@@ -16,19 +16,12 @@ import { validateToken  } from '../oidc/util';
 import { isLocalhost, isIE11OrLess } from '../features';
 import SdkClock from '../clock';
 import {
-  Token, 
-  Tokens, 
-  TokenType, 
   TokenManagerOptions, 
-  isIDToken, 
-  isAccessToken,
-  isRefreshToken,
   TokenManagerErrorEventHandler,
   TokenManagerSetStorageEventHandler,
   TokenManagerRenewEventHandler,
   TokenManagerEventHandler,
   TokenManagerInterface,
-  RefreshToken,
   AccessTokenCallback,
   IDTokenCallback,
   RefreshTokenCallback,
@@ -40,8 +33,17 @@ import {
   EVENT_SET_STORAGE,
   TokenManagerAnyEventHandler,
   TokenManagerAnyEvent,
-  OktaAuthOAuthInterface
 } from './types';
+import {  
+  Token, 
+  Tokens, 
+  TokenType, 
+  isIDToken, 
+  isAccessToken,
+  isRefreshToken,
+  RefreshToken,
+  OktaAuthOAuthInterface,
+} from '../oidc/types';
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from '../constants';
 import { EventEmitter } from '../base/types';
 import { StorageOptions, StorageProvider, StorageType } from '../storage/types';

@@ -38,6 +38,8 @@ export async function renewToken(sdk: OktaAuthOAuthInterface, token: Token): Pro
     throwInvalidTokenError();
   }
 
+  // TODO: remove tokenManager dependency
+  // @ts-ignore
   let tokens = sdk.tokenManager.getTokensSync();
   if (tokens.refreshToken) {
     tokens = await renewTokensWithRefresh(sdk, {

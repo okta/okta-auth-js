@@ -15,7 +15,6 @@ import { OAuthTransactionMeta, PKCETransactionMeta } from './meta';
 import { CustomUrls, OktaAuthOAuthOptions, SigninWithRedirectOptions, TokenParams } from './options';
 import { OAuthStorageManagerInterface } from './storage';
 import { AccessToken, IDToken, RefreshToken, RevocableToken, Token, Tokens } from './Token';
-import { TokenManagerInterface } from './TokenManager';
 import { CustomUserClaims, UserClaims } from './UserClaims';
 import { TransactionManagerInterface } from './TransactionManager';
 import { OktaAuthSessionInterface } from '../../session/types';
@@ -95,9 +94,6 @@ export interface PkceAPI {
   computeChallenge(str: string): PromiseLike<any>;
 }
 
-export interface IsAuthenticatedOptions {
-  onExpiredToken?: 'renew' | 'remove' | 'none';
-}
 
 export interface SignoutRedirectUrlOptions {
   postLogoutRedirectUri?: string;
@@ -130,22 +126,10 @@ export interface OktaAuthOAuthInterface
   OriginalUriApi
 {
   token: TokenAPI;
-  tokenManager: TokenManagerInterface;
   pkce: PkceAPI;
   transactionManager: TM;
   
   isPKCE(): boolean;
-  getIdToken(): string | undefined;
-  getAccessToken(): string | undefined;
-  getRefreshToken(): string | undefined;
-
-  isAuthenticated(options?: IsAuthenticatedOptions): Promise<boolean>;
-  signOut(opts?: SignoutOptions): Promise<void>;
   isLoginRedirect(): boolean;
-  storeTokensFromRedirect(): Promise<void>;
-  getUser<T extends CustomUserClaims = CustomUserClaims>(): Promise<UserClaims<T>>;
   signInWithRedirect(opts?: SigninWithRedirectOptions): Promise<void>;
-  
-  revokeAccessToken(accessToken?: AccessToken): Promise<unknown>;
-  revokeRefreshToken(refreshToken?: RefreshToken): Promise<unknown>;
 }

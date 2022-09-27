@@ -5,3 +5,4 @@ export * from './mixin';
 export * from './storage';
 export * from './types';
 export * from './ServiceManager';
+export * from './TokenManager';

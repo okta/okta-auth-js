@@ -54,17 +54,6 @@ export interface TokenParams extends CustomUrls {
   popupTitle?: string;
 }
 
-export interface TokenManagerOptions {
-  autoRenew?: boolean;
-  autoRemove?: boolean;
-  clearPendingRemoveTokens?: boolean;
-  secure?: boolean;
-  storage?: string | SimpleStorage;
-  storageKey?: string;
-  expireEarlySeconds?: number;
-  syncStorage?: boolean;
-}
-
 export interface SigninWithRedirectOptions extends TokenParams {
   originalUri?: string;
 }
@@ -87,7 +76,6 @@ export interface OktaAuthOAuthOptions extends
   >
 {
   ignoreLifetime?: boolean;
-  tokenManager?: TokenManagerOptions;
   postLogoutRedirectUri?: string;
   maxClockSkew?: number;
   restoreOriginalUri?: (oktaAuth: OktaAuthOAuthInterface, originalUri?: string) => Promise<void>;

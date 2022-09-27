@@ -16,7 +16,6 @@ export * from './storage';
 export * from './endpoints';
 export * from './options';
 export * from './types';
-export * from './TokenManager';
 export * from './TransactionManager';
 export * from './util';
 

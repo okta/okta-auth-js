@@ -21,6 +21,7 @@ import {
   parseEmailVerifyCallback
 } from '../emailVerify';
 import { handleInteractionCodeRedirect } from '../handleInteractionCodeRedirect';
+import { getTokensFromInteractionCodeRedirect } from '../getTokensFromInteractionCodeRedirect';
 import { makeIdxState } from '../idxState';
 import { interact } from '../interact';
 import { introspect } from '../introspect';
@@ -58,7 +59,9 @@ export function createIdxAPI(sdk: OktaAuthIdxInterface): IdxAPI {
     recoverPassword: recoverPassword.bind(null, sdk),
 
     // oauth redirect callback
+    /** @deprecated */
     handleInteractionCodeRedirect: handleInteractionCodeRedirect.bind(null, sdk),
+    getTokensFromInteractionCodeRedirect: getTokensFromInteractionCodeRedirect.bind(null, sdk),
 
     // interaction required callback
     isInteractionRequired: isInteractionRequired.bind(null, sdk),

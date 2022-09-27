@@ -1,8 +1,18 @@
 /* eslint-disable max-len */
-import { StorageProvider } from '../../storage/types';
-import { TokenManagerOptions } from './options';
-import { AccessToken, IDToken, RefreshToken, Token, Tokens, TokenType } from './Token';
+import { StorageProvider, SimpleStorage } from '../../storage/types';
+import { AccessToken, IDToken, RefreshToken, Token, Tokens, TokenType } from '../../oidc/types/Token';
 import { EventEmitter } from '../../base/types';
+
+export interface TokenManagerOptions {
+  autoRenew?: boolean;
+  autoRemove?: boolean;
+  clearPendingRemoveTokens?: boolean;
+  secure?: boolean;
+  storage?: string | SimpleStorage;
+  storageKey?: string;
+  expireEarlySeconds?: number;
+  syncStorage?: boolean;
+}
 
 export interface TokenManagerError {
   errorSummary: string;
@@ -74,4 +84,8 @@ export interface TokenManagerInterface {
 
   start();
   stop();
+}
+
+export interface IsAuthenticatedOptions {
+  onExpiredToken?: 'renew' | 'remove' | 'none';
 }

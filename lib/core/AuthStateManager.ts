@@ -16,16 +16,16 @@
 import PCancelable from 'p-cancelable';
 import { AuthSdkError } from '../errors';
 import {
-  EVENT_ADDED,
-  EVENT_REMOVED,
   OAuthStorageManagerInterface,
   OAuthTransactionMeta,
-  OktaAuthOAuthInterface
 } from '../oidc';
 import {
   AuthState,
   AuthStateLogOptions,
   OktaAuthCoreOptions,
+  EVENT_ADDED,
+  EVENT_REMOVED,
+  OktaAuthCoreInterface,
 } from './types';
 import { PromiseQueue, getConsole } from '../util';
 
@@ -58,7 +58,7 @@ export class AuthStateManager
   O extends OktaAuthCoreOptions
 >
 {
-  _sdk: OktaAuthOAuthInterface<M, S, O>;
+  _sdk: OktaAuthCoreInterface<M, S, O>;
   _pending: { 
     updateAuthStatePromise: any;
     canceledTimes: number; 
@@ -68,7 +68,7 @@ export class AuthStateManager
   _logOptions: AuthStateLogOptions;
   _transformQueue: PromiseQueue;
 
-  constructor(sdk: OktaAuthOAuthInterface<M, S, O>) {
+  constructor(sdk: OktaAuthCoreInterface<M, S, O>) {
     if (!sdk.tokenManager.emitter) {
       throw new AuthSdkError('Emitter should be initialized before AuthStateManager');
     }

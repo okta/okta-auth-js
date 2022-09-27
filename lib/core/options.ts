@@ -11,7 +11,13 @@
  */
 
 import { createOAuthOptionsConstructor } from '../oidc';
-import { AuthState, OktaAuthCoreInterface, OktaAuthCoreOptions, ServiceManagerOptions } from './types';
+import { 
+  AuthState, 
+  OktaAuthCoreInterface, 
+  OktaAuthCoreOptions, 
+  ServiceManagerOptions,
+  TokenManagerOptions,
+} from './types';
 
 
 export function createCoreOptionsConstructor()
@@ -21,11 +27,13 @@ export function createCoreOptionsConstructor()
     extends OAuthOptionsConstructor
     implements Required<OktaAuthCoreOptions>
   {
+    tokenManager: TokenManagerOptions;
     services: ServiceManagerOptions;
     transformAuthState: (oktaAuth: OktaAuthCoreInterface, authState: AuthState) => Promise<AuthState>;
 
     constructor(options: any) {
       super(options);
+      this.tokenManager = options.tokenManager;
       this.services = options.services;
       this.transformAuthState = options.transformAuthState;
     }

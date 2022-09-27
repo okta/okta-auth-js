@@ -13,12 +13,15 @@
 import { BroadcastChannel } from 'broadcast-channel';
 import { isBrowser } from '../features';
 import {
-  ServiceManagerOptions, ServiceInterface
+  ServiceManagerOptions, 
+  ServiceInterface,
+  EVENT_ADDED, 
+  EVENT_REMOVED, 
+  EVENT_RENEWED, 
+  EVENT_SET_STORAGE, 
+  TokenManagerInterface,
 } from '../core/types';
-import {
-  Token, Tokens, 
-  EVENT_ADDED, EVENT_REMOVED, EVENT_RENEWED, EVENT_SET_STORAGE, TokenManagerInterface
-} from '../oidc/types';
+import { Token, Tokens } from '../oidc/types';
 import { AuthSdkError } from '../errors';
 
 export type SyncMessage = {

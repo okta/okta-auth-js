@@ -20,7 +20,6 @@ import {
   OktaAuthOAuthInterface,
   OktaAuthOAuthOptions,
   SetLocationFunction,
-  TokenManagerOptions,
   TransactionManagerOptions
 } from '../types';
 import { enableSharedStorage } from './node';
@@ -81,7 +80,6 @@ export function createOAuthOptionsConstructor() {
     codeChallengeMethod: string;
 
     // Additional options
-    tokenManager: TokenManagerOptions;
     postLogoutRedirectUri: string;
     restoreOriginalUri: (oktaAuth: OktaAuthOAuthInterface, originalUri?: string) => Promise<void>;
     transactionManager: TransactionManagerOptions;
@@ -123,7 +121,6 @@ export function createOAuthOptionsConstructor() {
       this.codeChallenge = options.codeChallenge;
       this.codeChallengeMethod = options.codeChallengeMethod;
 
-      this.tokenManager = options.tokenManager;
       this.postLogoutRedirectUri = options.postLogoutRedirectUri;
       this.restoreOriginalUri = options.restoreOriginalUri;
       this.transactionManager = { enableSharedStorage, ...options.transactionManager };

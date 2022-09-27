@@ -22,9 +22,11 @@ export async function getUserInfo<T extends CustomUserClaims = CustomUserClaims>
 ): Promise<UserClaims<T>> {
   // If token objects were not passed, attempt to read from the TokenManager
   if (!accessTokenObject) {
+    // TODO: remove tokenManager dependency
     accessTokenObject = (await sdk.tokenManager.getTokens()).accessToken as AccessToken;
   }
   if (!idTokenObject) {
+    // TODO: remove tokenManager dependency
     idTokenObject = (await sdk.tokenManager.getTokens()).idToken as IDToken;
   }
 
