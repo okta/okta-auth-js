@@ -24,6 +24,7 @@ import {
 export interface OktaAuthCoreOptions extends OktaAuthOAuthOptions
 {
   tokenManager?: TokenManagerOptions;
+  /** @deprecated */
   services?: ServiceManagerOptions;
   // eslint-disable-next-line no-use-before-define
   transformAuthState?: (oktaAuth: OktaAuthCoreInterface, authState: AuthState) => Promise<AuthState>;
@@ -43,7 +44,9 @@ export interface OktaAuthCoreInterface<
 extends OktaAuthOAuthInterface<M, S, O, TM>
 {
   tokenManager: TokenManagerInterface;
+  /** @deprecated */
   serviceManager: ServiceManagerInterface;
+  /** @deprecated */
   authStateManager: AuthStateManagerInterface;
   start(): Promise<void>;
   stop(): Promise<void>;

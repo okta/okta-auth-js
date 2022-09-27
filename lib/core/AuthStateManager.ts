@@ -26,6 +26,7 @@ import {
   EVENT_ADDED,
   EVENT_REMOVED,
   OktaAuthCoreInterface,
+  TokenManagerInterface,
 } from './types';
 import { PromiseQueue, getConsole } from '../util';
 
@@ -67,13 +68,16 @@ export class AuthStateManager
   _prevAuthState: AuthState | null;
   _logOptions: AuthStateLogOptions;
   _transformQueue: PromiseQueue;
+  
+  private tokenManager: TokenManagerInterface;
 
-  constructor(sdk: OktaAuthCoreInterface<M, S, O>) {
+  constructor(sdk: OktaAuthCoreInterface<M, S, O>, tokenManager: TokenManagerInterface) {
     if (!sdk.tokenManager.emitter) {
       throw new AuthSdkError('Emitter should be initialized before AuthStateManager');
     }
 
     this._sdk = sdk;
+    this.tokenManager = tokenManager;
     this._pending = { ...DEFAULT_PENDING };
     this._authState = INITIAL_AUTH_STATE;
     this._logOptions = {};
@@ -85,11 +89,11 @@ export class AuthStateManager
     // Listen on tokenManager events to start updateState process
     // "added" event is emitted in both add and renew process
     // Only listen on "added" event to update auth state
-    sdk.tokenManager.on(EVENT_ADDED, (key, token) => {
+    this.tokenManager.on(EVENT_ADDED, (key, token) => {
       this._setLogOptions({ event: EVENT_ADDED, key, token });
       this.updateAuthState();
     });
-    sdk.tokenManager.on(EVENT_REMOVED, (key, token) => {
+    this.tokenManager.on(EVENT_REMOVED, (key, token) => {
       this._setLogOptions({ event: EVENT_REMOVED, key, token });
       this.updateAuthState();
     });
@@ -129,7 +133,7 @@ export class AuthStateManager
       this._prevAuthState = this._authState;
       this._authState = authState;
       // emit new authState object
-      this._sdk.tokenManager.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
+      this.tokenManager.emitter.emit(EVENT_AUTH_STATE_CHANGE, { ...authState });
       devMode && log('emitted');
     };
 
@@ -183,7 +187,7 @@ export class AuthStateManager
             return;
           }
 
-          const { accessToken, idToken, refreshToken } = this._sdk.tokenManager.getTokensSync();
+          const { accessToken, idToken, refreshToken } = this.tokenManager.getTokensSync();
           const authState = {
             accessToken,
             idToken,
@@ -214,10 +218,10 @@ export class AuthStateManager
   }
 
   subscribe(handler): void {
-    this._sdk.tokenManager.emitter.on(EVENT_AUTH_STATE_CHANGE, handler);
+    this.tokenManager.emitter.on(EVENT_AUTH_STATE_CHANGE, handler);
   }
 
   unsubscribe(handler?): void {
-    this._sdk.tokenManager.emitter.off(EVENT_AUTH_STATE_CHANGE, handler);
+    this.tokenManager.emitter.off(EVENT_AUTH_STATE_CHANGE, handler);
   }
 }

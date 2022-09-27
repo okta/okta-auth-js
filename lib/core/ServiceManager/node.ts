@@ -21,7 +21,8 @@ import {
   ServiceInterface,
   ServiceManagerOptions,
   OktaAuthCoreInterface,
-  OktaAuthCoreOptions
+  OktaAuthCoreOptions,
+  TokenManagerInterface
 } from '../types';
 
 export class ServiceManager
@@ -33,10 +34,12 @@ export class ServiceManager
 implements ServiceManagerInterface 
 {
   private sdk: OktaAuthCoreInterface<M, S, O>;
+  private tokenManager: TokenManagerInterface;
   private options: ServiceManagerOptions;
 
-  constructor(sdk: OktaAuthCoreInterface<M, S, O>, options: ServiceManagerOptions = {}) {
+  constructor(sdk: OktaAuthCoreInterface<M, S, O>, tokenManager: TokenManagerInterface, options: ServiceManagerOptions = {}) {
     this.sdk = sdk;
+    this.tokenManager = tokenManager;
     this.options = options;
   }
 

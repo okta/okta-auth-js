@@ -47,13 +47,16 @@ export function mixinCore
       super(...args);
 
       // TokenManager
-      this.tokenManager = new TokenManager(this, this.options.tokenManager);
+      this.tokenManager = new TokenManager(this, {
+        services: this.options.services,
+        ...this.options.tokenManager,
+      });
 
       // AuthStateManager
-      this.authStateManager = new AuthStateManager<M, S, O>(this);
+      this.authStateManager = this.tokenManager.authStateManager as AuthStateManager<M, S, O>;
 
       // ServiceManager
-      this.serviceManager = new ServiceManager<M, S, O>(this, this.options.services);
+      this.serviceManager = this.tokenManager.serviceManager as ServiceManager<M, S, O>;
     }
 
     async start() {

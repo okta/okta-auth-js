@@ -21,7 +21,8 @@ import {
   ServiceInterface,
   ServiceManagerOptions,
   OktaAuthCoreInterface,
-  OktaAuthCoreOptions
+  OktaAuthCoreOptions,
+  TokenManagerInterface
 } from '../types';
 import { AutoRenewService, SyncStorageService, LeaderElectionService } from '../../services';
 import { removeNils } from '../../util';
@@ -39,6 +40,7 @@ export class ServiceManager
 implements ServiceManagerInterface 
 {
   private sdk: OktaAuthCoreInterface<M, S, O>;
+  private tokenManager: TokenManagerInterface;
   private options: ServiceManagerOptions;
   private services: Map<string, ServiceInterface>;
   private started: boolean;
@@ -51,12 +53,13 @@ implements ServiceManagerInterface
     syncStorage: true
   };
 
-  constructor(sdk: OktaAuthCoreInterface<M, S, O>, options: ServiceManagerOptions = {}) {
+  constructor(sdk: OktaAuthCoreInterface<M, S, O>, tokenManager: TokenManagerInterface, options: ServiceManagerOptions = {}) {
     this.sdk = sdk;
+    this.tokenManager = tokenManager;
     this.onLeader = this.onLeader.bind(this);
 
     // TODO: backwards compatibility, remove in next major version - OKTA-473815
-    const { autoRenew, autoRemove, syncStorage } = sdk.tokenManager.getOptions();
+    const { autoRenew, autoRemove, syncStorage } = tokenManager.getOptions();
     options.electionChannelName = options.electionChannelName || options.broadcastChannelName;
     this.options = Object.assign({}, 
       ServiceManager.defaultOptions,
@@ -138,18 +141,16 @@ implements ServiceManagerInterface
   }
 
   private createService(name: string): ServiceInterface {
-    const tokenManager = this.sdk.tokenManager;
-
     let service: ServiceInterface;
     switch (name) {
       case LEADER_ELECTION:
         service = new LeaderElectionService({...this.options, onLeader: this.onLeader});
         break;
       case AUTO_RENEW:
-        service = new AutoRenewService(tokenManager, {...this.options});
+        service = new AutoRenewService(this.tokenManager, {...this.options});
         break;
       case SYNC_STORAGE:
-        service = new SyncStorageService(tokenManager, {...this.options});
+        service = new SyncStorageService(this.tokenManager, {...this.options});
         break;
       default:
         throw new Error(`Unknown service ${name}`);

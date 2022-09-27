@@ -15,7 +15,7 @@
   * create new instance in tokenManager
 - [x] move TokenManager from oidc module to core
 - [x] move top level methods from oidc mixin to core mixin
-- [ ] combine AuthStateManager & ServiceManager into TokenManager
+- [x] combine AuthStateManager & ServiceManager into TokenManager
   * we can keep the top level instance to avoid breaking change in current version
   * add deprecate tag and remove in the next major version
 - [ ] add top level public method `setTokenManager` to update the only one instance of tokenManager in authjs instance, so all top level wrapper methods can still work

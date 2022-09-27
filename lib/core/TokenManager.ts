@@ -33,6 +33,9 @@ import {
   EVENT_SET_STORAGE,
   TokenManagerAnyEventHandler,
   TokenManagerAnyEvent,
+  ServiceManagerInterface,
+  AuthStateManagerInterface,
+  OktaAuthCoreInterface,
 } from './types';
 import {  
   Token, 
@@ -42,11 +45,12 @@ import {
   isAccessToken,
   isRefreshToken,
   RefreshToken,
-  OktaAuthOAuthInterface,
 } from '../oidc/types';
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from '../constants';
 import { EventEmitter } from '../base/types';
 import { StorageOptions, StorageProvider, StorageType } from '../storage/types';
+import { ServiceManager } from './ServiceManager';
+import { AuthStateManager } from './AuthStateManager';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore 
@@ -78,8 +82,10 @@ function defaultState(): TokenManagerState {
 }
 export class TokenManager implements TokenManagerInterface {
   emitter: EventEmitter;
-  
-  private sdk: OktaAuthOAuthInterface;
+  serviceManager: ServiceManagerInterface;
+  authStateManager: AuthStateManagerInterface;
+
+  private sdk: OktaAuthCoreInterface;
   private clock: SdkClock;
   private storage: StorageProvider;
   private state: TokenManagerState;
@@ -112,7 +118,7 @@ export class TokenManager implements TokenManagerInterface {
   }
 
   // eslint-disable-next-line complexity
-  constructor(sdk: OktaAuthOAuthInterface, options: TokenManagerOptions = {}) {
+  constructor(sdk: OktaAuthCoreInterface, options: TokenManagerOptions = {}) {
     this.sdk = sdk;
     this.emitter = new Emitter();
     if (!this.emitter) {
@@ -140,6 +146,12 @@ export class TokenManager implements TokenManagerInterface {
     this.storage = sdk.storageManager.getTokenStorage({...storageOptions, useSeparateCookies: true});
     this.clock = SdkClock.create(/* sdk, options */);
     this.state = defaultState();
+
+    // AuthStateManager
+    this.authStateManager = new AuthStateManager(sdk, this);
+
+    // ServiceManager
+    this.serviceManager = new ServiceManager(sdk, this, this.options.services);
   }
 
   start() {
