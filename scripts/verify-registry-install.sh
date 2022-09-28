@@ -62,7 +62,7 @@ yarn init -y
 # add empty lock file, so this dir can be a isolated project
 touch yarn.lock
 
-if ! yarn add ${published_tarball}; then
+if ! yarn add @okta/okta-auth-js@${published_tarball}; then
   echo "yarn-v3 install @okta/okta-auth-js@${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
