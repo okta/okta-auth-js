@@ -30,14 +30,15 @@ artifact_version="$(ci-pkginfo -t pkgname)-$(ci-pkginfo -t pkgsemver)"
 published_tarball=${REGISTRY}/@okta/okta-auth-js/-/${artifact_version}.tgz
 
 # verify npm install
-mkdir npm-installation-test
-pushd npm-installation-test
+mkdir npm-test
+pushd npm-test
 npm init -y
 
 if ! npm i ${published_tarball}; then
   echo "npm install ${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
+echo "Done with npm installation test"
 popd
 
 # verify yarn classic install
@@ -49,22 +50,7 @@ if ! yarn add ${published_tarball}; then
   echo "yarn-classic install ${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
-popd
-
-# verify yarn classic install
-mkdir yarn-classic-test
-pushd yarn-classic-test
-yarn init -y
-
-if ! yarn; then
-  echo "install failed! Exiting..."
-  exit ${FAILED_SETUP}
-fi
-
-if ! yarn add ${published_tarball}; then
-  echo "install ${published_tarball} failed! Exiting..."
-  exit ${FAILED_SETUP}
-fi
+echo "Done with yarn classic installation test"
 popd
 
 # verify yarn v3 install
@@ -78,6 +64,7 @@ if ! yarn add ${published_tarball}; then
   echo "yarn-v3 install ${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
+echo "Done with yarn v3 installation test"
 popd
 
 exit $SUCCESS
