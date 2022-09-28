@@ -5,7 +5,7 @@
 # Install required node version
 export REGISTRY="https://artifacts.aue1d.saasure.com/artifactory/npm-topic"
 
-cd ${OKTA_HOME}/${REPO}
+cd ${OKTA_HOME}
 
 NODE_VERSION="${1:-v14.18.0}"
 setup_service node $NODE_VERSION
