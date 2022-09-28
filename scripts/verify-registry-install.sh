@@ -63,7 +63,7 @@ yarn init -y
 touch yarn.lock
 
 if ! yarn add ${published_tarball}; then
-  echo "yarn-v3 install ${published_tarball} failed! Exiting..."
+  echo "yarn-v3 install @okta/okta-auth-js@${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
 echo "Done with yarn v3 installation test"
