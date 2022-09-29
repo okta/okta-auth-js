@@ -35,12 +35,6 @@ if ! yarn install --frozen-lockfile --ignore-scripts; then
   exit ${FAILED_SETUP}
 fi
 
-# microtime was not built due to `--ignore-scripts` flag, build it manually
-cd ./node_modules/microtime
-yum install -y python3
-yarn
-cd ../..
-
 # Build
 if ! yarn build; then
   echo "build failed! Exiting..."
