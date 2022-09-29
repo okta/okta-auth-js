@@ -262,7 +262,7 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
       shouldClearTransaction = true;
     } else {
       // only save response if there are actions available (ignore messages)
-      shouldSaveResponse = shouldSaveResponse && hasActions;
+      shouldSaveResponse = shouldSaveResponse || hasActions;
     }
     // leave shared storage intact so the transaction can be continued in another tab
     clearSharedStorage = false;
