@@ -74,6 +74,7 @@ let packageJSON = JSON.parse(fs.readFileSync(`${BUILD_DIR}/package.json`));
 packageJSON.private = false;
 delete packageJSON.scripts.prepare;
 delete packageJSON.workspaces;          // fixes workspace warning
+delete packageJSON.engines.yarn;
 
 function removeBuildDir(val) {
   if (typeof val === 'string') {
