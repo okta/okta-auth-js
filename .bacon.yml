@@ -94,7 +94,7 @@ test_suites:
       criteria: MERGE
       queue_name: small
     - name: verify-registry-install
-      # prereq_test_suite_name: publish
+      prereq_test_suite_name: publish
       script_path: ../okta-auth-js/scripts
       sort_order: '13'
       timeout: '20'
