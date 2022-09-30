@@ -16,7 +16,8 @@ const config = [
       'static.js',
       'tokens.js',
       'transactionStorage.js'
-    ]
+    ],
+    features: ['login.feature']
   },
   {
     name: '@okta/test.app.react-mfa-v1',

@@ -38,18 +38,31 @@ const getTask = (config) => () => {
       if (process.env.RUN_SAUCE_TESTS) {
         wdioConfig = 'sauce.wdio.conf.js';
       }
+      if (process.env.RUN_CUCUMBER_TESTS) {
+        const features = config.features || [];
+        if (!features.length) {
+          return false;
+        }
+        wdioConfig = 'cucumber.wdio.conf.ts';
+      }
 
       let opts = process.argv.slice(2); // pass extra arguments through
       const runnerArgs = ['wdio', 'run', wdioConfig];
-      (config.spec || []).forEach(spec => {
-        runnerArgs.push('--spec');
-        runnerArgs.push(`./specs/${spec}`);
-      });
-      (config.exclude || []).forEach(spec => {
-        runnerArgs.push('--exclude');
-        runnerArgs.push(`./specs/${spec}`);
-      });
-
+      if (process.env.RUN_CUCUMBER_TESTS) {
+        (config.features || []).forEach(feature => {
+          runnerArgs.push('--spec');
+          runnerArgs.push(`./features/${feature}`);
+        });
+      } else {
+        (config.spec || []).forEach(spec => {
+          runnerArgs.push('--spec');
+          runnerArgs.push(`./specs/${spec}`);
+        });
+        (config.exclude || []).forEach(spec => {
+          runnerArgs.push('--exclude');
+          runnerArgs.push(`./specs/${spec}`);
+        });
+      }
       const runner = spawn(
         'yarn',
         runnerArgs.concat(opts),
@@ -80,7 +93,7 @@ const tasks = config
     process.env.TEST_NAME
       ? ({ name }) => name === process.env.TEST_NAME
       : () => true
-  )
+  ).filter(({ features }) => features && features.length)
   .map(config => getTask(config));
 
 // track process returnCode for each task

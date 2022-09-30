@@ -104,6 +104,7 @@
     "test:e2e": "yarn workspace @okta/test.e2e start",
     "test:e2e:tokens": "export REFRESH_TOKEN=true && yarn test:e2e",
     "test:e2e:saucelabs": "export RUN_SAUCE_TESTS=true && yarn test:e2e",
+    "test:e2e:cucumber": "RUN_CUCUMBER_TESTS=true yarn test:e2e",
     "test:browser": "jest --config ./jest.browser.js",
     "test:server": "jest --config ./jest.server.js",
     "test:report": "yarn test --ci --silent || true",
