@@ -31,6 +31,7 @@ export interface OAuthParams {
   grant_type?: string;
   code?: string;
   interaction_code?: string;
+  acr_values?: string;
 }
 
 export interface OAuthResponse {

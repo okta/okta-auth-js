@@ -43,6 +43,7 @@ export function convertTokenParamsToOAuthParams(tokenParams: TokenParams) {
     'response_type': tokenParams.responseType,
     'sessionToken': tokenParams.sessionToken,
     'state': tokenParams.state,
+    'acr_values': tokenParams.acrValues,
   };
   oauthParams = removeNils(oauthParams) as OAuthParams;
 

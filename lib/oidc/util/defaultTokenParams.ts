@@ -25,6 +25,7 @@ export function getDefaultTokenParams(sdk: OktaAuthOAuthInterface): TokenParams 
     responseType,
     responseMode,
     scopes,
+    acrValues,
     state,
     ignoreSignature
   } = sdk.options;
@@ -38,6 +39,7 @@ export function getDefaultTokenParams(sdk: OktaAuthOAuthInterface): TokenParams 
     state: state || generateState(),
     nonce: generateNonce(),
     scopes: scopes || ['openid', 'email'],
+    acrValues,
     ignoreSignature
   });
 }

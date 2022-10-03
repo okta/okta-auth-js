@@ -654,7 +654,8 @@ class TestApp {
     options = Object.assign({}, {
       responseType: this.config.responseType,
       scopes: this.config.defaultScopes ? [] : this.config.scopes,
-      state: this.config.state
+      acrValues: this.config.acrValues,
+      state: this.config.state,
     }, options);
     return this.oktaAuth.token.getWithRedirect(options)
       .catch(e => {
