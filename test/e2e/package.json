@@ -27,5 +27,9 @@
     "cross-spawn-with-kill": "^1.0.0",
     "regenerator-runtime": "^0.13.3",
     "wait-on": "^6.0.1"
+  },
+  "devDependencies": {
+    "@wdio/types": "^7.25.1",
+    "eslint-plugin-cucumber": "^2.0.0"
   }
 }

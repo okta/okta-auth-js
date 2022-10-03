@@ -2726,6 +2726,14 @@
     "@types/node" "^18.0.0"
     got "^11.8.1"
 
+"@wdio/types@^7.25.1":
+  version "7.25.1"
+  resolved "https://registry.yarnpkg.com/@wdio/types/-/types-7.25.1.tgz#9e06f5479bc3c95f78811ba77dd96470417f882a"
+  integrity sha512-9Xt2U0YXYxRW4UvMFwjt+44UkfhwrI1gPhW+y56SubpyKaUfdNGberteboQoR/7Os1SVtJry4FohEZNmFzPK6g==
+  dependencies:
+    "@types/node" "^18.0.0"
+    got "^11.8.1"
+
 "@wdio/utils@7.25.0":
   version "7.25.0"
   resolved "https://registry.yarnpkg.com/@wdio/utils/-/utils-7.25.0.tgz#9b6442ffd9a864d98baa7c54a7237b140dc5fbc4"
@@ -5467,6 +5475,13 @@ eslint-plugin-compat@^3.3.0:
     find-up "^5.0.0"
     lodash.memoize "4.1.2"
     semver "7.3.5"
+
+eslint-plugin-cucumber@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-cucumber/-/eslint-plugin-cucumber-2.0.0.tgz#7b00966a1ae495fa8677bb1c57628e3dbe5e9639"
+  integrity sha512-x5nowfeAiGxmT9WehHUhp3cMqiaVmUf6QalFRiWMPG6Uq6bEDkYNHA+jsHnvF4TBNNaO5zFb+4UMQKU7R50anA==
+  dependencies:
+    lodash "^4.17.15"
 
 eslint-plugin-es@^3.0.0:
   version "3.0.1"

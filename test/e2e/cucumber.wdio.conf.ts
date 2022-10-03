@@ -1,4 +1,4 @@
-import type { Options } from '@wdio/types'
+import type { Options } from '@wdio/types';
 
 const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '105.0.5195.52';
 const drivers = {
@@ -368,4 +368,4 @@ export const config: Options.Testrunner = {
     */
     // onReload: function(oldSessionId, newSessionId) {
     // }
-}
+};
