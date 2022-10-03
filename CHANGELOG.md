@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.0.1
+
+### Fixes
+
+- [#1319](https://github.com/okta/okta-auth-js/pull/1319) IDX: fixes cancel request issue in terminal status
+
 ## 7.0.0
 
 ### Breaking Changes
