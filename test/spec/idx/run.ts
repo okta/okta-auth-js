@@ -618,6 +618,15 @@ describe('idx/run', () => {
         await run(authClient);
         expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
       });
+      it('saves the idxResponse when has actions', async () => {
+        const { idxResponse, authClient } = testContext;
+        idxResponse.actions = {
+          cancel: () => {}
+        };
+        jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+        await run(authClient);
+        expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalled();
+      });
     });
   });
 
