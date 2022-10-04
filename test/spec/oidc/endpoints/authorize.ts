@@ -69,5 +69,15 @@ describe('authorize endpoint', () => {
         }
       })).toBe('?client_id=fakeClientId&code_challenge=fakeCodeChallenge&response_type=id_token%20token&scope=openid%20email&launch=launch');
     });
+
+    it('respects acr_values', () => {
+      expect(buildAuthorizeParams({
+        clientId: 'fakeClientId',
+        codeChallenge: 'fakeCodeChallenge',
+        scopes: ['openid'],
+        responseType: 'code',
+        acrValues: 'urn:okta:loa:1fa:any'
+      })).toBe('?client_id=fakeClientId&code_challenge=fakeCodeChallenge&response_type=code&acr_values=urn%3Aokta%3Aloa%3A1fa%3Aany&scope=openid');
+    });
   });
 });
