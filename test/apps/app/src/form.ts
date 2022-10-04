@@ -143,7 +143,7 @@ export function updateForm(origConfig: Config): void {
   (document.getElementById('f_redirectUri') as HTMLInputElement).value = config.redirectUri;
   (document.getElementById('f_responseType') as HTMLInputElement).value = config.responseType.join(',');
   (document.getElementById('f_scopes') as HTMLInputElement).value = config.scopes.join(',');
-  (document.getElementById('f_acrValues') as HTMLInputElement).value = config.acrValues;
+  (document.getElementById('f_acrValues') as HTMLInputElement).value = config.acrValues || '';
   (document.getElementById('f_postLogoutRedirectUri') as HTMLInputElement).value = config.postLogoutRedirectUri;
   (document.getElementById('f_clientId') as HTMLInputElement).value = config.clientId;
   (document.getElementById('f_clientSecret') as HTMLInputElement).value = config.clientSecret;
