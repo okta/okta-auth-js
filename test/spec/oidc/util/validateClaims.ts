@@ -236,7 +236,7 @@ describe('validateClaims', function () {
     expect(fn).toThrowError('The acr [foo] does not match acr_values [urn:okta:loa:2fa:any:ifpossible]');  
   });
 
-  it('does not throw error on missing acr, because unknown acr_values can be ignored', function() {
+  it('does not throw error on missing acr, if unknown acr_values is provided', function() {
     validationOptions.acrValues = 'foo';
     const claims = {
       iss: validationOptions.issuer,
@@ -246,5 +246,17 @@ describe('validateClaims', function () {
       validateClaims(sdk, claims, validationOptions);
     };
     expect(fn).not.toThrowError();
+  });
+
+  it('does throw an error on missing acr, if supported acr_values is provided', function() {
+    validationOptions.acrValues = 'urn:okta:loa:2fa:any:ifpossible';
+    const claims = {
+      iss: validationOptions.issuer,
+      aud: validationOptions.clientId,
+    } as unknown as UserClaims;
+    var fn = function () {
+      validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).toThrowError('The acr [undefined] does not match acr_values [urn:okta:loa:2fa:any:ifpossible]');  
   });
 });
