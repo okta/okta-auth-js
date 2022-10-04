@@ -1316,6 +1316,7 @@ The following configuration options can be included in `token.getWithoutPrompt`,
 | `display` | The display parameter to be passed to the Social Identity Provider when performing [Social Login][social-login]. |
 | `prompt` | Determines whether the Okta login will be displayed on failure. Use `none` to prevent this behavior. Valid values: `none`, `consent`, `login`, or `consent login`. See [Parameter details](https://developer.okta.com/docs/reference/api/oidc/#parameter-details) for more information. |
 | `maxAge` | Allowable elapsed time, in seconds, since the last time the end user was actively authenticated by Okta. |
+| `acrValues` | Optional parameter to increase the level of user assurance. Values supported: `urn:okta:loa:1fa:pwd`, `urn:okta:loa:1fa:any`, `urn:okta:loa:2fa:any`, `urn:okta:loa:2fa:any:ifpossible`, `phr`, `phrh`. See [Predefined ACR values](https://developer.okta.com/docs/guides/step-up-authentication/main/#predefined-parameter-values) for more information. |
 | `loginHint` | A username to prepopulate if prompting for authentication. |
 
 For more details, see Okta's [Authorize Request API](https://developer.okta.com/docs/api/resources/oidc#request-parameters).
