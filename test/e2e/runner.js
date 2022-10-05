@@ -93,8 +93,11 @@ const tasks = config
     process.env.TEST_NAME
       ? ({ name }) => name === process.env.TEST_NAME
       : () => true
-  ).filter(({ features }) => features && features.length)
-  .map(config => getTask(config));
+  ).filter(
+    process.env.RUN_CUCUMBER_TESTS
+      ? ({ features }) => features && features.length
+      : () => true
+  ).map(config => getTask(config));
 
 // track process returnCode for each task
 const codes = [];
