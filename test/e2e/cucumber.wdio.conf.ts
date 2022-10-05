@@ -1,6 +1,6 @@
 import type { Options } from '@wdio/types';
 
-const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '105.0.5195.52';
+const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '89.0.4389.23';
 const drivers = {
   chrome: { version: CHROMEDRIVER_VERSION }
 };
