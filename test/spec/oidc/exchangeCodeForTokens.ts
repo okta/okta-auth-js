@@ -43,16 +43,19 @@ describe('exchangeCodeForTokens', () => {
     const codeVerifier = 'y';
     const interactionCode = 'b';
     const redirectUri = 'http://localhost';
-    const tokenParams = { authorizationCode, clientId, codeVerifier, interactionCode, redirectUri };
+    const acrValues = 'foo';
+    const getTokenOptions = { authorizationCode, clientId, codeVerifier, interactionCode, redirectUri };
+    const tokenParams = { ...getTokenOptions, acrValues };
     const urls = getOAuthUrls(sdk);
     await exchangeCodeForTokens(sdk, tokenParams);
-    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, tokenParams, urls);
+    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, getTokenOptions, urls);
     expect(handleOAuthResponse).toHaveBeenCalledWith(sdk, {
       clientId,
       ignoreSignature: undefined,
       redirectUri,
       responseType: ['token', 'id_token'],
-      scopes: ['openid', 'email']
+      scopes: ['openid', 'email'],
+      acrValues
     }, oauthResponse, urls);
   });
 

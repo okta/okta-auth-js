@@ -71,6 +71,7 @@ describe('oauthMeta', () => {
       codeVerifier: 'abcd',
       codeChallenge: 'efgh',
       codeChallengeMethod: 'fake',
+      acrValues: 'foo',
     });
 
     const meta = createOAuthMeta(sdk, tokenParams);
@@ -86,6 +87,7 @@ describe('oauthMeta', () => {
       codeVerifier: 'abcd',
       codeChallenge: 'efgh',
       codeChallengeMethod: 'fake',
+      acrValues: 'foo',
     });
   });
 });

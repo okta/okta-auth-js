@@ -42,7 +42,7 @@ export function validateClaims(sdk: OktaAuthOAuthInterface, claims: UserClaims, 
       'does not match [' + aud + ']');
   }
 
-  if (acr && claims.acr && claims.acr !== acr) {
+  if (acr && claims.acr !== acr) {
     throw new AuthSdkError('The acr [' + claims.acr + '] ' +
       'does not match acr_values [' + acr + ']');
   }

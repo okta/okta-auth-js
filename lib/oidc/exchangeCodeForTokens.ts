@@ -32,7 +32,8 @@ export function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenParams: 
     redirectUri,
     scopes,
     ignoreSignature,
-    state
+    state,
+    acrValues
   } = tokenParams;
 
   var getTokenOptions = {
@@ -59,6 +60,7 @@ export function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenParams: 
         scopes,
         responseType,
         ignoreSignature,
+        acrValues
       };
       return handleOAuthResponse(sdk, handleResponseOptions, response, urls!)
         .then((response: TokenResponse) => {

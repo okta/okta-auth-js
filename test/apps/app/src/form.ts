@@ -52,7 +52,16 @@ const Form = `
   <label for="scopes">Scopes (comma separated)</label><input id="f_scopes" name="scopes" type="text" />
   </div>
   <div class="pure-control-group">
-  <label for="acrValues">acr_values (space separated)</label><input id="f_acrValues" name="acrValues" type="text" />
+  <label for="acrValues"><a href="https://developer.okta.com/docs/guides/step-up-authentication/main/">acr_values</a></label>
+  <select id="f_acrValues" name="acrValues">
+    <option value="" selected>None</option>
+    <option value="urn:okta:loa:1fa:pwd">urn:okta:loa:1fa:pwd</option>
+    <option value="urn:okta:loa:1fa:any">urn:okta:loa:1fa:any</option>
+    <option value="urn:okta:loa:2fa:any">urn:okta:loa:2fa:any</option>
+    <option value="urn:okta:loa:2fa:any:ifpossible">urn:okta:loa:2fa:any:ifpossible</option>
+    <option value="phr">phr</option>
+    <option value="phrh">phrh</option>
+  </select>
   </div>
   <div class="pure-control-group">
   <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="f_postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" />
