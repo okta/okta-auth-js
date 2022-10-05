@@ -69,6 +69,17 @@ describe('E2E login', () => {
         await TestApp.logoutRedirect();
       });
 
+      it('can specify acr_values', async () => {
+        const acrValues = 'urn:okta:loa:2fa:any:ifpossible';
+        await bootstrap({ acrValues });
+        await loginRedirect(flow);
+        await TestApp.getUserInfo();
+        await TestApp.assertUserInfo();
+        const idToken = await TestApp.getIdToken();
+        assert(idToken.claims.acr === acrValues);
+        await TestApp.logoutRedirect();
+      });
+
       it('can login using a popup window', async() => {
         await bootstrap();
         await loginPopup();
