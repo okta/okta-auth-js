@@ -90,4 +90,9 @@ describe('getDefaultTokenParams', () => {
   it('`nonce`: generates a default value', () => {
     expect(getDefaultTokenParams({ options: {} } as OktaAuthOAuthInterface).nonce).toBeTruthy();
   });
+  
+  it('`acrValues`: uses value from sdk.options', () => {
+    const sdk = { options: { acrValues: 'foo' } } as OktaAuthOAuthInterface;
+    expect(getDefaultTokenParams(sdk).acrValues).toBe('foo');
+  });
 });
