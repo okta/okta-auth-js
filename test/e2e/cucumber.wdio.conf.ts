@@ -1,9 +1,31 @@
 import type { Options } from '@wdio/types';
+import { WebDriverLogTypes } from '@wdio/types/build/Options';
 
 const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '89.0.4389.23';
+const DEBUG = process.env.DEBUG;
+const CI = process.env.CI;
+const LOG = process.env.LOG as WebDriverLogTypes;
+
+const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
+const logLevel: WebDriverLogTypes = LOG || 'warn';
 const drivers = {
   chrome: { version: CHROMEDRIVER_VERSION }
 };
+const chromeOptions = {
+  args: []
+};
+
+if (CI) {
+  chromeOptions.args = chromeOptions.args.concat([
+      '--headless',
+      '--disable-gpu',
+      '--window-size=1600x1200',
+      '--no-sandbox',
+      '--whitelisted-ips',
+      '--disable-extensions',
+      '--verbose'
+  ]);
+}
 
 export const config: Options.Testrunner = {
     //
@@ -91,7 +113,8 @@ export const config: Options.Testrunner = {
         maxInstances: 5,
         //
         browserName: 'chrome',
-        acceptInsecureCerts: true
+        'goog:chromeOptions': chromeOptions
+
         // If outputDir is provided WebdriverIO can capture driver session logs
         // it is possible to configure which logTypes to include/exclude.
         // excludeDriverLogs: ['*'], // pass '*' to exclude all driver session logs
@@ -104,7 +127,7 @@ export const config: Options.Testrunner = {
     // Define all options that are relevant for the WebdriverIO instance here
     //
     // Level of logging verbosity: trace | debug | info | warn | error | silent
-    logLevel: 'info',
+    logLevel,
     //
     // Set specific log levels per logger
     // loggers:
@@ -199,7 +222,7 @@ export const config: Options.Testrunner = {
         // <string> (expression) only execute the features or scenarios with tags matching the expression
         tagExpression: '',
         // <number> timeout for step definitions
-        timeout: 60000,
+        timeout: defaultTimeoutInterval,
         // <boolean> Enable this config to treat undefined definitions as warnings.
         ignoreUndefinedDefinitions: false
     },
