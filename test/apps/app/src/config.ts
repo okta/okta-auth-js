@@ -85,6 +85,7 @@ export function getConfigFromUrl(): Config {
   const forceRedirect = url.searchParams.get('forceRedirect') === 'true'; // off by default
   const enableSharedStorage = url.searchParams.get('enableSharedStorage') !== 'false'; // on by default
   const syncStorage = url.searchParams.get('syncStorage') !== 'false'; // on by default
+  const acrValues = url.searchParams.get('acrValues') || undefined;
   let crossTabsCount = parseInt(url.searchParams.get('crossTabsCount'));
   if (isNaN(crossTabsCount)) {
     crossTabsCount = DEFAULT_CROSS_TABS_COUNT;
@@ -98,6 +99,7 @@ export function getConfigFromUrl(): Config {
     pkce,
     defaultScopes,
     scopes,
+    acrValues,
     responseType,
     responseMode,
     postLogoutRedirectUri,

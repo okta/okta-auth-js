@@ -6,6 +6,7 @@
 [localStorage]: https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
 [sessionStorage]: https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage
 [cookie]: https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
+[early-access]: https://developer.okta.com/docs/reference/releases-at-okta/#early-access-ea
 
 [<img src="https://www.okta.com/sites/default/files/Dev_Logo-01_Large-thumbnail.png" align="right" width="256px"/>](https://devforum.okta.com/)
 
@@ -1316,6 +1317,7 @@ The following configuration options can be included in `token.getWithoutPrompt`,
 | `display` | The display parameter to be passed to the Social Identity Provider when performing [Social Login][social-login]. |
 | `prompt` | Determines whether the Okta login will be displayed on failure. Use `none` to prevent this behavior. Valid values: `none`, `consent`, `login`, or `consent login`. See [Parameter details](https://developer.okta.com/docs/reference/api/oidc/#parameter-details) for more information. |
 | `maxAge` | Allowable elapsed time, in seconds, since the last time the end user was actively authenticated by Okta. |
+| `acrValues` | [[EA][early-access]] Optional parameter to increase the level of user assurance. See [Predefined ACR values](https://developer.okta.com/docs/guides/step-up-authentication/main/#predefined-parameter-values) for more information. |
 | `loginHint` | A username to prepopulate if prompting for authentication. |
 
 For more details, see Okta's [Authorize Request API](https://developer.okta.com/docs/api/resources/oidc#request-parameters).

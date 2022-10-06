@@ -17,9 +17,10 @@ import AuthSdkError from '../../errors/AuthSdkError';
 import { OktaAuthOAuthInterface, TokenVerifyParams, UserClaims } from '../../oidc/types';
 
 export function validateClaims(sdk: OktaAuthOAuthInterface, claims: UserClaims, validationParams: TokenVerifyParams) {
-  var aud = validationParams.clientId;
-  var iss = validationParams.issuer;
-  var nonce = validationParams.nonce;
+  const aud = validationParams.clientId;
+  const iss = validationParams.issuer;
+  const nonce = validationParams.nonce;
+  const acr = validationParams.acrValues;
 
   if (!claims || !iss || !aud) {
     throw new AuthSdkError('The jwt, iss, and aud arguments are all required');
@@ -29,7 +30,7 @@ export function validateClaims(sdk: OktaAuthOAuthInterface, claims: UserClaims, 
     throw new AuthSdkError('OAuth flow response nonce doesn\'t match request nonce');
   }
 
-  var now = Math.floor(Date.now()/1000);
+  const now = Math.floor(Date.now()/1000);
 
   if (claims.iss !== iss) {
     throw new AuthSdkError('The issuer [' + claims.iss + '] ' +
@@ -39,6 +40,11 @@ export function validateClaims(sdk: OktaAuthOAuthInterface, claims: UserClaims, 
   if (claims.aud !== aud) {
     throw new AuthSdkError('The audience [' + claims.aud + '] ' +
       'does not match [' + aud + ']');
+  }
+
+  if (acr && claims.acr !== acr) {
+    throw new AuthSdkError('The acr [' + claims.acr + '] ' +
+      'does not match acr_values [' + acr + ']');
   }
 
   if (claims.iat! > claims.exp!) {

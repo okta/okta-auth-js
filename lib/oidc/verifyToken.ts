@@ -26,14 +26,14 @@ export async function verifyToken(sdk: OktaAuthOAuthInterface, token: IDToken, v
   }
 
   // Decode the Jwt object (may throw)
-  var jwt = decodeToken(token.idToken);
+  const jwt = decodeToken(token.idToken);
 
   // The configured issuer may point to a frontend proxy.
   // Get the "real" issuer from .well-known/openid-configuration
   const configuredIssuer = validationParams?.issuer || sdk.options.issuer;
   const { issuer } = await getWellKnown(sdk, configuredIssuer);
 
-  var validationOptions: TokenVerifyParams = Object.assign({
+  const validationOptions: TokenVerifyParams = Object.assign({
     // base options, can be overridden by params
     clientId: sdk.options.clientId,
     ignoreSignature: sdk.options.ignoreSignature
