@@ -1,0 +1,24 @@
+{
+  "plugins": [
+      "cucumber"
+  ],
+  "rules": {
+    "cucumber/async-then": 2,
+    "cucumber/expression-type": 0,
+    "cucumber/no-restricted-tags": [2, "wip", "broken", "foo"],
+    "cucumber/no-arrow-functions": 2,
+    "new-cap": 0,
+    "@typescript-eslint/no-unused-vars": [
+      2, {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "no-unused-vars": [
+      2, {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ]
+}
+}
