@@ -5,7 +5,7 @@ const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
 
-const BUILD_DIR = path.resolve(__dirname, '..', 'build');
+const BUILD_DIR = path.resolve(__dirname, '../..', 'build');
 const BUNDLE_LIB_CMD = 'yarn build:web';
 const BUNDLE_CDN_CMD = 'yarn build:cdn';
 const BUNDLE_POLYFILL_CMD = 'yarn build:polyfill';

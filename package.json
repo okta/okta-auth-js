@@ -89,7 +89,7 @@
     "./polyfill/index.js"
   ],
   "scripts": {
-    "banners": "node ./scripts/maintain-banners.js",
+    "banners": "node ./scripts/buildtools/maintain-banners.js",
     "clean": "yarn clean:build",
     "clean:build": "rimraf build && rimraf build2",
     "clean:esm": "rimraf build/esm",
@@ -114,7 +114,7 @@
     "test:bundle:esm:node": "cross-env BUNDLE_ENV=node NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.esm.mjs",
     "test:bundle:cjs": "cross-env BUNDLE_ENV=node jest --config ./jest.cjs.js",
     "test:types": "yarn workspace @okta/test.types test",
-    "build": "node scripts/build.js",
+    "build": "node scripts/buildtools/build.js",
     "build:cdn": "cross-env NODE_ENV=production webpack --config webpack.cdn.config.js",
     "build:web": "cross-env NODE_ENV=production webpack --config webpack.config.js",
     "build:cjs": "cross-env babel lib -d build/cjs --config-file ./babel.cjs.js --extensions \".ts\",\".js\" --source-maps",
