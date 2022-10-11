@@ -36,6 +36,8 @@ type InsufficientAuthenticationError = {
   error_description: string;
   // eslint-disable-next-line camelcase
   max_age: string;
+  // eslint-disable-next-line camelcase
+  acr_values: string;
 }
 
 const parseInsufficientAuthenticationError = (
@@ -93,7 +95,9 @@ export async function sendRequest<T extends BaseTransaction> (
         // eslint-disable-next-line camelcase
         error_description,
         // eslint-disable-next-line camelcase
-        max_age 
+        max_age,
+        // eslint-disable-next-line camelcase
+        acr_values 
       } = parseInsufficientAuthenticationError(errorResp?.headers?.['www-authenticate']);
       if (error === 'insufficient_authentication_context') {
         const insufficientAuthenticationError = new AuthApiError(
@@ -103,8 +107,12 @@ export async function sendRequest<T extends BaseTransaction> (
             errorCauses: [{ errorSummary: error_description }]
           }, 
           errorResp, 
-          // eslint-disable-next-line camelcase
-          { max_age: +max_age }
+          {
+            // eslint-disable-next-line camelcase
+            max_age: +max_age,
+            // eslint-disable-next-line camelcase
+            ...(acr_values && { acr_values })
+          }
         );
         throw insufficientAuthenticationError;
       } else {
