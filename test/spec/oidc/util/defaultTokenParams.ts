@@ -95,4 +95,9 @@ describe('getDefaultTokenParams', () => {
     const sdk = { options: { acrValues: 'foo' } } as OktaAuthOAuthInterface;
     expect(getDefaultTokenParams(sdk).acrValues).toBe('foo');
   });
+  
+  it('`maxAge`: uses value from sdk.options', () => {
+    const sdk = { options: { maxAge: 900 } } as OktaAuthOAuthInterface;
+    expect(getDefaultTokenParams(sdk).maxAge).toBe(900);
+  });
 });

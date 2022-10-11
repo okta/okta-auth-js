@@ -26,6 +26,7 @@ export function getDefaultTokenParams(sdk: OktaAuthOAuthInterface): TokenParams 
     responseMode,
     scopes,
     acrValues,
+    maxAge,
     state,
     ignoreSignature
   } = sdk.options;
@@ -40,6 +41,7 @@ export function getDefaultTokenParams(sdk: OktaAuthOAuthInterface): TokenParams 
     nonce: generateNonce(),
     scopes: scopes || ['openid', 'email'],
     acrValues,
+    maxAge,
     ignoreSignature
   });
 }
