@@ -1,7 +1,7 @@
 import type { Options } from '@wdio/types';
 import { WebDriverLogTypes } from '@wdio/types/build/Options';
 
-const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '89.0.4389.23';
+const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '106.0.5249.61';
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
 const LOG = process.env.LOG as WebDriverLogTypes;

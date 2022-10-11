@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 source $(dirname "${BASH_SOURCE[0]}")/../setup-e2e.sh
 
