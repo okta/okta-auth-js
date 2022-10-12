@@ -64,7 +64,7 @@ setup_sample_tests () {
     get_vault_secret_key devex/trex-js-idx-sdk-vars trex_client_secret CLIENT_SECRET
     get_vault_secret_key devex/trex-js-idx-sdk-vars trex_idx_sdk_org_api_key OKTA_API_KEY
   else
-    if [ -n "${USE_OK_14}"]; then
+    if [ -n "$USE_OK_14" ]; then
       echo "Running tests against production (ok14) org"
       export CLIENT_ID=0oax3dcx0sak1KKb9696
       export ISSUER=https://javascript-idx-sdk-new.okta.com
