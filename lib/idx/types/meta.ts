@@ -21,5 +21,6 @@ export interface IdxTransactionMeta extends PKCETransactionMeta {
   activationToken?: string;
   recoveryToken?: string;
   maxAge?: string | number;
+  acrValues?: string;
 }
 

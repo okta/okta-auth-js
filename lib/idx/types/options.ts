@@ -51,6 +51,7 @@ export interface InteractOptions extends IdxOptions {
   recoveryToken?: string;
   clientSecret?: string;
   maxAge?: string | number;
+  acrValues?: string;
   nonce?: string;
 }
 
