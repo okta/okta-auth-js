@@ -18,6 +18,7 @@ require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 const createProxyMiddleware = require('./proxyMiddleware');
 const loginMiddleware = require('./loginMiddleware');
 const callbackMiddleware = require('./callbackMiddleware');
+const { cibaClientAuthMiddleware } = require('./ciba');
 const renderWidget = require('./renderWidget');
 
 const path = require('path');
@@ -52,6 +53,9 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/login', loginMiddleware);
 app.get('/login', renderWidget);
 app.get('/authorization-code/callback', callbackMiddleware);
+
+// CIBA
+app.post('/ciba/client-auth', cibaClientAuthMiddleware);
 
 const port = config.devServer.port;
 app.listen(port, function () {

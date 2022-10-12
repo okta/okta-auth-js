@@ -88,6 +88,7 @@ export function createOAuthOptionsConstructor() {
 
     // For server-side web applications ONLY!
     clientSecret: string;
+    privateKey: string;
     setLocation: SetLocationFunction;
 
     // Workaround for bad client time/clock
@@ -129,6 +130,7 @@ export function createOAuthOptionsConstructor() {
       this.transactionManager = { enableSharedStorage, ...options.transactionManager };
       
       this.clientSecret = options.clientSecret;
+      this.privateKey = options.privateKey;
       this.setLocation = options.setLocation;
       
       // As some end user's devices can have their date 
