@@ -1,7 +1,6 @@
 #!/bin/bash
 
-DIR=$(dirname "${BASH_SOURCE[0]}")
-
+DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 source $DIR/setup.sh
 
 # setup for e2e tests
@@ -33,7 +32,7 @@ run_e2e () {
     exit ${TEST_FAILURE}
   fi
 
-  if [ -z "${RUN_CUCUMBER}" ]; then
+  if [ -n "${RUN_CUCUMBER}" ]; then
     if ! yarn test:e2e:cucumber; then
       echo "Cucumber tests failed! Exiting..."
       exit ${TEST_FAILURE}
@@ -45,8 +44,53 @@ run_e2e () {
   exit ${PUBLISH_TYPE_AND_RESULT_DIR}
 }
 
-
-
 setup_sample_tests () {
-  echo 'foo'
+  export DBUS_SESSION_BUS_ADDRESS=/dev/null
+  export TEST_SUITE_TYPE="junit"
+  export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
+
+  export USERNAME=mary@acme.com
+  get_secret prod/okta-sdk-vars/password PASSWORD
+
+  export ORG_OIE_ENABLED=true
+  get_vault_secret_key devex/auth-js-sdk-vars a18n_api_key A18N_API_KEY
+
+  # If this script is run as a bacon task, run against trexcloud environment
+  if [[ "${BACON_TASK}" == true ]]; then
+    echo "Running tests against trexcloud org"
+    export ISSUER=https://javascript-idx-sdk.trexcloud.com
+    export CLIENT_ID=0oa3r1keeeFFb7VMG0g7
+    export SPA_CLIENT_ID=0oa3r92jj01DWBeWC0g7
+    get_vault_secret_key devex/trex-js-idx-sdk-vars trex_client_secret CLIENT_SECRET
+    get_vault_secret_key devex/trex-js-idx-sdk-vars trex_idx_sdk_org_api_key OKTA_API_KEY
+  else
+    if [ -n "${USE_OK_14}"]; then
+      echo "Running tests against production (ok14) org"
+      export CLIENT_ID=0oax3dcx0sak1KKb9696
+      export ISSUER=https://javascript-idx-sdk-new.okta.com
+      export ISSUER_IDFIRST=https://javascript-idx-sdk-idfirst.okta.com
+      get_vault_secret_key devex/prod-js-idx-sdk-vars prod_client_secret_new CLIENT_SECRET
+      get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_sdk_org_api_key_new OKTA_API_KEY
+      get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_idfirst_sdk_org_api_key OKTA_API_KEY_IDFIRST
+    else
+      echo "Running tests against production (ok12) org"
+      export ISSUER=https://javascript-idx-sdk.okta.com
+      export CLIENT_ID=0oav2oxnlYjULp0Cy5d6
+      export SPA_CLIENT_ID=0oa17suj5x9khaVH75d7
+      get_vault_secret_key devex/prod-js-idx-sdk-vars prod_client_secret CLIENT_SECRET
+      get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_sdk_org_api_key OKTA_API_KEY
+    fi
+  fi
+}
+
+run_sample_tests () {
+  # Run the tests
+  if ! yarn test:samples; then
+    echo "tests failed! Exiting..."
+    exit ${TEST_FAILURE}
+  fi
+
+  echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
+  echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
+  exit ${PUBLISH_TYPE_AND_RESULT_DIR}
 }

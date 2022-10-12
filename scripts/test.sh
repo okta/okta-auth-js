@@ -23,8 +23,3 @@
 # echo $(pwd)
 
 export SUCCESS=0
-
-foo () {
-	echo 'foo'
-	exit ${SUCCESS}
-}

@@ -39,13 +39,13 @@ else
   # bacon commands
   get_secret () {
     if [ -z "$(echo "$2")" ]; then
-      echo "$2 is not defined. Exitting..."
+      echo "$2 is not defined. Exiting..."
       exit 1
     fi
   }
 
   get_vault_secret_key () {
-    get_secret $2 $4
+    get_secret $1 $3
   }
 
   junit () {

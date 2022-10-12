@@ -100,7 +100,6 @@
     "validate": "yarn tsc --noEmit && yarn lint && yarn workspace @okta/test.app validate && yarn test:types",
     "test": "yarn test:unit && yarn test:samples && yarn test:e2e",
     "test:unit": "yarn test:server && yarn test:browser",
-    "posttest:e2e": "yarn stop",
     "test:e2e": "yarn workspace @okta/test.e2e start",
     "test:e2e:tokens": "export REFRESH_TOKEN=true && yarn test:e2e",
     "test:e2e:saucelabs": "export RUN_SAUCE_TESTS=true && yarn test:e2e",
@@ -126,7 +125,6 @@
     "dev:samples": "yarn workspace @okta/samples dev",
     "prepare": "yarn build",
     "start": "yarn workspace @okta/test.app start --open",
-    "stop": "kill -s TERM $(lsof -t -i:8080 -sTCP:LISTEN) || true",
     "verify:package": "node scripts/verify-package.js"
   },
   "author": "Okta",
