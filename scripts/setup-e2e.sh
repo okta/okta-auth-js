@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export RUN_BUILD="1"
 DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 source $DIR/setup.sh
 
@@ -13,6 +14,9 @@ if [ -n "${TEST_SUITE_ID}" ]; then
 else
 # if running locally
   . $DIR/../testenv
+
+  # TODO: remove this after https://oktainc.atlassian.net/browse/OKTA-541393
+  export CI=true
 fi
 
 setup_e2e () {
