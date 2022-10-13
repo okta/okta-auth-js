@@ -98,10 +98,7 @@ if [ ! -z "$WIDGET_VERSION" ]; then
   echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"
 fi
 
-# not all CI operations require a built version, like unit tests or linting
-if [ -n "$RUN_BUILD" ]; then
-  if ! yarn build; then
-    echo "build failed! Exiting..."
-    exit ${TEST_FAILURE}
-  fi
+if ! yarn build; then
+  echo "build failed! Exiting..."
+  exit ${TEST_FAILURE}
 fi

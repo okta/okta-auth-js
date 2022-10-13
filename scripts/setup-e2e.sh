@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export RUN_BUILD="1"
 DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 source $DIR/setup.sh
 
@@ -17,6 +16,8 @@ else
 
   # TODO: remove this after https://oktainc.atlassian.net/browse/OKTA-541393
   export CI=true
+
+  # move testenv while tests are running?
 fi
 
 setup_e2e () {
