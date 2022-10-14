@@ -35,7 +35,7 @@ export async function authenticateCibaClient(sdk, options) {
     throw new AuthSdkError('A clientSecret or privateKey must be specified in the OktaAuth constructor to authenticate CIBA client');
   }
 
-  if (!options.scopes || options.scopes!.indexOf('openid') === -1) {
+  if (options.scopes!.indexOf('openid') === -1) {
     throw new AuthSdkError('openid scope must be specified in the scopes argument to authenticate CIBA client');
   }
 
