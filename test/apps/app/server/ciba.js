@@ -18,7 +18,10 @@ async function cibaClientAuthMiddleware(req, res) {
     redirectUri,
     privateKey,
   });
-  const { headers, ...restResp } = await authenticateCibaClient(authClient, {
+  const { 
+    headers, // eslint-disable-line
+    ...restResp 
+  } = await authenticateCibaClient(authClient, {
     loginHint,
   });
 

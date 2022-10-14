@@ -96,7 +96,23 @@ export interface OktaAuthOAuthOptions extends
 
   // For server-side web applications ONLY!
   clientSecret?: string;
+  privateKey?: string;
   setLocation?: SetLocationFunction;
 }
 
 export type OktaAuthOauthOptionsConstructor = OktaAuthOptionsConstructor<OktaAuthOAuthOptions>;
+
+export interface CibaAuthOptions extends 
+  Pick<OktaAuthOAuthOptions, 
+    'clientId' | 
+    'clientSecret' |
+    'privateKey' |
+    'scopes'
+  > 
+{
+  loginHint?: string;
+  idTokenHint?: string;
+  acrValues?: string;
+  bindingMessage?: string;
+  requestExpiry?: number;
+}

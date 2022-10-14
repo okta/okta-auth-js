@@ -31,6 +31,12 @@ export interface TokenResponse {
   code?: string;
 }
 
+export interface CibaAuthResponse {
+  auth_req_id: string;
+  expires_in: number;
+  interval?: number;
+}
+
 export interface ParseFromUrlOptions {
   url?: string;
   responseMode?: string;

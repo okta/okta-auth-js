@@ -214,6 +214,6 @@ describe('authenticateCibaClient', () => {
     // query string should only include allowed options
     expect(params.has('invalid_option')).toBeFalsy();
     expect(params.has('invalidOption')).toBeFalsy();
-  })
+  });
 
 });

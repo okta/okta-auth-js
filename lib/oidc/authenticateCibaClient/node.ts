@@ -10,15 +10,20 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { makeJwt } from '../crypto/jwt';
-import { getOAuthBaseUrl } from './util/oauth';
-import { httpRequest } from '../http';
-import { AuthSdkError } from '../errors';
-import { removeNils, toQueryString } from '../util';
+/* eslint complexity:[0,8] */
+import { makeJwt } from '../../crypto/jwt';
+import { getOAuthBaseUrl } from '../util/oauth';
+import { httpRequest } from '../../http';
+import { AuthSdkError } from '../../errors';
+import { removeNils, toQueryString } from '../../util';
+import { OktaAuthOAuthInterface, CibaAuthOptions, CibaAuthResponse } from '../types';
 
 const CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
 
-export async function authenticateCibaClient(sdk, options) {
+export async function authenticateCibaClient(
+  sdk: OktaAuthOAuthInterface, 
+  options: CibaAuthOptions
+): Promise<CibaAuthResponse> {
   options = {
     clientId: sdk.options.clientId,
     clientSecret: sdk.options.clientSecret,
@@ -28,25 +33,36 @@ export async function authenticateCibaClient(sdk, options) {
   };
 
   if (!options.clientId) {
-    throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to authenticate CIBA client');
+    throw new AuthSdkError(
+      'A clientId must be specified in the OktaAuth constructor to authenticate CIBA client'
+    );
   }
   
   if (!options.clientSecret && !options.privateKey) {
-    throw new AuthSdkError('A clientSecret or privateKey must be specified in the OktaAuth constructor to authenticate CIBA client');
+    throw new AuthSdkError(
+      'A clientSecret or privateKey must be specified in the OktaAuth constructor to authenticate CIBA client'
+    );
   }
 
   if (options.scopes!.indexOf('openid') === -1) {
-    throw new AuthSdkError('openid scope must be specified in the scopes argument to authenticate CIBA client');
+    throw new AuthSdkError(
+      'openid scope must be specified in the scopes argument to authenticate CIBA client'
+    );
   }
 
   if (!options.loginHint && !options.idTokenHint) {
-    throw new AuthSdkError('A loginHint or idTokenHint must be specified in the function options to authenticate CIBA client');
+    throw new AuthSdkError(
+      'A loginHint or idTokenHint must be specified in the function options to authenticate CIBA client'
+    );
   }
 
   const baseUrl = getOAuthBaseUrl(sdk);
   const bcAuthorizeUrl = `${baseUrl}/v1/bc/authorize`;
 
-  const { privateKey, ...params } = options;
+  const { privateKey, ...params } = options as CibaAuthOptions & {
+    clientAssertionType?: string;
+    clientAssertion?: string;
+  };
   if (privateKey) {
     const jwt = await makeJwt({
       privateKey,
@@ -60,6 +76,7 @@ export async function authenticateCibaClient(sdk, options) {
   const headers = {
     'Content-Type': 'application/x-www-form-urlencoded'
   };
+  /* eslint-disable camelcase */
   const args = toQueryString(removeNils({
     // client authentication params
     client_id: params.clientId,
@@ -68,13 +85,14 @@ export async function authenticateCibaClient(sdk, options) {
     client_secret: params.clientSecret,
     
     // ciba params
-    scope: params.scopes.join(' '),
+    scope: params.scopes!.join(' '),
     acr_values: params.acrValues,
     login_hint: params.loginHint,
     id_token_hint: params.idTokenHint,
     binding_message: params.bindingMessage,
     request_expiry: params.requestExpiry,
   })).slice(1);
+  /* eslint-enable camelcase */
 
   return httpRequest(sdk, {
     url: bcAuthorizeUrl,
