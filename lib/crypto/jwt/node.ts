@@ -10,8 +10,9 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-const nJwt = require('njwt');
-const Rasha = require('rasha');
+import * as nJwt from 'njwt';
+import Rasha from 'rasha';
+
 const DEFAULT_ALG = 'RS256';
 
 function getPemAndJwk(privateKey) {

@@ -205,6 +205,7 @@
     "jasmine-ajax": "^4.0.0",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
+    "jest-date-mock": "^1.0.8",
     "jest-jasmine2": "^28.1.0",
     "jest-junit": "^13.0.0",
     "jest-runner": "^28.1.0",
