@@ -12,6 +12,8 @@ get_secret prod/okta-sdk-vars/password PASSWORD
 
 # This client has refresh token enabled
 export CLIENT_ID=0oa8lrg7ojTsbJgRQ696
+export WEB_CLIENT_ID=0oa8ls36zUZj7oFJ2696
+export WEB_PRIVATE_KEY_CLIENT_ID=0oa2pea6upKkLmWn1697
 
 if ! yarn test:integration; then
   echo "integration failed! Exiting..."
