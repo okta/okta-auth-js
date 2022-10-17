@@ -9,6 +9,9 @@ export CI=true
 export ISSUER=https://oie-signin-widget.okta.com
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
+get_vault_secret_key devex/okta-signin-widget web_client_secret CLIENT_SECRET
+get_vault_secret_key devex/okta-signin-widget web_private_key_jwk JWK
+get_vault_secret_key devex/okta-signin-widget web_private_key_pem PEM
 
 # This client has refresh token enabled
 export CLIENT_ID=0oa8lrg7ojTsbJgRQ696
