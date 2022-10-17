@@ -9,7 +9,7 @@ setup_sample_tests
 export SAMPLE_NAME=@okta/samples.express-embedded-auth-with-sdk
 export MAX_INSTANCES=2
 
-# NOTE: the command belong evaluates to the same PASSWORD retrieved in setup-e2e, leaving commented just in case
+# NOTE: the command below evaluates to the same PASSWORD retrieved in setup-e2e, leaving commented just in case
 # get_vault_secret_key devex/prod-js-idx-sdk-vars password PASSWORD
 
 run_sample_tests

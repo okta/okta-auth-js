@@ -68,13 +68,10 @@ artifactory_install () {
 
   ssl=$(npm config get strict-ssl)
   npm config set strict-ssl false
-  cp package.json package.json.bak
   if ! yarn add -DW --force --ignore-scripts ${REGISTRY}/okta-signin-widget-${WIDGET_VERSION}.tgz ; then
     echo "WIDGET_VERSION could not be installed via artifactory: ${WIDGET_VERSION}"
-    mv package.json.bak package.json
     exit ${FAILED_SETUP}
   fi
-  mv package.json.bak package.json
   npm config set strict-ssl $ssl
 }
 
@@ -85,16 +82,52 @@ npm_install () {
   fi
 }
 
+verify_workspace_versions () {
+  PKG=$1
+
+  onError () {
+    echo "ADDITIONAL WIDGET INSTALL DETECTED (check $1)"
+    yarn why $PKG
+    exit ${FAILED_SETUP}
+  }
+
+  AUTHJS_INSTALLS=$(find . -type d -path "*/node_modules/$PKG" | wc -l)
+  if [ $AUTHJS_INSTALLS -gt 1 ]
+  then
+    onError 1
+  fi
+
+  # parses `yarn why` output to generate an json array of installed versions
+  INSTALLED_VERSIONS=$(yarn why --json $PKG | jq -r -s 'map(select(.type == "info") | 
+      select(.data | strings | contains("Found"))) | 
+      map(.data[11:-1] | map(split("@")[-1]) | unique'
+  )
+
+  if [ $(echo $INSTALLED_VERSIONS | jq length) -ne 1 ]
+  then
+    onError 2
+  fi
+
+  if [ $(echo $INSTALLED_VERSIONS | jq .[0] | tr -d \" ) != $AUTHJS_VERSION ]
+  then
+    onError 3
+  fi
+}
+
 if [ ! -z "$WIDGET_VERSION" ]; then
   echo "Installing WIDGET_VERSION: ${WIDGET_VERSION}"
   
   SHA=$(echo $WIDGET_VERSION | cut -d "-" -f 2)
+  # cut -d "-" ran on '7.0.0' returns '7.0.0', ensure a SHA exists on the version string
   if [ "$WIDGET_VERSION" = "$SHA" ]; then
+    # no sha found, install from npm
     npm_install
   else
+    # sha found, install from artifactory
     artifactory_install
   fi
 
+  verify_workspace_versions @okta/okta-signin-widget
   echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"
 fi
 

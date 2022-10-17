@@ -12,12 +12,14 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   export CI=true
 else
 # if running locally
-  . $DIR/../testenv
+  . $DIR/../.bacon.env
+
+  # moves `testenv` so it does not change env of test apps ran during e2e tests
+  mv $DIR/../testenv $DIR/../testenv.bak
+  trap "mv $DIR/../testenv.bak $DIR/../testenv &>/dev/null" EXIT SIGINT SIGKILL SIGSTOP
 
   # TODO: remove this after https://oktainc.atlassian.net/browse/OKTA-541393
   export CI=true
-
-  # move testenv while tests are running?
 fi
 
 setup_e2e () {
