@@ -127,6 +127,8 @@ if [ ! -z "$WIDGET_VERSION" ]; then
     artifactory_install
   fi
 
+  ./utils/install-beta-pkg @okta/okta-signin-widget "$WIDGET_VERSION"
+
   verify_workspace_versions @okta/okta-signin-widget
   echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"
 fi

@@ -174,7 +174,7 @@
     "@babel/plugin-transform-typescript": "^7.10.5",
     "@babel/preset-env": "^7.8.2",
     "@babel/preset-typescript": "^7.10.4",
-    "@okta/okta-signin-widget": "^6.8.2",
+    "@okta/okta-signin-widget": "6.0.0",
     "@rollup/plugin-alias": "^3.1.8",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-replace": "^3.0.0",

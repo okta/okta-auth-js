@@ -1668,6 +1668,20 @@
     rasha "^1.2.5"
     safe-flat "^2.0.2"
 
+"@okta/okta-signin-widget@6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-6.0.0.tgz#493a54e19c79a76614e073028c8dcab5491d59e1"
+  integrity sha512-nsSKRGeA96YfIX+96gJq4Q0ibiUTDnDA0aOJ7dEYVikLy1pq8aEWrc8VxFG218uVVLd4w38EqHBE4osLpCaiow==
+  dependencies:
+    cross-fetch "^3.1.5"
+    handlebars "^4.5.3"
+    jasmine "^4.0.1"
+    q "1.4.1"
+    u2f-api-polyfill "0.4.3"
+    underscore "1.13.1"
+  optionalDependencies:
+    fsevents "*"
+
 "@okta/okta-signin-widget@^6.8.2":
   version "6.8.2"
   resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-6.8.2.tgz#30abf5508a24c81c50f9f71e7aad0645e2b4b744"
@@ -6763,7 +6777,7 @@ handle-thing@^2.0.0:
   resolved "https://registry.yarnpkg.com/handle-thing/-/handle-thing-2.0.1.tgz#857f79ce359580c340d43081cc648970d0bb234e"
   integrity sha512-9Qn4yBxelxoh2Ow62nP+Ka/kMnOXRi8BXnRaUwezLNhqelnN49xKz4F/dPP8OYLxLxq6JDtZb2i9XznUQbNPTg==
 
-handlebars@>=3.0.0, handlebars@^4.0.0, handlebars@^4.7.6, handlebars@^4.7.7:
+handlebars@>=3.0.0, handlebars@^4.0.0, handlebars@^4.5.3, handlebars@^4.7.6, handlebars@^4.7.7:
   version "4.7.7"
   resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.7.tgz#9ce33416aad02dbd6c8fafa8240d5d98004945a1"
   integrity sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==
@@ -7702,6 +7716,11 @@ jasmine-ajax@^4.0.0:
   resolved "https://registry.yarnpkg.com/jasmine-ajax/-/jasmine-ajax-4.0.0.tgz#7d8ba7e47e3f7e780e155fe9aa563faafa7e1a26"
   integrity sha512-htTxNw38BSHxxmd8RRMejocdPqLalGHU6n3HWFbzp/S8AuTQd1MYjkSH3dYDsbZ7EV1Xqx/b94m3tKaVSVBV2A==
 
+jasmine-core@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-4.4.0.tgz#848fe45c1839cacaf1f2429d400d1d4f85d2856a"
+  integrity sha512-+l482uImx5BVd6brJYlaHe2UwfKoZBqQfNp20ZmdNfsjGFTemGfqHLsXjKEW23w9R/m8WYeFc9JmIgjj6dUtAA==
+
 jasmine-core@~3.10.0:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.10.1.tgz#7aa6fa2b834a522315c651a128d940eca553989a"
@@ -7714,6 +7733,14 @@ jasmine@3.10.0:
   dependencies:
     glob "^7.1.6"
     jasmine-core "~3.10.0"
+
+jasmine@^4.0.1:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-4.4.0.tgz#e3e359723d9679993b70de3e0441517c154b9647"
+  integrity sha512-xrbOyYkkCvgduNw7CKktDtNb+BwwBv/zvQeHpTkbxqQ37AJL5V4sY3jHoMIJPP/hTc3QxLVwOyxc87AqA+kw5g==
+  dependencies:
+    glob "^7.1.6"
+    jasmine-core "^4.4.0"
 
 jest-changed-files@^28.1.3:
   version "28.1.3"
