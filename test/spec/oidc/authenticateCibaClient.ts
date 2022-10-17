@@ -189,6 +189,7 @@ describe('authenticateCibaClient', () => {
       acrValues: 'fake:acr',
       bindingMessage: 'fake-binding-message',
       requestExpiry: 100,
+      // @ts-ignore test invalid option
       invalidOption: 'invalid',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {

@@ -16,7 +16,7 @@ get_vault_secret_key devex/okta-signin-widget web_private_key_pem PEM
 # This client has refresh token enabled
 export CLIENT_ID=0oa8lrg7ojTsbJgRQ696
 export WEB_CLIENT_ID=0oa8ls36zUZj7oFJ2696
-export WEB_PRIVATE_KEY_CLIENT_ID=0oa2pea6upKkLmWn1697
+export WEB_PRIVATE_KEY_CLIENT_ID=0oa2p95e9mMHe9VmR697
 
 if ! yarn test:integration; then
   echo "integration failed! Exiting..."
