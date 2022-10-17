@@ -44,7 +44,6 @@ describe('authenticateCibaClient', () => {
   });
 
   it('authenticates ciba client with private key - PEM', async () => {
-    console.log('pem from vault', process.env.PEM);
     const client = createClient({
       clientId: process.env.WEB_PRIVATE_KEY_CLIENT_ID,
       privateKey: process.env.PEM,
@@ -71,7 +70,6 @@ describe('authenticateCibaClient', () => {
   });
 
   it('authenticates ciba client with private key - JWK', async () => {
-    console.log('jwk from vault', process.env.JWK);
     const client = createClient({
       clientId: process.env.WEB_PRIVATE_KEY_CLIENT_ID,
       privateKey: process.env.JWK,
