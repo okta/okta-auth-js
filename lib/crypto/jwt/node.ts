@@ -12,6 +12,7 @@
 
 import * as nJwt from 'njwt';
 import Rasha from 'rasha';
+import { JWTOptions } from '../types';
 
 const DEFAULT_ALG = 'RS256';
 
@@ -45,7 +46,7 @@ function getPemAndJwk(privateKey) {
   }
 }
 
-export function makeJwt(options) {
+export function makeJwt(options: JWTOptions): Promise<nJwt.Jwt> {
   const { clientId, aud, privateKey } = options;
 
   const now = Math.floor(new Date().getTime() / 1000); // seconds since epoch
