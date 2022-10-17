@@ -29,7 +29,7 @@ require('core-js/web/url');
 require('webcrypto-shim');
 
 if (typeof window.TextEncoder !== 'function') {
-  var TextEncodingPolyfill = require('text-encoding');
+  var TextEncodingPolyfill = require('fast-text-encoding');
   window.TextEncoder = TextEncodingPolyfill.TextEncoder;
   window.TextDecoder = TextEncodingPolyfill.TextDecoder;
 }
