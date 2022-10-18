@@ -44,3 +44,4 @@ for ws in $workspaces
 do
   replace_version $ws $PKG $VERSION
 done
+yarn --ignore-scripts

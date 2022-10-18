@@ -68,13 +68,13 @@ artifactory_siw_install () {
 
   ssl=$(npm config get strict-ssl)
   npm config set strict-ssl false
-  pkg="${REGISTRY}/okta-signin-widget-${WIDGET_VERSION}.tgz"
-  if ! yarn add -DW --force --ignore-scripts $pkg; then
+  pkg_uri="${REGISTRY}/okta-signin-widget-${WIDGET_VERSION}.tgz"
+  if ! yarn add -DW --force --ignore-scripts $pkg_uri &>/dev/null; then
     echo "WIDGET_VERSION could not be installed via artifactory: ${WIDGET_VERSION}"
     exit ${FAILED_SETUP}
   fi
   npm config set strict-ssl $ssl
-  echo $pkg
+  echo $pkg_uri
 }
 
 npm_siw_install () {
@@ -94,14 +94,14 @@ verify_workspace_versions () {
     exit ${FAILED_SETUP}
   }
 
-  AUTHJS_INSTALLS=$(find . -type d -path "*/node_modules/$PKG" | wc -l)
-  if [ $AUTHJS_INSTALLS -gt 1 ]
+  LOCAL_INSTALLS=$(find . -type d -path "*/node_modules/$PKG" | wc -l)
+  if [ $LOCAL_INSTALLS -gt 1 ]
   then
     onError 1
   fi
 
   # parses `yarn why` output to generate an json array of installed versions
-  INSTALLED_VERSIONS=$(yarn why --json $PKG | jq -r -s 'map(select(.type == "info") | select(.data | strings | contains("Found"))) | map(.data[11:-1] | map(split("@")[-1]) | unique')
+  INSTALLED_VERSIONS=$(yarn why --json $PKG | jq -r -s 'map(select(.type == "info") | select(.data | strings | contains("Found"))) | map(.data[11:-1]) | map(split("@")[-1]) | unique')
 
   if [ $(echo $INSTALLED_VERSIONS | jq length) -ne 1 ]
   then
