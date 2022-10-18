@@ -63,23 +63,26 @@ if ! yarn install --frozen-lockfile --ignore-scripts; then
   exit ${FAILED_SETUP}
 fi
 
-artifactory_install () {
+artifactory_siw_install () {
   REGISTRY="https://artifacts.aue1d.saasure.com/artifactory/npm-topic/@okta/okta-signin-widget/-/@okta"
 
   ssl=$(npm config get strict-ssl)
   npm config set strict-ssl false
-  if ! yarn add -DW --force --ignore-scripts ${REGISTRY}/okta-signin-widget-${WIDGET_VERSION}.tgz ; then
+  pkg="${REGISTRY}/okta-signin-widget-${WIDGET_VERSION}.tgz"
+  if ! yarn add -DW --force --ignore-scripts $pkg; then
     echo "WIDGET_VERSION could not be installed via artifactory: ${WIDGET_VERSION}"
     exit ${FAILED_SETUP}
   fi
   npm config set strict-ssl $ssl
+  echo $pkg
 }
 
-npm_install () {
-  if ! yarn add -DW --force --ignore-scripts @okta/okta-signin-widget@${WIDGET_VERSION} ; then
-    echo "WIDGET_VERSION could not be installed via npm: ${WIDGET_VERSION}"
-    exit ${FAILED_SETUP}
-  fi
+npm_siw_install () {
+  # if ! yarn add -DW --force --ignore-scripts @okta/okta-signin-widget@${WIDGET_VERSION} ; then
+  #   echo "WIDGET_VERSION could not be installed via npm: ${WIDGET_VERSION}"
+  #   exit ${FAILED_SETUP}
+  # fi
+  echo ${WIDGET_VERSION}
 }
 
 verify_workspace_versions () {
@@ -105,7 +108,7 @@ verify_workspace_versions () {
     onError 2
   fi
 
-  if [ $(echo $INSTALLED_VERSIONS | jq .[0] | tr -d \" ) != $AUTHJS_VERSION ]
+  if [ $(echo $INSTALLED_VERSIONS | jq .[0] | tr -d \" ) != $WIDGET_VERSION ]
   then
     onError 3
   fi
@@ -118,13 +121,13 @@ if [ ! -z "$WIDGET_VERSION" ]; then
   # cut -d "-" ran on '7.0.0' returns '7.0.0', ensure a SHA exists on the version string
   if [ "$WIDGET_VERSION" = "$SHA" ]; then
     # no sha found, install from npm
-    npm_install
+    INSTALLED_VERSION=$(npm_siw_install)
   else
     # sha found, install from artifactory
-    artifactory_install
+    INSTALLED_VERSION=$(artifactory_siw_install)
   fi
 
-  ${OKTA_HOME}/${REPO}/scripts/utils/install-beta-pkg.sh @okta/okta-signin-widget "$WIDGET_VERSION"
+  ${OKTA_HOME}/${REPO}/scripts/utils/install-beta-pkg.sh @okta/okta-signin-widget "$INSTALLED_VERSION"
 
   verify_workspace_versions @okta/okta-signin-widget
   echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"
