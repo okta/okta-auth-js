@@ -62,7 +62,7 @@ export async function handleOAuthResponse(
   urls = urls || getOAuthUrls(sdk, tokenParams);
 
   let responseType = tokenParams.responseType || [];
-  if (!Array.isArray(responseType)) {
+  if (!Array.isArray(responseType) && responseType !== 'none') {
     responseType = [responseType];
   }
 
@@ -152,7 +152,8 @@ export async function handleOAuthResponse(
   return {
     tokens: tokenDict,
     state: res.state!,
-    code: res.code
+    code: res.code,
+    responseType
   };
   
 }

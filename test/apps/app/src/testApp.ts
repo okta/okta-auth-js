@@ -22,6 +22,7 @@ import {
   AccessToken, 
   AuthnTransaction, 
   TokenParams,
+  EnrollAuthenticatorOptions,
   isAuthorizationCodeError,
   IdxStatus,
   IdxTransaction,
@@ -77,6 +78,9 @@ function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
         </li>
         <li class="pure-menu-item">
           <a id="test-concurrent-login" href="/" onclick="testConcurrentLogin(event)" class="pure-menu-link">Test Concurrent Login</a>
+        </li>
+        <li class="pure-menu-item">
+          <a id="enroll-authenticator" href="/" onclick="enrollAuthenticator(event)" class="pure-menu-link">Enroll Authenticator</a>
         </li>
         ${protectedPageLink}
       </ul>
@@ -172,6 +176,7 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     simulateCrossTabTokenRenew: testApp.simulateCrossTabTokenRenew.bind(testApp),
     startService: testApp.startService.bind(testApp),
     stopService: testApp.stopService.bind(testApp),
+    enrollAuthenticator: testApp.enrollAuthenticator.bind(testApp),
   };
   Object.keys(boundFunctions).forEach(functionName => {
     (window as any)[functionName] = makeClickHandler((boundFunctions as any)[functionName]);
@@ -795,7 +800,9 @@ class TestApp {
   async getTokensFromUrl(): Promise<TokenResponse> {
     // parseFromUrl() Will parse the authorization code from the URL fragment and exchange it for tokens
     const res = await this.oktaAuth.token.parseFromUrl();
-    this.oktaAuth.tokenManager.setTokens(res.tokens);
+    if (res.responseType !== 'none') {
+      this.oktaAuth.tokenManager.setTokens(res.tokens);
+    }
     return res;
   }
 
@@ -880,6 +887,20 @@ class TestApp {
     }
   }
 
+  async enrollAuthenticator(): Promise<void> {
+    this.config.state = this.config.state || 'enroll-authenticator-redirect' + Math.round(Math.random() * 1000);
+    saveConfigToStorage(this.config);
+    const options: EnrollAuthenticatorOptions = Object.assign({}, {
+      state: this.config.state,
+      enrollAmrValues: this.config.enrollAmrValues,
+    });
+    return this.oktaAuth.token.enrollAuthenticator(options)
+      .catch(e => {
+        this.renderError(e);
+        throw e;
+      });
+  }
+
   configHTML(): string {
     const config = htmlString(this.config);
     return `
@@ -935,6 +956,9 @@ class TestApp {
                 <li class="pure-menu-item">
                   <a id="cross-tab-token-renew" onclick="simulateCrossTabTokenRenew(event)" class="pure-menu-link">Simulate cross-tab token renew</a>
                 </li>
+                <li class="pure-menu-item">
+                  <a id="enroll-authenticator" href="/" onclick="enrollAuthenticator(event)" class="pure-menu-link">Enroll Authenticator</a>
+                </li>
                 ${protectedLink(this)}
               </ul>
             </div>
@@ -959,8 +983,10 @@ class TestApp {
 
   callbackHTML(res: TokenResponse): string {
     const tokensReceived = res.tokens ? Object.keys(res.tokens): [];
+    const isEnrollSuccess = res.responseType === 'none';
     const success = res.tokens && tokensReceived.length;
-    const errorMessage = success ? '' :  'Tokens not returned. Check error console for more details';
+    const errorMessage = isEnrollSuccess ? 'Authenticator enrollment completed' : 
+      success ? '' :  'Tokens not returned. Check error console for more details';
     const successMessage = success ?
       'Successfully received tokens on the callback page: ' + tokensReceived.join(', ') : '';
     const originalUri = this.oktaAuth.getOriginalUri(res.state);

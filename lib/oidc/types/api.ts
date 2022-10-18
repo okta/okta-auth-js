@@ -12,7 +12,8 @@
 
 import { JWTObject } from './JWT';
 import { OAuthTransactionMeta, PKCETransactionMeta } from './meta';
-import { CustomUrls, OktaAuthOAuthOptions, SigninWithRedirectOptions, TokenParams } from './options';
+import { CustomUrls, OktaAuthOAuthOptions, SigninWithRedirectOptions, EnrollAuthenticatorOptions, TokenParams } from './options';
+import { OAuthResponseType } from './proto';
 import { OAuthStorageManagerInterface } from './storage';
 import { AccessToken, IDToken, RefreshToken, RevocableToken, Token, Tokens } from './Token';
 import { TokenManagerInterface } from './TokenManager';
@@ -29,6 +30,7 @@ export interface TokenResponse {
   tokens: Tokens;
   state: string;
   code?: string;
+  responseType?: OAuthResponseType | OAuthResponseType[] | 'none';
 }
 
 export interface ParseFromUrlOptions {
@@ -46,9 +48,15 @@ export interface ParseFromUrlInterface extends ParseFromUrlFunction {
 
 export type GetWithRedirectFunction = (params?: TokenParams) => Promise<void>;
 
+export type EnrollAuthenticatorFunction = (params: EnrollAuthenticatorOptions) => Promise<void>;
+
 export type SetLocationFunction = (loc: string) => void;
 
 export interface GetWithRedirectAPI extends GetWithRedirectFunction {
+  _setLocation: SetLocationFunction;
+}
+
+export interface EnrollAuthenticatorAPI extends EnrollAuthenticatorFunction {
   _setLocation: SetLocationFunction;
 }
 
@@ -64,6 +72,7 @@ export interface TokenAPI extends BaseTokenAPI {
     idToken?: IDToken
   ): Promise<UserClaims<S>>;
   getWithRedirect: GetWithRedirectAPI;
+  enrollAuthenticator: EnrollAuthenticatorAPI;
   parseFromUrl: ParseFromUrlInterface;
   getWithoutPrompt(params?: TokenParams): Promise<TokenResponse>;
   getWithPopup(params?: TokenParams): Promise<TokenResponse>;
