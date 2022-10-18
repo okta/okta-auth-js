@@ -39,7 +39,7 @@ replace_version () {
 
 workspaces=$(yarn -s workspaces info | jq 'map(..|objects|select(.location).location)[1:] | @sh' | tr -d \'\")
 
-replace_version . $PKG $VERSION   # run on toplevel workspace
+# replace_version . $PKG $VERSION   # run on toplevel workspace
 for ws in $workspaces
 do
   replace_version $ws $PKG $VERSION

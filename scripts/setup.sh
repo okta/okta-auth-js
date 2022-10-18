@@ -98,10 +98,7 @@ verify_workspace_versions () {
   fi
 
   # parses `yarn why` output to generate an json array of installed versions
-  INSTALLED_VERSIONS=$(yarn why --json $PKG | jq -r -s 'map(select(.type == "info") | 
-      select(.data | strings | contains("Found"))) | 
-      map(.data[11:-1] | map(split("@")[-1]) | unique'
-  )
+  INSTALLED_VERSIONS=$(yarn why --json $PKG | jq -r -s 'map(select(.type == "info") | select(.data | strings | contains("Found"))) | map(.data[11:-1] | map(split("@")[-1]) | unique')
 
   if [ $(echo $INSTALLED_VERSIONS | jq length) -ne 1 ]
   then
@@ -127,7 +124,7 @@ if [ ! -z "$WIDGET_VERSION" ]; then
     artifactory_install
   fi
 
-  ./utils/install-beta-pkg @okta/okta-signin-widget "$WIDGET_VERSION"
+  ${OKTA_HOME}/${REPO}/scripts/utils/install-beta-pkg.sh @okta/okta-signin-widget "$WIDGET_VERSION"
 
   verify_workspace_versions @okta/okta-signin-widget
   echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"

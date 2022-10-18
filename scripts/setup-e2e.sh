@@ -12,7 +12,8 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   export CI=true
 else
 # if running locally
-  . $DIR/../.bacon.env
+  # https://gist.github.com/mihow/9c7f559807069a03e302605691f85572
+  export $(cat $DIR/../.bacon.env | xargs)    # this might not work if the .ini files contains special characters
 
   # moves `testenv` so it does not change env of test apps ran during e2e tests
   mv $DIR/../testenv $DIR/../testenv.bak
