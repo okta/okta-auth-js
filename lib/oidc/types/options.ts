@@ -30,11 +30,13 @@ export interface TokenParams extends CustomUrls {
   pkce?: boolean;
   clientId?: string;
   redirectUri?: string;
-  responseType?: OAuthResponseType | OAuthResponseType[];
+  responseType?: OAuthResponseType | OAuthResponseType[] | 'none';
   responseMode?: OAuthResponseMode;
   state?: string;
   nonce?: string;
   scopes?: string[];
+  acrValues?: string;
+  enrollAmrValues?: string | string[];
   display?: string;
   ignoreSignature?: boolean;
   codeVerifier?: string;
@@ -64,6 +66,10 @@ export interface TokenManagerOptions {
   storageKey?: string;
   expireEarlySeconds?: number;
   syncStorage?: boolean;
+}
+
+export interface EnrollAuthenticatorOptions extends TokenParams {
+  enrollAmrValues: string | string[];
 }
 
 export interface SigninWithRedirectOptions extends TokenParams {

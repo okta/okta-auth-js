@@ -225,7 +225,7 @@ var authClient = new OktaAuth(config);
 
 ### Running as a service
 
-By default, creating a new instance of `OktaAuth` will not create any asynchronous side-effects. However, certain features such as [token auto renew](#autorenew), [token auto remove](#autoremove) and [cross-tab synchronization](#syncstorage) require `OktaAuth` to be running as a service. This means timeouts are set in the background which will continue working until the service is stopped.  To start the `OktaAuth` service, simply call the `start` method right after creation and before calling other methods like [handleLoginRedirect](#handleloginredirecttokens). To terminate all background processes, call `stop`. See [Service Configuration](#services) for more info.
+By default, creating a new instance of `OktaAuth` will not create any asynchronous side-effects. However, certain features such as [token auto renew](#autorenew), [token auto remove](#autoremove) and [cross-tab synchronization](#syncstorage) require `OktaAuth` to be running as a service. This means timeouts are set in the background which will continue working until the service is stopped.  To start the `OktaAuth` service, simply call the `start` method right after creation and before calling other methods like [handleLoginRedirect](#handleloginredirecttokens-originaluri). To terminate all background processes, call `stop`. See [Service Configuration](#services) for more info.
 
 ```javascript
   var authClient = new OktaAuth(config);
@@ -536,7 +536,7 @@ oktaAuth.authStateManager.updateAuthState();
 
 > :link: web browser only <br>
 
-Callback function. When [sdk.handleLoginRedirect](#handleloginredirecttokens) is called, by default it uses `window.location.replace` to redirect back to the [originalUri](#setoriginaluriuri). This option overrides the default behavior.
+Callback function. When [sdk.handleLoginRedirect](#handleloginredirecttokens-originaluri) is called, by default it uses `window.location.replace` to redirect back to the [originalUri](#setoriginaluriuri). This option overrides the default behavior.
 
 ```javascript
 const config = {
@@ -891,7 +891,7 @@ This is accomplished by selecting a single tab to handle the network requests to
 * [getOriginalUri](#getoriginaluristate)
 * [removeOriginalUri](#removeoriginaluri)
 * [isLoginRedirect](#isloginredirect)
-* [handleLoginRedirect](#handleloginredirecttokens)
+* [handleLoginRedirect](#handleloginredirecttokens-originaluri)
 * [setHeaders](#setheaders)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
@@ -915,6 +915,7 @@ This is accomplished by selecting a single tab to handle the network requests to
   * [token.isLoginRedirect](#tokenisloginredirect)
   * [token.prepareTokenParams](#tokenpreparetokenparams)
   * [token.exchangeCodeForTokens](#tokenexchangecodefortokens)
+  * [token.enrollAuthenticator](#tokenenrollauthenticatoroptions)
 * [tokenManager](#tokenmanager-api)
   * [tokenManager.add](#tokenmanageraddkey-token)
   * [tokenManager.get](#tokenmanagergetkey)
@@ -1315,9 +1316,10 @@ The following configuration options can be included in `token.getWithoutPrompt`,
 | `idp` | Identity provider to use if there is no Okta Session. |
 | `idpScope` | A space delimited list of scopes to be provided to the Social Identity Provider when performing [Social Login][social-login] These scopes are used in addition to the scopes already configured on the Identity Provider. |
 | `display` | The display parameter to be passed to the Social Identity Provider when performing [Social Login][social-login]. |
-| `prompt` | Determines whether the Okta login will be displayed on failure. Use `none` to prevent this behavior. Valid values: `none`, `consent`, `login`, or `consent login`. See [Parameter details](https://developer.okta.com/docs/reference/api/oidc/#parameter-details) for more information. |
+| `prompt` | Determines whether the Okta login will be displayed on failure. Use `none` to prevent this behavior. Valid values: `none`, `consent`, `login`, or `consent login`. See [Parameter details](https://developer.okta.com/docs/reference/api/oidc/#parameter-details) for more information.  Special value `enroll_authenticator` is used for [token.enrollAuthenticator](#tokenenrollauthenticatoroptions). |
 | `maxAge` | Allowable elapsed time, in seconds, since the last time the end user was actively authenticated by Okta. |
 | `acrValues` | [[EA][early-access]] Optional parameter to increase the level of user assurance. See [Predefined ACR values](https://developer.okta.com/docs/guides/step-up-authentication/main/#predefined-parameter-values) for more information. |
+| `enrollAmrValues` | List of [authentication methods](https://self-issued.info/docs/draft-jones-oauth-amr-values-00.html) used to enroll authenticators with [token.enrollAuthenticator](#tokenenrollauthenticatoroptions) |
 | `loginHint` | A username to prepopulate if prompting for authentication. |
 
 For more details, see Okta's [Authorize Request API](https://developer.okta.com/docs/api/resources/oidc#request-parameters).
@@ -1596,6 +1598,50 @@ Returns a `TokenParams` object. If `PKCE` is enabled, this object will contain v
 #### `token.exchangeCodeForTokens`
 
 Used internally to perform the final step of the `PKCE` authorization code flow. Accepts a `TokenParams` object which should contain a `codeVerifier` and an `authorizationCode`.
+
+#### `token.enrollAuthenticator(options)`
+
+> :link: web browser only <br>
+> :hourglass: async
+
+Enroll authenticators using a redirect to [authorizeUrl](#authorizeurl) with special parameters. After a successful enrollment, the browser will be redirected to the configured [redirectUri](#configuration-options). URL will not contain any tokens. You can use [sdk.handleLoginRedirect](#handleloginredirecttokens-originaluri).
+
+* `options` - See [Authorize options](#authorize-options)
+
+  Options that will be omitted: `scopes`, `nonce`. 
+
+  Options that will be overridden: `responseType: 'none', prompt: 'enroll_authenticator'`.
+
+  ##### `options.enrollAmrValues` - list of [authentication methods](https://self-issued.info/docs/draft-jones-oauth-amr-values-00.html).
+
+  List of AMR values:
+  | AMR Value     | Authenticator        |
+  | ------------- | -------------------- |
+  | `pwd`         | Okta Password        |
+  | `kba`         | Security question    |
+  | `email`       | Okta Email           |
+  | `sms`         | SMS                  |
+  | `tel`         | Voice call           |
+  | `duo`         | DUO                  |
+  | `symantec`    | Symantec VIP         |
+  | `google_otp`  | Google Authenticator |
+  | `okta_verify` | Okta Verify          |
+  | `pop`         | WebAuthn             |
+  | `oath_otp`    | On-Prem MFA          |
+  | `rsa`         | RSA SecurID          |
+  | `yubikey`     | Yubikey              |
+  | `otp`         | Custom HOTP          |
+  | `fed`         | External IdP         |
+  | `sc`          | SmartCard/PIV        |
+
+```javascript
+authClient.token.enrollAuthenticator({
+  enrollAmrValues: ['okta_verify']
+})
+.catch(function(err) {
+  // handle AuthSdkError
+});
+```
 
 ### `tokenManager` API
 

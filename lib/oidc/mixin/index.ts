@@ -180,8 +180,10 @@ export function mixinOAuth
      * Store parsed tokens from redirect url
      */
     async storeTokensFromRedirect(): Promise<void> {
-      const { tokens } = await this.token.parseFromUrl();
-      this.tokenManager.setTokens(tokens);
+      const { tokens, responseType } = await this.token.parseFromUrl();
+      if (responseType !== 'none') {
+        this.tokenManager.setTokens(tokens);
+      }
     }
   
     isLoginRedirect(): boolean {

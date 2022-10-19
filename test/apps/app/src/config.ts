@@ -31,6 +31,7 @@ export interface Config extends OktaAuthOptions {
   enableSharedStorage: boolean; // TransactionManager
   isTokenRenewPage?: boolean; // special lite /renew page to test cross-tab token renew
   crossTabsCount?: number;
+  enrollAmrValues?: string[];
 }
 
 export function getDefaultConfig(): Config {
@@ -86,6 +87,7 @@ export function getConfigFromUrl(): Config {
   const enableSharedStorage = url.searchParams.get('enableSharedStorage') !== 'false'; // on by default
   const syncStorage = url.searchParams.get('syncStorage') !== 'false'; // on by default
   const acrValues = url.searchParams.get('acrValues') || undefined;
+  const enrollAmrValues = (url.searchParams.get('enrollAmrValues') || '').split(',');
   let crossTabsCount = parseInt(url.searchParams.get('crossTabsCount'));
   if (isNaN(crossTabsCount)) {
     crossTabsCount = DEFAULT_CROSS_TABS_COUNT;
@@ -100,6 +102,7 @@ export function getConfigFromUrl(): Config {
     defaultScopes,
     scopes,
     acrValues,
+    enrollAmrValues,
     responseType,
     responseMode,
     postLogoutRedirectUri,

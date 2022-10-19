@@ -18,6 +18,7 @@ import {
   Tokens,
   UserClaims,
   TokenParams,
+  EnrollAuthenticatorOptions,
   TokenResponse,
   JWTObject,
   RefreshToken,
@@ -85,6 +86,17 @@ const tokens = {
   expectType<TokenResponse>(await authClient.token.getWithPopup(authorizeOptions));
   expectType<void>(await authClient.token.getWithRedirect(authorizeOptions));
   expectType<TokenResponse>(await authClient.token.parseFromUrl());
+
+  const enrollAuthenticatorOptons: EnrollAuthenticatorOptions = {
+    enrollAmrValues: ['email', 'kba']
+  };
+  expectType<void>(await authClient.token.enrollAuthenticator(enrollAuthenticatorOptons));
+  expectError(async () => {
+    await authClient.token.enrollAuthenticator({});
+  });
+  expectError(async () => {
+    await authClient.token.enrollAuthenticator();
+  });
 
   const customUrls = {
     issuer: 'https://{yourOktaDomain}/oauth2/{authorizationServerId}',
