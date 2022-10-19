@@ -31,6 +31,7 @@ export interface Config extends OktaAuthOptions {
   enableSharedStorage: boolean; // TransactionManager
   isTokenRenewPage?: boolean; // special lite /renew page to test cross-tab token renew
   crossTabsCount?: number;
+  enrollAmrValues?: string[];
 }
 
 export function getDefaultConfig(): Config {
