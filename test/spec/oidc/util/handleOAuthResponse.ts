@@ -104,6 +104,16 @@ describe('handleOAuthResponse', () => {
           expect(errorThrown).toBe(false);
         });
 
+        it('does not throw if responseType is "none" and response contains no tokens', async () => {
+          let errorThrown = false;
+          try {
+            await handleOAuthResponse(sdk, {responseType: 'none'}, {}, undefined  as unknown as CustomUrls);
+          } catch (err) {
+            errorThrown = true;
+          }
+          expect(errorThrown).toBe(false);
+        });
+
         it('throws if response contains both "error" and "error_description"', async () => {
           let errorThrown = false;
           try {

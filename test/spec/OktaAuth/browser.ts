@@ -482,6 +482,13 @@ describe('OktaAuth (browser)', function() {
       await auth.storeTokensFromRedirect();
       expect(auth.tokenManager.setTokens).toHaveBeenCalledWith({ accessToken, idToken });
     });
+    it('does not store tokens if responseType is "none"', async () => {
+      auth.token.parseFromUrl = jest.fn().mockResolvedValue({
+        responseType: 'none'
+      });
+      await auth.storeTokensFromRedirect();
+      expect(auth.tokenManager.setTokens).not.toHaveBeenCalled();
+    });
   });
 
   describe('setOriginalUri', () => {
