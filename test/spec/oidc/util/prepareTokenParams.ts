@@ -30,7 +30,7 @@ jest.mock('../../../../lib/features', () => {
 jest.mock('../../../../lib/oidc/endpoints/well-known', () => {
   return mocked.wellKnown;
 });
-import { OktaAuth } from '@okta/okta-auth-js';
+import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import { prepareTokenParams, pkce }  from '../../../../lib/oidc';
 import { createTransactionManager } from '../../../../lib/oidc/TransactionManager';
 
@@ -114,6 +114,75 @@ describe('prepareTokenParams', function() {
     .then(function(oauthParams) {
       expect(oauthParams.codeChallenge).toBe(codeChallenge);
     });
+  });
+
+
+  describe('prompt=enroll_authenticator', function() {
+    it('throws an error if enrollAmrValues not specified', async () => {
+      const sdk = new OktaAuth({
+        issuer: 'https://foo.com'
+      });
+      let errorThrown = false;
+      try {
+        await prepareTokenParams(sdk, {
+          prompt: 'enroll_authenticator',
+        });
+      } catch (err) {
+        errorThrown = true;
+        expect(err).toBeInstanceOf(AuthSdkError);
+        expect((err as AuthSdkError).message).toEqual('enroll_amr_values must be specified');
+      }
+      expect(errorThrown).toBe(true);
+    });
+
+    it('sets responseType to none', async () => {
+      const sdk = new OktaAuth({
+        issuer: 'https://foo.com'
+      });
+      const params = await prepareTokenParams(sdk, {
+        prompt: 'enroll_authenticator',
+        enrollAmrValues: ['a']
+      });
+      expect(params.responseType).toBe('none');
+    });
+
+    it('does not prepare PKCE params', async () => {
+      const sdk = new OktaAuth({
+        issuer: 'https://foo.com',
+        pkce: true
+      });
+      spyOn(mocked.features, 'isPKCESupported').and.returnValue(true);
+      const params = await prepareTokenParams(sdk, {
+        prompt: 'enroll_authenticator',
+        enrollAmrValues: ['a']
+      });
+      expect(params.codeVerifier).toBe(undefined);
+      expect(params.codeChallenge).toBe(undefined);
+      expect(params.codeChallengeMethod).toBe(undefined);
+    });
+
+    it('removes scopes, nonce, maxAge', async () => {
+      const sdk = new OktaAuth({
+        issuer: 'https://foo.com'
+      });
+      const params = await prepareTokenParams(sdk, {
+        prompt: 'enroll_authenticator',
+        enrollAmrValues: ['a'],
+        scopes: ['openid','email'],
+        nonce: 'fake-nonce',
+        maxAge: 100,
+      });
+      expect(params.scopes).toBe(undefined);
+      expect(params.nonce).toBe(undefined);
+      expect(params.maxAge).toBe(undefined);
+    });
+
+    // Note:
+    // The only suported `acrValues` is 'urn:okta:2fa:ifpossible'
+    // Autorize endpoint will throw an error otherwise,
+    //  but this can change in the future,
+    //  so not checking this in okta-auth-js
+
   });
   
 });

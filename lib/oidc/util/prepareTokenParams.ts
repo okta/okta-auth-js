@@ -90,12 +90,15 @@ function prepareEnrollAuthenticator(
   if (!tokenParams.enrollAmrValues) {
     throw new AuthSdkError('enroll_amr_values must be specified');
   }
-  if (tokenParams.maxAge && tokenParams.maxAge > 0) {
-    throw new AuthSdkError('max_age cannot be more than 0');
-  }
-  // scope, nonce, and resource must be omitted
+
+  // scope, nonce must be omitted
   delete tokenParams.scopes;
   delete tokenParams.nonce;
+
+  // maxAge is not supported
+  if (tokenParams.maxAge && tokenParams.maxAge > 0) {
+    delete tokenParams.maxAge;
+  }
 
   return tokenParams;
 }
