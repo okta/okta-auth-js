@@ -11,7 +11,7 @@
  */
 
 
-/* global USER_AGENT, fetch */
+/* global USER_AGENT */
 
 import util from '@okta/test.support/util';
 import { OktaAuth } from '@okta/okta-auth-js';
