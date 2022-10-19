@@ -6175,10 +6175,10 @@ fined@^1.0.1:
     object.pick "^1.2.0"
     parse-filepath "^1.0.1"
 
-fishery@^1.3.1:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/fishery/-/fishery-1.4.0.tgz#5a74f31ebc189cf40bb78a32abdc1e8e6b905468"
-  integrity sha512-uzPsEWtoHluyqgk9hC/MzMbm42NPWmDWjbdzMRLuJ+jxmAHo+nDbiI3zk2S+HQFXme/VlNnPsNYZQBryrbCTLw==
+fishery@~1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/fishery/-/fishery-1.3.1.tgz#ca06759167dd2d6ac43d0983ac0a99d7b907b0fc"
+  integrity sha512-Oto2fALKmpijLbNAMHvFTrbIPPn9Ds7olDl17qFU8d9eEiro/32wF3V/6Gq0ApabyYP+VhySKqQLiCtJPMeP1A==
   dependencies:
     lodash.mergewith "^4.6.2"
 
