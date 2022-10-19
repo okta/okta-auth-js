@@ -25,7 +25,8 @@ export interface OAuthTransactionMeta extends
     'pkce' |
     'ignoreSignature' |
     'nonce' |
-    'acrValues'
+    'acrValues' |
+    'enrollAmrValues'
   >
 {
   urls: CustomUrls;

@@ -90,7 +90,12 @@ const tokens = {
   const enrollAuthenticatorOptons: EnrollAuthenticatorOptions = {
     enrollAmrValues: ['email', 'kba']
   };
+  const enrollAuthenticatorOptons2: EnrollAuthenticatorOptions = {
+    enrollAmrValues: 'email',
+    responseType: 'none'
+  };
   expectType<void>(await authClient.token.enrollAuthenticator(enrollAuthenticatorOptons));
+  expectType<void>(await authClient.token.enrollAuthenticator(enrollAuthenticatorOptons2));
   expectError(async () => {
     await authClient.token.enrollAuthenticator({});
   });

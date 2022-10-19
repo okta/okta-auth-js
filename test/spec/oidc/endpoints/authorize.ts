@@ -38,14 +38,15 @@ describe('authorize endpoint', () => {
       })).toBe('?client_id=fakeClientId&code_challenge=fakeCodeChallenge&response_type=id_token&scope=openid%20email');
     });
 
-    it('converts array parameters "idpScope", "responseType", and "scopes" to space-separated string', () => {
+    it('converts array parameters "idpScope", "responseType", "scopes" and "enrollAmrValues" to space-separated string', () => {
       expect(buildAuthorizeParams({
         clientId: 'fakeClientId',
         codeChallenge: 'fakeCodeChallenge',
         scopes: ['openid', 'email'],
         idpScope: ['scope1', 'scope2'],
-        responseType: ['id_token', 'token']
-      })).toBe('?client_id=fakeClientId&code_challenge=fakeCodeChallenge&idp_scope=scope1%20scope2&response_type=id_token%20token&scope=openid%20email');
+        responseType: ['id_token', 'token'],
+        enrollAmrValues: ['okta_verify', 'pop'],
+      })).toBe('?client_id=fakeClientId&code_challenge=fakeCodeChallenge&idp_scope=scope1%20scope2&response_type=id_token%20token&enroll_amr_values=okta_verify%20pop&scope=openid%20email');
     });
 
     it('throws if responseType includes id_token but scopes does not include openid', () => {
@@ -78,6 +79,15 @@ describe('authorize endpoint', () => {
         responseType: 'code',
         acrValues: 'urn:okta:loa:1fa:any'
       })).toBe('?client_id=fakeClientId&code_challenge=fakeCodeChallenge&response_type=code&acr_values=urn%3Aokta%3Aloa%3A1fa%3Aany&scope=openid');
+    });
+
+    it('respects enroll_amr_values', () => {
+      expect(buildAuthorizeParams({
+        clientId: 'fakeClientId',
+        prompt: 'enroll_authenticator',
+        responseType: 'none',
+        enrollAmrValues: ['okta_verify', 'pop']
+      })).toBe('?client_id=fakeClientId&prompt=enroll_authenticator&response_type=none&enroll_amr_values=okta_verify%20pop');
     });
   });
 });

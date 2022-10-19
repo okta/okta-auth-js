@@ -72,6 +72,7 @@ describe('oauthMeta', () => {
       codeChallenge: 'efgh',
       codeChallengeMethod: 'fake',
       acrValues: 'foo',
+      enrollAmrValues: ['a', 'b']
     });
 
     const meta = createOAuthMeta(sdk, tokenParams);
@@ -88,6 +89,7 @@ describe('oauthMeta', () => {
       codeChallenge: 'efgh',
       codeChallengeMethod: 'fake',
       acrValues: 'foo',
+      enrollAmrValues: ['a', 'b'],
     });
   });
 });
