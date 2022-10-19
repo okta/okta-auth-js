@@ -16,7 +16,10 @@ import { clone } from '../util';
 import { prepareTokenParams, createOAuthMeta } from './util';
 import { buildAuthorizeParams } from './endpoints/authorize';
 
-export async function enrollAuthenticator(sdk: OktaAuthOAuthInterface, options: EnrollAuthenticatorOptions): Promise<void> {
+export async function enrollAuthenticator(
+    sdk: OktaAuthOAuthInterface, 
+    options: EnrollAuthenticatorOptions
+): Promise<void> {
   options = clone(options) || {};
   options.prompt = 'enroll_authenticator';
 
