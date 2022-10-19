@@ -157,7 +157,7 @@
     "eslint-plugin-jsdoc": "^25.4.2",
     "eslint-plugin-node": "^11.1.0",
     "globby": "^6.1.0",
-    "husky": ">=6",
+    "husky": "^6",
     "jasmine-ajax": "^4.0.0",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
