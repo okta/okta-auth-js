@@ -4,6 +4,7 @@ DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 source $DIR/setup.sh
 
 # setup for e2e tests
+create_log_group "E2E Env Setup"
 if [ -n "${TEST_SUITE_ID}" ]; then
 # if running on bacon
   setup_service java 1.8.222
@@ -22,8 +23,10 @@ else
   # TODO: remove this after https://oktainc.atlassian.net/browse/OKTA-541393
   export CI=true
 fi
+finish_log_group $?
 
 setup_e2e () {
+  create_log_group "E2E Setup"
   export DBUS_SESSION_BUS_ADDRESS=/dev/null
   export TEST_SUITE_TYPE="junit"
   export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
@@ -31,18 +34,20 @@ setup_e2e () {
   export ISSUER=https://samples-javascript.okta.com/oauth2/default
   export USERNAME=george@acme.com
   get_secret prod/okta-sdk-vars/password PASSWORD
+  finish_log_group $?
 }
 
 run_e2e () {
-  # Run the tests
-  if ! yarn test:e2e; then
-    echo "OIE e2e tests failed! Exiting..."
-    exit ${TEST_FAILURE}
-  fi
-
+  create_log_group "E2E Test Run"
   if [ -n "${RUN_CUCUMBER}" ]; then
+    yarn test:e2e   # run standard e2e tests first, but don't exit so cucumber tests also run
     if ! yarn test:e2e:cucumber; then
       echo "Cucumber tests failed! Exiting..."
+      exit ${TEST_FAILURE}
+    fi
+  else
+    if ! yarn test:e2e; then
+      echo "OIE e2e tests failed! Exiting..."
       exit ${TEST_FAILURE}
     fi
   fi
@@ -50,9 +55,11 @@ run_e2e () {
   echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
   echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
   exit ${PUBLISH_TYPE_AND_RESULT_DIR}
+  finish_log_group $?
 }
 
 setup_sample_tests () {
+  create_log_group "E2E Setup"
   export DBUS_SESSION_BUS_ADDRESS=/dev/null
   export TEST_SUITE_TYPE="junit"
   export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
@@ -89,9 +96,11 @@ setup_sample_tests () {
       get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_sdk_org_api_key OKTA_API_KEY
     fi
   fi
+  finish_log_group $?
 }
 
 run_sample_tests () {
+  create_log_group "E2E Test Run"
   # Run the tests
   if ! yarn test:samples; then
     echo "tests failed! Exiting..."
@@ -101,4 +110,5 @@ run_sample_tests () {
   echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
   echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
   exit ${PUBLISH_TYPE_AND_RESULT_DIR}
+  finish_log_group $?
 }

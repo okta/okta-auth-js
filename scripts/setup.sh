@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+for f in $(ls $DIR/utils); do source $DIR/utils/$f; done
+
 # if running on bacon
 if [ -n "${TEST_SUITE_ID}" ]; then
   # Can be used to run a canary build against a beta AuthJS version that has been published to artifactory.
@@ -18,7 +21,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
 
 else
   # bacon defines OKTA_HOME and REPO, define these relative to this file
-  export OKTA_HOME=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)/..
+  export OKTA_HOME=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd)
   export REPO="."
   export TEST_SUITE_TYPE_FILE=/dev/null
   export TEST_RESULT_FILE_DIR_FILE=/dev/null
@@ -52,16 +55,30 @@ else
     echo 'noop'
   }
 
+  create_log_group () {
+    set +x
+    echo "~*~*~~*~*~ $1 ~*~*~~*~*~ "
+    set -x
+  }
+
+  finish_log_group () {
+    set +x
+    echo "~*~*~~*~*~ *~*~* ~*~*~~*~*~"
+    set -x
+  }
+
   set -x  # when running locally, might as well see all the commands being ran
 fi
 
 cd ${OKTA_HOME}/${REPO}
 
+create_log_group "Yarn Install"
 # Install dependences. --ignore-scripts will prevent chromedriver from attempting to install
 if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
+finish_log_group $?
 
 artifactory_siw_install () {
   REGISTRY="https://artifacts.aue1d.saasure.com/artifactory/npm-topic/@okta/okta-signin-widget/-/@okta"
@@ -78,11 +95,10 @@ artifactory_siw_install () {
 }
 
 npm_siw_install () {
-  # if ! yarn add -DW --force --ignore-scripts @okta/okta-signin-widget@${WIDGET_VERSION} ; then
-  #   echo "WIDGET_VERSION could not be installed via npm: ${WIDGET_VERSION}"
-  #   exit ${FAILED_SETUP}
-  # fi
-  echo ${WIDGET_VERSION}
+  if ! yarn add -DW --force --ignore-scripts @okta/okta-signin-widget@${WIDGET_VERSION} ; then
+    echo "WIDGET_VERSION could not be installed via npm: ${WIDGET_VERSION}"
+    exit ${FAILED_SETUP}
+  fi
 }
 
 verify_workspace_versions () {
@@ -115,8 +131,9 @@ verify_workspace_versions () {
 }
 
 if [ ! -z "$WIDGET_VERSION" ]; then
+  create_log_group "Beta SIW Install"
   echo "Installing WIDGET_VERSION: ${WIDGET_VERSION}"
-  
+
   SHA=$(echo $WIDGET_VERSION | cut -d "-" -f 2)
   # cut -d "-" ran on '7.0.0' returns '7.0.0', ensure a SHA exists on the version string
   if [ "$WIDGET_VERSION" = "$SHA" ]; then
@@ -127,13 +144,16 @@ if [ ! -z "$WIDGET_VERSION" ]; then
     INSTALLED_VERSION=$(artifactory_siw_install)
   fi
 
-  ${OKTA_HOME}/${REPO}/scripts/utils/install-beta-pkg.sh @okta/okta-signin-widget "$INSTALLED_VERSION"
+  install_beta_pkg @okta/okta-signin-widget "$INSTALLED_VERSION"
 
   verify_workspace_versions @okta/okta-signin-widget
   echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"
+  finish_log_group $?
 fi
 
+create_log_group "Yarn Build"
 if ! yarn build; then
   echo "build failed! Exiting..."
   exit ${TEST_FAILURE}
 fi
+finish_log_group $?

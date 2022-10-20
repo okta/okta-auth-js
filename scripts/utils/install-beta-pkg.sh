@@ -1,17 +1,9 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
-  echo "\`package name\` was not supplied. Exiting..."
-  exit 1
-fi
+source $(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)/foreach_workspace.sh
 
-if [ -z "$2" ]; then
-  echo "\`version\` was not supplied. Exiting..."
-  exit 1
-fi
-
-PKG=$1
-VERSION=$2
+# determine if script is being invoked or sourced
+(return 0 2>/dev/null) && sourced=1 || sourced=0
 
 replace_workspace_version () {
   # $1 = workspace path
@@ -25,23 +17,32 @@ replace_workspace_version () {
   printf '%s\n' "${json}" > $1/package.json
 }
 
-replace_version () {
-  # $1 = workspace path
-  # #2 = package name
-  # $3 = version
-  ws=$1
-  pkg=$2
-  ver=$3
-
-  echo $1
-  replace_workspace_version $1 $2 $3
+install_beta_pkg () {
+  # $1 = package name
+  # $2 = version
+  foreach_workspace -p replace_workspace_version $1 $2
+  yarn --ignore-scripts
 }
 
-workspaces=$(yarn -s workspaces info | jq 'map(..|objects|select(.location).location)[1:] | @sh' | tr -d \'\")
+if [ $sourced -ne 1 ]; then
+  if [ -z "$1" ]; then
+    echo "\`package name\` was not supplied. Exiting..."
+    exit 1
+  fi
 
-# replace_version . $PKG $VERSION   # run on toplevel workspace
-for ws in $workspaces
-do
-  replace_version $ws $PKG $VERSION
-done
-yarn --ignore-scripts
+  if [ -z "$2" ]; then
+    echo "\`version\` was not supplied. Exiting..."
+    exit 1
+  fi
+
+  install_beta_pkg $1 $2
+fi
+
+# workspaces=$(yarn -s workspaces info | jq 'map(..|objects|select(.location).location)[1:] | @sh' | tr -d \'\")
+
+# # replace_version . $PKG $VERSION   # run on toplevel workspace
+# for ws in $workspaces
+# do
+#   replace_version $ws $PKG $VERSION
+# done
+# yarn --ignore-scripts

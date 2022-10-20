@@ -125,7 +125,8 @@
     "dev:samples": "yarn workspace @okta/samples dev",
     "prepare": "yarn build",
     "start": "yarn workspace @okta/test.app start --open",
-    "verify:package": "node scripts/verify-package.js"
+    "verify:package": "node scripts/verify-package.js",
+    "clean:e2e": "./scripts/utils/foreach_workspace.sh \"git restore ./package.json\""
   },
   "author": "Okta",
   "keywords": [
