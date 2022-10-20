@@ -104,7 +104,7 @@ For additional security, the MyAccount API requires a higher assurance level to 
 
 ### Re-Authenticate with Okta Hosted Login flow
 
-Bootstrap re-authentication flow by calling `getWithRedirect` with `maxAge`.
+Bootstrap re-authentication flow by calling `getWithRedirect` with `maxAge` and `acrValues`.
 
 ```js
 await getWithRedirect(
@@ -112,6 +112,7 @@ await getWithRedirect(
   {
     prompt: 'login',
     maxAge,
+    acrValues,
     scopes,
     extraParams: {
       id_token_hint: idToken

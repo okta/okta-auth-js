@@ -15,6 +15,7 @@ const WidgetPage = () => {
   const otp = queryParams.get('otp');
   const state = queryParams.get('state');
   const maxAge = queryParams.get('maxAge');
+  const acrValues = queryParams.get('acrValues');
 
   useEffect(() => {
     if (!widgetRef.current) {
@@ -35,7 +36,9 @@ const WidgetPage = () => {
         // To avoid redirect do not set "pkce" or "display" here. OKTA-335945
         issuer,
         scopes,
-        ...(maxAge && { maxAge }), // config to bootstrap re-authentication for insufficient authentication scenario 
+        // config to bootstrap re-authentication for insufficient authentication scenario
+        ...(maxAge && { maxAge }),
+        ...(acrValues && { acrValues }),
       },
       useInteractionCodeFlow: true,
       ...(state && { state }),
@@ -54,7 +57,7 @@ const WidgetPage = () => {
     );
 
     return () => widget.remove();
-  }, [oktaAuth, history, maxAge, otp, state]);
+  }, [oktaAuth, history, maxAge, acrValues, otp, state]);
 
   return (
     <div>
