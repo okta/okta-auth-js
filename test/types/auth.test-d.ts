@@ -29,6 +29,7 @@ const authorizeOptions: TokenParams = {
   display: 'popup',
   prompt: 'consent',
   maxAge: 100,
+  acrValues: 'phr',
   pkce: false,
   clientId: 'GHtf9iJdr60A9IYrR0jw',
   ignoreSignature: false,
