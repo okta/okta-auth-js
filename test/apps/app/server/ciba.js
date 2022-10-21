@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { OktaAuth, authenticateCibaClient } = require('@okta/okta-auth-js');
+const { OktaAuth, authenticateWithCiba } = require('@okta/okta-auth-js');
 const { toQueryString } = require('../src/util');
 
 const privateKey = fs.readFileSync(path.resolve(__dirname, 'private.key')).toString();
@@ -21,7 +21,7 @@ async function cibaClientAuthMiddleware(req, res) {
   const { 
     headers, // eslint-disable-line
     ...restResp 
-  } = await authenticateCibaClient(authClient, {
+  } = await authenticateWithCiba(authClient, {
     loginHint,
   });
 

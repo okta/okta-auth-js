@@ -20,7 +20,7 @@ import { OktaAuthOAuthInterface, CibaAuthOptions, CibaAuthResponse } from '../ty
 
 const CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
 
-export async function authenticateCibaClient(
+export async function authenticateWithCiba(
   sdk: OktaAuthOAuthInterface, 
   options: CibaAuthOptions
 ): Promise<CibaAuthResponse> {

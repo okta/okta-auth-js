@@ -24,7 +24,7 @@ const mocked = {
   http: require('../../../lib/http')
 };
 
-import { authenticateCibaClient } from '../../../lib/oidc';
+import { authenticateWithCiba } from '../../../lib/oidc';
 import { AuthSdkError } from '../../../lib/errors';
 
 function mockOktaAuth(options = {}): OktaAuthOAuthInterface {
@@ -36,19 +36,19 @@ function mockOktaAuth(options = {}): OktaAuthOAuthInterface {
   } as unknown as OktaAuthOAuthInterface;
 }
 
-describe('authenticateCibaClient', () => {
+describe('authenticateWithCiba', () => {
 
   it('throws if no clientId is available', async () => {
     const authClient = mockOktaAuth();
     await expect(async () => {
-      await authenticateCibaClient(authClient, {});
+      await authenticateWithCiba(authClient, {});
     }).rejects.toThrowError(new AuthSdkError('A clientId must be specified in the OktaAuth constructor to authenticate CIBA client'));
   });
 
   it('throws if neither clientSecret nor privateKey is available', async () => {
     const authClient = mockOktaAuth({ clientId: 'fake-client-id' });
     await expect(async () => {
-      await authenticateCibaClient(authClient, {});
+      await authenticateWithCiba(authClient, {});
     }).rejects.toThrowError(new AuthSdkError('A clientSecret or privateKey must be specified in the OktaAuth constructor to authenticate CIBA client'));
   });
 
@@ -59,7 +59,7 @@ describe('authenticateCibaClient', () => {
       scopes: [],
     });
     await expect(async () => {
-      await authenticateCibaClient(authClient, {});
+      await authenticateWithCiba(authClient, {});
     }).rejects.toThrowError(new AuthSdkError('openid scope must be specified in the scopes argument to authenticate CIBA client'));
   });
 
@@ -70,7 +70,7 @@ describe('authenticateCibaClient', () => {
       scopes: ['openid'],
     });
     await expect(async () => {
-      await authenticateCibaClient(authClient, {});
+      await authenticateWithCiba(authClient, {});
     }).rejects.toThrowError(new AuthSdkError('A loginHint or idTokenHint must be specified in the function options to authenticate CIBA client'));
   });
 
@@ -82,7 +82,7 @@ describe('authenticateCibaClient', () => {
       scopes: ['openid', 'email'],
     });
 
-    await authenticateCibaClient(authClient, {
+    await authenticateWithCiba(authClient, {
       loginHint: 'user@test.com',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
@@ -103,7 +103,7 @@ describe('authenticateCibaClient', () => {
       scopes: ['openid', 'email'],
     });
 
-    await authenticateCibaClient(authClient, {
+    await authenticateWithCiba(authClient, {
       idTokenHint: 'fake-id-token',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
@@ -124,7 +124,7 @@ describe('authenticateCibaClient', () => {
       scopes: ['openid', 'email'],
     });
 
-    await authenticateCibaClient(authClient, {
+    await authenticateWithCiba(authClient, {
       loginHint: 'user@test.com',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
@@ -154,7 +154,7 @@ describe('authenticateCibaClient', () => {
       scopes: ['openid', 'email'],
     });
 
-    await authenticateCibaClient(authClient, {
+    await authenticateWithCiba(authClient, {
       loginHint: 'user@test.com',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
@@ -184,7 +184,7 @@ describe('authenticateCibaClient', () => {
       scopes: ['openid', 'email'],
     });
 
-    await authenticateCibaClient(authClient, {
+    await authenticateWithCiba(authClient, {
       loginHint: 'user@test.com',
       acrValues: 'fake:acr',
       bindingMessage: 'fake-binding-message',

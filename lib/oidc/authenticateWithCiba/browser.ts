@@ -14,7 +14,7 @@
 import { OktaAuthOAuthInterface, CibaAuthOptions, CibaAuthResponse } from '../types';
 import { AuthSdkError } from '../../errors';
 
-export async function authenticateCibaClient(
+export async function authenticateWithCiba(
   sdk?: OktaAuthOAuthInterface, 
   options?: CibaAuthOptions
 ): Promise<CibaAuthResponse> {

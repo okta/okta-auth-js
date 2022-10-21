@@ -3,7 +3,7 @@ import { jest } from '@jest/globals';
 import Cookies from 'js-cookie';
 import Emitter from 'tiny-emitter';
 import PCancelable from 'p-cancelable';
-import { OktaAuth, authenticateCibaClient, AuthSdkError } from '@okta/okta-auth-js';
+import { OktaAuth, authenticateWithCiba, AuthSdkError } from '@okta/okta-auth-js';
 import NodeCache from 'node-cache';
 
 describe('OktaAuth (api)', function() {
@@ -88,9 +88,9 @@ describe('OktaAuth (api)', function() {
         return;
       }
 
-      it('throws when use authenticateCibaClient', async () => {
+      it('throws when use authenticateWithCiba', async () => {
         await expect(async () => {
-          await authenticateCibaClient(auth, {});
+          await authenticateWithCiba(auth, {});
         }).rejects.toThrowError(new AuthSdkError('This function is not supported in browser bundle.'));
       });
     });

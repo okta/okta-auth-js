@@ -1,16 +1,16 @@
 import { createClient, signinAndGetTokens } from '../../util';
-import { authenticateCibaClient } from '../../../../lib/oidc';
+import { authenticateWithCiba } from '../../../../lib/oidc';
 import { OAuthError } from '../../../../lib/errors';
 import { PEM as INVALID_PEM, JWK as INVALID_JWK } from '@okta/test.support/jwt';
 
-describe('authenticateCibaClient', () => {
+describe('authenticateWithCiba', () => {
   it('authenticates ciba client with client secret', async () => {
     const client = createClient({
       clientId: process.env.WEB_CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
       scopes: ['openid']
     });
-    const resp = await authenticateCibaClient(client, {
+    const resp = await authenticateWithCiba(client, {
       loginHint: 'george@acme.com'
     });
     expect(resp.auth_req_id).toBeDefined();
@@ -24,7 +24,7 @@ describe('authenticateCibaClient', () => {
       scopes: ['openid']
     });
     await expect(async () => {
-      await authenticateCibaClient(client, {
+      await authenticateWithCiba(client, {
         loginHint: 'george@acme.com'
       });
     }).rejects.toThrowError(new OAuthError('invalid_client', 'Invalid value for \'client_id\' parameter.'));
@@ -37,7 +37,7 @@ describe('authenticateCibaClient', () => {
       scopes: ['openid']
     });
     await expect(async () => {
-      await authenticateCibaClient(client, {
+      await authenticateWithCiba(client, {
         loginHint: 'george@acme.com'
       });
     }).rejects.toThrowError(new OAuthError('invalid_client', 'The client secret supplied for a confidential client is invalid.'));
@@ -49,7 +49,7 @@ describe('authenticateCibaClient', () => {
       privateKey: process.env.PEM,
       scopes: ['openid']
     });
-    const resp = await authenticateCibaClient(client, {
+    const resp = await authenticateWithCiba(client, {
       loginHint: 'george@acme.com'
     });
     expect(resp.auth_req_id).toBeDefined();
@@ -63,7 +63,7 @@ describe('authenticateCibaClient', () => {
       scopes: ['openid']
     });
     await expect(async () => {
-      await authenticateCibaClient(client, {
+      await authenticateWithCiba(client, {
         loginHint: 'george@acme.com'
       });
     }).rejects.toThrowError(new OAuthError('invalid_client', 'The client_assertion signature is invalid.'));
@@ -75,7 +75,7 @@ describe('authenticateCibaClient', () => {
       privateKey: process.env.JWK,
       scopes: ['openid']
     });
-    const resp = await authenticateCibaClient(client, {
+    const resp = await authenticateWithCiba(client, {
       loginHint: 'george@acme.com'
     });
     expect(resp.auth_req_id).toBeDefined();
@@ -89,7 +89,7 @@ describe('authenticateCibaClient', () => {
       scopes: ['openid']
     });
     await expect(async () => {
-      await authenticateCibaClient(client, {
+      await authenticateWithCiba(client, {
         loginHint: 'george@acme.com'
       });
     }).rejects.toThrowError(new OAuthError('invalid_client', 'The client_assertion signature is invalid.'));
@@ -106,7 +106,7 @@ describe('authenticateCibaClient', () => {
         idToken: { idToken } = {},
       }
     } = await signinAndGetTokens(client);
-    const resp = await authenticateCibaClient(client, {
+    const resp = await authenticateWithCiba(client, {
       idTokenHint: idToken
     });
     expect(resp.auth_req_id).toBeDefined();
