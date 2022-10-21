@@ -25,6 +25,8 @@ import {
   TransactionManagerInterface,
   TransactionManagerConstructor,
   UserClaims,
+  CibaAuthOptions,
+  CibaAuthResponse,
 } from '../types';
 import PKCE from '../util/pkce';
 import { createTokenAPI } from '../factory';
@@ -32,6 +34,7 @@ import { TokenManager } from '../TokenManager';
 import { getOAuthUrls, isLoginRedirect } from '../util';
 
 import { OktaAuthSessionInterface } from '../../session/types';
+import { authenticateWithCiba } from '../authenticateWithCiba';
 import { provideOriginalUri } from './node';
 export function mixinOAuth
 <
@@ -334,6 +337,10 @@ export function mixinOAuth
         // Flow ends with logout redirect
         window.location.assign(logoutUri);
       }
+    }
+
+    authenticateWithCiba(options: CibaAuthOptions): Promise<CibaAuthResponse> {
+      return authenticateWithCiba(this, options);
     }
 
   };

@@ -12,6 +12,13 @@
 
 
 /* eslint-disable no-new */
+
+jest.mock('../../../lib/oidc/authenticateWithCiba', () => {
+  return {
+    authenticateWithCiba: () => {},
+  };
+});
+
 import { 
   OktaAuth, 
   AuthApiError,
@@ -22,6 +29,10 @@ import {
 } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
+
+const mocked = {
+  authenticateWithCiba: require('../../../lib/oidc/authenticateWithCiba')
+};
 
 describe('OktaAuth (api)', function() {
   let auth;
@@ -597,5 +608,14 @@ describe('OktaAuth (api)', function() {
       );
     });
 
+  });
+
+  describe('authenticateWithCiba', () => {
+    it('calls authenticateWithCiba with all options', async () => {
+      jest.spyOn(mocked.authenticateWithCiba, 'authenticateWithCiba').mockReturnValue(Promise.resolve());
+      const options = { fake1: 'fake1', fake2: 'fake2' };
+      await mocked.authenticateWithCiba.authenticateWithCiba(options);
+      expect(mocked.authenticateWithCiba.authenticateWithCiba).toHaveBeenCalledWith(options);
+    });
   });
 });
