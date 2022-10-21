@@ -27,6 +27,8 @@ require('core-js/es/string/ends-with');
 require('core-js/es/typed-array/uint8-array');
 require('core-js/features/array/from');
 require('core-js/features/array/includes');
+require('core-js/es/array/find');
+
 require('core-js/web/url');
 require('webcrypto-shim');
 
