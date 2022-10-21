@@ -10,15 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-/* eslint complexity:[0,8] */
 import { makeJwt } from '../../crypto/jwt';
 import { getOAuthBaseUrl } from '../util/oauth';
-import { httpRequest } from '../../http';
 import { AuthSdkError } from '../../errors';
-import { removeNils, toQueryString } from '../../util';
-import { OktaAuthOAuthInterface, CibaAuthOptions, CibaAuthResponse } from '../types';
-
-const CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
+import { OktaAuthOAuthInterface, CibaAuthOptions, CibaAuthResponse, BcAuthorizeOptions } from '../types';
+import { postToBcAuthorizeEndpoint } from '../endpoints/bc-authorize';
 
 export async function authenticateWithCiba(
   sdk: OktaAuthOAuthInterface, 
@@ -59,9 +55,11 @@ export async function authenticateWithCiba(
   const baseUrl = getOAuthBaseUrl(sdk);
   const bcAuthorizeUrl = `${baseUrl}/v1/bc/authorize`;
 
-  const { privateKey, ...params } = options as CibaAuthOptions & {
-    clientAssertionType?: string;
-    clientAssertion?: string;
+  const { privateKey, scopes, ...params } = options;
+
+  const bcAuthorizeOptions: BcAuthorizeOptions = {
+    ...params,
+    scope: scopes!.join(' ')
   };
   if (privateKey) {
     const jwt = await makeJwt({
@@ -69,35 +67,8 @@ export async function authenticateWithCiba(
       clientId: options.clientId,
       aud: bcAuthorizeUrl
     }).then(jwt => jwt.compact());
-    params.clientAssertionType = CLIENT_ASSERTION_TYPE;
-    params.clientAssertion = jwt;
+    bcAuthorizeOptions.clientAssertion = jwt;
   }
 
-  const headers = {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  };
-  /* eslint-disable camelcase */
-  const args = toQueryString(removeNils({
-    // client authentication params
-    client_id: params.clientId,
-    client_assertion_type: params.clientAssertionType,
-    client_assertion: params.clientAssertion,
-    client_secret: params.clientSecret,
-    
-    // ciba params
-    scope: params.scopes!.join(' '),
-    acr_values: params.acrValues,
-    login_hint: params.loginHint,
-    id_token_hint: params.idTokenHint,
-    binding_message: params.bindingMessage,
-    request_expiry: params.requestExpiry,
-  })).slice(1);
-  /* eslint-enable camelcase */
-
-  return httpRequest(sdk, {
-    url: bcAuthorizeUrl,
-    method: 'POST',
-    args,
-    headers
-  });
+  return postToBcAuthorizeEndpoint(sdk, bcAuthorizeOptions);
 }
