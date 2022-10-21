@@ -24,6 +24,7 @@ require('core-js/features/symbol/iterator');
 require('core-js/es/promise');
 require('core-js/es/string/starts-with');
 require('core-js/es/string/ends-with');
+require('core-js/es/string/includes');
 require('core-js/es/typed-array/uint8-array');
 require('core-js/features/array/from');
 require('core-js/features/array/includes');
