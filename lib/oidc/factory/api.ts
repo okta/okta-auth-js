@@ -18,7 +18,6 @@ import { getUserInfo } from '../getUserInfo';
 import { getWithoutPrompt } from '../getWithoutPrompt';
 import { getWithPopup } from '../getWithPopup';
 import { getWithRedirect } from '../getWithRedirect';
-import { enrollAuthenticator } from '../enrollAuthenticator';
 import { parseFromUrl } from '../parseFromUrl';
 import { renewToken } from '../renewToken';
 import { renewTokens } from '../renewTokens';
@@ -29,8 +28,6 @@ import {
   CustomUserClaims,
   GetWithRedirectAPI,
   GetWithRedirectFunction,
-  EnrollAuthenticatorAPI,
-  EnrollAuthenticatorFunction,
   IDToken,
   OktaAuthOAuthInterface,
   ParseFromUrlInterface,
@@ -60,12 +57,6 @@ export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue)
     _setLocation
   });
 
-  const enrollAuthenticatorFn = useQueue(enrollAuthenticator.bind(null, sdk)) as EnrollAuthenticatorFunction;
-  const enrollAuthenticatorApi: EnrollAuthenticatorAPI = Object.assign(enrollAuthenticatorFn, {
-    // This is exposed so we can set window.location in our tests
-    _setLocation
-  });
-
   // eslint-disable-next-line max-len
   const parseFromUrlFn = useQueue(parseFromUrl.bind(null, sdk)) as ParseFromUrlInterface;
   const parseFromUrlApi: ParseFromUrlInterface = Object.assign(parseFromUrlFn, {
@@ -91,7 +82,6 @@ export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue)
     getWithoutPrompt: getWithoutPrompt.bind(null, sdk),
     getWithPopup: getWithPopup.bind(null, sdk),
     getWithRedirect: getWithRedirectApi,
-    enrollAuthenticator: enrollAuthenticatorApi,
     parseFromUrl: parseFromUrlApi,
     decode: decodeToken,
     revoke: revokeToken.bind(null, sdk),

@@ -25,11 +25,14 @@ import {
   TransactionManagerInterface,
   TransactionManagerConstructor,
   UserClaims,
+  EnrollAuthenticatorAPI,
+  EnrollAuthenticatorFunction,
 } from '../types';
 import PKCE from '../util/pkce';
 import { createTokenAPI } from '../factory';
 import { TokenManager } from '../TokenManager';
 import { getOAuthUrls, isLoginRedirect } from '../util';
+import { enrollAuthenticator } from '../enrollAuthenticator';
 
 import { OktaAuthSessionInterface } from '../../session/types';
 import { provideOriginalUri } from './node';
@@ -56,6 +59,7 @@ export function mixinOAuth
     tokenManager: TokenManager;
     transactionManager: TM;
     pkce: PkceAPI;
+    enrollAuthenticator: EnrollAuthenticatorAPI;
 
     _pending: { handleLogin: boolean };
     _tokenQueue: PromiseQueue;
@@ -81,6 +85,20 @@ export function mixinOAuth
 
       // TokenManager
       this.tokenManager = new TokenManager(this, this.options.tokenManager);
+
+      const _setLocation = (url) => {
+        if (this.options.setLocation) {
+          this.options.setLocation(url);
+        } else {
+          window.location = url;
+        }
+      };
+      const enrollAuthenticatorFn = enrollAuthenticator.bind(null, this) as EnrollAuthenticatorFunction;
+      const enrollAuthenticatorApi: EnrollAuthenticatorAPI = Object.assign(enrollAuthenticatorFn, {
+        // This is exposed so we can set window.location in our tests
+        _setLocation
+      });
+      this.enrollAuthenticator = enrollAuthenticatorApi;
     }
 
     // inherited from subclass
