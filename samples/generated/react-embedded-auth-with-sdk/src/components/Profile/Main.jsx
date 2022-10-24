@@ -35,7 +35,9 @@ const Profile = () => {
     const accessToken = oktaAuth.getAccessToken();
     const idToken = oktaAuth.getIdToken();
     const scopes = decodeToken(accessToken).payload.scp;
-    const maxAge = +error.meta.max_age; // Required for insufficient authentication scenario 
+    // Required for insufficient authentication scenario 
+    const maxAge = +error.meta.max_age;
+    const acrValues = error.meta.acr_values;
 
     if (approach === 'authorize') {
       // Re-auth with Okta-hosted login flow
@@ -44,6 +46,7 @@ const Profile = () => {
         {
           prompt: 'login',
           maxAge,
+          acrValues,
           scopes,
           extraParams: {
             id_token_hint: idToken
@@ -52,10 +55,17 @@ const Profile = () => {
       );
     } else if (approach === 'interact-sdk') {
       // App will be redirected to FlowPage (/flow) once IdxTransaction is updated
-      const idxTransaction = await oktaAuth.idx.authenticate({ maxAge });
+      const idxTransaction = await oktaAuth.idx.authenticate({ maxAge, acrValues });
       setIdxTransaction(idxTransaction);
     } else if (approach === 'interact-widget') {
-      history.replace(`/widget?maxAge=${maxAge}`);
+
+      const queryParams = new URLSearchParams({
+        maxAge
+      });
+      if (acrValues) {
+        queryParams.append('acrValues', acrValues);
+      }
+      history.replace(`/widget?${queryParams.toString()}`);
     }
   }, [oktaAuth, approach, error, setIdxTransaction, history]);
 

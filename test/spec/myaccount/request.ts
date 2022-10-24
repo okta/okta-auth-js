@@ -59,7 +59,7 @@ describe('sendRequest', () => {
       xhr: {
         status: 403,
         headers: {
-          'www-authenticate': 'Bearer realm="IdpMyAccountAPI", error="insufficient_authentication_context", error_description="The access token requires additional assurance to access the resource", max_age=900'
+          'www-authenticate': 'Bearer realm="IdpMyAccountAPI", error="insufficient_authentication_context", error_description="The access token requires additional assurance to access the resource", max_age=900, acr_values="urn:okta:loa:2fa:any:ifpossible"'
         }
       }
     });
@@ -74,6 +74,7 @@ describe('sendRequest', () => {
       expect((err as any).errorSummary).toEqual('insufficient_authentication_context');
       expect((err as any).errorCauses).toEqual([{ errorSummary: 'The access token requires additional assurance to access the resource' }]);
       expect((err as any).meta.max_age).toEqual(900);
+      expect((err as any).meta.acr_values).toEqual('urn:okta:loa:2fa:any:ifpossible');
     }
   });
 
