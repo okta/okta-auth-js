@@ -734,4 +734,20 @@ describe('OktaAuth (browser)', function() {
 
   });
 
+  describe('handleRedirect', () => {
+    beforeEach(() => {
+      jest.spyOn(auth, 'handleLoginRedirect');
+    });
+
+    it('calls handleLoginRedirect', async () => {
+      await auth.handleRedirect();
+      expect(auth.handleLoginRedirect).toHaveBeenCalledWith(undefined, undefined);
+    });
+
+    it('calls handleLoginRedirect and passes originalUri', async () => {
+      await auth.handleRedirect('/overridden');
+      expect(auth.handleLoginRedirect).toHaveBeenCalledWith(undefined, '/overridden');
+    });
+  });
+
 });

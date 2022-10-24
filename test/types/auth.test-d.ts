@@ -119,7 +119,10 @@ const authorizeOptions2: TokenParams = {
   expectType<void>(await authClient.handleLoginRedirect());
   const tokens = await authClient.tokenManager.getTokens();
   expectType<void>(await authClient.handleLoginRedirect(tokens));
+  expectType<void>(await authClient.handleLoginRedirect(tokens, `${window.location.href}`));
   expectType<void>(await authClient.storeTokensFromRedirect());
+  expectType<void>(await authClient.handleRedirect());
+  expectType<void>(await authClient.handleRedirect(`${window.location.href}`));
 
   // signOut
   expectType<void>(await authClient.signOut());
