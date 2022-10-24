@@ -27,7 +27,7 @@ import {
   UserClaims,
 } from '../types';
 import PKCE from '../util/pkce';
-import { createTokenAPI } from '../factory';
+import { createTokenAPI } from '../factory/api';
 import { TokenManager } from '../TokenManager';
 import { getOAuthUrls, isLoginRedirect } from '../util';
 

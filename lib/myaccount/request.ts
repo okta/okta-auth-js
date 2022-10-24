@@ -7,6 +7,7 @@ import {
   ProfileSchemaTransaction,
   PhoneTransaction
 } from './transactions';
+import { TransactionOptions } from './transactions/Base';
 import { httpRequest } from '../http';
 import { AuthApiError, AuthSdkError } from '../errors';
 import { MyAccountRequestOptions as RequestOptions } from './types';
@@ -132,12 +133,15 @@ export async function sendRequest<T extends BaseTransaction> (
     }));
   }
 
-  return new TransactionClass(oktaAuth, { 
+  const transactionOptions: TransactionOptions = { 
     res, 
-    accessToken
-  });
+    accessToken,
+    generateRequestFnFromLinks
+  };
+  return new TransactionClass(oktaAuth, transactionOptions);
 }
 /* eslint-enable complexity */
+
 
 export type GenerateRequestFnFromLinksOptions = {
   oktaAuth: OktaAuthOAuthInterface;
@@ -148,6 +152,7 @@ export type GenerateRequestFnFromLinksOptions = {
 }
 
 type IRequestFnFromLinks = <T extends BaseTransaction>(payload?) => Promise<T | T[]>;
+export type GenerateRequestFnFromLinksFn = (options: GenerateRequestFnFromLinksOptions) => IRequestFnFromLinks;
 
 export function generateRequestFnFromLinks ({
   oktaAuth, 

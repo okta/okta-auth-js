@@ -1,7 +1,7 @@
 import { OktaAuthHttpInterface } from '../../http/types';
-import { TransactionLink } from '../request';
+import { TransactionLink, GenerateRequestFnFromLinksFn } from '../request';
 
-type TransactionOptions = {
+export type TransactionOptions = {
   // TODO: move res type to http module
   res: {
     headers: Record<string, string>;
@@ -9,6 +9,7 @@ type TransactionOptions = {
     [property: string]: unknown;
   };
   accessToken: string;
+  generateRequestFnFromLinks: GenerateRequestFnFromLinksFn;
 };
 export default class BaseTransaction {
   // Deprecated

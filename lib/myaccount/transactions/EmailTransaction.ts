@@ -1,7 +1,7 @@
 import { EmailChallengeTransaction, EmailStatusTransaction } from '.';
 import { EmailProfile, EmailRole, Status, VerificationPayload } from '../types';
 import BaseTransaction from './Base';
-import { generateRequestFnFromLinks } from '../request';
+import { GenerateRequestFnFromLinksFn } from '../request';
 
 export default class EmailTransaction extends BaseTransaction {
   id: string;
@@ -20,6 +20,7 @@ export default class EmailTransaction extends BaseTransaction {
     super(oktaAuth, options);
 
     const { accessToken, res } = options;
+    const generateRequestFnFromLinks: GenerateRequestFnFromLinksFn = options.generateRequestFnFromLinks;
     // assign required fields from res
     const { id, profile, roles, status, _links } = res;
     this.id = id;
