@@ -24,16 +24,11 @@ describe('getWithRedirect', () => {
   beforeEach(() => {
     const sdk = {
       options: {
-
+        setLocation: jest.fn()
       },
       getOriginalUri: () => {},
       transactionManager: {
         save: () => {}
-      },
-      token: {
-        getWithRedirect: {
-          _setLocation: () => {}
-        }
       }
     };
     const tokenParams = {
@@ -86,10 +81,9 @@ describe('getWithRedirect', () => {
 
   it('redirects to the authorize endpoint', async () => {
     const { sdk, tokenParams } = testContext;
-    jest.spyOn(sdk.token.getWithRedirect, '_setLocation');
     await getWithRedirect(sdk, {});
     expect(mocked.authorize.buildAuthorizeParams).toHaveBeenCalledWith(tokenParams);
-    expect(sdk.token.getWithRedirect._setLocation).toHaveBeenCalledWith('http://fake-authorize?fake=true');
+    expect(sdk.options.setLocation).toHaveBeenCalledWith('http://fake-authorize?fake=true');
   });
 
 });

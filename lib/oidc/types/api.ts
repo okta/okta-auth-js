@@ -58,14 +58,6 @@ export type EnrollAuthenticatorFunction = (params: EnrollAuthenticatorOptions) =
 
 export type SetLocationFunction = (loc: string) => void;
 
-export interface GetWithRedirectAPI extends GetWithRedirectFunction {
-  _setLocation: SetLocationFunction;
-}
-
-export interface EnrollAuthenticatorAPI extends EnrollAuthenticatorFunction {
-  _setLocation: SetLocationFunction;
-}
-
 export interface BaseTokenAPI {
   decode(token: string): JWTObject;
   prepareTokenParams(params?: TokenParams): Promise<TokenParams>;
@@ -77,7 +69,7 @@ export interface TokenAPI extends BaseTokenAPI {
     accessToken?: AccessToken,
     idToken?: IDToken
   ): Promise<UserClaims<S>>;
-  getWithRedirect: GetWithRedirectAPI;
+  getWithRedirect: GetWithRedirectFunction;
   parseFromUrl: ParseFromUrlInterface;
   getWithoutPrompt(params?: TokenParams): Promise<TokenResponse>;
   getWithPopup(params?: TokenParams): Promise<TokenResponse>;
@@ -160,7 +152,7 @@ export interface OktaAuthOAuthInterface
   storeTokensFromRedirect(): Promise<void>;
   getUser<T extends CustomUserClaims = CustomUserClaims>(): Promise<UserClaims<T>>;
   signInWithRedirect(opts?: SigninWithRedirectOptions): Promise<void>;
-  enrollAuthenticator: EnrollAuthenticatorAPI;
+  enrollAuthenticator: EnrollAuthenticatorFunction;
   
   revokeAccessToken(accessToken?: AccessToken): Promise<unknown>;
   revokeRefreshToken(refreshToken?: RefreshToken): Promise<unknown>;

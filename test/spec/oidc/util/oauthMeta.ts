@@ -16,16 +16,11 @@ describe('oauthMeta', () => {
   beforeEach(() => {
     const sdk = {
       options: {
-
+        setLocation: () => {}
       },
       getOriginalUri: () => {},
       transactionManager: {
         save: () => {}
-      },
-      token: {
-        getWithRedirect: {
-          _setLocation: () => {}
-        }
       }
     };
     const tokenParams = {

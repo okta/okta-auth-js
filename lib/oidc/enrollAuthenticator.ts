@@ -27,5 +27,9 @@ export async function enrollAuthenticator(
   const meta = createOAuthMeta(sdk, tokenParams);
   const requestUrl = meta.urls.authorizeUrl + buildAuthorizeParams(tokenParams);
   sdk.transactionManager.save(meta);
-  sdk.enrollAuthenticator._setLocation(requestUrl);
+  if (sdk.options.setLocation) {
+    sdk.options.setLocation(requestUrl);
+  } else {
+    window.location.assign(requestUrl);
+  }
 }
