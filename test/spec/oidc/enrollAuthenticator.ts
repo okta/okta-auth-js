@@ -31,10 +31,8 @@ describe('enrollAuthenticator', () => {
       transactionManager: {
         save: () => {}
       },
-      token: {
-        enrollAuthenticator: {
-          _setLocation: () => {}
-        }
+      enrollAuthenticator: {
+        _setLocation: () => {}
       }
     };
     const tokenParams = {
@@ -96,10 +94,10 @@ describe('enrollAuthenticator', () => {
 
   it('redirects to the authorize endpoint', async () => {
     const { sdk, tokenParams, enrollParams, authorizeParams } = testContext;
-    jest.spyOn(sdk.token.enrollAuthenticator, '_setLocation');
+    jest.spyOn(sdk.enrollAuthenticator, '_setLocation');
     await enrollAuthenticator(sdk, enrollParams);
     expect(mocked.authorize.buildAuthorizeParams).toHaveBeenCalledWith(tokenParams);
-    expect(sdk.token.enrollAuthenticator._setLocation).toHaveBeenCalledWith(`http://fake-authorize${authorizeParams}`);
+    expect(sdk.enrollAuthenticator._setLocation).toHaveBeenCalledWith(`http://fake-authorize${authorizeParams}`);
   });
 
 });

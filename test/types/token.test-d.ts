@@ -94,13 +94,13 @@ const tokens = {
     enrollAmrValues: 'email',
     responseType: 'none'
   };
-  expectType<void>(await authClient.token.enrollAuthenticator(enrollAuthenticatorOptons));
-  expectType<void>(await authClient.token.enrollAuthenticator(enrollAuthenticatorOptons2));
+  expectType<void>(await authClient.enrollAuthenticator(enrollAuthenticatorOptons));
+  expectType<void>(await authClient.enrollAuthenticator(enrollAuthenticatorOptons2));
   expectError(async () => {
-    await authClient.token.enrollAuthenticator({});
+    await authClient.enrollAuthenticator({});
   });
   expectError(async () => {
-    await authClient.token.enrollAuthenticator();
+    await authClient.enrollAuthenticator();
   });
 
   const customUrls = {

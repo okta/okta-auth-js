@@ -79,7 +79,6 @@ export async function preparePKCE(
 }
 
 function prepareEnrollAuthenticator(
-  sdk: OktaAuthOAuthInterface, 
   tokenParams: TokenParams
 ): TokenParams {
   tokenParams = {
@@ -113,7 +112,7 @@ export async function prepareTokenParams(
   tokenParams = { ...defaults, ...tokenParams };
 
   if (tokenParams.prompt === 'enroll_authenticator') {
-    tokenParams = prepareEnrollAuthenticator(sdk, tokenParams);
+    tokenParams = prepareEnrollAuthenticator(tokenParams);
   } else if (tokenParams.pkce) {
     tokenParams = await preparePKCE(sdk, tokenParams);
   }

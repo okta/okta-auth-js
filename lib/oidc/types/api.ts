@@ -78,7 +78,6 @@ export interface TokenAPI extends BaseTokenAPI {
     idToken?: IDToken
   ): Promise<UserClaims<S>>;
   getWithRedirect: GetWithRedirectAPI;
-  enrollAuthenticator: EnrollAuthenticatorAPI;
   parseFromUrl: ParseFromUrlInterface;
   getWithoutPrompt(params?: TokenParams): Promise<TokenResponse>;
   getWithPopup(params?: TokenParams): Promise<TokenResponse>;
@@ -161,6 +160,7 @@ export interface OktaAuthOAuthInterface
   storeTokensFromRedirect(): Promise<void>;
   getUser<T extends CustomUserClaims = CustomUserClaims>(): Promise<UserClaims<T>>;
   signInWithRedirect(opts?: SigninWithRedirectOptions): Promise<void>;
+  enrollAuthenticator: EnrollAuthenticatorAPI;
   
   revokeAccessToken(accessToken?: AccessToken): Promise<unknown>;
   revokeRefreshToken(refreshToken?: RefreshToken): Promise<unknown>;

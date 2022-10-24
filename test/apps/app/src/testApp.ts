@@ -906,7 +906,7 @@ class TestApp {
       state: this.config.state,
       enrollAmrValues: this.config.enrollAmrValues,
     });
-    return this.oktaAuth.token.enrollAuthenticator(options)
+    return this.oktaAuth.enrollAuthenticator(options)
       .catch(e => {
         this.renderError(e);
         throw e;
