@@ -16,5 +16,6 @@ yarn-error.*
 coverage
 dist
 .bacon.env
+scripts/dockolith
 
 !.gitkeep

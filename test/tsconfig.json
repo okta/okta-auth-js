@@ -23,7 +23,8 @@
       "@okta/okta-auth-js": [
         "../lib/exports/default"
       ]
-    }
+    },
+    "types":[ "node" ]
   },
   "include": [
     "../types/global.d.ts",
