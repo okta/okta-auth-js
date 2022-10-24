@@ -53,6 +53,10 @@ export function mixinCore
       await this.serviceManager.stop();
     }
 
+    async handleRedirect(originalUri?: string): Promise<void> {
+      await this.handleLoginRedirect(undefined, originalUri);
+    }
+
     // eslint-disable-next-line complexity
     async handleLoginRedirect(tokens?: Tokens, originalUri?: string): Promise<void> {
       let state = this.options.state;

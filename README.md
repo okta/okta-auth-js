@@ -225,7 +225,7 @@ var authClient = new OktaAuth(config);
 
 ### Running as a service
 
-By default, creating a new instance of `OktaAuth` will not create any asynchronous side-effects. However, certain features such as [token auto renew](#autorenew), [token auto remove](#autoremove) and [cross-tab synchronization](#syncstorage) require `OktaAuth` to be running as a service. This means timeouts are set in the background which will continue working until the service is stopped.  To start the `OktaAuth` service, simply call the `start` method right after creation and before calling other methods like [handleLoginRedirect](#handleloginredirecttokens-originaluri). To terminate all background processes, call `stop`. See [Service Configuration](#services) for more info.
+By default, creating a new instance of `OktaAuth` will not create any asynchronous side-effects. However, certain features such as [token auto renew](#autorenew), [token auto remove](#autoremove) and [cross-tab synchronization](#syncstorage) require `OktaAuth` to be running as a service. This means timeouts are set in the background which will continue working until the service is stopped.  To start the `OktaAuth` service, simply call the `start` method right after creation and before calling other methods like [handleRedirect](#handleredirectoriginaluri). To terminate all background processes, call `stop`. See [Service Configuration](#services) for more info.
 
 ```javascript
   var authClient = new OktaAuth(config);
@@ -536,7 +536,7 @@ oktaAuth.authStateManager.updateAuthState();
 
 > :link: web browser only <br>
 
-Callback function. When [sdk.handleLoginRedirect](#handleloginredirecttokens-originaluri) is called, by default it uses `window.location.replace` to redirect back to the [originalUri](#setoriginaluriuri). This option overrides the default behavior.
+Callback function. When [sdk.handleRedirect](#handleredirectoriginaluri) is called, by default it uses `window.location.replace` to redirect back to the [originalUri](#setoriginaluriuri). This option overrides the default behavior.
 
 ```javascript
 const config = {
@@ -552,7 +552,7 @@ const config = {
 const oktaAuth = new OktaAuth(config);
 if (oktaAuth.isLoginRedirect()) {
   try {
-    await oktaAuth.handleLoginRedirect();
+    await oktaAuth.handleRedirect();
   } catch (e) {
     // log or display error details
   }
@@ -893,6 +893,7 @@ This is accomplished by selecting a single tab to handle the network requests to
 * [removeOriginalUri](#removeoriginaluri)
 * [isLoginRedirect](#isloginredirect)
 * [handleLoginRedirect](#handleloginredirecttokens-originaluri)
+* [handleRedirect](#handleredirectoriginaluri)
 * [setHeaders](#setheaders)
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
@@ -967,7 +968,7 @@ You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens 
 ```javascript
 if (authClient.isLoginRedirect()) {
   try {
-    await authClient.handleLoginRedirect();
+    await authClient.handleRedirect();
   } catch (e) {
     // log or display error details
   }
@@ -1084,7 +1085,7 @@ See [authn API](docs/authn.md#verifyrecoverytokenoptions).
 > :link: web browser only <br>
 > :hourglass: async
 
-Enroll authenticators using a redirect to [authorizeUrl](#authorizeurl) with special parameters. After a successful enrollment, the browser will be redirected to the configured [redirectUri](#configuration-options). URL will not contain any tokens. You can use [sdk.handleLoginRedirect](#handleloginredirecttokens-originaluri).
+Enroll authenticators using a redirect to [authorizeUrl](#authorizeurl) with special parameters. After a successful enrollment, the browser will be redirected to the configured [redirectUri](#configuration-options). You can use [sdk.handleRedirect](#handleredirectoriginaluri) to handle the redirect on successful enrollment or an error.
 
 * `options` - See [Authorize options](#authorize-options)
 
@@ -1219,7 +1220,7 @@ Check `window.location` to verify if the app is in OAuth callback state or not. 
 if (authClient.isLoginRedirect()) {
   // callback flow
   try {
-    await authClient.handleLoginRedirect();
+    await authClient.handleRedirect();
   } catch (e) {
     // log or display error details
   }
@@ -1232,10 +1233,21 @@ if (authClient.isLoginRedirect()) {
 
 > :link: web browser only <br>
 > :hourglass: async
+> :warning: Deprecated, this method could be removed in next major release, use [sdk.handleRedirect](#handleredirectoriginaluri) instead.
 
 Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options). By default, [originalUri](#getoriginaluristate) will be retrieved from storage, but this can be overridden by passing a value fro `originalUri` to this function in the 2nd parameter.
 
 > **Note:** `handleLoginRedirect` throws `OAuthError` or `AuthSdkError` in case there are errors during token retrieval.
+
+### `handleRedirect(originalUri?)`
+
+> :link: web browser only <br>
+> :hourglass: async
+
+Handle a redirect to the configured [redirectUri](#configuration-options) that happens on the end of [login](#signInWithRedirectoptions) flow, [enroll authenticator](#enrollauthenticatoroptions) flow or on an error.  
+Stores tokens from redirect url into storage (for login flow), then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options). By default, [originalUri](#getoriginaluristate) will be retrieved from storage, but this can be overridden by specifying `originalUri` in the first parameter to this function.
+
+> **Note:** `handleRedirect` throws `OAuthError` or `AuthSdkError` in case there are errors during token retrieval or building URL to enroll authenticator.
 
 ### `setHeaders()`
 
