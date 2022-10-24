@@ -26,7 +26,6 @@ import { revokeToken } from '../revokeToken';
 import {
   AccessToken,
   CustomUserClaims,
-  GetWithRedirectAPI,
   GetWithRedirectFunction,
   IDToken,
   OktaAuthOAuthInterface,
@@ -43,19 +42,7 @@ export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue)
     return PromiseQueue.prototype.push.bind(queue, method, null);
   };
 
-  const _setLocation = (url) => {
-    if (sdk.options.setLocation) {
-      sdk.options.setLocation(url);
-    } else {
-      window.location = url;
-    }
-  };
-
   const getWithRedirectFn = useQueue(getWithRedirect.bind(null, sdk)) as GetWithRedirectFunction;
-  const getWithRedirectApi: GetWithRedirectAPI = Object.assign(getWithRedirectFn, {
-    // This is exposed so we can set window.location in our tests
-    _setLocation
-  });
 
   // eslint-disable-next-line max-len
   const parseFromUrlFn = useQueue(parseFromUrl.bind(null, sdk)) as ParseFromUrlInterface;
@@ -81,7 +68,7 @@ export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue)
     exchangeCodeForTokens: exchangeCodeForTokens.bind(null, sdk),
     getWithoutPrompt: getWithoutPrompt.bind(null, sdk),
     getWithPopup: getWithPopup.bind(null, sdk),
-    getWithRedirect: getWithRedirectApi,
+    getWithRedirect: getWithRedirectFn,
     parseFromUrl: parseFromUrlApi,
     decode: decodeToken,
     revoke: revokeToken.bind(null, sdk),

@@ -7,16 +7,17 @@ import { parseOAuthResponseFromUrl } from '../../../lib/oidc/parseFromUrl';
 function mockGetWithRedirect(client, testContext) {
   jest.spyOn(client, 'getOriginalUri').mockImplementation(() => {});
   jest.spyOn(client, 'setOriginalUri').mockImplementation(() => {});
-  jest.spyOn(client.token.getWithRedirect, '_setLocation').mockImplementation(authorizeUrl => {
+  testContext.origSetLocation = client.options.setLocation;
+  client.options.setLocation = authorizeUrl => {
     testContext.authorizeUrl = authorizeUrl;
-  });
+  };
   jest.spyOn(client.token.parseFromUrl, '_getLocation').mockImplementation(() => {});
 }
 
-function unmockGetWithRedirect(client) {
+function unmockGetWithRedirect(client, testContext) {
   client.getOriginalUri.mockRestore();
   client.setOriginalUri.mockRestore();
-  client.token.getWithRedirect._setLocation.mockRestore();
+  client.options.setLocation = testContext.origSetLocation;
   client.token.parseFromUrl._getLocation.mockRestore();
 }
 
@@ -41,7 +42,7 @@ async function getTokens(client, tokenParams) {
   });
   const transactionMeta = client.transactionManager.load();
   const tokenResponse = await handleOAuthResponse(client, transactionMeta, oauthResponse, undefined as unknown as CustomUrls);
-  unmockGetWithRedirect(client);
+  unmockGetWithRedirect(client, localContext);
   return tokenResponse;
 }
 

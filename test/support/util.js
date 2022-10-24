@@ -381,10 +381,6 @@ util.parseQueryParams = function (query) {
   return obj;
 };
 
-util.mockSetWindowLocation = function (client) {
-  return jest.spyOn(client.token.getWithRedirect, '_setLocation');
-};
-
 util.mockSetCookie = function () {
   return jest.spyOn(cookies, 'set');
 };

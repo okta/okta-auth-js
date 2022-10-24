@@ -419,14 +419,14 @@ oauthUtil.setupRedirect = function(opts) {
     pkce: false,
     issuer: 'https://auth-js-test.okta.com',
     clientId: 'NPSfOkH5eZrTy8PMDlvx',
-    redirectUri: 'https://example.com/redirect'
+    redirectUri: 'https://example.com/redirect',
+    setLocation: jest.fn()
   }, opts.oktaAuthArgs));
 
   // Mock the well-known and keys request
   oauthUtil.loadWellKnownAndKeysCache(client);
 
   oauthUtil.mockStateAndNonce();
-  var windowLocationMock = util.mockSetWindowLocation(client);
   var setCookieMock = util.mockSetCookie();
 
   jest.spyOn(storageUtil, 'getSessionStorage')
@@ -446,7 +446,7 @@ oauthUtil.setupRedirect = function(opts) {
 
   return promise
     .then(function() {
-      expect(windowLocationMock).toHaveBeenCalledWith(opts.expectedRedirectUrl);
+      expect(client.options.setLocation).toHaveBeenCalledWith(opts.expectedRedirectUrl);
       expect(setCookieMock.mock.calls).toEqual(opts.expectedCookies);
     })
     .finally(() => {
