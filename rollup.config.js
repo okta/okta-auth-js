@@ -116,7 +116,7 @@ const getPlugins = (env, entryName) => {
     license({
       banner: {
         content: {
-          file: path.join(__dirname, 'scripts', 'license-template'),
+          file: path.join(__dirname, 'scripts', 'buildtools', 'license-template'),
         }
       }
     }),

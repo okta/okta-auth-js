@@ -15,5 +15,6 @@ junit-results.xml
 yarn-error.*
 coverage
 dist
+.bacon.env
 
 !.gitkeep
