@@ -113,10 +113,10 @@ test_suites:
       queue_name: small
 
     - name: e2e-monolith
-      script_path: ../okta-auth-js/scripts
+      script_path: ../okta-auth-js/scripts/e2e
       sort_order: '14'
       timeout: '30'
-      script_name: ./e2e/e2e-dockolith
+      script_name: e2e-dockolith
       criteria: OPTIONAL
       queue_name: ci-queue-prodJenga-Monolith-Build
     # Sauce labs tests are flaky due to the free account we are currently using
