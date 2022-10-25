@@ -1,9 +1,7 @@
-const fs = require('fs');
-const path = require('path');
 const { OktaAuth } = require('@okta/okta-auth-js');
 const { toQueryString } = require('../src/util');
 
-const privateKey = fs.readFileSync(path.resolve(__dirname, 'private.key')).toString();
+const privateKey = process.env.PEM;
 
 async function cibaClientAuthMiddleware(req, res) {
   console.log('cibaClientAuthMiddleware received form data:', req.body);
