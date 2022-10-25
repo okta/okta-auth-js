@@ -10,6 +10,11 @@ if [[ -z "${OKTA_CLIENT_TOKEN}" ]]; then
 fi
 
 # Creates a test org and outputs environment variables to a file named "testenv.local" in the project root
-yarn workspace @okta/test.support monolith:create-env
+
+#yarn workspace @okta/test.support monolith:create-env
+pushd ./test/support
+yarn ts-node ./monolith/create-env.ts
+popd
+
 # cat testenv.local >> testenv
 # echo "updated testenv"

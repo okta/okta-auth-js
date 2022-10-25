@@ -2,9 +2,9 @@
 
 DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
-source $DIR/../setup-e2e.sh
+source $DIR/../setup-dockolith.sh
 
-setup_e2e
+# setup_e2e
 
 # overrides
 
@@ -21,4 +21,11 @@ export $(cat $DIR/../.bacon.env | xargs)
 # TODO: use clientId
 export CLIENT_ID=$SPA_CLIENT_ID
 
-run_e2e
+create_log_group "E2E Test Run"
+if ! yarn test:e2e:cucumber; then
+  echo "OIE e2e tests failed! Exiting..."
+  exit ${TEST_FAILURE}
+fi
+finish_log_group $?
+
+exit ${PUBLISH_TYPE_AND_RESULT_DIR}

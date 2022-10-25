@@ -37,7 +37,7 @@ async function bootstrap() {
           rule.conditions.grantTypes = {
             include: [
               'implicit',
-              'refresh_token',
+              'client_credentials',
               'password',
               'authorization_code',
               'interaction_code' // need to add interaction_code grant or user will see no_matching_policy error
@@ -107,7 +107,8 @@ async function bootstrap() {
       {
         label: 'AUTHJS SPA APP',
         appType: 'browser',
-        interactionCode: true
+        interactionCode: true,
+        refreshToken: true
       }
     ],
     origins: [

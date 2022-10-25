@@ -111,6 +111,14 @@ test_suites:
       script_name: verify-registry-install
       criteria: MERGE
       queue_name: small
+
+    - name: e2e-monolith
+      script_path: ../okta-auth-js/scripts
+      sort_order: '14'
+      timeout: '30'
+      script_name: ./e2e/e2e-dockolith
+      criteria: OPTIONAL
+      queue_name: ci-queue-prodJenga-Monolith-Build
     # Sauce labs tests are flaky due to the free account we are currently using
     # Re-enable this task on bacon once we have an paid account
     # - name: e2e-saucelabs 
