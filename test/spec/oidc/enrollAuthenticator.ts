@@ -21,13 +21,22 @@ const mocked = {
 
 describe('enrollAuthenticator', () => {
   let testContext;
+  let originalLocation;
   beforeEach(() => {
+    originalLocation = global.window.location;
+    delete (global.window as any).location;
+    global.window.location = {
+      protocol: 'https:',
+      hostname: 'somesite.local',
+      href: 'https://somesite.local',
+      assign: jest.fn()
+    } as unknown as Location;
+
     const sdk = {
       options: {
         issuer: 'http://fake',
         clientId: 'fakeClientId',
-        redirectUri: 'http://fake-redirect',
-        setLocation: jest.fn()
+        redirectUri: 'http://fake-redirect'
       },
       transactionManager: {
         save: () => {}
@@ -63,6 +72,10 @@ describe('enrollAuthenticator', () => {
     jest.spyOn(mocked.util, 'createOAuthMeta').mockReturnValue(testContext.meta);
   });
 
+  afterEach(() => {
+    global.window.location = originalLocation;
+  });
+
   describe('transactionMeta', () => {
     beforeEach(() => {
       const { sdk } = testContext;
@@ -90,11 +103,19 @@ describe('enrollAuthenticator', () => {
     expect(mocked.util.prepareTokenParams).toHaveBeenCalledWith(sdk, tokenParams);
   });
 
-  it('redirects to the authorize endpoint', async () => {
+  it('redirects to the authorize endpoint with options.setLocation', async () => {
     const { sdk, tokenParams, enrollParams, authorizeParams } = testContext;
+    sdk.options.setLocation = jest.fn();
     await enrollAuthenticator(sdk, enrollParams);
     expect(mocked.authorize.buildAuthorizeParams).toHaveBeenCalledWith(tokenParams);
     expect(sdk.options.setLocation).toHaveBeenCalledWith(`http://fake-authorize${authorizeParams}`);
+  });
+
+  it('redirects to the authorize endpoint with window.location.assign if options.setLocation is not set', async () => {
+    const { sdk, tokenParams, enrollParams, authorizeParams } = testContext;
+    await enrollAuthenticator(sdk, enrollParams);
+    expect(mocked.authorize.buildAuthorizeParams).toHaveBeenCalledWith(tokenParams);
+    expect(window.location.assign).toHaveBeenCalledWith(`http://fake-authorize${authorizeParams}`);
   });
 
 });
