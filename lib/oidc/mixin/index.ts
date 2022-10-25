@@ -25,7 +25,7 @@ import {
   TransactionManagerInterface,
   TransactionManagerConstructor,
   UserClaims,
-  EnrollAuthenticatorFunction,
+  EnrollAuthenticatorOptions,
 } from '../types';
 import PKCE from '../util/pkce';
 import { createTokenAPI } from '../factory';
@@ -58,7 +58,6 @@ export function mixinOAuth
     tokenManager: TokenManager;
     transactionManager: TM;
     pkce: PkceAPI;
-    enrollAuthenticator: EnrollAuthenticatorFunction;
 
     _pending: { handleLogin: boolean };
     _tokenQueue: PromiseQueue;
@@ -84,8 +83,6 @@ export function mixinOAuth
 
       // TokenManager
       this.tokenManager = new TokenManager(this, this.options.tokenManager);
-
-      this.enrollAuthenticator = enrollAuthenticator.bind(null, this) as EnrollAuthenticatorFunction;
     }
 
     // inherited from subclass
@@ -341,6 +338,10 @@ export function mixinOAuth
         // Flow ends with logout redirect
         window.location.assign(logoutUri);
       }
+    }
+
+    async enrollAuthenticator(options: EnrollAuthenticatorOptions) {
+      return enrollAuthenticator(this, options);
     }
 
   };
