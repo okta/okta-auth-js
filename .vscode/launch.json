@@ -70,6 +70,16 @@
     },
 
     {
+      "name": "test app: main",
+      "type": "node",
+      "request": "launch",
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceRoot}/test/apps/app",
+      "program": "server/index.js",
+    },
+
+    {
       "name": "sample: static SPA",
       "type": "node",
       "request": "launch",

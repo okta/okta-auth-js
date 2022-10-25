@@ -34,3 +34,4 @@ export { getWithoutPrompt } from './getWithoutPrompt';
 export { getWithPopup } from './getWithPopup';
 export { getWithRedirect } from './getWithRedirect';
 export { parseFromUrl } from './parseFromUrl';
+export { authenticateWithCiba } from './authenticateWithCiba';

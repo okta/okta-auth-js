@@ -12,7 +12,7 @@
 
 import { JWTObject } from './JWT';
 import { OAuthTransactionMeta, PKCETransactionMeta } from './meta';
-import { CustomUrls, OktaAuthOAuthOptions, SigninWithRedirectOptions, TokenParams } from './options';
+import { CibaAuthOptions, CustomUrls, OktaAuthOAuthOptions, SigninWithRedirectOptions, TokenParams } from './options';
 import { OAuthStorageManagerInterface } from './storage';
 import { AccessToken, IDToken, RefreshToken, RevocableToken, Token, Tokens } from './Token';
 import { TokenManagerInterface } from './TokenManager';
@@ -29,6 +29,12 @@ export interface TokenResponse {
   tokens: Tokens;
   state: string;
   code?: string;
+}
+
+export interface CibaAuthResponse {
+  auth_req_id: string;
+  expires_in: number;
+  interval?: number;
 }
 
 export interface ParseFromUrlOptions {
@@ -117,6 +123,10 @@ export interface OriginalUriApi {
   getOriginalUri(state?: string): string | undefined;
   setOriginalUri(originalUri: string, state?: string): void;
   removeOriginalUri(state?: string): void;
+}
+
+export interface CibaApi {
+  authenticateWithCiba(options: CibaAuthOptions): Promise<CibaAuthResponse>;
 }
 
 export interface OktaAuthOAuthInterface

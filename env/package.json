@@ -4,6 +4,6 @@
   "main": "index.js",
   "private": true,
   "dependencies": {
-    "dotenv": "^8.2.0"
+    "dotenv": "^16.0.3"
   }
 }

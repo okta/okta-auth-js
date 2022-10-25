@@ -17,3 +17,5 @@ coverage
 dist
 
 !.gitkeep
+
+private.key
