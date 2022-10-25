@@ -16,6 +16,7 @@ import { AuthSdkError } from '../../errors';
 import { OktaAuthOAuthInterface, CibaAuthOptions, CibaAuthResponse, BcAuthorizeOptions } from '../types';
 import { postToBcAuthorizeEndpoint } from '../endpoints/bc-authorize';
 
+/* eslint complexity:[0,8] */
 export async function authenticateWithCiba(
   sdk: OktaAuthOAuthInterface, 
   options: CibaAuthOptions

@@ -189,6 +189,7 @@ describe('authenticateWithCiba', () => {
       acrValues: 'fake:acr',
       bindingMessage: 'fake-binding-message',
       requestExpiry: 100,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore test invalid option
       invalidOption: 'invalid',
     });
