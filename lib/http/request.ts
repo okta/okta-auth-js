@@ -19,11 +19,10 @@ import {
   OktaAuthHttpInterface,
   RequestOptions,
   FetchOptions,
-  RequestData
+  RequestData,
+  HttpResponse
 } from './types';
-import { AuthApiError, OAuthError, AuthSdkError } from '../errors';
-import { HttpResponse } from './types';
-import { APIError } from '../errors/types';
+import { AuthApiError, OAuthError, AuthSdkError, APIError } from '../errors';
 
 type InsufficientAuthenticationError = {
   error: string;
