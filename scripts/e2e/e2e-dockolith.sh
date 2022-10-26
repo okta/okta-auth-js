@@ -4,7 +4,7 @@ DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
 source $DIR/../setup-dockolith.sh
 
-# setup_e2e
+setup_e2e
 
 # overrides
 
