@@ -114,8 +114,15 @@ authClient.forgotPassword({
   factorType: 'SMS',
 })
 .then(function(transaction) {
+  // transaction.status == 'RECOVERY_CHALLENGE'
   return transaction.verify({
     passCode: '123456' // The passCode from the SMS or CALL
+  });
+})
+.then(function(transaction) {
+  // transaction.status == 'PASSWORD_RESET'
+  return transaction.resetPassword({
+    newPassword: 'N3wP4ssw0rd'
   });
 })
 .then(function(transaction) {
