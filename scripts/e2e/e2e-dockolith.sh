@@ -31,4 +31,6 @@ if ! yarn test:e2e:cucumber; then
 fi
 finish_log_group $?
 
+echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
+echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
 exit ${PUBLISH_TYPE_AND_RESULT_DIR}

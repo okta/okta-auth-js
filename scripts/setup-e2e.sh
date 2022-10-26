@@ -50,11 +50,11 @@ run_e2e () {
       exit ${TEST_FAILURE}
     fi
   fi
+  finish_log_group $?
 
   echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
   echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
   exit ${PUBLISH_TYPE_AND_RESULT_DIR}
-  finish_log_group $?
 }
 
 setup_sample_tests () {
@@ -105,9 +105,9 @@ run_sample_tests () {
     echo "tests failed! Exiting..."
     exit ${TEST_FAILURE}
   fi
+  finish_log_group $?
 
   echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
   echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
   exit ${PUBLISH_TYPE_AND_RESULT_DIR}
-  finish_log_group $?
 }
