@@ -16,7 +16,10 @@ export ORG_OIE_ENABLED=true
 # export RUN_CUCUMBER=1
 
 # re-export env vars in .bacon.env
-export $(cat $DIR/../.bacon.env | xargs)
+# export $(cat $DIR/../.bacon.env | xargs)
+set -a
+source $DIR/../.bacon.env
+set +a
 
 # TODO: use clientId
 export CLIENT_ID=$SPA_CLIENT_ID
