@@ -74,8 +74,7 @@ cd ${OKTA_HOME}/${REPO}
 
 create_log_group "Yarn Install"
 # Install dependences. --ignore-scripts will prevent chromedriver from attempting to install
-install=$(yarn install --frozen-lockfile --ignore-scripts)
-if [$? > 0]; then
+if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
@@ -153,14 +152,9 @@ if [ ! -z "$WIDGET_VERSION" ]; then
 fi
 
 # only run build when installs something
-match=$( echo "$install" | grep -q 'success Already up-to-date.' && echo 'matched' )
-if [ "$match" = "matched" ]; then
-  echo 'Skipping build...'
-else
-  create_log_group "Yarn Build"
-  if ! yarn build; then
-    echo "build failed! Exiting..."
-    exit ${TEST_FAILURE}
-  fi
-  finish_log_group $?
+create_log_group "Yarn Build"
+if ! yarn build; then
+  echo "build failed! Exiting..."
+  exit ${TEST_FAILURE}
 fi
+finish_log_group $?
