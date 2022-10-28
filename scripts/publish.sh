@@ -1,5 +1,6 @@
-#!/bin/bash -xe
+#!/bin/bash -ex
 
+set +x    # ignore generic installation logs from setup/yarn add @okta/ci*
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
 REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-topic"
@@ -10,6 +11,7 @@ export TEST_SUITE_TYPE="build"
 export PATH="${PATH}:$(yarn global bin)"
 yarn global add @okta/ci-append-sha
 yarn global add @okta/ci-pkginfo
+set -x
 
 if [ -n "${action_branch}" ];
 then

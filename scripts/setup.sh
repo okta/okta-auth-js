@@ -75,7 +75,7 @@ cd ${OKTA_HOME}/${REPO}
 create_log_group "Yarn Install"
 # Install dependences. --ignore-scripts will prevent chromedriver from attempting to install
 install=$(yarn install --frozen-lockfile --ignore-scripts)
-if [$? -ne 0]; then
+if [$? > 0]; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
