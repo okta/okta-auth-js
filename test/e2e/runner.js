@@ -55,8 +55,10 @@ const getTask = (config) => () => {
         });
       } else {
         (config.spec || []).forEach(spec => {
-          runnerArgs.push('--spec');
-          runnerArgs.push(`./specs/${spec}`);
+          if (!(process.env.LOCAL_MONOLITH && ['concurrent.js', 'tokens.js', 'static.js'].includes(spec))) {
+            runnerArgs.push('--spec');
+            runnerArgs.push(`./specs/${spec}`);
+          }
         });
         (config.exclude || []).forEach(spec => {
           runnerArgs.push('--exclude');

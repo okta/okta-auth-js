@@ -16,18 +16,20 @@ export CI=true
 
 # fi
 
-# Start monolith
-create_log_group "Install/Start Monolith"
-source ./scripts/monolith/install-dockolith.sh
-source ./scripts/monolith/start-dockolith.sh
-finish_log_group $?
+create_dockolith_test_org () {
+  # Start monolith
+  create_log_group "Install/Start Monolith"
+  source ./scripts/monolith/install-dockolith.sh
+  source ./scripts/monolith/start-dockolith.sh
+  finish_log_group $?
 
-# Create test org and save environment variables in "testenv"
-create_log_group "Create Test Org"
-# Add widget test host to /etc/hosts
-export TEST_ORG_SUBDOMAIN="authjs-test-1"
-echo "${DOCKER_HOST_CONTAINER_IP} ${TEST_ORG_SUBDOMAIN}.okta1.com" >> /etc/hosts
-cat /etc/hosts
-source ./scripts/monolith/create-env.sh
-export ORG_OIE_ENABLED=true
-finish_log_group $?
+  # Create test org and save environment variables in "testenv"
+  create_log_group "Create Test Org"
+  # Add widget test host to /etc/hosts
+  export TEST_ORG_SUBDOMAIN="authjs-test-1"
+  echo "${DOCKER_HOST_CONTAINER_IP} ${TEST_ORG_SUBDOMAIN}.okta1.com" >> /etc/hosts
+  cat /etc/hosts
+  source ./scripts/monolith/create-env.sh
+  export ORG_OIE_ENABLED=true
+  finish_log_group $?
+}
