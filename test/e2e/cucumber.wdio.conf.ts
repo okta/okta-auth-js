@@ -1,6 +1,7 @@
 import type { Options } from '@wdio/types';
+import type { WebdriverIO } from '@wdio/types/build/Options';
 const wdioConfig = require('./wdio.conf');
-const { capabilities, services, reporters, ...conf } = wdioConfig.config;
+const { capabilities, services, ...conf } = wdioConfig.config;
 
 const DEBUG = process.env.DEBUG;
 

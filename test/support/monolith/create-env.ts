@@ -1,8 +1,10 @@
+// eslint-disable-next-line no-undef, node/no-missing-import
 import * as dockolith from '@okta/dockolith';
 import { writeFileSync } from 'fs';
 import * as path from 'path';
 
 // Bootstraps a local monolith instance
+/* eslint max-statements: [2, 60], complexity: [2, 10] */
 async function bootstrap() {
   const subDomain = process.env.TEST_ORG_SUBDOMAIN || 'authjs-test-' + Date.now();
   const outputFilePath = path.join(__dirname, '../../../', '.bacon.env');
@@ -120,7 +122,7 @@ async function bootstrap() {
   };
 
   // Set Feature flags
-  console.error('Setting feature flags...')
+  console.error('Setting feature flags...');
   for (const option of options.enableFFs) {
     await dockolith.enableFeatureFlag(config, orgId, option);
   }
@@ -161,7 +163,7 @@ async function bootstrap() {
   });
 
   // Create apps
-  const createdApps: any[] = []
+  const createdApps: any[] = [];
   for (const option of options.apps) {
     console.error(`Creating app "${option.label}"`);
     const app = await dockolith.createApp(config, {
@@ -221,7 +223,7 @@ async function bootstrap() {
 
     USERNAME: user1.profile.login,
     PASSWORD: options.users[0].password,
-  }
+  };
 
   console.error(`Writing output to: ${outputFilePath}`);
 
