@@ -2,7 +2,7 @@ const compose = (...functions) => args => functions.reduceRight((arg, fn) => fn(
 
 const inputTransformer = nextStep => form => {
   // only process UI inputs
-  const inputs = nextStep.inputs?.filter(input => !!input.label);
+  const inputs = nextStep.inputs?.filter(input => !!input.label || !!input.options);
   
   if (!inputs?.length) {
     return form;
@@ -10,7 +10,7 @@ const inputTransformer = nextStep => form => {
 
   return { 
     ...form,
-    inputs: inputs.map(({ label, name, type, secret, required }) => {
+    inputs: inputs.map(({ label, name, type, secret, required, options }) => {
       if (secret) {
         type = 'password';
       } else if (type === 'string') {
@@ -18,24 +18,8 @@ const inputTransformer = nextStep => form => {
       } else if (type === 'boolean') {
         type = 'checkbox';
       }
-      return { label, name, type, required };
+      return { label, name, type, required, options };
     })
-  };
-};
-
-const selectTransformer = nextStep => form => {
-  const { inputs, options } = nextStep;
-  
-  if (!options) {
-    return form;
-  }
-
-  return {
-    ...form,
-    select: {
-      name: inputs[0].name,
-      options: options.map(({ label, value }) => ({ key: value, value, label }))
-    }
   };
 };
 
@@ -92,6 +76,5 @@ const googleAuthenticatorTransformer = nextStep => form => {
 export const formTransformer = nextStep => compose(
   googleAuthenticatorTransformer(nextStep),
   securityQuestionTransformer(nextStep),
-  selectTransformer(nextStep),
   inputTransformer(nextStep)
 );

@@ -62,7 +62,7 @@ export type VerificationPayload = {
   verificationCode: string;
 };
 
-export type PasswordProfile = {
+export type EnrollPasswordPayload = {
   profile: {
     password: string;
   }

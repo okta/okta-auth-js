@@ -1,14 +1,14 @@
-import { PasswordProfile, Status, UpdatePasswordPayload } from '../types';
+import { EnrollPasswordPayload, UpdatePasswordPayload, Status } from '../types';
 import BaseTransaction from './Base';
 import { generateRequestFnFromLinks } from '../request';
 
 export default class PasswordTransaction extends BaseTransaction {
-  profile: PasswordProfile;
+  id: string;
   status: Status;
 
   // eslint-disable-next-line no-use-before-define
   get: () => Promise<PasswordTransaction>;
-  enroll?: (payload: UpdatePasswordPayload) => Promise<PasswordTransaction>;
+  enroll?: (payload: EnrollPasswordPayload) => Promise<PasswordTransaction>;
   update?: (payload: UpdatePasswordPayload) => Promise<PasswordTransaction>;
   delete?: () => Promise<BaseTransaction>;
 
@@ -17,8 +17,8 @@ export default class PasswordTransaction extends BaseTransaction {
 
     const { res, accessToken } = options;
     // assign required fields from res
-    const { profile, status, _links } = res;
-    this.profile = profile;
+    const { id, status, _links } = res;
+    this.id = id;
     this.status = status;
 
 

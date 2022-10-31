@@ -14,7 +14,9 @@ export default {
     'okta.myAccount.profile.read', 
     'okta.myAccount.profile.manage',
     'okta.myAccount.email.manage',
-    'okta.myAccount.phone.manage'
+    'okta.myAccount.phone.manage',
+    'okta.myAccount.password.read', 
+    'okta.myAccount.password.manage',
   ],
   pkce: true
 };
