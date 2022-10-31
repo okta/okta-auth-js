@@ -19,9 +19,96 @@ import {
   OktaAuthHttpInterface,
   RequestOptions,
   FetchOptions,
-  RequestData
+  RequestData,
+  HttpResponse
 } from './types';
-import { AuthApiError, OAuthError } from '../errors';
+import { AuthApiError, OAuthError, AuthSdkError, APIError } from '../errors';
+
+type InsufficientAuthenticationError = {
+  error: string;
+  // eslint-disable-next-line camelcase
+  error_description: string;
+  // eslint-disable-next-line camelcase
+  max_age: string;
+  // eslint-disable-next-line camelcase
+  acr_values: string;
+};
+
+const parseInsufficientAuthenticationError = (
+  header: string
+): InsufficientAuthenticationError => {
+  if (!header) {
+    throw new AuthSdkError('Missing header string');
+  }
+
+  return header
+    .split(',')
+    .map(part => part.trim())
+    .map(part => part.split('='))
+    .reduce((acc, curr) => {
+      // unwrap quotes from value
+      acc[curr[0]] = curr[1].replace(/^"(.*)"$/, '$1');
+      return acc;
+    }, {}) as InsufficientAuthenticationError;
+};
+
+const formatError = (sdk: OktaAuthHttpInterface, resp: HttpResponse): AuthApiError | OAuthError => {
+  let err: AuthApiError | OAuthError;
+  let serverErr: Record<string, any> = {};
+  if (resp.responseText && isString(resp.responseText)) {
+    try {
+      serverErr = JSON.parse(resp.responseText);
+    } catch (e) {
+      serverErr = {
+        errorSummary: 'Unknown error'
+      };
+    }
+  }
+
+  if (resp.status >= 500) {
+    serverErr.errorSummary = 'Unknown error';
+  }
+
+  if (sdk.options.transformErrorXHR) {
+    resp = sdk.options.transformErrorXHR(clone(resp));
+  }
+
+  if (serverErr.error && serverErr.error_description) {
+    err = new OAuthError(serverErr.error, serverErr.error_description);
+  } else {
+    err = new AuthApiError(serverErr as APIError, resp);
+  }
+
+  if (resp?.status === 403 && !!resp?.headers?.['www-authenticate']) {
+    const { 
+      error, 
+      // eslint-disable-next-line camelcase
+      error_description,
+      // eslint-disable-next-line camelcase
+      max_age,
+      // eslint-disable-next-line camelcase
+      acr_values 
+    } = parseInsufficientAuthenticationError(resp?.headers?.['www-authenticate']);
+    if (error === 'insufficient_authentication_context') {
+      err = new AuthApiError(
+        { 
+          errorSummary: error,
+          // eslint-disable-next-line camelcase
+          errorCauses: [{ errorSummary: error_description }]
+        }, 
+        resp, 
+        {
+          // eslint-disable-next-line camelcase
+          max_age: +max_age,
+          // eslint-disable-next-line camelcase
+          ...(acr_values && { acr_values })
+        }
+      );
+    }
+  }
+
+  return err;
+};
 
 export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions): Promise<any> {
   options = options || {};
@@ -106,30 +193,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       return res;
     })
     .catch(function(resp) {
-      var serverErr = resp.responseText || {};
-      if (isString(serverErr)) {
-        try {
-          serverErr = JSON.parse(serverErr);
-        } catch (e) {
-          serverErr = {
-            errorSummary: 'Unknown error'
-          };
-        }
-      }
-
-      if (resp.status >= 500) {
-        serverErr.errorSummary = 'Unknown error';
-      }
-
-      if (sdk.options.transformErrorXHR) {
-        resp = sdk.options.transformErrorXHR(clone(resp));
-      }
-
-      if (serverErr.error && serverErr.error_description) {
-        err = new OAuthError(serverErr.error, serverErr.error_description);
-      } else {
-        err = new AuthApiError(serverErr, resp);
-      }
+      err = formatError(sdk, resp);
 
       if (err.errorCode === 'E0000011') {
         storage.delete(STATE_TOKEN_KEY_NAME);
