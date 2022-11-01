@@ -1683,10 +1683,10 @@
   optionalDependencies:
     fsevents "*"
 
-"@okta/okta-signin-widget@^6.4.1", "@okta/okta-signin-widget@^6.7.0":
-  version "6.8.2"
-  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-6.8.2.tgz#30abf5508a24c81c50f9f71e7aad0645e2b4b744"
-  integrity sha512-C+pEJtmZLgjHW5TsiINKVqg9IvTVW65/Hp4J3yh9S/546YY+mBdhCsHKXL705Fkf+43talN+I/trz8Bz+eBsyw==
+"@okta/okta-signin-widget@^6.8.2":
+  version "6.9.0"
+  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-6.9.0.tgz#252d939525a422580c51e549a6e4ed4cd20f4765"
+  integrity sha512-UElSmcXRpRmYJqv2mz8IAnEjOK4Nt9fniw89bcmj3BK4q506oVgOheE7dxq5wnHLMYsJuuiDgc3gUrcFsrw+rw==
   dependencies:
     "@okta/okta-auth-js" "6.9.0"
     "@sindresorhus/to-milliseconds" "^1.0.0"
