@@ -8,8 +8,11 @@ export default class PasswordTransaction extends BaseTransaction {
   lastUpdated: string;
   status: PasswordStatus;
 
+  // eslint-disable-next-line no-use-before-define
   get: () => Promise<PasswordTransaction>;
+  // eslint-disable-next-line no-use-before-define
   enroll?: (payload: EnrollPasswordPayload) => Promise<PasswordTransaction>;
+  // eslint-disable-next-line no-use-before-define
   update?: (payload: UpdatePasswordPayload) => Promise<PasswordTransaction>;
   delete?: () => Promise<BaseTransaction>;
 
@@ -22,7 +25,7 @@ export default class PasswordTransaction extends BaseTransaction {
     this.id = id;
     this.status = status;
     this.created = created;
-    this.lastUpdated = lastUpdated
+    this.lastUpdated = lastUpdated;
 
     // assign transformed fns to transaction
     this.get = async () => {
