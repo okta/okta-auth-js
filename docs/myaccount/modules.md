@@ -279,6 +279,8 @@ ___
 
 ▸ **addEmail**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](classes/EmailTransaction.md)\>
 
+@scope: okta.myAccount.email.manage
+
 #### Parameters
 
 | Name | Type |
@@ -292,13 +294,15 @@ ___
 
 #### Defined in
 
-[myaccount/emailApi.ts:45](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L45)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### addPhone
 
 ▸ **addPhone**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](classes/PhoneTransaction.md)\>
+
+@scope: okta.myAccount.phone.manage
 
 #### Parameters
 
@@ -313,7 +317,7 @@ ___
 
 #### Defined in
 
-[myaccount/phoneApi.ts:44](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L44)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -352,6 +356,8 @@ ___
 
 ▸ **deleteEmail**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
 
+@scope: okta.myAccount.email.manage
+
 #### Parameters
 
 | Name | Type |
@@ -365,7 +371,7 @@ ___
 
 #### Defined in
 
-[myaccount/emailApi.ts:63](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L63)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -373,6 +379,8 @@ ___
 
 ▸ **deletePassword**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
 
+@scope: okta.myAccount.password.manage
+
 #### Parameters
 
 | Name | Type |
@@ -386,7 +394,7 @@ ___
 
 #### Defined in
 
-[myaccount/passwordApi.ts:64](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/passwordApi.ts#L64)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -394,6 +402,8 @@ ___
 
 ▸ **deletePhone**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
 
+@scope: okta.myAccount.phone.manage
+
 #### Parameters
 
 | Name | Type |
@@ -407,13 +417,15 @@ ___
 
 #### Defined in
 
-[myaccount/phoneApi.ts:62](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L62)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### enrollPassword
 
 ▸ **enrollPassword**(`oktaAuth`, `options?`): `Promise`<[`PasswordTransaction`](classes/PasswordTransaction.md)\>
+
+@scope: okta.myAccount.password.manage
 
 #### Parameters
 
@@ -428,13 +440,15 @@ ___
 
 #### Defined in
 
-[myaccount/passwordApi.ts:28](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/passwordApi.ts#L28)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### getEmail
 
 ▸ **getEmail**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](classes/EmailTransaction.md)\>
+
+@scope: okta.myAccount.email.read
 
 #### Parameters
 
@@ -449,13 +463,15 @@ ___
 
 #### Defined in
 
-[myaccount/emailApi.ts:28](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L28)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### getEmailChallenge
 
 ▸ **getEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`EmailChallengeTransaction`](classes/EmailChallengeTransaction.md)\>
+
+@scope: okta.myAccount.email.read
 
 #### Parameters
 
@@ -470,13 +486,15 @@ ___
 
 #### Defined in
 
-[myaccount/emailApi.ts:96](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L96)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### getEmails
 
 ▸ **getEmails**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](classes/EmailTransaction.md)[]\>
+
+@scope: okta.myAccount.email.read
 
 #### Parameters
 
@@ -491,13 +509,15 @@ ___
 
 #### Defined in
 
-[myaccount/emailApi.ts:12](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L12)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### getPassword
 
 ▸ **getPassword**(`oktaAuth`, `options?`): `Promise`<[`PasswordTransaction`](classes/PasswordTransaction.md)\>
+
+@scope: okta.myAccount.password.read
 
 #### Parameters
 
@@ -512,13 +532,15 @@ ___
 
 #### Defined in
 
-[myaccount/passwordApi.ts:11](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/passwordApi.ts#L11)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### getPhone
 
 ▸ **getPhone**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](classes/PhoneTransaction.md)\>
+
+@scope: okta.myAccount.phone.read
 
 #### Parameters
 
@@ -533,13 +555,15 @@ ___
 
 #### Defined in
 
-[myaccount/phoneApi.ts:27](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L27)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### getPhones
 
 ▸ **getPhones**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](classes/PhoneTransaction.md)[]\>
+
+@scope: okta.myAccount.phone.read
 
 #### Parameters
 
@@ -554,13 +578,15 @@ ___
 
 #### Defined in
 
-[myaccount/phoneApi.ts:11](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L11)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### getProfile
 
 ▸ **getProfile**(`oktaAuth`, `options?`): `Promise`<[`ProfileTransaction`](classes/ProfileTransaction.md)\>
+
+@scope: okta.myAccount.profile.read
 
 #### Parameters
 
@@ -575,13 +601,15 @@ ___
 
 #### Defined in
 
-[myaccount/profileApi.ts:11](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/profileApi.ts#L11)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### getProfileSchema
 
 ▸ **getProfileSchema**(`oktaAuth`, `options?`): `Promise`<[`ProfileSchemaTransaction`](classes/ProfileSchemaTransaction.md)\>
+
+@scope: okta.myAccount.profile.read
 
 #### Parameters
 
@@ -596,7 +624,7 @@ ___
 
 #### Defined in
 
-[myaccount/profileApi.ts:42](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/profileApi.ts#L42)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -633,6 +661,8 @@ ___
 
 ▸ **sendEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`EmailChallengeTransaction`](classes/EmailChallengeTransaction.md)\>
 
+@scope: okta.myAccount.email.read
+
 #### Parameters
 
 | Name | Type |
@@ -646,13 +676,15 @@ ___
 
 #### Defined in
 
-[myaccount/emailApi.ts:79](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L79)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### sendPhoneChallenge
 
 ▸ **sendPhoneChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
+
+@scope: okta.myAccount.phone.manage
 
 #### Parameters
 
@@ -667,13 +699,15 @@ ___
 
 #### Defined in
 
-[myaccount/phoneApi.ts:78](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L78)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### updatePassword
 
 ▸ **updatePassword**(`oktaAuth`, `options?`): `Promise`<[`PasswordTransaction`](classes/PasswordTransaction.md)\>
+
+@scope: okta.myAccount.password.manage
 
 #### Parameters
 
@@ -688,13 +722,15 @@ ___
 
 #### Defined in
 
-[myaccount/passwordApi.ts:46](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/passwordApi.ts#L46)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
 ### updateProfile
 
 ▸ **updateProfile**(`oktaAuth`, `options?`): `Promise`<[`ProfileTransaction`](classes/ProfileTransaction.md)\>
+
+@scope: okta.myAccount.profile.manage
 
 #### Parameters
 
@@ -709,7 +745,7 @@ ___
 
 #### Defined in
 
-[myaccount/profileApi.ts:24](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/profileApi.ts#L24)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -717,6 +753,8 @@ ___
 
 ▸ **verifyEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
 
+@scope: okta.myAccount.email.manage
+
 #### Parameters
 
 | Name | Type |
@@ -730,7 +768,7 @@ ___
 
 #### Defined in
 
-[myaccount/emailApi.ts:113](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L113)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -738,6 +776,8 @@ ___
 
 ▸ **verifyPhoneChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
 
+@scope: okta.myAccount.phone.manage
+
 #### Parameters
 
 | Name | Type |
@@ -751,4 +791,4 @@ ___
 
 #### Defined in
 
-[myaccount/phoneApi.ts:95](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L95)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)

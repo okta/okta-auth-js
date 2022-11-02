@@ -6,7 +6,7 @@ import {
 } from './types';
 
 /**
- * @scope: okta.myaccount.profile.read
+ * @scope: okta.myAccount.profile.read
  */
 export const getProfile: IAPIFunction<ProfileTransaction> = async (oktaAuth, options?) => {
   const transaction = await sendRequest(oktaAuth, {
@@ -19,7 +19,7 @@ export const getProfile: IAPIFunction<ProfileTransaction> = async (oktaAuth, opt
 };
 
 /**
- * @scope: okta.myaccount.profile.manage
+ * @scope: okta.myAccount.profile.manage
  */
 export const updateProfile: IAPIFunction<ProfileTransaction> = async (
   oktaAuth, 
@@ -37,7 +37,7 @@ export const updateProfile: IAPIFunction<ProfileTransaction> = async (
 };
 
 /**
- * @scope: okta.myaccount.profile.read
+ * @scope: okta.myAccount.profile.read
  */
 export const getProfileSchema: IAPIFunction<ProfileSchemaTransaction> = async (
   oktaAuth, 
