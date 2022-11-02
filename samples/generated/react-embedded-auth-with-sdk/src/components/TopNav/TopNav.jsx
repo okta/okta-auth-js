@@ -9,8 +9,6 @@ const TopNav = () => {
 
   const handleLogoutOut = async () => {
     await oktaAuth.signOut();
-    oktaAuth.transactionManager.clear();
-    oktaAuth.tokenManager.clear();
   };
 
   return (

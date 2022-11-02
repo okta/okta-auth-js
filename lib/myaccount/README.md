@@ -26,7 +26,7 @@ okta.myAccount.phone.read
 okta.myAccount.phone.manage
 ```
 
-**phone:**
+**password:**
 ```
 okta.myAccount.password.read
 okta.myAccount.password.manage

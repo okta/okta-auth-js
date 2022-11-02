@@ -24,7 +24,6 @@ export const getPassword: IAPIFunction<PasswordTransaction> = async (
 /**
  * @scope: okta.myAccount.password.manage
  */
-// TODO: type check payload?
 export const enrollPassword: IAPIFunction<PasswordTransaction> = async (
   oktaAuth, 
   options
