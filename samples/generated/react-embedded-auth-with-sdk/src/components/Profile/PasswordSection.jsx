@@ -3,10 +3,10 @@ import {
   getPassword,
   enrollPassword,
   updatePassword,
-  deletePassword
+  PasswordStatus
 } from '@okta/okta-auth-js/myaccount';
 import { useOktaAuth } from '@okta/okta-react';
-import { Box, Text } from '@okta/odyssey-react';
+import { Box, Text, Icon } from '@okta/odyssey-react';
 import Spinner from '../Spinner';
 import TransactionModalButton from '../TransactionModalButton';
 import { useMyAccountContext } from '../../contexts';
@@ -36,17 +36,17 @@ const PasswordSection = () => {
     return enrollPassword(oktaAuth, {
       payload: {
         profile: {
-          newPassword
+          password: newPassword
         }
       }
     });
   };
 
   const handleUpdatePassword = async (newPassword, currentPassword) => {
-    return enrollPassword(oktaAuth, {
+    return updatePassword(oktaAuth, {
       payload: {
         profile: {
-          newPassword,
+          password: newPassword,
           ...(currentPassword && { currentPassword })   // optional param
         }
       }
@@ -64,31 +64,48 @@ const PasswordSection = () => {
   return (
     <Box id="password-section">
       <Text as="strong">Password</Text>
-      <Box display="flex" alignItems="center" paddingTop="s">
-          {/* <Box className='password'>
-            <Text>{password.profile.password}</Text>
-          </Box> */}
-          <Box marginLeft="s">
-            <TransactionModalButton 
-              buttonText="Remove"
-              action="remove"
-              factor="phone number"
-              onStart={handleDeletePassword.bind(null, password)}
-              onFinish={finishTransaction}
-            />
-          </Box>
+      {password.status === PasswordStatus.NOT_ENROLLED && (
+        <Box display="flex" paddingTop="s">
+          <TransactionModalButton 
+            buttonText="Enroll"
+            action="enroll"
+            factor="password"
+            onStart={handleEnrollPassword}
+            onFinish={finishTransaction}
+          />
         </Box>
-      {/* <Box paddingTop="s" paddingBottom="s">
-        <TransactionModalButton
-          buttonText="Add phone number"
-          action="add"
-          factor="phone number"
-          challengePayload={{method: 'SMS'}}
-          onStart={handleAddPhone}
-          onVerify={handleVerifyChallenge}
-          onFinish={finishTransaction} 
-        />
-      </Box> */}
+      )}
+      {password.status === PasswordStatus.ACTIVE && (
+        <>
+          <Box paddingTop="s">
+            <Text>Active <Icon name="check-circle-filled"/></Text>
+            <Box>
+              <Text as="small">last updated on {new Date(password.lastUpdated).toLocaleString()}</Text>
+            </Box>
+          </Box>
+          <Box display="flex" paddingTop="s">
+            <Box display="inline-flex" paddingRight="xs">
+              <TransactionModalButton 
+                buttonText="Update"
+                action="update"
+                factor="password"
+                onStart={handleUpdatePassword}
+                onFinish={finishTransaction}
+              />
+            </Box>
+            &#x2022;
+            <Box display="inline-flex" paddingLeft="xs">
+              <TransactionModalButton 
+                buttonText="Remove"
+                action="remove"
+                factor="password"
+                onStart={handleDeletePassword.bind(null, password)}
+                onFinish={finishTransaction}
+              />
+            </Box>
+          </Box>
+        </>
+      )}
     </Box>
   );
 };

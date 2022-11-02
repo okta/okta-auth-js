@@ -18,6 +18,8 @@
 
   ↳ [`ProfileSchemaTransaction`](ProfileSchemaTransaction.md)
 
+  ↳ [`PasswordTransaction`](PasswordTransaction.md)
+
 ## Table of contents
 
 ### Constructors
@@ -38,12 +40,12 @@
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthHttpInterface`<`StorageManagerInterface`, `OktaAuthHttpOptions`\> |
 | `options` | `TransactionOptions` |
 
 #### Defined in
 
-[transactions/Base.ts:17](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L17)
+[myaccount/transactions/Base.ts:17](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L17)
 
 ## Properties
 
@@ -53,4 +55,4 @@
 
 #### Defined in
 
-[transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
+[myaccount/transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)

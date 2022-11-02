@@ -13,18 +13,18 @@
 
 ### PRIMARY
 
-• **PRIMARY**
+• **PRIMARY** = ``"PRIMARY"``
 
 #### Defined in
 
-[types.ts:14](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L14)
+[myaccount/types.ts:21](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L21)
 
 ___
 
 ### SECONDARY
 
-• **SECONDARY**
+• **SECONDARY** = ``"SECONDARY"``
 
 #### Defined in
 
-[types.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L15)
+[myaccount/types.ts:22](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L22)

@@ -43,7 +43,7 @@
 
 #### Defined in
 
-[transactions/EmailChallengeTransaction.ts:20](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L20)
+[myaccount/transactions/EmailChallengeTransaction.ts:20](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L20)
 
 ## Properties
 
@@ -53,7 +53,7 @@
 
 #### Defined in
 
-[transactions/EmailChallengeTransaction.ts:12](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L12)
+[myaccount/transactions/EmailChallengeTransaction.ts:12](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L12)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 #### Defined in
 
-[transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
+[myaccount/transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailChallengeTransaction.ts:11](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L11)
+[myaccount/transactions/EmailChallengeTransaction.ts:11](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L11)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailChallengeTransaction.ts:16](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L16)
+[myaccount/transactions/EmailChallengeTransaction.ts:16](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L16)
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailChallengeTransaction.ts:13](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L13)
+[myaccount/transactions/EmailChallengeTransaction.ts:13](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L13)
 
 ___
 
@@ -115,7 +115,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailChallengeTransaction.ts:14](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L14)
+[myaccount/transactions/EmailChallengeTransaction.ts:14](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L14)
 
 ___
 
@@ -139,4 +139,4 @@ ___
 
 #### Defined in
 
-[transactions/EmailChallengeTransaction.ts:18](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L18)
+[myaccount/transactions/EmailChallengeTransaction.ts:18](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailChallengeTransaction.ts#L18)

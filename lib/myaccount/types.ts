@@ -24,8 +24,12 @@ export enum EmailRole {
 
 export enum Status {
   VERIFIED = 'VERIFIED',
-  UNVERIFIED = 'UNVERIFIED',
-  NOT_SETUP = 'NOT_SETUP'
+  UNVERIFIED = 'UNVERIFIED'
+}
+
+export enum PasswordStatus {
+  NOT_ENROLLED = 'NOT_ENROLLED',
+  ACTIVE = 'ACTIVE'
 }
 
 export type EmailProfile = {

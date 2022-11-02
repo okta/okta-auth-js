@@ -40,7 +40,7 @@
 
 #### Defined in
 
-[transactions/ProfileTransaction.ts:8](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileTransaction.ts#L8)
+[myaccount/transactions/ProfileTransaction.ts:8](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileTransaction.ts#L8)
 
 ## Properties
 
@@ -50,7 +50,7 @@
 
 #### Defined in
 
-[transactions/ProfileTransaction.ts:4](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileTransaction.ts#L4)
+[myaccount/transactions/ProfileTransaction.ts:4](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileTransaction.ts#L4)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 #### Defined in
 
-[transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
+[myaccount/transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 #### Defined in
 
-[transactions/ProfileTransaction.ts:5](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileTransaction.ts#L5)
+[myaccount/transactions/ProfileTransaction.ts:5](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileTransaction.ts#L5)
 
 ___
 
@@ -84,4 +84,4 @@ ___
 
 #### Defined in
 
-[transactions/ProfileTransaction.ts:6](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileTransaction.ts#L6)
+[myaccount/transactions/ProfileTransaction.ts:6](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileTransaction.ts#L6)

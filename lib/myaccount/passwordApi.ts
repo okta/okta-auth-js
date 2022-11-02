@@ -6,7 +6,7 @@ import {
 } from './types';
 
 /**
- * @scope: okta.myaccount.password.read
+ * @scope: okta.myAccount.password.read
  */
 export const getPassword: IAPIFunction<PasswordTransaction> = async (
   oktaAuth,
@@ -22,7 +22,7 @@ export const getPassword: IAPIFunction<PasswordTransaction> = async (
 };
 
 /**
- * @scope: okta.myaccount.password.manage
+ * @scope: okta.myAccount.password.manage
  */
 // TODO: type check payload?
 export const enrollPassword: IAPIFunction<PasswordTransaction> = async (
@@ -41,10 +41,8 @@ export const enrollPassword: IAPIFunction<PasswordTransaction> = async (
 };
 
 /**
- * @scope: okta.myaccount.password.manage
+ * @scope: okta.myAccount.password.manage
  */
-// TODO: type check payload?
-// TODO: optional parameter of `currentPassword`?
 export const updatePassword: IAPIFunction<PasswordTransaction> = async (
   oktaAuth, 
   options
@@ -61,7 +59,7 @@ export const updatePassword: IAPIFunction<PasswordTransaction> = async (
 };
 
 /**
- * @scope: okta.myaccount.password.manage
+ * @scope: okta.myAccount.password.manage
  */
 export const deletePassword: IAPIFunction<BaseTransaction> = async (
   oktaAuth, 

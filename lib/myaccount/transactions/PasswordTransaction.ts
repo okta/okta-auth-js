@@ -1,12 +1,13 @@
-import { EnrollPasswordPayload, UpdatePasswordPayload, Status } from '../types';
+import { EnrollPasswordPayload, UpdatePasswordPayload, PasswordStatus } from '../types';
 import BaseTransaction from './Base';
 import { generateRequestFnFromLinks } from '../request';
 
 export default class PasswordTransaction extends BaseTransaction {
   id: string;
-  status: Status;
+  created: string;
+  lastUpdated: string;
+  status: PasswordStatus;
 
-  // eslint-disable-next-line no-use-before-define
   get: () => Promise<PasswordTransaction>;
   enroll?: (payload: EnrollPasswordPayload) => Promise<PasswordTransaction>;
   update?: (payload: UpdatePasswordPayload) => Promise<PasswordTransaction>;
@@ -17,10 +18,11 @@ export default class PasswordTransaction extends BaseTransaction {
 
     const { res, accessToken } = options;
     // assign required fields from res
-    const { id, status, _links } = res;
+    const { id, status, created, lastUpdated, _links } = res;
     this.id = id;
     this.status = status;
-
+    this.created = created;
+    this.lastUpdated = lastUpdated
 
     // assign transformed fns to transaction
     this.get = async () => {
@@ -34,7 +36,7 @@ export default class PasswordTransaction extends BaseTransaction {
       return await fn() as PasswordTransaction;
     };
 
-    if (this.status == Status.NOT_SETUP) {
+    if (this.status == PasswordStatus.NOT_ENROLLED) {
       this.enroll = async () => {
         const fn = generateRequestFnFromLinks({ 
           oktaAuth, 
