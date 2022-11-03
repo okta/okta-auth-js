@@ -1,5 +1,8 @@
 #!/bin/bash
 
+DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+source $DIR/setup.sh
+
 # Monolith version to test against
 export MONOLITH_BUILDVERSION=2022.10.1-begin-254-gaefef87dfc4e
 
