@@ -15,6 +15,14 @@
 
 require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 
+if (!!process.env.DEBUG) {
+  // do nothing
+}
+else {
+  console.log = (()=>{});
+  console.error = (()=>{});
+}
+
 const createProxyMiddleware = require('./proxyMiddleware');
 const loginMiddleware = require('./loginMiddleware');
 const callbackMiddleware = require('./callbackMiddleware');

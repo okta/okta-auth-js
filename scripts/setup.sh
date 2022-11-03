@@ -151,9 +151,13 @@ if [ ! -z "$WIDGET_VERSION" ]; then
   finish_log_group $?
 fi
 
-create_log_group "Yarn Build"
-if ! yarn build; then
-  echo "build failed! Exiting..."
-  exit ${TEST_FAILURE}
+if [ -z "$SKIP_SETUP_BUILD" ]; then
+  create_log_group "Yarn Build"
+  if ! yarn build; then
+    echo "build failed! Exiting..."
+    exit ${TEST_FAILURE}
+  fi
+  finish_log_group $?
+else
+  echo '`SKIP_SETUP_BUILD` set, skipping build...'
 fi
-finish_log_group $?

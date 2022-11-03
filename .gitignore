@@ -8,7 +8,7 @@ build2/reports/e2e/*
 !build2/reports/e2e/.gitkeep
 test/SpecRunner.html
 npm-debug.log
-testenv
+testenv*
 testenv.yml
 junit.xml
 junit-results.xml

@@ -17,8 +17,7 @@ create_dockolith_test_org () {
   create_log_group "Create Test Org"
   # Add widget test host to /etc/hosts
   export TEST_ORG_SUBDOMAIN="authjs-test-1"
-  echo "${DOCKER_HOST_CONTAINER_IP} ${TEST_ORG_SUBDOMAIN}.okta1.com" >> /etc/hosts
-  cat /etc/hosts
+  # echo "${DOCKER_HOST_CONTAINER_IP} ${TEST_ORG_SUBDOMAIN}.okta1.com" >> /etc/hosts
   source ./scripts/monolith/create-e2e-env.sh
   finish_log_group $?
 }
