@@ -2,6 +2,7 @@
 
 LOCAL_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
+export SKIP_SETUP_BUILD=1
 source $LOCAL_DIR/../setup-dockolith.sh
 
 create_dockolith_test_org

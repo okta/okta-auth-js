@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+create_log_group "Install Dockolith"
 if [[ -z ${DOCKOLITH_BRANCH} ]]; then
   export DOCKOLITH_BRANCH=master
 fi
@@ -15,3 +16,4 @@ popd
 cp package.json package.json.bak
 yarn add -DW --no-lockfile file:./scripts/dockolith
 mv package.json.bak package.json
+finish_log_group $?
