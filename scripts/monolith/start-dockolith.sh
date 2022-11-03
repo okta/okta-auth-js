@@ -8,6 +8,6 @@ if [[ -z "${CI}" ]]; then
 fi
 
 pushd ./scripts/dockolith
-source ./scripts/docker-monolith.sh
-echo $DOCKER_HOST_CONTAINER_IP
+  source ./scripts/docker-monolith.sh
+  echo $DOCKER_HOST_CONTAINER_IP
 popd

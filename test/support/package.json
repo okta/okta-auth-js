@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "license": "Apache-2.0",
   "scripts": {
-    "lint": "eslint .",
-    "monolith:create-env": "ts-node ./monolith/create-env.ts"
+    "lint": "eslint ."
   },
   "engines": {
     "node": ">=14.0",

@@ -3,19 +3,6 @@
 # Monolith version to test against
 export MONOLITH_BUILDVERSION=2022.10.1-begin-254-gaefef87dfc4e
 
-set +e
-source $(dirname "${BASH_SOURCE[0]}")/setup-e2e.sh
-set -e
-export LOCAL_MONOLITH=true
-export CI=true
-
-# if [ -n "${TEST_SUITE_ID}" ]; then
-# # if running on bacon
-# else
-# # if running locally
-
-# fi
-
 create_dockolith_test_org () {
   # Start monolith
   create_log_group "Install/Start Monolith"
@@ -29,7 +16,6 @@ create_dockolith_test_org () {
   export TEST_ORG_SUBDOMAIN="authjs-test-1"
   echo "${DOCKER_HOST_CONTAINER_IP} ${TEST_ORG_SUBDOMAIN}.okta1.com" >> /etc/hosts
   cat /etc/hosts
-  source ./scripts/monolith/create-env.sh
-  export ORG_OIE_ENABLED=true
+  source ./scripts/monolith/create-e2e-env.sh
   finish_log_group $?
 }

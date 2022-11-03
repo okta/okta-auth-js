@@ -19,6 +19,10 @@ const { config } = require('./config');
 
 env.setEnvironmentVarsFromTestEnv(__dirname);
 
+const SPECS_TO_SKIP_IN_DOCKOLITH_TESTS = [
+  'concurrent.js', 'tokens.js', 'static.js'
+];
+
 const getTask = (config) => () => {
   return new Promise(resolve => {
     // start the dev server
@@ -55,7 +59,7 @@ const getTask = (config) => () => {
         });
       } else {
         (config.spec || []).forEach(spec => {
-          if (!(process.env.LOCAL_MONOLITH && ['concurrent.js', 'tokens.js', 'static.js'].includes(spec))) {
+          if (!(process.env.LOCAL_MONOLITH && SPECS_TO_SKIP_IN_DOCKOLITH_TESTS.includes(spec))) {
             runnerArgs.push('--spec');
             runnerArgs.push(`./specs/${spec}`);
           }

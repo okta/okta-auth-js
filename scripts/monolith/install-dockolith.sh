@@ -5,9 +5,9 @@ if [[ -z ${DOCKOLITH_BRANCH} ]]; then
 fi
 
 pushd ./scripts
-rm -rf dockolith
-echo "Cloning dockolith from branch: ${DOCKOLITH_BRANCH}"
-git clone --depth 1 -b $DOCKOLITH_BRANCH https://github.com/okta/dockolith.git
+  rm -rf dockolith
+  echo "Cloning dockolith from branch: ${DOCKOLITH_BRANCH}"
+  git clone --depth 1 -b $DOCKOLITH_BRANCH https://github.com/okta/dockolith.git
 popd
 
 # Yarn "add" always modifies package.json https://github.com/yarnpkg/yarn/issues/1743

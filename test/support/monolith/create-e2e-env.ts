@@ -7,7 +7,7 @@ import * as path from 'path';
 /* eslint max-statements: [2, 60], complexity: [2, 10] */
 async function bootstrap() {
   const subDomain = process.env.TEST_ORG_SUBDOMAIN || 'authjs-test-' + Date.now();
-  const outputFilePath = path.join(__dirname, '../../../', '.bacon.env');
+  const outputFilePath = path.join(__dirname, '../../../', 'testenv.local');
 
   console.error(`Bootstrap starting: ${subDomain}`);
 
@@ -215,11 +215,13 @@ async function bootstrap() {
     TEST_ORG_ID: orgId,
 
     ISSUER: config.orgUrl,
-
     SPA_CLIENT_ID: spaApp.id,
     WEB_CLIENT_ID: webApp.id,
+    CLIENT_ID: spaApp.id,
     
     ORG_OIE_ENABLED: true,
+    REFRESH_TOKEN: true,
+    LOCAL_MONOLITH: 1,
 
     USERNAME: user1.profile.login,
     PASSWORD: options.users[0].password,

@@ -151,7 +151,6 @@ if [ ! -z "$WIDGET_VERSION" ]; then
   finish_log_group $?
 fi
 
-# only run build when installs something
 create_log_group "Yarn Build"
 if ! yarn build; then
   echo "build failed! Exiting..."
