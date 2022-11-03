@@ -6,6 +6,16 @@ source $DIR/setup.sh
 # Monolith version to test against
 export MONOLITH_BUILDVERSION=2022.10.1-begin-254-gaefef87dfc4e
 
+set +e
+if [ -n "${TEST_SUITE_ID}" ]; then
+# if running on bacon
+  setup_service java 1.8.222
+  setup_service google-chrome-stable 106.0.5249.61-1
+
+  export CI=true
+fi
+set -e
+
 create_dockolith_test_org () {
   # Start monolith
   create_log_group "Install/Start Monolith"
