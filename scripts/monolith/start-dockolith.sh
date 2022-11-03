@@ -8,5 +8,5 @@ if [[ -n "${TEST_SUITE_ID}" ]]; then
     echo $DOCKER_HOST_CONTAINER_IP
   popd
 else
-  echo "Skipping `start-dockolith`. This script only runs on CI, for now"
+  echo "Skipping \`start-dockolith\`. This script only runs on CI, for now"
 fi
