@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-undef, node/no-missing-import
+// eslint-disable-next-line no-undef, node/no-missing-import, node/no-extraneous-import
 import * as dockolith from '@okta/dockolith';
 import { writeFileSync } from 'fs';
 import * as path from 'path';
