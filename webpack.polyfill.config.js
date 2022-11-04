@@ -19,5 +19,10 @@ module.exports = _.extend({}, _.cloneDeep(commonConfig), {
     // Add a single Okta license after removing others
     new webpack.BannerPlugin(license)
   ]),
-  devtool: 'source-map'
+  devtool: 'source-map',
+  performance: {
+    maxAssetSize: 120000,
+    maxEntrypointSize: 120000,
+    hints: 'error'
+  }
 });

@@ -21,15 +21,18 @@ require('core-js/features/object/iterate-entries');
 require('core-js/features/object/iterate-keys');
 require('core-js/features/object/iterate-values');
 require('core-js/features/symbol/iterator');
-require('core-js/es/promise');
-require('core-js/es/typed-array/uint8-array');
 require('core-js/features/array/from');
 require('core-js/features/array/includes');
+require('core-js/es/promise');
+require('core-js/es/string/starts-with');
+require('core-js/es/string/ends-with');
+require('core-js/es/string/includes'); // SIW
+require('core-js/es/typed-array/uint8-array');
+require('core-js/es/array/find'); // SIW
+require('core-js/modules/es.map'); // Map.entries, Map.values
 require('core-js/web/url');
 require('webcrypto-shim');
 
 if (typeof window.TextEncoder !== 'function') {
-  var TextEncodingPolyfill = require('text-encoding');
-  window.TextEncoder = TextEncodingPolyfill.TextEncoder;
-  window.TextDecoder = TextEncodingPolyfill.TextDecoder;
+  require('fast-text-encoding');
 }
