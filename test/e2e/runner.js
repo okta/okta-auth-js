@@ -20,7 +20,7 @@ const { config } = require('./config');
 env.setEnvironmentVarsFromTestEnv(__dirname);
 
 const SPECS_TO_SKIP_IN_DOCKOLITH_TESTS = [
-  'concurrent.js', 'tokens.js', 'static.js'
+  'concurrent.js', 'tokens.js', 'static.js', 'originalUri.js'
 ];
 
 const getTask = (config) => () => {
