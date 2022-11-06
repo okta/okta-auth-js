@@ -146,7 +146,7 @@ const MyAccountPanel = ({corsError}) => {
         >
           <EmailSection />
           <PhoneSection />
-          <PasswordSection />
+          {/* <PasswordSection /> */}
         </Box>
 
         <Box className="pure-u-1 pure-u-sm-1-2" marginTop="s">

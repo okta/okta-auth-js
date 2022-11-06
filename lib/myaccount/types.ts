@@ -97,7 +97,9 @@ export type MyAccountRequestOptions = {
     | AddPhonePayload 
     | ChallengePhonePayload
     | VerificationPayload 
-    | UpdateProfilePayload;
+    | UpdateProfilePayload
+    | EnrollPasswordPayload
+    | UpdatePasswordPayload;
   accessToken?: string;
 }
 
