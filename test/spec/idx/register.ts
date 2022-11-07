@@ -321,27 +321,6 @@ describe('idx/register', () => {
       expect(didThrow).toBe(true);
       expect(mocked.startTransaction.startTransaction).toHaveBeenCalledWith(authClient, { flow: 'register', autoRemediate: false });
     });
-    it('presence of identify remediation means activationToken is not supported', async () => {
-      const { authClient, transactionMeta } = testContext;
-      jest.spyOn(authClient.transactionManager, 'exists').mockReturnValue(false);
-      authClient.token.prepareTokenParams = jest.fn().mockResolvedValue(transactionMeta);
-      const identifyResponse = IdxResponseFactory.build({
-        neededToProceed: [
-          IdentifyRemediationFactory.build()
-        ]
-      });
-      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
-            
-      let didThrow = false;
-      try {
-        await register(authClient, { activationToken: 'fn-activationToken' });
-      } catch (error) {
-        didThrow = true;
-        expect(error).toBeInstanceOf(AuthSdkError);
-        expect((error as any).errorSummary).toBe('activationToken is not supported based on your current org configuration.');
-      }
-      expect(didThrow).toBe(true);
-    });
     it('with activationToken should not check select-enroll-profile remediation', async () => {
       const { authClient, transactionMeta } = testContext;
       jest.spyOn(authClient.transactionManager, 'exists').mockReturnValue(false);
