@@ -38,6 +38,9 @@ expectType<InteractResponse>(await authClient.idx.interact());
 expectType<IdxResponse>(await authClient.idx.introspect());
 expectType<IdxTransaction>(await authClient.idx.proceed());
 
+const transaction = await authClient.idx.authenticate();
+expectType<boolean | undefined>(transaction.context.currentAuthenticator.value.deviceKnown);
+
 expectType<boolean>(authClient.idx.canProceed());
 expectType<void>(authClient.idx.setFlow('register'));
 expectType<boolean>(authClient.idx.isInteractionRequired());
