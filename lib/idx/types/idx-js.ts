@@ -173,6 +173,7 @@ export interface IdxContext {
     type: string;
     value: Record<string, unknown>;
   };
+  uiDisplay?: IdxContextUIDisplay
   app: {
     type: string;
     value: Record<string, unknown>;
@@ -180,6 +181,14 @@ export interface IdxContext {
   messages?: IdxMessages;
   success?: IdxRemediation;
   failure?: IdxRemediation;
+}
+
+export interface IdxContextUIDisplay {
+  type: string;
+  value: {
+    label?: string;
+    buttonLabel?: string;
+  }
 }
 
 export interface IdxMessage {
