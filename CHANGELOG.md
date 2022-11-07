@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.0.2
+
+### Fixes
+
+- [#1335](https://github.com/okta/okta-auth-js/pull/1335) IDX: add uiDisplay property to IdxContext type
+
 ## 7.0.1
 
 ### Fixes

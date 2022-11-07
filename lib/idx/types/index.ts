@@ -24,6 +24,8 @@ export type {
   IdxRemediation,
   IdxAuthenticator,
   IdxActionParams,
+  IdxContextUIDisplay,
+
 } from './idx-js';
 export * from './meta';
 export type { FlowIdentifier } from './FlowIdentifier';
