@@ -28,7 +28,7 @@ export async function register(
 
   // Only check at the beginning of the transaction
   if (!hasSavedInteractionHandle(authClient)) {
-    const { enabledFeatures, availableSteps } = await startTransaction(authClient, {
+    const { enabledFeatures } = await startTransaction(authClient, {
       ...options,
       flow: 'register',
       autoRemediate: false
