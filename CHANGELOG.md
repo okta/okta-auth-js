@@ -4,7 +4,8 @@
 
 ### Fixes
 
-- [#1335](https://github.com/okta/okta-auth-js/pull/1335) IDX: add uiDisplay property to IdxContext type
+- [#1335](https://github.com/okta/okta-auth-js/pull/1335) IDX: adds `uiDisplay` property to `IdxContext` type
+- [#1336](https://github.com/okta/okta-auth-js/pull/1319) IDX: adds `deviceKnown` property to `IdxAuthenticator` type
 
 ## 7.0.1
 

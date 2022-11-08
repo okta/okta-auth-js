@@ -88,6 +88,7 @@ export interface IdxAuthenticator {
   resend?: Record<string, unknown>;
   poll?: Record<string, unknown>;
   recover?: Record<string, unknown>;
+  deviceKnown?: boolean;
 }
 
 export interface IdxForm {
