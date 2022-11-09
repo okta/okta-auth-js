@@ -11,29 +11,9 @@
  */
 
 
-import { AuthSdkError } from '../../errors';
 import { CustomUrls, OAuthParams, OAuthResponse, RefreshToken, TokenParams } from '../types';
 import { removeNils, toQueryString } from '../../util';
 import { httpRequest, OktaAuthHttpInterface } from '../../http';
-
-function validateOptions(options: TokenParams) {
-  // Quick validation
-  if (!options.clientId) {
-    throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to get a token');
-  }
-
-  if (!options.redirectUri) {
-    throw new AuthSdkError('The redirectUri passed to /authorize must also be passed to /token');
-  }
-
-  if (!options.authorizationCode && !options.interactionCode) {
-    throw new AuthSdkError('An authorization code (returned from /authorize) must be passed to /token');
-  }
-
-  if (!options.codeVerifier) {
-    throw new AuthSdkError('The "codeVerifier" (generated and saved by your app) must be passed to /token');
-  }
-}
 
 function getPostData(sdk, options: TokenParams): string {
   // Convert Token params to OAuth params, sent to the /token endpoint
@@ -61,7 +41,6 @@ function getPostData(sdk, options: TokenParams): string {
 
 // exchange authorization code for an access token
 export function postToTokenEndpoint(sdk, options: TokenParams, urls: CustomUrls): Promise<OAuthResponse> {
-  validateOptions(options);
   var data = getPostData(sdk, options);
 
   const headers = {

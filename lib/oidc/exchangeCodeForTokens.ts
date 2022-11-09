@@ -17,6 +17,26 @@ import { getOAuthUrls, getDefaultTokenParams } from './util';
 import { clone } from '../util';
 import { postToTokenEndpoint } from './endpoints/token';
 import { handleOAuthResponse } from './handleOAuthResponse';
+import { AuthSdkError } from '../errors';
+
+function validateOptions(options: TokenParams) {
+  // Quick validation
+  if (!options.clientId) {
+    throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to get a token');
+  }
+
+  if (!options.redirectUri) {
+    throw new AuthSdkError('The redirectUri passed to /authorize must also be passed to /token');
+  }
+
+  if (!options.authorizationCode && !options.interactionCode) {
+    throw new AuthSdkError('An authorization code (returned from /authorize) must be passed to /token');
+  }
+
+  if (!options.codeVerifier) {
+    throw new AuthSdkError('The "codeVerifier" (generated and saved by your app) must be passed to /token');
+  }
+}
 
 // codeVerifier is required. May pass either an authorizationCode or interactionCode
 export function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenParams: TokenParams, urls?: CustomUrls): Promise<TokenResponse> {
@@ -42,6 +62,8 @@ export function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenParams: 
     interactionCode,
     codeVerifier,
   };
+
+  validateOptions(getTokenOptions);
 
   return postToTokenEndpoint(sdk, getTokenOptions, urls)
     .then((response: OAuthResponse) => {
