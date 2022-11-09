@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "watch": "webpack --watch",
     "start": "node server",
-    "start:dev": "nodemon server",
+    "start:dev": "nodemon --watch server --watch ../../../build/cjs server",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

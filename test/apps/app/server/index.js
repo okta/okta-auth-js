@@ -15,6 +15,7 @@
 
 require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 
+const { testenvMiddleware } = require('./testenv');
 const createProxyMiddleware = require('./proxyMiddleware');
 const loginMiddleware = require('./loginMiddleware');
 const callbackMiddleware = require('./callbackMiddleware');
@@ -56,6 +57,9 @@ app.get('/authorization-code/callback', callbackMiddleware);
 
 // CIBA
 app.post('/ciba/client-auth', cibaClientAuthMiddleware);
+
+// Reload testenv
+app.post('/reload-testenv', testenvMiddleware);
 
 const port = config.devServer.port;
 app.listen(port, function () {

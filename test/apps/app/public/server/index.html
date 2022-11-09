@@ -13,6 +13,12 @@
         <div class="link selected">Server-side Web App</div>
         <a href="/static" onclick="navigateToApp('/static', event)">Static SPA App</a>
       </div>
+      <div id="form-testenv" class="box">
+        <form method="POST" action="/reload-testenv">
+          <input id="config" type="hidden" name="config"/>
+          <button type="submit">Reload Test Env</button>
+        </form>
+      </div>
       <div id="form" class="box">
         <strong>SignIn</strong>
         <hr/>

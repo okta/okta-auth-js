@@ -1,8 +1,6 @@
 const { OktaAuth } = require('@okta/okta-auth-js');
 const { toQueryString } = require('../src/util');
 
-const privateKey = process.env.PEM;
-
 async function cibaClientAuthMiddleware(req, res) {
   console.log('cibaClientAuthMiddleware received form data:', req.body);
   const config = JSON.parse(req.body.config);
@@ -15,18 +13,27 @@ async function cibaClientAuthMiddleware(req, res) {
     scopes: config.scopes,
     redirectUri,
     // client can be authenticated by either clientSecret or privateKey
-    privateKey,
+    privateKey: process.env.JWK || process.env.PEM,
     clientSecret,
   });
-  const { 
-    headers, // eslint-disable-line
-    ...restResp 
-  } = await authClient.authenticateWithCiba({
-    loginHint,
-  });
 
+  let resp, error;
+  try {
+    const { 
+      headers, // eslint-disable-line
+      ...restResp 
+    } = await authClient.authenticateWithCiba({
+      loginHint,
+    });
+    resp = restResp;
+  } catch (err) {
+    console.log('Ciba client authentication error', err);
+    error = err;
+  }
+  
   const qs = toQueryString(Object.assign({}, config, {
-    cibaClientAuth: JSON.stringify(restResp, null, 2),
+    ...( resp && { cibaClientAuth: JSON.stringify(resp, null, 2) }),
+    ...( error && { error }),
   }));
   console.log('Reloading the page.');
   res.redirect('/server' + qs);
