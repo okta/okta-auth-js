@@ -29,7 +29,6 @@ export async function postToBcAuthorizeEndpoint(
   };
   const args = toQueryString(options).slice(1);
 
-  console.log('post bc/authorize', url, args);
   return httpRequest(sdk, {
     url,
     method: 'POST',

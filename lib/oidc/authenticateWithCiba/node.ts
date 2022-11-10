@@ -23,15 +23,23 @@ export async function authenticateWithCiba(
   sdk: OktaAuthOAuthInterface, 
   options: CibaAuthOptions
 ): Promise<CibaAuthResponse> {
-  const clientId = sdk.options.clientId || options.clientId;
   options = {
+    clientId: sdk.options.clientId,
     clientSecret: sdk.options.clientSecret,
     privateKey: sdk.options.privateKey,
     scopes: sdk.options.scopes,
     ...options, // favor fn options
   };
 
-  if (options.scopes!.indexOf('openid') === -1) {
+  const aud = getOAuthBaseUrl(sdk) + '/v1/bc/authorize';
+  const clientAuthParams = await prepareClientAuthenticationParams(sdk, {
+    clientId: options.clientId!,
+    clientSecret: options.clientSecret,
+    privateKey: options.privateKey,
+    aud,
+  });
+
+  if (options.scopes?.indexOf('openid') === -1) {
     throw new AuthSdkError(
       'openid scope must be specified in the scopes argument to authenticate CIBA client'
     );
@@ -42,14 +50,6 @@ export async function authenticateWithCiba(
       'A loginHint or idTokenHint must be specified in the function options to authenticate CIBA client'
     );
   }
-
-  const aud = getOAuthBaseUrl(sdk) + '/v1/bc/authorize';
-  const clientAuthParams = await prepareClientAuthenticationParams(sdk, {
-    clientId,
-    clientSecret: options.clientSecret,
-    privateKey: options.privateKey,
-    aud,
-  });
 
   const payload = removeNils({
     ...clientAuthParams,

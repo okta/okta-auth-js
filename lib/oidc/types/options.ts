@@ -108,7 +108,7 @@ export type ClientAuthenticationOptions = {
   privateKey?: string;
 }
 
-export type CibaAuthOptions = ClientAuthenticationOptions & 
+export type CibaAuthOptions = Partial<ClientAuthenticationOptions> & 
   Pick<OktaAuthOAuthOptions, 'scopes'> & 
   {
     loginHint?: string;

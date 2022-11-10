@@ -49,7 +49,7 @@ describe('authenticateWithCiba', () => {
     const authClient = mockOktaAuth({ clientId: 'fake-client-id' });
     await expect(async () => {
       await authenticateWithCiba(authClient, {});
-    }).rejects.toThrowError(new AuthSdkError('A clientSecret or privateKey must be specified in the OktaAuth constructor to authenticate CIBA client'));
+    }).rejects.toThrowError(new AuthSdkError('A clientSecret or privateKey must be specified in the OktaAuth constructor to authenticate OIDC client'));
   });
 
   it('throws if no openid in scopes', async () => {
