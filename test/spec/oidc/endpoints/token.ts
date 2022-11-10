@@ -19,15 +19,9 @@ jest.mock('../../../../lib/http', () => {
   };
 });
 
-const mocked = {
-  http: require('../../../../lib/http')
-};
-
-import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
 import { postToTokenEndpoint } from '../../../../lib/oidc/endpoints/token';
 import factory from '@okta/test.support/factory';
-import { CustomUrls } from '../../../../lib/oidc/types';
 
 describe('token endpoint', function() {
   var ISSUER = 'http://example.okta.com';
@@ -73,10 +67,10 @@ describe('token endpoint', function() {
     },
     execute: function (test) {
       return postToTokenEndpoint(test.oa, {
-        clientId: CLIENT_ID,
-        redirectUri: REDIRECT_URI,
-        authorizationCode: authorizationCode,
-        codeVerifier: codeVerifier,
+        client_id: CLIENT_ID,
+        redirect_uri: REDIRECT_URI,
+        code: authorizationCode,
+        code_verifier: codeVerifier,
       }, {
         tokenUrl: ISSUER + endpoint
       });

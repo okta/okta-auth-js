@@ -10,36 +10,26 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { makeJwt } from '../../crypto/jwt';
-import { getOAuthBaseUrl } from '../util/oauth';
+import { getOAuthBaseUrl } from '../util';
 import { AuthSdkError } from '../../errors';
-import { OktaAuthOAuthInterface, CibaAuthOptions, CibaAuthResponse, BcAuthorizeOptions } from '../types';
+import { OktaAuthOAuthInterface, CibaAuthOptions, CibaAuthResponse, CibaAuthorizeParams } from '../types';
 import { postToBcAuthorizeEndpoint } from '../endpoints/bc-authorize';
+import { prepareClientAuthenticationParams } from '../util/prepareClientAuthenticationParams';
+import { removeNils } from '../../util';
 
 /* eslint complexity:[0,8] */
+/* eslint-disable camelcase */
 export async function authenticateWithCiba(
   sdk: OktaAuthOAuthInterface, 
   options: CibaAuthOptions
 ): Promise<CibaAuthResponse> {
+  const clientId = sdk.options.clientId || options.clientId;
   options = {
-    clientId: sdk.options.clientId,
     clientSecret: sdk.options.clientSecret,
     privateKey: sdk.options.privateKey,
     scopes: sdk.options.scopes,
     ...options, // favor fn options
   };
-
-  if (!options.clientId) {
-    throw new AuthSdkError(
-      'A clientId must be specified in the OktaAuth constructor to authenticate CIBA client'
-    );
-  }
-  
-  if (!options.clientSecret && !options.privateKey) {
-    throw new AuthSdkError(
-      'A clientSecret or privateKey must be specified in the OktaAuth constructor to authenticate CIBA client'
-    );
-  }
 
   if (options.scopes!.indexOf('openid') === -1) {
     throw new AuthSdkError(
@@ -53,23 +43,23 @@ export async function authenticateWithCiba(
     );
   }
 
-  const baseUrl = getOAuthBaseUrl(sdk);
-  const bcAuthorizeUrl = `${baseUrl}/v1/bc/authorize`;
+  const aud = getOAuthBaseUrl(sdk) + '/v1/bc/authorize';
+  const clientAuthParams = await prepareClientAuthenticationParams(sdk, {
+    clientId,
+    clientSecret: options.clientSecret,
+    privateKey: options.privateKey,
+    aud,
+  });
 
-  const { privateKey, scopes, ...params } = options;
+  const payload = removeNils({
+    ...clientAuthParams,
+    scope: options.scopes!.join(' '),
+    login_hint: options.loginHint,
+    id_token_hint: options.idTokenHint,
+    acr_values: options.acrValues,
+    binding_message: options.bindingMessage,
+    request_expiry: options.requestExpiry,
+  }) as CibaAuthorizeParams;
 
-  const bcAuthorizeOptions: BcAuthorizeOptions = {
-    ...params,
-    scope: scopes!.join(' ')
-  };
-  if (privateKey) {
-    const jwt = await makeJwt({
-      privateKey,
-      clientId: options.clientId,
-      aud: bcAuthorizeUrl
-    }).then(jwt => jwt.compact());
-    bcAuthorizeOptions.clientAssertion = jwt;
-  }
-
-  return postToBcAuthorizeEndpoint(sdk, bcAuthorizeOptions);
+  return postToBcAuthorizeEndpoint(sdk, payload);
 }

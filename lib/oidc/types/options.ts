@@ -102,33 +102,22 @@ export interface OktaAuthOAuthOptions extends
 
 export type OktaAuthOauthOptionsConstructor = OktaAuthOptionsConstructor<OktaAuthOAuthOptions>;
 
-export interface BcAuthorizeOptions extends 
-  Pick<OktaAuthOAuthOptions, 
-    'clientId' | 
-    'clientSecret'
-  > 
-{
-  scope?: string;
-  loginHint?: string;
-  idTokenHint?: string;
-  acrValues?: string;
-  bindingMessage?: string;
-  requestExpiry?: number;
-  clientAssertionType?: string;
-  clientAssertion?: string;
+export type ClientAuthenticationOptions = {
+  clientId: string;
+  clientSecret?: string;
+  privateKey?: string;
 }
 
-export interface CibaAuthOptions extends 
-  Pick<OktaAuthOAuthOptions, 
-    'clientId' | 
-    'clientSecret' |
-    'privateKey' |
-    'scopes'
-  > 
-{
-  loginHint?: string;
-  idTokenHint?: string;
-  acrValues?: string;
-  bindingMessage?: string;
-  requestExpiry?: number;
+export type CibaAuthOptions = ClientAuthenticationOptions & 
+  Pick<OktaAuthOAuthOptions, 'scopes'> & 
+  {
+    loginHint?: string;
+    idTokenHint?: string;
+    acrValues?: string;
+    bindingMessage?: string;
+    requestExpiry?: number;
+  }
+  
+export type CibaTokenOptions = ClientAuthenticationOptions & {
+  authReqId: string;
 }

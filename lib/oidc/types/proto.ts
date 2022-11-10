@@ -11,8 +11,42 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-export interface OAuthParams {
+// https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+export type ClientAuthenticationAssertionParams = {
   client_id?: string;
+  client_assertion: string;
+  client_assertion_type: string;
+}
+
+export type ClientAuthenticationSecretParams = {
+  client_id: string;
+  client_secret: string;
+}
+
+export type ClientAuthenticationNoneParams = {
+  client_id: string;
+}
+
+export type ClientAuthenticationParams = 
+  ClientAuthenticationAssertionParams | 
+  ClientAuthenticationSecretParams |
+  ClientAuthenticationNoneParams
+
+export type CibaAuthorizeParams = ClientAuthenticationParams & {
+  scope: string;
+  acr_values?: string;
+  login_hint?: string;
+  id_token_hint?: string;
+  binding_message?: string;
+  request_expiry?: number;
+}
+
+export type CibaTokenParams = {
+  grant_type: string;
+  auth_req_id: string;
+}
+
+export type AuthorizeParams = {
   code_challenge?: string;
   code_challenge_method?: string;
   display?: string;
@@ -31,7 +65,13 @@ export interface OAuthParams {
   grant_type?: string;
   code?: string;
   interaction_code?: string;
+  code_verifier?: string;
 }
+
+export type OAuthParams = ClientAuthenticationParams & AuthorizeParams
+
+export type TokenParamsProto = ClientAuthenticationParams & 
+  (CibaTokenParams | AuthorizeParams)
 
 export interface OAuthResponse {
   state?: string;

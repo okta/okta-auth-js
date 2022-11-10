@@ -10,49 +10,28 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { getOAuthBaseUrl } from '../util/oauth';
 import { httpRequest } from '../../http';
-import { removeNils, toQueryString } from '../../util';
-import { OktaAuthOAuthInterface, CibaAuthResponse, BcAuthorizeOptions } from '../types';
-
-const CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
+import { toQueryString } from '../../util';
+import { getOAuthBaseUrl } from '../util';
+import { 
+  OktaAuthOAuthInterface, 
+  CibaAuthResponse, 
+  CibaAuthorizeParams,
+} from '../types';
 
 export async function postToBcAuthorizeEndpoint(
   sdk: OktaAuthOAuthInterface, 
-  options: BcAuthorizeOptions
+  options: CibaAuthorizeParams,
 ): Promise<CibaAuthResponse> {
-  options = {
-    clientId: sdk.options.clientId,
-    clientSecret: sdk.options.clientSecret,
-    ...options, // favor fn options
-  };
-
-  const baseUrl = getOAuthBaseUrl(sdk);
-  const bcAuthorizeUrl = `${baseUrl}/v1/bc/authorize`;
+  const url = getOAuthBaseUrl(sdk) + '/v1/bc/authorize';
   const headers = {
     'Content-Type': 'application/x-www-form-urlencoded'
   };
-  
-  /* eslint-disable camelcase */
-  const args = toQueryString(removeNils({
-    // client authentication params
-    client_id: options.clientId,
-    client_assertion: options.clientAssertion,
-    client_assertion_type: options.clientAssertion && CLIENT_ASSERTION_TYPE,
-    client_secret: options.clientSecret,
-    
-    // ciba params
-    scope: options.scope,
-    acr_values: options.acrValues,
-    login_hint: options.loginHint,
-    id_token_hint: options.idTokenHint,
-    binding_message: options.bindingMessage,
-    request_expiry: options.requestExpiry,
-  })).slice(1);
-  /* eslint-enable camelcase */
+  const args = toQueryString(options).slice(1);
 
+  console.log('post bc/authorize', url, args);
   return httpRequest(sdk, {
-    url: bcAuthorizeUrl,
+    url,
     method: 'POST',
     args,
     headers

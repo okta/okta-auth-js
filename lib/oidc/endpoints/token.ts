@@ -11,46 +11,20 @@
  */
 
 
-import { CustomUrls, OAuthParams, OAuthResponse, RefreshToken, TokenParams } from '../types';
-import { removeNils, toQueryString } from '../../util';
+import { CustomUrls, TokenParamsProto, OAuthResponse, RefreshToken, TokenParams } from '../types';
+import { toQueryString } from '../../util';
 import { httpRequest, OktaAuthHttpInterface } from '../../http';
 
-function getPostData(sdk, options: TokenParams): string {
-  // Convert Token params to OAuth params, sent to the /token endpoint
-  var params: OAuthParams = removeNils({
-    'client_id': options.clientId,
-    'redirect_uri': options.redirectUri,
-    'grant_type': options.interactionCode ? 'interaction_code' : 'authorization_code',
-    'code_verifier': options.codeVerifier
-  });
-
-  if (options.interactionCode) {
-    params['interaction_code'] = options.interactionCode;
-  } else if (options.authorizationCode) {
-    params.code = options.authorizationCode;
-  }
-
-  const { clientSecret } = sdk.options;
-  if (clientSecret) {
-    params['client_secret'] = clientSecret;
-  }
-
-  // Encode as URL string
-  return toQueryString(params).slice(1);
-}
-
-// exchange authorization code for an access token
-export function postToTokenEndpoint(sdk, options: TokenParams, urls: CustomUrls): Promise<OAuthResponse> {
-  var data = getPostData(sdk, options);
-
+// General function to post data to token endpoint
+export function postToTokenEndpoint(sdk, options: TokenParamsProto, urls: CustomUrls): Promise<OAuthResponse> {
   const headers = {
     'Content-Type': 'application/x-www-form-urlencoded'
   };
-
+  const args = toQueryString(options).slice(1);
   return httpRequest(sdk, {
     url: urls.tokenUrl,
     method: 'POST',
-    args: data,
+    args,
     headers
   });
 }

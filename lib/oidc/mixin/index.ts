@@ -27,6 +27,7 @@ import {
   UserClaims,
   CibaAuthOptions,
   CibaAuthResponse,
+  OAuthResponse,
 } from '../types';
 import PKCE from '../util/pkce';
 import { createTokenAPI } from '../factory';
@@ -35,6 +36,7 @@ import { getOAuthUrls, isLoginRedirect } from '../util';
 
 import { OktaAuthSessionInterface } from '../../session/types';
 import { authenticateWithCiba } from '../authenticateWithCiba';
+import { pollTokenWithCiba } from '../pollTokenWithCiba';
 import { provideOriginalUri } from './node';
 export function mixinOAuth
 <
@@ -341,6 +343,10 @@ export function mixinOAuth
 
     authenticateWithCiba(options: CibaAuthOptions): Promise<CibaAuthResponse> {
       return authenticateWithCiba(this, options);
+    }
+
+    pollTokenWithCiba(options: any): Promise<OAuthResponse> {
+      return pollTokenWithCiba(this, options);
     }
 
   };

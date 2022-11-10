@@ -77,6 +77,7 @@
       "console": "integratedTerminal",
       "cwd": "${workspaceRoot}/test/apps/app",
       "program": "server/index.js",
+      "runtimeExecutable": "/Users/shuowu/.nvm/versions/node/v16.16.0/bin/node"
     },
 
     {

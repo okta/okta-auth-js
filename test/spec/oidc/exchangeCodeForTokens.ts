@@ -47,7 +47,13 @@ describe('exchangeCodeForTokens', () => {
     const tokenParams = { authorizationCode, clientId, codeVerifier, interactionCode, redirectUri };
     const urls = getOAuthUrls(sdk);
     await exchangeCodeForTokens(sdk, tokenParams);
-    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, tokenParams, urls);
+    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, {
+      client_id: 'x',
+      code_verifier: 'y',
+      grant_type: 'interaction_code',
+      interaction_code: 'b',
+      redirect_uri: 'http://localhost',
+    }, urls);
     expect(handleOAuthResponse).toHaveBeenCalledWith(sdk, {
       clientId,
       ignoreSignature: undefined,
@@ -72,7 +78,13 @@ describe('exchangeCodeForTokens', () => {
     const tokenParams = { authorizationCode, clientId, codeVerifier, interactionCode, redirectUri, scopes };
     const urls = getOAuthUrls(sdk);
     await exchangeCodeForTokens(sdk, tokenParams);
-    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, { authorizationCode, clientId, codeVerifier, interactionCode, redirectUri }, urls);
+    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, { 
+      client_id: 'x',
+      code_verifier: 'y',
+      grant_type: 'interaction_code',
+      interaction_code: 'b',
+      redirect_uri: 'http://localhost',
+    }, urls);
     expect(handleOAuthResponse).toHaveBeenCalledWith(sdk, {
       clientId,
       ignoreSignature: undefined,
