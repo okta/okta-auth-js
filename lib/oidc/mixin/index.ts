@@ -28,6 +28,7 @@ import {
   CibaAuthOptions,
   CibaAuthResponse,
   OAuthResponse,
+  CibaTokenOptions,
 } from '../types';
 import PKCE from '../util/pkce';
 import { createTokenAPI } from '../factory';
@@ -345,7 +346,7 @@ export function mixinOAuth
       return authenticateWithCiba(this, options);
     }
 
-    pollTokenWithCiba(options: any): Promise<OAuthResponse> {
+    pollTokenWithCiba(options: CibaTokenOptions): Promise<OAuthResponse> {
       return pollTokenWithCiba(this, options);
     }
 

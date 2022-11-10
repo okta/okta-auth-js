@@ -118,6 +118,6 @@ export type CibaAuthOptions = Partial<ClientAuthenticationOptions> &
     requestExpiry?: number;
   }
   
-export type CibaTokenOptions = ClientAuthenticationOptions & {
+export type CibaTokenOptions = Partial<ClientAuthenticationOptions> & {
   authReqId: string;
 }

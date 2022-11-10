@@ -15,7 +15,6 @@ import { AuthSdkError } from '../../errors';
 import { OktaAuthOAuthInterface, CibaAuthOptions, CibaAuthResponse, CibaAuthorizeParams } from '../types';
 import { postToBcAuthorizeEndpoint } from '../endpoints/bc-authorize';
 import { prepareClientAuthenticationParams } from '../util/prepareClientAuthenticationParams';
-import { removeNils } from '../../util';
 
 /* eslint complexity:[0,8] */
 /* eslint-disable camelcase */
@@ -39,7 +38,7 @@ export async function authenticateWithCiba(
     aud,
   });
 
-  if (options.scopes?.indexOf('openid') === -1) {
+  if (options.scopes!.indexOf('openid') === -1) {
     throw new AuthSdkError(
       'openid scope must be specified in the scopes argument to authenticate CIBA client'
     );
@@ -51,7 +50,7 @@ export async function authenticateWithCiba(
     );
   }
 
-  const payload = removeNils({
+  const params: CibaAuthorizeParams = {
     ...clientAuthParams,
     scope: options.scopes!.join(' '),
     login_hint: options.loginHint,
@@ -59,7 +58,6 @@ export async function authenticateWithCiba(
     acr_values: options.acrValues,
     binding_message: options.bindingMessage,
     request_expiry: options.requestExpiry,
-  }) as CibaAuthorizeParams;
-
-  return postToBcAuthorizeEndpoint(sdk, payload);
+  };
+  return postToBcAuthorizeEndpoint(sdk, params);
 }

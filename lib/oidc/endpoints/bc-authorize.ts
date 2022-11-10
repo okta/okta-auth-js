@@ -11,7 +11,7 @@
  */
 
 import { httpRequest } from '../../http';
-import { toQueryString } from '../../util';
+import { toQueryString, removeNils } from '../../util';
 import { getOAuthBaseUrl } from '../util';
 import { 
   OktaAuthOAuthInterface, 
@@ -27,7 +27,7 @@ export async function postToBcAuthorizeEndpoint(
   const headers = {
     'Content-Type': 'application/x-www-form-urlencoded'
   };
-  const args = toQueryString(options).slice(1);
+  const args = toQueryString(removeNils(options)).slice(1);
 
   return httpRequest(sdk, {
     url,

@@ -13,7 +13,13 @@
 /* eslint-disable camelcase */
 import { getOAuthUrls } from './util/oauth';
 import { AuthSdkError } from './../errors';
-import { OktaAuthOAuthInterface, OAuthResponse, CibaTokenOptions, TokenParamsProto } from './types';
+import { 
+  OktaAuthOAuthInterface, 
+  OAuthResponse, 
+  CibaTokenOptions, 
+  TokenParamsProto,
+  ClientAuthenticationOptions,
+} from './types';
 import { postToTokenEndpoint } from './endpoints';
 import { prepareClientAuthenticationParams } from './util/prepareClientAuthenticationParams';
 
@@ -24,8 +30,6 @@ export async function pollTokenWithCiba(
   options: CibaTokenOptions
 ): Promise<OAuthResponse> {
   options = {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore allow clientId overwrite
     clientId: sdk.options.clientId,
     clientSecret: sdk.options.clientSecret!,
     privateKey: sdk.options.privateKey,
@@ -37,8 +41,7 @@ export async function pollTokenWithCiba(
   }
 
   const urls = getOAuthUrls(sdk);
-  const clientAuthParams = await prepareClientAuthenticationParams(sdk, options);
-
+  const clientAuthParams = await prepareClientAuthenticationParams(sdk, options as ClientAuthenticationOptions);
   const payload: TokenParamsProto = {
     ...clientAuthParams,
     grant_type: GRANT_TYPE,

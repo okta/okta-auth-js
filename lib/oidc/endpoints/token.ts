@@ -12,7 +12,7 @@
 
 
 import { CustomUrls, TokenParamsProto, OAuthResponse, RefreshToken, TokenParams } from '../types';
-import { toQueryString } from '../../util';
+import { toQueryString, removeNils } from '../../util';
 import { httpRequest, OktaAuthHttpInterface } from '../../http';
 
 // General function to post data to token endpoint
@@ -20,7 +20,7 @@ export function postToTokenEndpoint(sdk, options: TokenParamsProto, urls: Custom
   const headers = {
     'Content-Type': 'application/x-www-form-urlencoded'
   };
-  const args = toQueryString(options).slice(1);
+  const args = toQueryString(removeNils(options)).slice(1);
   return httpRequest(sdk, {
     url: urls.tokenUrl,
     method: 'POST',

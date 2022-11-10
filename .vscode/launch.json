@@ -76,7 +76,7 @@
       "autoAttachChildProcesses": true,
       "console": "integratedTerminal",
       "cwd": "${workspaceRoot}/test/apps/app",
-      "program": "server/index.js"
+      "program": "server/index.js",
     },
 
     {
