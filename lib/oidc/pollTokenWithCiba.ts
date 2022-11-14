@@ -18,6 +18,7 @@ import {
   OAuthResponse, 
   CibaTokenOptions, 
   TokenParamsProto,
+  ClientAuthenticationOptions,
 } from './types';
 import { postToTokenEndpoint } from './endpoints';
 import { prepareClientAuthenticationParams } from './util/prepareClientAuthenticationParams';
@@ -28,24 +29,15 @@ export async function pollTokenWithCiba(
   sdk: OktaAuthOAuthInterface, 
   options: CibaTokenOptions
 ): Promise<OAuthResponse> {
-  options = {
-    clientId: sdk.options.clientId,
-    clientSecret: sdk.options.clientSecret!,
-    privateKey: sdk.options.privateKey,
-    ...options, // favor fn options
-  };
-
   if (!options.authReqId) {
     throw new AuthSdkError('Option authReqId must be specified in the function options to poll token');
   }
 
   const urls = getOAuthUrls(sdk);
   const clientAuthParams = await prepareClientAuthenticationParams(sdk, {
-    clientId: options.clientId!,
-    clientSecret: options.clientSecret,
-    privateKey: options.privateKey,
+    ...options,
     aud: urls.tokenUrl,
-  });
+  } as ClientAuthenticationOptions);
   const payload: TokenParamsProto = {
     ...clientAuthParams,
     grant_type: GRANT_TYPE,

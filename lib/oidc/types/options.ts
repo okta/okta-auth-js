@@ -106,6 +106,7 @@ export type ClientAuthenticationOptions = {
   clientId: string;
   clientSecret?: string;
   privateKey?: string;
+  aud?: string;
 }
 
 export type CibaAuthOptions = Partial<ClientAuthenticationOptions> & 

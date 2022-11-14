@@ -26,9 +26,7 @@ const CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-b
 
 export async function prepareClientAuthenticationParams(
   sdk: OktaAuthOAuthInterface,
-  options: ClientAuthenticationOptions & {
-    aud?: string;
-  }
+  options: ClientAuthenticationOptions
 ): Promise<ClientAuthenticationParams> {
   options = {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

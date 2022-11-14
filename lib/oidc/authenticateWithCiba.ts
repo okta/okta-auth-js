@@ -10,35 +10,30 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { getOAuthBaseUrl } from '../util';
-import { AuthSdkError } from '../../errors';
-import { OktaAuthOAuthInterface, CibaAuthOptions, CibaAuthResponse, CibaAuthorizeParams } from '../types';
-import { postToBcAuthorizeEndpoint } from '../endpoints/bc-authorize';
-import { prepareClientAuthenticationParams } from '../util/prepareClientAuthenticationParams';
+import { getOAuthBaseUrl } from './util';
+import { AuthSdkError } from '../errors';
+import { 
+  OktaAuthOAuthInterface, 
+  CibaAuthOptions, 
+  CibaAuthResponse, 
+  CibaAuthorizeParams, 
+  ClientAuthenticationOptions,
+} from './types';
+import { postToBcAuthorizeEndpoint } from './endpoints/bc-authorize';
+import { prepareClientAuthenticationParams } from './util/prepareClientAuthenticationParams';
 
-/* eslint complexity:[0,8] */
-/* eslint-disable camelcase */
 export async function authenticateWithCiba(
   sdk: OktaAuthOAuthInterface, 
   options: CibaAuthOptions
 ): Promise<CibaAuthResponse> {
-  options = {
-    clientId: sdk.options.clientId,
-    clientSecret: sdk.options.clientSecret,
-    privateKey: sdk.options.privateKey,
-    scopes: sdk.options.scopes,
-    ...options, // favor fn options
-  };
-
   const aud = getOAuthBaseUrl(sdk) + '/v1/bc/authorize';
   const clientAuthParams = await prepareClientAuthenticationParams(sdk, {
-    clientId: options.clientId!,
-    clientSecret: options.clientSecret,
-    privateKey: options.privateKey,
+    ...options,
     aud,
-  });
-
-  if (options.scopes!.indexOf('openid') === -1) {
+  } as ClientAuthenticationOptions);
+  
+  const scopes = sdk.options.scopes || options.scopes;
+  if (scopes!.indexOf('openid') === -1) {
     throw new AuthSdkError(
       'openid scope must be specified in the scopes argument to authenticate CIBA client'
     );
@@ -52,12 +47,14 @@ export async function authenticateWithCiba(
 
   const params: CibaAuthorizeParams = {
     ...clientAuthParams,
-    scope: options.scopes!.join(' '),
+    scope: scopes!.join(' '),
+    /* eslint-disable camelcase */
     login_hint: options.loginHint,
     id_token_hint: options.idTokenHint,
     acr_values: options.acrValues,
     binding_message: options.bindingMessage,
     request_expiry: options.requestExpiry,
+    /* eslint-enable camelcase */
   };
   return postToBcAuthorizeEndpoint(sdk, params);
 }
