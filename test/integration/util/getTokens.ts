@@ -3,7 +3,7 @@ import waitFor from '@okta/test.support/waitFor';
 import { AuthnTransaction } from '../../../lib/authn';
 import { getWithRedirect, handleOAuthResponse, CustomUrls } from '../../../lib/oidc';
 import { parseOAuthResponseFromUrl } from '../../../lib/oidc/parseFromUrl';
-import A18nClient from '../../../samples/test/support/management-api/a18nClient';
+import A18nClient from '@okta/test.support/a18nClient';
 
 function mockGetWithRedirect(client, testContext) {
   jest.spyOn(client, 'getOriginalUri').mockImplementation(() => {});
