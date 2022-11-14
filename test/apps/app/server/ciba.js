@@ -10,8 +10,8 @@ async function cibaClientAuthMiddleware(req, res) {
   const { issuer, clientId, redirectUri } = config;
 
   const authClient = new OktaAuth({
-    issuer,
-    clientId,
+    issuer: process.env.ISSUER || issuer,
+    clientId: process.env.CLIENT_ID || clientId,
     scopes: config.scopes,
     redirectUri,
     // client can be authenticated by either clientSecret or privateKey
@@ -48,16 +48,16 @@ async function cibaTokenPollingMiddleware(req, res) {
   console.log('cibaTokenPollingMiddleware received form data:', req.body);
   const config = JSON.parse(req.body.config);
   const authReqId = req.body.auth_req_id;
-  const { issuer, clientId, redirectUri, clientSecret } = config;
+  const { issuer, clientId, redirectUri } = config;
 
   const authClient = new OktaAuth({
-    issuer,
-    clientId,
+    issuer: process.env.ISSUER || issuer,
+    clientId: process.env.CLIENT_ID || clientId,
     scopes: config.scopes,
     redirectUri,
     // client can be authenticated by either clientSecret or privateKey
     privateKey: process.env.JWK || process.env.PEM,
-    clientSecret,
+    clientSecret: process.env.CLIENT_SECRET,
   });
 
   let resp, error;
