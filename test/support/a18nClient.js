@@ -149,6 +149,17 @@ class A18nClient {
     return url;
   }
 
+  async findProfile(profileName) {
+    const response = await this.getOnURL(PROFILE_URL);
+    const profile = response?.profiles.find(p => p.displayName === profileName);
+
+    if (!profile) {
+      throw new Error(`no a18n profile was found for '${profileName}'`);
+    }
+
+    return profile;
+  }
+
   async createProfile(profileName) {
     const profile = await this.postToURL(PROFILE_URL, {
       displayName: profileName || 'javascript-idx-sdk'

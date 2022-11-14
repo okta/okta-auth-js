@@ -66,9 +66,10 @@ export async function signinAndGetTokensViaEmail(client) {
     username,
     authenticator: 'okta_email'
   });
+  console.log(transaction);
 
   const a18nClient = new A18nClient({ a18nAPIKey: process.env.A18N_API_KEY })
-  const a18nProfile = await a18nClient.createProfile('myaccount-password')
+  const a18nProfile = await a18nClient.findProfile('myaccount-password')
   const verificationCode = await a18nClient.getEmailCode(a18nProfile.profileId)
 
   transaction = await client.idx.proceed({ verificationCode });
