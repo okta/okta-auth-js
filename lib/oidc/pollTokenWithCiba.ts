@@ -18,7 +18,6 @@ import {
   OAuthResponse, 
   CibaTokenOptions, 
   TokenParamsProto,
-  ClientAuthenticationOptions,
 } from './types';
 import { postToTokenEndpoint } from './endpoints';
 import { prepareClientAuthenticationParams } from './util/prepareClientAuthenticationParams';
@@ -37,11 +36,16 @@ export async function pollTokenWithCiba(
   };
 
   if (!options.authReqId) {
-    throw new AuthSdkError('Missing authReqId to pull token from authorization server');
+    throw new AuthSdkError('Option authReqId must be specified in the function options to poll token');
   }
 
   const urls = getOAuthUrls(sdk);
-  const clientAuthParams = await prepareClientAuthenticationParams(sdk, options as ClientAuthenticationOptions);
+  const clientAuthParams = await prepareClientAuthenticationParams(sdk, {
+    clientId: options.clientId!,
+    clientSecret: options.clientSecret,
+    privateKey: options.privateKey,
+    aud: urls.tokenUrl,
+  });
   const payload: TokenParamsProto = {
     ...clientAuthParams,
     grant_type: GRANT_TYPE,
