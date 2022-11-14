@@ -6,12 +6,15 @@ export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/unit"
 
 export CI=true
-export ISSUER=https://oie-signin-widget.okta.com
+# export ISSUER=https://oie-signin-widget.okta.com
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
 
 # This client has refresh token enabled
-export CLIENT_ID=0oa8lrg7ojTsbJgRQ696
+# export CLIENT_ID=0oa8lrg7ojTsbJgRQ696
+
+export CLIENT_ID=0oa3b5fp4h02UIrjZ697
+export ISSUER=https://javascript-idx-sdk-idfirst.okta.com
 
 if ! yarn test:integration; then
   echo "integration failed! Exiting..."
