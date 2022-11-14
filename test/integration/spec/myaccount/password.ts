@@ -6,7 +6,8 @@ import {
 } from '../../../../lib/myaccount';
 import {
   createClient,
-  signinAndGetTokens
+  signinAndGetTokens,
+  signinAndGetTokensViaEmail
 } from '../../util';
 import { PasswordTransaction } from '../../../../lib/myaccount/transactions';
 
@@ -29,6 +30,14 @@ describe('MyAccount Password API', () => {
       ]
     });
     token = accessToken!;
+
+    try {
+      const { status, tokens } = await signinAndGetTokensViaEmail(client);
+      console.log('#####', status, tokens, '######');
+    }
+    catch (err) {
+      console.log('#####', err, '######');
+    }
   });
 
   describe('Manage with Transaction functions', () => {

@@ -7,6 +7,7 @@ Object {
   "get": [Function],
   "headers": Any<Object>,
   "id": Any<String>,
+  "lastMethod": Any<String>,
   "profile": Object {
     "phoneNumber": Any<String>,
   },

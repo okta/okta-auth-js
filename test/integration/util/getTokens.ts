@@ -3,6 +3,7 @@ import waitFor from '@okta/test.support/waitFor';
 import { AuthnTransaction } from '../../../lib/authn';
 import { getWithRedirect, handleOAuthResponse, CustomUrls } from '../../../lib/oidc';
 import { parseOAuthResponseFromUrl } from '../../../lib/oidc/parseFromUrl';
+import A18nClient from '../../../samples/test/support/management-api/a18nClient';
 
 function mockGetWithRedirect(client, testContext) {
   jest.spyOn(client, 'getOriginalUri').mockImplementation(() => {});
@@ -57,4 +58,21 @@ export async function signinAndGetTokens(client, tokenParams?, credentials?) {
   const { sessionToken } = tx;
   const tokenResponse = await getTokens(client, Object.assign({ sessionToken }, tokenParams));
   return tokenResponse;
+}
+
+export async function signinAndGetTokensViaEmail(client) {
+  const username = process.env.PASSWORDLESS_USERNAME;
+  let transaction = await client.idx.authenticate({
+    username,
+    authenticator: 'okta_email'
+  });
+
+  const a18nClient = new A18nClient({ a18nAPIKey: process.env.A18N_API_KEY })
+  const a18nProfile = await a18nClient.createProfile('myaccount-password')
+  const verificationCode = await a18nClient.getEmailCode(a18nProfile.profileId)
+
+  transaction = await client.idx.proceed({ verificationCode });
+  const { status, tokens } = transaction;
+  console.log(status, tokens);
+  return transaction;
 }
