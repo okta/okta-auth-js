@@ -2,8 +2,8 @@ import { enrollAuthenticator } from '../../../lib/oidc/enrollAuthenticator';
 
 jest.mock('../../../lib/oidc/util', () => {
   return {
-    prepareTokenParams: () => {},
-    createOAuthMeta: () => {},
+    prepareEnrollAuthenticatorParams: () => {},
+    createEnrollAuthenticatorMeta: () => {},
     getOAuthUrls: () => {}
   };
 });
@@ -42,7 +42,7 @@ describe('enrollAuthenticator', () => {
         save: () => {}
       }
     };
-    const tokenParams = {
+    const preparedParams = {
       clientId: 'fakeClientId',
       responseType: 'none',
       prompt: 'enroll_authenticator',
@@ -60,16 +60,16 @@ describe('enrollAuthenticator', () => {
     };
     testContext = {
       sdk,
-      tokenParams,
+      preparedParams,
       authorizeParams,
       enrollParams,
       urls,
       meta
     };
-    jest.spyOn(mocked.util, 'prepareTokenParams').mockResolvedValue(testContext.tokenParams);
+    jest.spyOn(mocked.util, 'prepareEnrollAuthenticatorParams').mockReturnValue(testContext.preparedParams);
     jest.spyOn(mocked.util, 'getOAuthUrls').mockReturnValue(testContext.urls);
     jest.spyOn(mocked.authorize, 'buildAuthorizeParams').mockReturnValue(testContext.authorizeParams);
-    jest.spyOn(mocked.util, 'createOAuthMeta').mockReturnValue(testContext.meta);
+    jest.spyOn(mocked.util, 'createEnrollAuthenticatorMeta').mockReturnValue(testContext.meta);
   });
 
   afterEach(() => {
@@ -82,39 +82,25 @@ describe('enrollAuthenticator', () => {
       jest.spyOn(sdk.transactionManager, 'save');
     });
     
-    it('saves the transaction meta', async () => {
+    it('saves the transaction meta', () => {
       const { sdk, meta, enrollParams } = testContext;
-      await enrollAuthenticator(sdk, enrollParams);
+      enrollAuthenticator(sdk, enrollParams);
       expect(sdk.transactionManager.save).toHaveBeenCalledWith(meta);
     });
   });
 
-  it('overrides prompt with enroll_authenticator', async () => {
-    const { sdk, enrollParams } = testContext;
-    const badEnrollParams = {
-      ...enrollParams,
-      prompt: 'none'
-    };
-    const tokenParams = {
-      ...badEnrollParams,
-      prompt: 'enroll_authenticator'
-    };
-    await enrollAuthenticator(sdk, badEnrollParams);
-    expect(mocked.util.prepareTokenParams).toHaveBeenCalledWith(sdk, tokenParams);
-  });
-
-  it('redirects to the authorize endpoint with options.setLocation', async () => {
-    const { sdk, tokenParams, enrollParams, authorizeParams } = testContext;
+  it('redirects to the authorize endpoint with options.setLocation', () => {
+    const { sdk, preparedParams, enrollParams, authorizeParams } = testContext;
     sdk.options.setLocation = jest.fn();
-    await enrollAuthenticator(sdk, enrollParams);
-    expect(mocked.authorize.buildAuthorizeParams).toHaveBeenCalledWith(tokenParams);
+    enrollAuthenticator(sdk, enrollParams);
+    expect(mocked.authorize.buildAuthorizeParams).toHaveBeenCalledWith(preparedParams);
     expect(sdk.options.setLocation).toHaveBeenCalledWith(`http://fake-authorize${authorizeParams}`);
   });
 
-  it('redirects to the authorize endpoint with window.location.assign if options.setLocation is not set', async () => {
-    const { sdk, tokenParams, enrollParams, authorizeParams } = testContext;
-    await enrollAuthenticator(sdk, enrollParams);
-    expect(mocked.authorize.buildAuthorizeParams).toHaveBeenCalledWith(tokenParams);
+  it('redirects to the authorize endpoint with window.location.assign if options.setLocation is not set', () => {
+    const { sdk, preparedParams, enrollParams, authorizeParams } = testContext;
+    enrollAuthenticator(sdk, enrollParams);
+    expect(mocked.authorize.buildAuthorizeParams).toHaveBeenCalledWith(preparedParams);
     expect(window.location.assign).toHaveBeenCalledWith(`http://fake-authorize${authorizeParams}`);
   });
 

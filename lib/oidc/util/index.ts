@@ -14,13 +14,16 @@
 
 export * from './browser';
 export * from './defaultTokenParams';
+export * from './defaultEnrollAuthenticatorParams';
 export * from './errors';
 export * from './loginRedirect';
 export * from './oauth';
 export * from './oauthMeta';
+export * from './enrollAuthenticatorMeta';
 import pkce from './pkce';
 export { pkce };
 export * from './prepareTokenParams';
+export * from './prepareEnrollAuthenticatorParams';
 export * from './refreshToken';
 export * from './urlParams';
 export * from './validateClaims';

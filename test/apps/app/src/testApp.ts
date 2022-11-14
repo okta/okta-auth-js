@@ -899,18 +899,18 @@ class TestApp {
     }
   }
 
-  async enrollAuthenticator(): Promise<void> {
+  enrollAuthenticator(): void {
     this.config.state = this.config.state || 'enroll-authenticator-redirect' + Math.round(Math.random() * 1000);
     saveConfigToStorage(this.config);
     const options: EnrollAuthenticatorOptions = Object.assign({}, {
       state: this.config.state,
       enrollAmrValues: this.config.enrollAmrValues,
     });
-    return this.oktaAuth.enrollAuthenticator(options)
-      .catch(e => {
-        this.renderError(e);
-        throw e;
-      });
+    try {
+      this.oktaAuth.endpoints.authorize.enrollAuthenticator(options);
+    } catch(e) {
+      this.renderError(e);
+    }
   }
 
   configHTML(): string {

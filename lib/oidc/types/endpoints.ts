@@ -10,15 +10,14 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-export * from './api';
-export * from './JWT';
-export * from './meta';
-export * from './options';
-export * from './proto';
-export * from './storage';
-export * from './Token';
-export * from './TokenManager';
-export * from './Transaction';
-export * from './TransactionManager';
-export * from './UserClaims';
-export * from './endpoints';
+import {
+  EnrollAuthenticatorOptions
+} from './options';
+
+export type EnrollAuthenticatorFunction = (params: EnrollAuthenticatorOptions) => void;
+
+export interface Endpoints {
+  authorize: {
+    enrollAuthenticator: EnrollAuthenticatorFunction;
+  }
+}

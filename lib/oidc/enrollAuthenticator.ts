@@ -13,19 +13,18 @@
  */
 import { OktaAuthOAuthInterface, EnrollAuthenticatorOptions } from './types';
 import { clone } from '../util';
-import { prepareTokenParams, createOAuthMeta } from './util';
+import { prepareEnrollAuthenticatorParams, createEnrollAuthenticatorMeta } from './util';
 import { buildAuthorizeParams } from './endpoints/authorize';
 
-export async function enrollAuthenticator(
-    sdk: OktaAuthOAuthInterface, 
-    options: EnrollAuthenticatorOptions
-): Promise<void> {
+export function enrollAuthenticator(
+  sdk: OktaAuthOAuthInterface, 
+  options: EnrollAuthenticatorOptions
+): void {
   options = clone(options) || {};
-  options.prompt = 'enroll_authenticator';
 
-  const tokenParams = await prepareTokenParams(sdk, options);
-  const meta = createOAuthMeta(sdk, tokenParams);
-  const requestUrl = meta.urls.authorizeUrl + buildAuthorizeParams(tokenParams);
+  const params = prepareEnrollAuthenticatorParams(sdk, options);
+  const meta = createEnrollAuthenticatorMeta(sdk, params);
+  const requestUrl = meta.urls.authorizeUrl + buildAuthorizeParams(params);
   sdk.transactionManager.save(meta);
   if (sdk.options.setLocation) {
     sdk.options.setLocation(requestUrl);

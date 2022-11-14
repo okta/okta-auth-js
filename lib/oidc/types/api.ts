@@ -16,7 +16,6 @@ import {
   CustomUrls, 
   OktaAuthOAuthOptions, 
   SigninWithRedirectOptions, 
-  EnrollAuthenticatorOptions, 
   TokenParams
 } from './options';
 import { OAuthResponseType } from './proto';
@@ -26,6 +25,7 @@ import { TokenManagerInterface } from './TokenManager';
 import { CustomUserClaims, UserClaims } from './UserClaims';
 import { TransactionManagerInterface } from './TransactionManager';
 import { OktaAuthSessionInterface } from '../../session/types';
+import { Endpoints } from './endpoints';
 
 export interface PopupParams {
   popupTitle?: string;
@@ -53,8 +53,6 @@ export interface ParseFromUrlInterface extends ParseFromUrlFunction {
 }
 
 export type GetWithRedirectFunction = (params?: TokenParams) => Promise<void>;
-
-export type EnrollAuthenticatorFunction = (params: EnrollAuthenticatorOptions) => Promise<void>;
 
 export type SetLocationFunction = (loc: string) => void;
 
@@ -140,6 +138,7 @@ export interface OktaAuthOAuthInterface
   tokenManager: TokenManagerInterface;
   pkce: PkceAPI;
   transactionManager: TM;
+  endpoints: Endpoints;
   
   isPKCE(): boolean;
   getIdToken(): string | undefined;
@@ -152,7 +151,6 @@ export interface OktaAuthOAuthInterface
   storeTokensFromRedirect(): Promise<void>;
   getUser<T extends CustomUserClaims = CustomUserClaims>(): Promise<UserClaims<T>>;
   signInWithRedirect(opts?: SigninWithRedirectOptions): Promise<void>;
-  enrollAuthenticator: EnrollAuthenticatorFunction;
   
   revokeAccessToken(accessToken?: AccessToken): Promise<unknown>;
   revokeRefreshToken(refreshToken?: RefreshToken): Promise<unknown>;

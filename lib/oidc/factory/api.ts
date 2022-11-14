@@ -31,10 +31,12 @@ import {
   OktaAuthOAuthInterface,
   ParseFromUrlInterface,
   TokenAPI,
-  UserClaims
+  UserClaims,
+  Endpoints,
 } from '../types';
 import { isLoginRedirect, prepareTokenParams } from '../util';
 import { verifyToken } from '../verifyToken';
+import { enrollAuthenticator } from '../enrollAuthenticator';
 
 // Factory
 export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue): TokenAPI {
@@ -100,4 +102,12 @@ export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue)
   });
 
   return token;
+}
+
+export function createEndpoints(sdk: OktaAuthOAuthInterface): Endpoints {
+  return {
+    authorize: {
+      enrollAuthenticator: enrollAuthenticator.bind(null, sdk),
+    }
+  };
 }

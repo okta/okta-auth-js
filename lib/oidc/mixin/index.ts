@@ -25,13 +25,12 @@ import {
   TransactionManagerInterface,
   TransactionManagerConstructor,
   UserClaims,
-  EnrollAuthenticatorOptions,
+  Endpoints,
 } from '../types';
 import PKCE from '../util/pkce';
-import { createTokenAPI } from '../factory';
+import { createEndpoints, createTokenAPI } from '../factory';
 import { TokenManager } from '../TokenManager';
 import { getOAuthUrls, isLoginRedirect } from '../util';
-import { enrollAuthenticator } from '../enrollAuthenticator';
 
 import { OktaAuthSessionInterface } from '../../session/types';
 import { provideOriginalUri } from './node';
@@ -58,6 +57,7 @@ export function mixinOAuth
     tokenManager: TokenManager;
     transactionManager: TM;
     pkce: PkceAPI;
+    endpoints: Endpoints;
 
     _pending: { handleLogin: boolean };
     _tokenQueue: PromiseQueue;
@@ -83,6 +83,8 @@ export function mixinOAuth
 
       // TokenManager
       this.tokenManager = new TokenManager(this, this.options.tokenManager);
+
+      this.endpoints = createEndpoints(this);
     }
 
     // inherited from subclass
@@ -192,7 +194,6 @@ export function mixinOAuth
       return isLoginRedirect(this);
     }
 
-  
     isPKCE(): boolean {
       return !!this.options.pkce;
     }
@@ -338,10 +339,6 @@ export function mixinOAuth
         // Flow ends with logout redirect
         window.location.assign(logoutUri);
       }
-    }
-
-    async enrollAuthenticator(options: EnrollAuthenticatorOptions) {
-      return enrollAuthenticator(this, options);
     }
 
   };

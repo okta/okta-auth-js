@@ -78,30 +78,6 @@ export async function preparePKCE(
   return tokenParams;
 }
 
-function prepareEnrollAuthenticator(
-  tokenParams: TokenParams
-): TokenParams {
-  tokenParams = {
-    ...tokenParams,
-    responseType: 'none' // responseType is forced
-  };
-
-  if (!tokenParams.enrollAmrValues) {
-    throw new AuthSdkError('enroll_amr_values must be specified');
-  }
-
-  // scope, nonce must be omitted
-  delete tokenParams.scopes;
-  delete tokenParams.nonce;
-
-  // maxAge is not supported
-  if (tokenParams.maxAge && tokenParams.maxAge > 0) {
-    delete tokenParams.maxAge;
-  }
-
-  return tokenParams;
-}
-
 // Prepares params for a call to /authorize or /token
 export async function prepareTokenParams(
   sdk: OktaAuthOAuthInterface,
@@ -111,9 +87,7 @@ export async function prepareTokenParams(
   const defaults = getDefaultTokenParams(sdk);
   tokenParams = { ...defaults, ...tokenParams };
 
-  if (tokenParams.prompt === 'enroll_authenticator') {
-    tokenParams = prepareEnrollAuthenticator(tokenParams);
-  } else if (tokenParams.pkce) {
+  if (tokenParams.pkce) {
     tokenParams = await preparePKCE(sdk, tokenParams);
   }
 
