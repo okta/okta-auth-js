@@ -33,7 +33,7 @@ class A18nClient {
     let response;
     while (!response?.content && retryAttemptsRemaining > 0) {
       await sleep(1000);  // wait 1 second
-      response = await this.getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId));
+      response = await this.getOnURL(LATEST_EMAIL_URL.replace(':profileId', profileId), true);
       --retryAttemptsRemaining;
     }
 
@@ -150,8 +150,8 @@ class A18nClient {
   }
 
   async findProfile(profileName) {
-    const response = await this.getOnURL(PROFILE_URL);
-    const profile = response?.profiles.find(p => p.displayName === profileName);
+    const response = await this.getOnURL(PROFILE_URL, true);
+    const profile = response?.profiles?.find(p => p.displayName === profileName);
 
     if (!profile) {
       throw new Error(`no a18n profile was found for '${profileName}'`);

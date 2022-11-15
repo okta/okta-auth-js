@@ -21,7 +21,7 @@ Object {
   "get": [Function],
   "headers": Any<Object>,
   "id": Any<String>,
-  "lastMethod": Any<String>,
+  "lastMethod": "sms",
   "profile": Object {
     "phoneNumber": Any<String>,
   },

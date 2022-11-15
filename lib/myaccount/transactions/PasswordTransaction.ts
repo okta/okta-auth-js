@@ -1,6 +1,6 @@
 import { EnrollPasswordPayload, UpdatePasswordPayload, PasswordStatus } from '../types';
 import BaseTransaction from './Base';
-import { generateRequestFnFromLinks } from '../request';
+import { generateRequestFnFromLinks, sendRequest } from '../request';
 
 export default class PasswordTransaction extends BaseTransaction {
   id: string;
@@ -9,7 +9,7 @@ export default class PasswordTransaction extends BaseTransaction {
   status: PasswordStatus;
 
   // eslint-disable-next-line no-use-before-define
-  get: () => Promise<PasswordTransaction>;
+  get?: () => Promise<PasswordTransaction>;
   // eslint-disable-next-line no-use-before-define
   enroll?: (payload: EnrollPasswordPayload) => Promise<PasswordTransaction>;
   // eslint-disable-next-line no-use-before-define
@@ -28,31 +28,31 @@ export default class PasswordTransaction extends BaseTransaction {
     this.lastUpdated = lastUpdated;
 
     // assign transformed fns to transaction
-    this.get = async () => {
-      const fn = generateRequestFnFromLinks({ 
-        oktaAuth, 
-        accessToken, 
-        methodName: 'get', 
-        links: _links,
-        transactionClassName: 'PasswordTransaction'
-      });
-      return await fn() as PasswordTransaction;
-    };
-
     if (this.status == PasswordStatus.NOT_ENROLLED) {
-      this.enroll = async () => {
+      this.enroll = async (payload) => {
         const fn = generateRequestFnFromLinks({ 
           oktaAuth, 
           accessToken, 
-          methodName: 'post', 
+          methodName: 'enroll',
+          links: _links,
+          transactionClassName: 'PasswordTransaction'
+        });
+        return await fn(payload) as PasswordTransaction;
+      };
+    }
+    else {
+      this.get = async () => {
+        const fn = generateRequestFnFromLinks({ 
+          oktaAuth, 
+          accessToken, 
+          methodName: 'get',
           links: _links,
           transactionClassName: 'PasswordTransaction'
         });
         return await fn() as PasswordTransaction;
       };
-    }
-    else {
-      this.update = async () => {
+
+      this.update = async (payload) => {
         const fn = generateRequestFnFromLinks({ 
           oktaAuth, 
           accessToken, 
@@ -60,7 +60,7 @@ export default class PasswordTransaction extends BaseTransaction {
           links: _links,
           transactionClassName: 'PasswordTransaction'
         });
-        return await fn() as PasswordTransaction;
+        return await fn(payload) as PasswordTransaction;
       };
   
       this.delete = async () => {

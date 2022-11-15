@@ -6,7 +6,6 @@ import {
 } from '../../../../lib/myaccount';
 import {
   createClient,
-  signinAndGetTokens,
   signinAndGetTokensViaEmail
 } from '../../util';
 import { PasswordTransaction } from '../../../../lib/myaccount/transactions';
@@ -17,75 +16,79 @@ describe('MyAccount Password API', () => {
 
   beforeAll(async () => {
     client = createClient({});
-    const {
-      tokens: {
-        accessToken: { accessToken } = {}
-      }
-    } = await signinAndGetTokens(client, {
-      scopes: [
-        'openid',
-        'profile',
-        'okta.myAccount.password.read',
-        'okta.myAccount.password.manage'
-      ]
-    });
-    token = accessToken!;
-
     try {
-      const { status, tokens } = await signinAndGetTokensViaEmail(client);
-      console.log('#####', status, tokens, '######');
+      const { tokens } = await signinAndGetTokensViaEmail(client, {
+        scopes: [
+          'openid',
+          'profile',
+          'okta.myAccount.password.read',
+          'okta.myAccount.password.manage'
+        ]
+      });
+      console.log(tokens);
+
+      token = tokens.accessToken!.accessToken;
     }
     catch (err) {
-      console.log('#####', err, '######');
+      console.log('SETUP FAILED');
+      console.log(err);
+    }
+  });
+
+  afterEach(async () => {
+    try {
+      await deletePassword(client, { accessToken: token });
+    } catch {
+      // do nothing
     }
   });
 
   describe('Manage with Transaction functions', () => {
     let password: PasswordTransaction;
 
-    afterEach(async () => {
-      if (password && password.delete) {
-        try {
-          await password.delete();
-        } catch {
-          // do nothing
-        }
-      }
-    });
-
-    it.only('can manage password with transaction functions', async () => {
+   it('can manage password with transaction functions', async () => {
       password = await enrollPassword(client, {
         accessToken: token,
         payload: {
           profile: {
-            password: 'MyPassword'
+            password: 'MyPassword1'
           }
         }
       });
       expect(password).toMatchSnapshot({
         headers: expect.any(Object),
         id: expect.any(String),
-        status: expect('ACTIVE')
+        status: 'ACTIVE',
+        get: expect.any(Function),
+        update: expect.any(Function),
+        delete: expect.any(Function),
       });
 
       // get password (status ACTIVE)
-      let transaction = await password.get();
-      expect(transaction).toMatchSnapshot({
+      password = await password.get!();
+      expect(password).toMatchSnapshot({
         headers: expect.any(Object),
         id: expect.any(String),
-        status: expect('ACTIVE')
+        status: 'ACTIVE',
+        get: expect.any(Function),
+        update: expect.any(Function),
+        delete: expect.any(Function),
       });
 
       // update password
-      transaction = await password.update!({
+      password = await password.update!({
         profile: {
-          password: 'MyUpdatedPassword'
+          password: 'MyPassword2',
+          currentPassword: 'MyPassword1'
         }
       });
-      expect(transaction).toMatchSnapshot({
+      expect(password).toMatchSnapshot({
         headers: expect.any(Object),
         id: expect.any(String),
-        status: expect('ACTIVE')
+        status: 'ACTIVE',
+        get: expect.any(Function),
+        update: expect.any(Function),
+        delete: expect.any(Function),
       });
 
       // delete
@@ -93,40 +96,30 @@ describe('MyAccount Password API', () => {
       expect(deleteTransaction).toMatchSnapshot();
 
       // get password (status NOT_ENROLLED)
-      transaction = await password.get();
-      expect(transaction).toMatchSnapshot({
+      password = await getPassword(client, {
+        accessToken: token
+      });
+      expect(password).toMatchSnapshot({
         headers: expect.any(Object),
-        status: expect('NOT_ENROLLED')
+        status: 'NOT_ENROLLED',
+        enroll: expect.any(Function),
       });
 
-      transaction = await password.enroll!({
+      password = await password.enroll!({
         profile: {
-          password: 'MyNewlyEnrolledPassword'
+          password: 'MyPassword3'
         }
       });
-      expect(transaction).toMatchSnapshot({
+      expect(password).toMatchSnapshot({
         headers: expect.any(Object),
         id: expect.any(String),
-        status: expect('ACTIVE')
+        status: 'ACTIVE'
       });
-
-      // clean up
-      await password.delete!();
     });
   });
 
   describe('Manage with SDK methods', () => {
     let password: PasswordTransaction;
-
-    afterEach(async () => {
-      if (password && password.delete) {
-        try {
-          await password.delete();
-        } catch {
-          // do nothing
-        }
-      }
-    });
 
     it('can manage password with SDK methods', async () => {
       // create test password
@@ -134,14 +127,17 @@ describe('MyAccount Password API', () => {
         accessToken: token,
         payload: {
           profile: {
-            password: 'MyPassword'
+            password: 'MyPassword1'
           },
         }
       });
       expect(password).toMatchSnapshot({
         headers: expect.any(Object),
         id: expect.any(String),
-        status: expect('ACTIVE')
+        status: 'ACTIVE',
+        get: expect.any(Function),
+        update: expect.any(Function),
+        delete: expect.any(Function),
       });
 
       // get password
@@ -149,31 +145,33 @@ describe('MyAccount Password API', () => {
       expect(password).toMatchSnapshot({
         headers: expect.any(Object),
         id: expect.any(String),
-        status: expect('ACTIVE')
+        status: 'ACTIVE',
+        get: expect.any(Function),
+        update: expect.any(Function),
+        delete: expect.any(Function),
       });
 
       password = await updatePassword(client, {
         accessToken: token,
         payload: {
           profile: {
-            password: 'MyPassword'
+            password: 'MyPassword2'
           },
         }
       });
       expect(password).toMatchSnapshot({
         headers: expect.any(Object),
         id: expect.any(String),
-        status: expect('ACTIVE')
+        status: 'ACTIVE',
+        get: expect.any(Function),
+        update: expect.any(Function),
+        delete: expect.any(Function),
       });
 
       // delete
       const deleteTransaction = await deletePassword(client, { accessToken: token });
-      expect(deleteTransaction).toMatchSnapshot({
-        headers: expect.any(Object),
-        status: expect('NOT_ENROLLED')
-      });
+      expect(deleteTransaction).toMatchSnapshot();
     });
-
   });
 
 });
