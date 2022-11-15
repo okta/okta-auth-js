@@ -109,7 +109,7 @@ export type ClientAuthenticationOptions = {
   aud?: string;
 }
 
-export type CibaAuthOptions = Partial<ClientAuthenticationOptions> & 
+export type CibaAuthOptions = ClientAuthenticationOptions & 
   Pick<OktaAuthOAuthOptions, 'scopes'> & 
   {
     loginHint?: string;
@@ -119,6 +119,6 @@ export type CibaAuthOptions = Partial<ClientAuthenticationOptions> &
     requestExpiry?: number;
   }
   
-export type CibaTokenOptions = Partial<ClientAuthenticationOptions> & {
+export type CibaTokenOptions = ClientAuthenticationOptions & {
   authReqId: string;
 }

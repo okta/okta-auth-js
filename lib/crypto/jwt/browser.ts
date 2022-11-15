@@ -13,7 +13,5 @@
 import { AuthSdkError } from '../../errors';
 
 export function makeJwt() {
-  throw new AuthSdkError(
-    'Function makeJwt is not supported in browser bundle. Most likely your app should be running as a Web Application.'
-  );
+  throw new AuthSdkError('Function makeJwt is not supported in browser environment.');
 }

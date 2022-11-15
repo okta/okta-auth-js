@@ -18,7 +18,7 @@ jest.mock('../../../lib/http', () => {
 });
 
 import { OktaAuthOAuthInterface } from '../../../lib/oidc/types';
-import { PEM, JWK } from '@okta/test.support/jwt';
+import { PEM, JWK } from '@okta/test.support/jwt.mjs';
 
 const mocked = {
   http: require('../../../lib/http')

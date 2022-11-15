@@ -129,12 +129,16 @@ describe('exchangeCodeForTokens', () => {
       }).rejects.toThrow(new AuthSdkError('A clientId must be specified in the OktaAuth constructor to get a token'));
     });
 
-    it('Throws if no redirectUri', async function() {
-      oauthOptions.redirectUri = undefined;
-      await expect(async () => {
-        await exchangeCodeForTokens(authClient, oauthOptions);
-      }).rejects.toThrow(new AuthSdkError('The redirectUri passed to /authorize must also be passed to /token'));
-    });
+    // skip this test for browser env
+    // redirectUri is set with default value in browser env
+    if (typeof document === 'undefined') {
+      it('Throws if no redirectUri', async function() {
+        oauthOptions.redirectUri = undefined;
+        await expect(async () => {
+          await exchangeCodeForTokens(authClient, oauthOptions);
+        }).rejects.toThrow(new AuthSdkError('The redirectUri passed to /authorize must also be passed to /token'));
+      });
+    }
 
     it('Throws if no authorizationCode', async function() {
       oauthOptions.authorizationCode = undefined;

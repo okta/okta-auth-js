@@ -5,6 +5,7 @@ import Emitter from 'tiny-emitter';
 import PCancelable from 'p-cancelable';
 import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import NodeCache from 'node-cache';
+import { PEM } from '@okta/test.support/jwt.mjs';
 
 describe('OktaAuth (api)', function() {
   let auth;
@@ -83,15 +84,29 @@ describe('OktaAuth (api)', function() {
   });
 
   describe('Ciba', () => {
-    describe('browser bundle', () => {
+    describe('browser bundle + privateKey', () => {
       if (process.env.BUNDLE_ENV !== 'browser') {
         return;
       }
 
+      beforeEach(() => {
+        auth = new OktaAuth({ 
+          issuer, 
+          clientId: 'fake-client-id',
+          privateKey: PEM,
+        });
+      });
+
       it('throws when use authenticateWithCiba', async () => {
         await expect(async () => {
-          await auth.authenticateWithCiba(auth, {});
-        }).rejects.toThrowError(new AuthSdkError('This function is not supported in browser bundle.'));
+          await auth.authenticateWithCiba({});
+        }).rejects.toThrowError(new AuthSdkError('Function makeJwt is not supported in browser environment.'));
+      });
+
+      it('throws when use pollTokenWithCiba', async () => {
+        await expect(async () => {
+          await auth.pollTokenWithCiba({ authReqId: 'fake-auth-req-id' });
+        }).rejects.toThrowError(new AuthSdkError('Function makeJwt is not supported in browser environment.'));
       });
     });
   });

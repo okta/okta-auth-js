@@ -1,7 +1,7 @@
 import { createClient } from '../../util';
 import { authenticateWithCiba, pollTokenWithCiba } from '../../../../lib/oidc';
 import { OAuthError } from '../../../../lib/errors';
-import { PEM as INVALID_PEM, JWK as INVALID_JWK } from '@okta/test.support/jwt';
+import { PEM as INVALID_PEM, JWK as INVALID_JWK } from '@okta/test.support/jwt.mjs';
 
 // Note: only pending status can be reached/tested due to unable to automate user consent step
 

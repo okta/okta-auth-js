@@ -10,6 +10,7 @@ const config = Object.assign({}, baseConfig, {
     '<rootDir>/test/spec/serverStorage.js',
     '<rootDir>/test/spec/features/server',
     '<rootDir>/test/spec/oidc/authenticateWithCiba.ts',
+    '<rootDir>/test/spec/oidc/pollTokenWithCiba.ts',
     '<rootDir>/test/spec/crypto/jwt.ts'
   ]),
   moduleNameMapper: Object.assign({}, baseConfig.moduleNameMapper, {
