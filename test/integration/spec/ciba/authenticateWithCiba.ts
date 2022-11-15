@@ -1,7 +1,7 @@
 import { createClient, signinAndGetTokens } from '../../util';
 import { authenticateWithCiba } from '../../../../lib/oidc';
 import { OAuthError } from '../../../../lib/errors';
-import { PEM as INVALID_PEM, JWK as INVALID_JWK } from '@okta/test.support/jwt';
+import { PEM as INVALID_PEM, JWK as INVALID_JWK } from '@okta/test.support/jwt.mjs';
 
 describe('authenticateWithCiba', () => {
   it('authenticates ciba client with client secret', async () => {
