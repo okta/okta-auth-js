@@ -23,7 +23,7 @@ module.exports = {
     '**/test/validate-bundles/**/*.{js,ts}'
   ],
   'transform': {
-    '^.+\\.(ts)$': 'babel-jest'
+    '^.+\\.(ts|mjs)$': 'babel-jest'
   },
   'transformIgnorePatterns': [
     OktaAuth,
