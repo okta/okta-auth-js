@@ -703,6 +703,99 @@ describe('idx/interact', () => {
           });
         });
       });
+
+      describe('acrValues', () => {
+        beforeEach(() => {
+          const { authParams } = testContext;
+          authParams.acrValues = 'phr';
+          const authClient = new OktaAuth(authParams);
+          testContext.authClient = authClient;
+        });
+
+        it('uses acrValues from SDK options', async () => {
+          const { authClient } = testContext;
+          const res = await interact(authClient);
+          expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+            url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            args: ({
+              client_id: 'authClient-clientId',
+              scope: 'authClient',
+              redirect_uri: 'authClient-redirectUri',
+              code_challenge: 'tp-codeChallenge',
+              code_challenge_method: 'tp-codeChallengeMethod',
+              state: 'authClient-state',
+              acr_values: 'phr',
+            }),
+            withCredentials: true
+          });
+          expect(res).toEqual({
+            'interactionHandle': 'idx-interactionHandle',
+            'meta': {
+              'clientId': 'authClient-clientId',
+              'issuer': 'https://auth-js-test.okta.com',
+              'redirectUri': 'authClient-redirectUri',
+              'codeChallenge': 'tp-codeChallenge',
+              'codeChallengeMethod': 'tp-codeChallengeMethod',
+              'codeVerifier': 'tp-codeVerifier',
+              'interactionHandle': 'idx-interactionHandle',
+              'responseType': 'tp-responseType',
+              'scopes': [
+                'authClient',
+              ],
+              'state': 'authClient-state',
+              'acrValues': 'phr',
+              'withCredentials': true
+            },
+            'state': 'authClient-state',
+          });
+        });
+  
+        it('uses acrValues from function options (overrides sdk option)', async () => {
+          const { authClient } = testContext;
+          const res = await interact(authClient, { acrValues: 'phrh' });
+          expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
+            url: 'https://auth-js-test.okta.com/oauth2/v1/interact',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            args: ({
+              client_id: 'authClient-clientId',
+              scope: 'authClient',
+              redirect_uri: 'authClient-redirectUri',
+              code_challenge: 'tp-codeChallenge',
+              code_challenge_method: 'tp-codeChallengeMethod',
+              state: 'authClient-state',
+              acr_values: 'phrh',
+            }),
+            withCredentials: true
+          });
+          expect(res).toEqual({
+            'interactionHandle': 'idx-interactionHandle',
+            'meta': {
+              'clientId': 'authClient-clientId',
+              'issuer': 'https://auth-js-test.okta.com',
+              'redirectUri': 'authClient-redirectUri',
+              'codeChallenge': 'tp-codeChallenge',
+              'codeChallengeMethod': 'tp-codeChallengeMethod',
+              'codeVerifier': 'tp-codeVerifier',
+              'interactionHandle': 'idx-interactionHandle',
+              'responseType': 'tp-responseType',
+              'scopes': [
+                'authClient',
+              ],
+              'state': 'authClient-state',
+              'acrValues': 'phrh',
+              'withCredentials': true
+            },
+            'state': 'authClient-state',
+          });
+        });
+      });
   
       it('saves returned interactionHandle', async () => {
         const { authClient } = testContext;

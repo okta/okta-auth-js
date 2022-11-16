@@ -35,7 +35,6 @@ export interface TokenParams extends CustomUrls {
   state?: string;
   nonce?: string;
   scopes?: string[];
-  acrValues?: string;
   display?: string;
   ignoreSignature?: boolean;
   codeVerifier?: string;
@@ -47,6 +46,7 @@ export interface TokenParams extends CustomUrls {
   idpScope?: string | string[];
   loginHint?: string;
   maxAge?: string | number;
+  acrValues?: string;
   prompt?: string;
   sessionToken?: string;
   timeout?: number;
