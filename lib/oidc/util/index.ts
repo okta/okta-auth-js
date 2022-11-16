@@ -25,3 +25,4 @@ export * from './refreshToken';
 export * from './urlParams';
 export * from './validateClaims';
 export * from './validateToken';
+export * from './prepareClientAuthenticationParams';

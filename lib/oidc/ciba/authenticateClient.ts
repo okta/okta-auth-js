@@ -10,19 +10,19 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { getOAuthBaseUrl } from './util';
-import { AuthSdkError } from '../errors';
+import { getOAuthBaseUrl } from '../util';
+import { AuthSdkError } from '../../errors';
 import { 
   OktaAuthOAuthInterface, 
   CibaAuthOptions, 
   CibaAuthResponse, 
   CibaAuthorizeParams, 
   ClientAuthenticationOptions,
-} from './types';
-import { postToBcAuthorizeEndpoint } from './endpoints/bc-authorize';
-import { prepareClientAuthenticationParams } from './util/prepareClientAuthenticationParams';
+} from '../types';
+import { postToBcAuthorizeEndpoint } from '../endpoints/bc-authorize';
+import { prepareClientAuthenticationParams } from '../util/prepareClientAuthenticationParams';
 
-export async function authenticateWithCiba(
+export async function authenticateClient(
   sdk: OktaAuthOAuthInterface, 
   options: CibaAuthOptions
 ): Promise<CibaAuthResponse> {

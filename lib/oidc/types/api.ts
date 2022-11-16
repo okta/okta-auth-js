@@ -12,13 +12,21 @@
 
 import { JWTObject } from './JWT';
 import { OAuthTransactionMeta, PKCETransactionMeta } from './meta';
-import { CibaAuthOptions, CustomUrls, OktaAuthOAuthOptions, SigninWithRedirectOptions, TokenParams } from './options';
+import { 
+  CibaAuthOptions, 
+  CibaTokenOptions, 
+  CustomUrls, 
+  OktaAuthOAuthOptions, 
+  SigninWithRedirectOptions, 
+  TokenParams,
+} from './options';
 import { OAuthStorageManagerInterface } from './storage';
 import { AccessToken, IDToken, RefreshToken, RevocableToken, Token, Tokens } from './Token';
 import { TokenManagerInterface } from './TokenManager';
 import { CustomUserClaims, UserClaims } from './UserClaims';
 import { TransactionManagerInterface } from './TransactionManager';
 import { OktaAuthSessionInterface } from '../../session/types';
+import { OAuthResponse } from './proto';
 
 export interface PopupParams {
   popupTitle?: string;
@@ -79,6 +87,11 @@ export interface TokenAPI extends BaseTokenAPI {
   renewTokensWithRefresh(tokenParams: TokenParams, refreshTokenObject: RefreshToken): Promise<Tokens>;
   verify(token: IDToken, params?: object): Promise<IDToken>;
   isLoginRedirect(): boolean;
+}
+
+export interface CibaAPI {
+  authenticateClient(options: CibaAuthOptions): Promise<CibaAuthResponse>;
+  pollToken(options: CibaTokenOptions): Promise<OAuthResponse>;
 }
 
 export interface TokenVerifyParams {
