@@ -40,7 +40,6 @@ setup_e2e () {
 run_e2e () {
   create_log_group "E2E Test Run"
   if [ -n "${RUN_CUCUMBER}" ]; then
-    yarn test:e2e   # run standard e2e tests first, but don't exit so cucumber tests also run
     if ! yarn test:e2e:cucumber; then
       echo "Cucumber tests failed! Exiting..."
       exit ${TEST_FAILURE}

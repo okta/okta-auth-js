@@ -1,6 +1,10 @@
 import type { Options } from '@wdio/types';
 import { WebDriverLogTypes } from '@wdio/types/build/Options';
 
+const fs = require('fs');
+const path = require('path');
+const { mergeFiles } = require('junit-report-merger');
+
 const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '106.0.5249.61';
 const USE_FIREFOX = !!process.env.USE_FIREFOX;
 const DEBUG = process.env.DEBUG;
@@ -209,7 +213,15 @@ export const config: Options.Testrunner = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
-    reporters: ['spec'],
+    reporters: [
+      'spec',
+      ['junit', {
+        outputDir: './reports',
+        outputFileFormat(options: { cid: string }) {
+          return `results-${options.cid}.xml`;
+        }
+      }]
+    ],
 
 
     //
@@ -398,8 +410,13 @@ export const config: Options.Testrunner = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-    // onComplete: function(exitCode, config, capabilities, results) {
-    // },
+    onComplete: async function(exitCode, config, capabilities, results) {
+      const outputDir = path.join(__dirname, '../../build2/reports/e2e');
+      fs.mkdirSync(outputDir, { recursive: true });
+      const reportsDir = path.resolve(__dirname, 'reports');
+      await mergeFiles(path.resolve(outputDir, 'junit-results.xml'), ['./reports/*.xml']);
+      fs.rmdirSync(reportsDir, { recursive: true });
+    },
     /**
     * Gets executed when a refresh happens.
     * @param {String} oldSessionId session ID of the old session

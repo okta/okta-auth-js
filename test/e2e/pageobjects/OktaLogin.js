@@ -84,11 +84,17 @@ class OktaLogin {
   }
 
   async clickVerifyEmail() {
-    (await this.verifyBtn).click();
+    await browser.waitUntil(async () => {
+      return (await this.verifyBtn).isDisplayed();
+    }, 5000, 'wait for verify btn');
+
+    let verify = await this.verifyBtn;
+    await verify.click();
 
     // There can be a form validation error, just retry
     await delay(1000);
-    if ((await this.verifyBtn)?.isEnabled()) {
+    verify = await this.verifyBtn;
+    if (await verify.isDisplayed() && await verify.isEnabled()) {
       await this.submit();
     }
   }
