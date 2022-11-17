@@ -44,6 +44,7 @@ import SelectAuthenticatorUnlockAccount from './SelectAuthenticatorUnlockAccount
 import EnrollOktaVerifyAuthenticator from './EnrollOktaVerifyAuthenticator';
 import SelectEnrollmentChannel from './SelectEnrollmentChannel';
 import EnrollWebAuthn from './EnrollWebAuthn';
+import SelectAuthenticatorAuthenticate from './SelectAuthenticatorAuthenticate';
 
 const pages: { [key: string]: Page } = {
   'Login': LoginForm,
@@ -83,6 +84,8 @@ const pages: { [key: string]: Page } = {
   'Embedded Widget': OktaSignInOIE,
   'Login with Social IDP': OktaSignInOIEFacebookIdp,
   'Login with Okta OIDC IDP': OktaSignInOIEOktaIdp,
+  // React sample
+  'Select Authenticator Authenticate': SelectAuthenticatorAuthenticate,
 };
 
 

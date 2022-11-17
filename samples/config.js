@@ -133,7 +133,9 @@ const samples = [
     appType: 'browser',
     template: 'react-embedded-auth-with-sdk',
     generateType: GENERATE_TYPE_OVERWRITE,
-    features: [
+    features: process.env.TREX ? [
+      'progressive-profiling-acr-values'
+    ] : [
       // group sms related specs together, so they do not run in parallel
       // this spec takes time to finish, run it first
       [

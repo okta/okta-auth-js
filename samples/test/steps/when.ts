@@ -55,6 +55,10 @@ import { camelize } from '../util';
 import getCodeFromSMS from '../support/action/getCodeFromSMS';
 import selectEnrollMethod from '../support/action/selectEnrollMethod';
 import selectOption from '../support/action/selectOption';
+import selectApproach from '../support/action/selectApproach';
+import authenticators from '../support/selectors/maps/authenticators';
+import selectAuthenticatorAuthenticate from '../support/action/selectAuthenticatorAuthenticate';
+import { getTotp } from '../util';
 
 When(
   'she clicks the {string} button', 
@@ -99,6 +103,8 @@ When(
       code = await this.a18nClient.getEmailCode(this.credentials.profileId);
     } else if (type === 'Updated Email') {
       code = await this.a18nClient.getEmailCode(this.secondCredentials.profileId);
+    } else if (type === 'Google Authenticator App') {
+      code = getTotp(this.sharedSecret);
     }
     await enterCode(code);
   }
@@ -151,37 +157,13 @@ When(
 
 When(
   'she selects the {string} factor',
-  /* eslint-disable complexity */
   async (authenticator: string) => {
-    let authenticatorKey;
-    switch(authenticator) {
-      case 'Email':
-        authenticatorKey = 'okta_email';
-        break;
-      case 'Password':
-        authenticatorKey = 'okta_password';
-        break;
-      case 'Phone':
-        authenticatorKey = 'phone_number';
-        break;
-      case 'Google Authenticator':
-        authenticatorKey = 'google_otp';
-        break;
-      case 'Security Question':
-        authenticatorKey = 'security_question';
-        break;
-      case 'Okta Verify':
-        authenticatorKey = 'okta_verify';
-        break;
-      case 'WebAuthn':
-        authenticatorKey = 'webauthn';
-        break;
-      default:
-        throw new Error(`Unknown authenticator ${authenticator}`);
+    let authenticatorKey = authenticators[authenticator];
+    if (!authenticatorKey) {
+      throw new Error(`Unknown authenticator ${authenticator}`);
     }
     await selectAuthenticator(authenticatorKey);
   }
-  /* eslint-enable complexity */
 );
 
 When(
@@ -368,6 +350,22 @@ When(
 When(
   /^she inputs her recovery email$/,
   enterRecoveryEmail
+);
+
+When(
+  'she selects approach {string}',
+  selectApproach
+);
+
+When(
+  'she selects authenticator {string}',
+  async (authenticator: string) => {
+    let authenticatorKey = authenticators[authenticator];
+    if (!authenticatorKey) {
+      throw new Error(`Unknown authenticator ${authenticator}`);
+    }
+    await selectAuthenticatorAuthenticate(authenticatorKey);
+  }
 );
 
 When(

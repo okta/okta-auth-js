@@ -95,7 +95,13 @@ test_suites:
       script_name: e2e-react-embedded-auth-with-sdk
       criteria: MERGE
       queue_name: small
-
+    - name: e2e-react-embedded-auth-with-sdk-trex
+      script_path: ../okta-auth-js/scripts
+      sort_order: '12'
+      timeout: '20'
+      script_name: e2e-react-embedded-auth-with-sdk-trex
+      criteria: MERGE
+      queue_name: small
     - name: verify-registry-install
       prereq_test_suite_name: publish
       script_path: ../okta-auth-js/scripts

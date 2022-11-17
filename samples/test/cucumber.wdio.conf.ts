@@ -22,6 +22,7 @@ const configUtils = require('./util/configUtils');
 const specs = configUtils.getSampleFeatures();
 console.log('SPECS', specs);
 
+const USE_FIREFOX = !!process.env.USE_FIREFOX;
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
 const LOG = process.env.LOG;
@@ -29,6 +30,9 @@ const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel = LOG || 'warn';
 const chromeOptions = {
     args: []
+};
+const firefoxOptions = {
+  args: []
 };
 const maxInstances = process.env.MAX_INSTANCES ? +process.env.MAX_INSTANCES : 1;
 
@@ -42,14 +46,21 @@ if (CI) {
         '--disable-extensions',
         '--verbose'
     ]);
+    firefoxOptions.args = firefoxOptions.args.concat([
+        '-headless'
+    ]);
 }
 
 // driver version must match installed chrome version
 // https://chromedriver.storage.googleapis.com/index.html
 
 const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '106.0.5249.61';
-const drivers = {
-  chrome: { version: CHROMEDRIVER_VERSION }
+const drivers = USE_FIREFOX ? {
+  // Use latest geckodriver
+  // https://github.com/mozilla/geckodriver/releases
+  firefox: true,
+} : {
+  chrome: { version: CHROMEDRIVER_VERSION },
 };
 
  // If you are using Cucumber you need to specify the location of your step definitions.
@@ -158,8 +169,9 @@ export const config: WebdriverIO.Config = {
         // 5 instances get started at a time.
         maxInstances, // a18n api has very limited capacity, leave space for parallel CI/local processes
         //
-        browserName: 'chrome',
-        'goog:chromeOptions': chromeOptions
+        browserName: USE_FIREFOX ? 'firefox' : 'chrome',
+        'goog:chromeOptions': chromeOptions,
+        'moz:firefoxOptions': firefoxOptions,
         // If outputDir is provided WebdriverIO can capture driver session logs
         // it is possible to configure which logTypes to include/exclude.
         // excludeDriverLogs: ['*'], // pass '*' to exclude all driver session logs
