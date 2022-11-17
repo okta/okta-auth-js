@@ -410,6 +410,7 @@ export const config: Options.Testrunner = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     onComplete: async function(exitCode, config, capabilities, results) {
       const outputDir = path.join(__dirname, '../../build2/reports/e2e');
       fs.mkdirSync(outputDir, { recursive: true });

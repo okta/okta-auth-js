@@ -26,6 +26,7 @@
     "@wdio/selenium-standalone-service": "^7.24.0",
     "@wdio/spec-reporter": "^7.24.0",
     "cross-spawn-with-kill": "^1.0.0",
+    "junit-report-merger": "^3.0.5",
     "ts-node": "^9.1.1",
     "tsconfig-paths": "^4.1.0",
     "regenerator-runtime": "^0.13.3",
