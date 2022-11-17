@@ -109,7 +109,9 @@ class OktaLogin {
 
   async waitForLoad() {
     if (process.env.ORG_OIE_ENABLED) {
-      return browser.waitUntil(async () => this.OIEsigninSubmitBtn.then(el => el.isDisplayed()), 5000, 'wait for signin btn');
+      // With Step Up MFA there can be no Submit button displayed, 
+      //  but authenticator list or prompt to verify authenticator
+      return browser.waitUntil(async () => this.OIEsigninForm.then(el => el.isDisplayed()), 5000, 'wait for signin form');
     } else {
       return browser.waitUntil(async () => this.signinSubmitBtn.then(el => el.isDisplayed()), 5000, 'wait for signin btn');
     }
