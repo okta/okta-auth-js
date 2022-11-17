@@ -11,23 +11,22 @@
  */
 
 /* eslint-disable camelcase */
-import { getOAuthUrls } from './util/oauth';
-import { AuthSdkError } from './../errors';
+import { postToTokenEndpoint } from '../endpoints';
+import { getOAuthUrls, prepareClientAuthenticationParams } from '../util';
+import { AuthSdkError } from '../../errors';
 import { 
   OktaAuthOAuthInterface, 
   OAuthResponse, 
-  CibaTokenOptions, 
+  CibaGetTokenPollModeOptions, 
   TokenParamsProto,
   ClientAuthenticationOptions,
-} from './types';
-import { postToTokenEndpoint } from './endpoints';
-import { prepareClientAuthenticationParams } from './util/prepareClientAuthenticationParams';
+} from '../types';
 
 const GRANT_TYPE = 'urn:openid:params:grant-type:ciba';
 
-export async function pollTokenWithCiba(
+export async function getTokenPollMode(
   sdk: OktaAuthOAuthInterface, 
-  options: CibaTokenOptions
+  options: CibaGetTokenPollModeOptions
 ): Promise<OAuthResponse> {
   if (!options.authReqId) {
     throw new AuthSdkError('Option authReqId must be specified in the function options to poll token');

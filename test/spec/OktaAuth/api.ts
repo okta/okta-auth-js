@@ -13,9 +13,14 @@
 
 /* eslint-disable no-new */
 
-jest.mock('../../../lib/oidc/authenticateWithCiba', () => {
+jest.mock('../../../lib/oidc/ciba/authenticateClient', () => {
   return {
-    authenticateWithCiba: () => {},
+    authenticateClient: () => {},
+  };
+});
+jest.mock('../../../lib/oidc/ciba/getTokenPollMode', () => {
+  return {
+    getTokenPollMode: () => {},
   };
 });
 
@@ -30,8 +35,9 @@ import {
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 
-const mocked = {
-  authenticateWithCiba: require('../../../lib/oidc/authenticateWithCiba')
+const cibaMocked = {
+  authenticateClient: require('../../../lib/oidc/ciba/authenticateClient'),
+  getTokenPollMode: require('../../../lib/oidc/ciba/getTokenPollMode')
 };
 
 describe('OktaAuth (api)', function() {
@@ -610,12 +616,19 @@ describe('OktaAuth (api)', function() {
 
   });
 
-  describe('authenticateWithCiba', () => {
-    it('calls authenticateWithCiba with all options', async () => {
-      jest.spyOn(mocked.authenticateWithCiba, 'authenticateWithCiba').mockReturnValue(Promise.resolve());
+  describe('ciba', () => {
+    it('calls ciba/authenticateClient with all options', async () => {
+      jest.spyOn(cibaMocked.authenticateClient, 'authenticateClient').mockReturnValue(Promise.resolve());
       const options = { fake1: 'fake1', fake2: 'fake2' };
-      await mocked.authenticateWithCiba.authenticateWithCiba(options);
-      expect(mocked.authenticateWithCiba.authenticateWithCiba).toHaveBeenCalledWith(options);
+      await cibaMocked.authenticateClient.authenticateClient(options);
+      expect(cibaMocked.authenticateClient.authenticateClient).toHaveBeenCalledWith(options);
+    });
+
+    it('calls ciba/getTokenPollMode with all options', async () => {
+      jest.spyOn(cibaMocked.getTokenPollMode, 'getTokenPollMode').mockReturnValue(Promise.resolve());
+      const options = { fake1: 'fake1', fake2: 'fake2' };
+      await cibaMocked.getTokenPollMode.getTokenPollMode(options);
+      expect(cibaMocked.getTokenPollMode.getTokenPollMode).toHaveBeenCalledWith(options);
     });
   });
 });

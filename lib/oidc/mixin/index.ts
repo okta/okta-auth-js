@@ -25,10 +25,7 @@ import {
   TransactionManagerInterface,
   TransactionManagerConstructor,
   UserClaims,
-  CibaAuthOptions,
-  CibaAuthResponse,
-  OAuthResponse,
-  CibaTokenOptions,
+  CibaAPI,
 } from '../types';
 import PKCE from '../util/pkce';
 import { createTokenAPI } from '../factory';
@@ -36,8 +33,7 @@ import { TokenManager } from '../TokenManager';
 import { getOAuthUrls, isLoginRedirect } from '../util';
 
 import { OktaAuthSessionInterface } from '../../session/types';
-import { authenticateWithCiba } from '../authenticateWithCiba';
-import { pollTokenWithCiba } from '../pollTokenWithCiba';
+import { authenticateClient, getTokenPollMode } from '../ciba';
 import { provideOriginalUri } from './node';
 export function mixinOAuth
 <
@@ -59,6 +55,7 @@ export function mixinOAuth
   {
     static crypto: CryptoAPI = crypto;
     token: TokenAPI;
+    ciba: CibaAPI;
     tokenManager: TokenManager;
     transactionManager: TM;
     pkce: PkceAPI;
@@ -84,6 +81,11 @@ export function mixinOAuth
       this._tokenQueue = new PromiseQueue();
 
       this.token = createTokenAPI(this, this._tokenQueue);
+
+      this.ciba = {
+        authenticateClient: authenticateClient.bind(null, this),
+        getTokenPollMode: getTokenPollMode.bind(null, this),
+      };
 
       // TokenManager
       this.tokenManager = new TokenManager(this, this.options.tokenManager);
@@ -340,14 +342,6 @@ export function mixinOAuth
         // Flow ends with logout redirect
         window.location.assign(logoutUri);
       }
-    }
-
-    authenticateWithCiba(options: CibaAuthOptions): Promise<CibaAuthResponse> {
-      return authenticateWithCiba(this, options);
-    }
-
-    pollTokenWithCiba(options: CibaTokenOptions): Promise<OAuthResponse> {
-      return pollTokenWithCiba(this, options);
     }
 
   };
