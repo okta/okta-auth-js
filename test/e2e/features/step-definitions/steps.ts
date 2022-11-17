@@ -1,4 +1,4 @@
-import { Given, When, Then} from '@wdio/cucumber-framework';
+import { Given, When, Then, AfterStep } from '@wdio/cucumber-framework';
 import ActionContext from 'support/context';
 import TestApp from '../../pageobjects/TestApp';
 import OktaLogin from '../../pageobjects/OktaLogin';
@@ -18,8 +18,6 @@ Then('she should see an error message saying {string}',
     await expect($('#error')).toBeExisting();
 });
 
-
-
 Given(
   'Mary is on the default view in an UNAUTHENTICATED state', 
   async function (this: ActionContext) {
@@ -32,7 +30,6 @@ Given(
 
     await TestApp.assertLoggedOut();
 });
-
 
 When('she clicks the {string} button', async function (buttonName) {
   let el: WebdriverIO.Element;
@@ -203,10 +200,10 @@ When(
 );
 
 Then(
-  'the app receives and additional token for this ACR value',
-  async function () {
+  'the app receives and additional token for this ACR value {string}',
+  async function (acrValue: string) {
     const idToken = await TestApp.getIdToken();
-    expect(idToken?.claims?.acr).toBe('urn:okta:loa:2fa:any:ifpossible');
+    expect(idToken?.claims?.acr).toBe(acrValue);
   }
 );
 
