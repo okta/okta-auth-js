@@ -17,7 +17,7 @@ class SelectAuthenticatorAuthenticate extends PageWithTitle {
   title = 'Select Authenticator Authenticate';
 
   get select() { return 'select[name=authenticator]'; }
-  option(value: string) { return `div[role=listbox] div[role=option][data-value=${value}]` }
+  option(value: string) { return `div[role=listbox] div[role=option][data-value=${value}]`; }
 
   get submit() { return 'button[type=submit]';}
 }
