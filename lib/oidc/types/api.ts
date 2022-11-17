@@ -14,7 +14,7 @@ import { JWTObject } from './JWT';
 import { OAuthTransactionMeta, PKCETransactionMeta } from './meta';
 import { 
   CibaAuthOptions, 
-  CibaTokenOptions, 
+  CibaGetTokenPollModeOptions, 
   CustomUrls, 
   OktaAuthOAuthOptions, 
   SigninWithRedirectOptions, 
@@ -91,7 +91,7 @@ export interface TokenAPI extends BaseTokenAPI {
 
 export interface CibaAPI {
   authenticateClient(options: CibaAuthOptions): Promise<CibaAuthResponse>;
-  pollToken(options: CibaTokenOptions): Promise<OAuthResponse>;
+  getTokenPollMode(options: CibaGetTokenPollModeOptions): Promise<OAuthResponse>;
 }
 
 export interface TokenVerifyParams {

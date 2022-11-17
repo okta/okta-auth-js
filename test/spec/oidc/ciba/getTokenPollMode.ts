@@ -11,21 +11,21 @@
  *
  */
 
-jest.mock('../../../lib/http', () => {
+jest.mock('../../../../lib/http', () => {
   return {
     httpRequest: () => {},
   };
 });
 
-import { OktaAuthOAuthInterface } from '../../../lib/oidc/types';
+import { OktaAuthOAuthInterface } from '../../../../lib/oidc/types';
 import { PEM, JWK } from '@okta/test.support/jwt.mjs';
 
 const mocked = {
-  http: require('../../../lib/http')
+  http: require('../../../../lib/http')
 };
 
-import { pollTokenWithCiba } from '../../../lib/oidc';
-import { AuthSdkError } from '../../../lib/errors';
+import { getTokenPollMode } from '../../../../lib/oidc/ciba';
+import { AuthSdkError } from '../../../../lib/errors';
 
 function mockOktaAuth(options = {}): OktaAuthOAuthInterface {
   return {
@@ -41,14 +41,14 @@ describe('pollTokenWithCiba', () => {
   it('throws if no clientId is available', async () => {
     const authClient = mockOktaAuth();
     await expect(async () => {
-      await pollTokenWithCiba(authClient, { authReqId: 'fake-auth-req-id' });
+      await getTokenPollMode(authClient, { authReqId: 'fake-auth-req-id' });
     }).rejects.toThrowError(new AuthSdkError('A clientId must be specified in the OktaAuth constructor to authenticate CIBA client'));
   });
 
   it('throws if neither clientSecret nor privateKey is available', async () => {
     const authClient = mockOktaAuth({ clientId: 'fake-client-id' });
     await expect(async () => {
-      await pollTokenWithCiba(authClient, { authReqId: 'fake-auth-req-id' });
+      await getTokenPollMode(authClient, { authReqId: 'fake-auth-req-id' });
     }).rejects.toThrowError(new AuthSdkError('A clientSecret or privateKey must be specified in the OktaAuth constructor to authenticate OIDC client'));
   });
 
@@ -61,7 +61,7 @@ describe('pollTokenWithCiba', () => {
     await expect(async () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore test invalid option
-      await pollTokenWithCiba(authClient, {});
+      await getTokenPollMode(authClient, {});
     }).rejects.toThrowError(new AuthSdkError('Option authReqId must be specified in the function options to poll token'));
   });
 
@@ -72,7 +72,7 @@ describe('pollTokenWithCiba', () => {
       clientSecret: 'fake-secret',
     });
 
-    await pollTokenWithCiba(authClient, {
+    await getTokenPollMode(authClient, {
       authReqId: 'fake-auth-req-id',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
@@ -92,7 +92,7 @@ describe('pollTokenWithCiba', () => {
       privateKey: PEM,
     });
 
-    await pollTokenWithCiba(authClient, {
+    await getTokenPollMode(authClient, {
       authReqId: 'fake-auth-req-id',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
@@ -122,7 +122,7 @@ describe('pollTokenWithCiba', () => {
       scopes: ['openid', 'email'],
     });
 
-    await pollTokenWithCiba(authClient, {
+    await getTokenPollMode(authClient, {
       authReqId: 'fake-auth-req-id',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {

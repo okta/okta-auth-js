@@ -24,7 +24,7 @@ async function cibaClientAuthMiddleware(req, res) {
     const { 
       headers, // eslint-disable-line
       ...restResp 
-    } = await authClient.authenticateWithCiba({
+    } = await authClient.ciba.authenticateClient({
       loginHint,
     });
     resp = restResp;
@@ -65,7 +65,7 @@ async function cibaTokenPollingMiddleware(req, res) {
     const { 
       headers, // eslint-disable-line
       ...restResp 
-    } = await authClient.pollTokenWithCiba({
+    } = await authClient.ciba.getTokenPollMode({
       authReqId,
     });
     resp = restResp;

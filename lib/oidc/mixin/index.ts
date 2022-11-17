@@ -33,7 +33,7 @@ import { TokenManager } from '../TokenManager';
 import { getOAuthUrls, isLoginRedirect } from '../util';
 
 import { OktaAuthSessionInterface } from '../../session/types';
-import { authenticateClient, pollToken } from '../ciba';
+import { authenticateClient, getTokenPollMode } from '../ciba';
 import { provideOriginalUri } from './node';
 export function mixinOAuth
 <
@@ -84,7 +84,7 @@ export function mixinOAuth
 
       this.ciba = {
         authenticateClient: authenticateClient.bind(null, this),
-        pollToken: pollToken.bind(null, this),
+        getTokenPollMode: getTokenPollMode.bind(null, this),
       };
 
       // TokenManager

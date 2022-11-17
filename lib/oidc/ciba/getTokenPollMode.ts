@@ -17,16 +17,16 @@ import { AuthSdkError } from '../../errors';
 import { 
   OktaAuthOAuthInterface, 
   OAuthResponse, 
-  CibaTokenOptions, 
+  CibaGetTokenPollModeOptions, 
   TokenParamsProto,
   ClientAuthenticationOptions,
 } from '../types';
 
 const GRANT_TYPE = 'urn:openid:params:grant-type:ciba';
 
-export async function pollToken(
+export async function getTokenPollMode(
   sdk: OktaAuthOAuthInterface, 
-  options: CibaTokenOptions
+  options: CibaGetTokenPollModeOptions
 ): Promise<OAuthResponse> {
   if (!options.authReqId) {
     throw new AuthSdkError('Option authReqId must be specified in the function options to poll token');
