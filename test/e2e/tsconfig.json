@@ -1,12 +1,18 @@
 {
     "compilerOptions": {
         "moduleResolution": "node",
+        "allowJs": true,
         "types": [
             "node",
             "webdriverio/async",
             "@wdio/cucumber-framework",
             "expect-webdriverio"
         ],
-        "target": "es2019"
+        "esModuleInterop": true,
+        "target": "es2019",
+        "paths": {
+          "support/*": ["../../samples/test/support/*"],
+          "management-api/*": ["../../samples/test/support/management-api/*"],
+        }
     }
 }

@@ -2,16 +2,25 @@ import type { Options } from '@wdio/types';
 import { WebDriverLogTypes } from '@wdio/types/build/Options';
 
 const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '106.0.5249.61';
+const USE_FIREFOX = !!process.env.USE_FIREFOX;
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
 const LOG = process.env.LOG as WebDriverLogTypes;
 
+const maxInstances = process.env.MAX_INSTANCES ? +process.env.MAX_INSTANCES : 1;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel: WebDriverLogTypes = LOG || 'warn';
-const drivers = {
-  chrome: { version: CHROMEDRIVER_VERSION }
+const drivers = USE_FIREFOX ? {
+  // Use latest geckodriver
+  // https://github.com/mozilla/geckodriver/releases
+  firefox: true,
+} : {
+  chrome: { version: CHROMEDRIVER_VERSION },
 };
 const chromeOptions = {
+  args: []
+};
+const firefoxOptions = {
   args: []
 };
 
@@ -24,6 +33,9 @@ if (CI) {
       '--whitelisted-ips',
       '--disable-extensions',
       '--verbose'
+  ]);
+  firefoxOptions.args = firefoxOptions.args.concat([
+      '-headless'
   ]);
 }
 
@@ -110,10 +122,11 @@ export const config: Options.Testrunner = {
         // maxInstances can get overwritten per capability. So if you have an in-house Selenium
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
-        maxInstances: 5,
+        maxInstances: maxInstances,
         //
-        browserName: 'chrome',
-        'goog:chromeOptions': chromeOptions
+        browserName: USE_FIREFOX ? 'firefox' : 'chrome',
+       'goog:chromeOptions': chromeOptions,
+       'moz:firefoxOptions': firefoxOptions,
 
         // If outputDir is provided WebdriverIO can capture driver session logs
         // it is possible to configure which logTypes to include/exclude.
@@ -151,7 +164,7 @@ export const config: Options.Testrunner = {
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
     // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
     // gets prepended directly.
-    baseUrl: 'http://localhost',
+    baseUrl: 'http://localhost:8080',
     //
     // Default timeout for all waitFor* commands.
     waitforTimeout: 10000,
@@ -204,11 +217,15 @@ export const config: Options.Testrunner = {
     // If you are using Cucumber you need to specify the location of your step definitions.
     cucumberOpts: {
         // <string[]> (file/dir) require files before executing features
-        require: ['./features/step-definitions/steps.ts'],
+        require: [
+          './features/step-definitions/*.ts',
+        ],
         // <boolean> show full backtrace for errors
         backtrace: false,
         // <string[]> ("extension:module") require files with the given EXTENSION after requiring MODULE (repeatable)
-        requireModule: [],
+        requireModule: [
+          'tsconfig-paths/register',
+        ],
         // <boolean> invoke formatters without executing steps
         dryRun: false,
         // <boolean> abort the run on first failure
