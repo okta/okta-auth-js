@@ -9,6 +9,7 @@ import addAppToPolicy from 'management-api/addAppToPolicy';
 import upsertPolicyRule from 'management-api/upsertPolicyRule';
 import createCredentials from 'management-api/createCredentials';
 import createUser from 'management-api/createUser';
+import enrollFactor from 'management-api/enrollFactor';
 
 
 // Extend the hook timeout to fight against org rate limit
@@ -121,5 +122,18 @@ Given(
         assignToGroups: [this.group.id]
       })
     });
+  }
+);
+
+Given(
+  'she has enrolled in the {string} factor',
+  { timeout },
+  async function(this: ActionContext, factorType: string) {
+    this.enrolledFactor = await enrollFactor(this.config, {
+      userId: this.user.id,
+      factorType,
+      phoneNumber: this.credentials.phoneNumber,
+    });
+    this.sharedSecret = this.enrolledFactor._embedded?.activation?.sharedSecret;
   }
 );

@@ -10,6 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+function delay(ms) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, ms);
+  });
+}
 
 /* eslint-disable max-len */
 class OktaLogin {
@@ -26,6 +31,17 @@ class OktaLogin {
   get facebookEmail() { return $('#email');}
   get facebookPassword() { return $('#pass');}
   get facebookSubmitBtn() { return $('#loginbutton');}
+
+  get signinFormTitle() { return $('.okta-form-title.o-form-head'); }
+  get verifyWithEmailCodeButton() { return $('form[data-se="o-form"] button.enter-auth-code-instead-link'); }
+  get code() {
+    if (process.env.ORG_OIE_ENABLED) {
+      return this.OIEsigninPassword;
+    } else { 
+      return this.signinPassword;
+    }
+  }
+  get verifyBtn() { return $('form[data-se="o-form"] input[type=submit][value=Verify]'); }
 
   async signin(username, password) {
     await this.waitForLoad();
@@ -47,6 +63,39 @@ class OktaLogin {
     await this.signinUsername.then(el => el.setValue(username));
     await this.signinPassword.then(el => el.setValue(password));
     await this.signinSubmitBtn.then(el => el.click());
+  }
+
+  async submit() {
+    const btn = process.env.ORG_OIE_ENABLED ? this.OIEsigninSubmitBtn : this.signinSubmitBtn;
+    (await btn).click();
+  }
+
+  async clickSendEmail() {
+    await this.submit();
+  }
+
+  async clickVerifyEmail() {
+    (await this.verifyBtn).click();
+
+    // There can be a form validation error, just retry
+    await delay(1000);
+    if ((await this.verifyBtn)?.isEnabled()) {
+      await this.submit();
+    }
+  }
+
+  async verifyWithEmailCode() {
+    await browser.waitUntil(async () => {
+      return (await this.verifyWithEmailCodeButton).isDisplayed();
+    }, 5000, 'wait for verify with email code btn');
+    (await this.verifyWithEmailCodeButton).click();
+  }
+
+  async enterCode(code) {
+    await browser.waitUntil(async () => {
+      return (await this.code).isDisplayed();
+    }, 5000, 'wait for verify code input');
+    (await this.code).setValue(code);
   }
 
   async waitForLoad() {

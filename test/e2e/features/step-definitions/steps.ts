@@ -73,6 +73,18 @@ Then(
 );
 
 Then(
+  'the app should construct an authorize request for the protected action, not including an ACR Token in the request but including the ACR value',
+  async function () {
+    await browser.waitUntil(async () => {
+      const url = await browser.getUrl();
+      const queryStr = url.split('?')[1];
+      const params = new URLSearchParams(queryStr);
+      return url.includes('/authorize') && !!params.get('acr_values');
+    });
+  }
+);
+
+Then(
   'she should be redirected to the Okta Sign In Widget',
   async function () {
     await OktaLogin.waitForLoad();
@@ -126,9 +138,6 @@ When(
   }
 );
 
-
-
-
 // When('she enters {string} into {string}', async function (value, field) {
 //   let f: WebdriverIO.Element;
 //   switch (field) {
@@ -141,25 +150,67 @@ When(
 //   await f.setValue(value);
 // });
 
+When('she selects {string} into {string}', async function (value, field) {
+  let f: WebdriverIO.Element;
+  switch (field) {
+    case 'ACR values':
+      f = await TestApp.acrValues;  
+    break;
+    default:
+      throw new Error(`Unknown field ${field}`);
+  }
+  await f.selectByAttribute('value', value);
+});
 
-// await waitForDisplayed(UserHome.profileTable);
+Then('she sees {string} in {string}', async function (value, field) {
+  let el: WebdriverIO.Element;
+  switch (field) {
+    case 'ACR values':
+      el = await TestApp.acrValues;  
+    break;
+    default:
+      throw new Error(`Unknown field ${field}`);
+  }
 
-  // const el = await $('#error');
-  // await el.waitForDisplayed({
-  //   timeout: 10*1000,
-  // });
+  const actualValue = await el.getValue();
+  expect(actualValue).toBe(value);
+});
 
+Then(
+  'she should be challenged to verify her email',
+  { timeout: 10*1000 }, 
+  async function () {
+    await browser.waitUntil(async () => {
+      const header = await OktaLogin.signinFormTitle;
+      const title = await header.getText();
+      return title === 'Get a verification email';
+    }, {
+      timeout: 10*1000
+    });
+  }
+);
 
-// Then('she sees {string} in {string}', async function (value, field) {
-//   let el: WebdriverIO.Element;
-//   switch (field) {
-//     case 'ACR values':
-//       el = await TestApp.acrValues;  
-//     break;
-//     default:
-//       throw new Error(`Unknown field ${field}`);
-//   }
+When(
+  'she verifies her email',
+  { timeout: 30*1000 }, 
+  async function (this: ActionContext) {
+    await OktaLogin.clickSendEmail();
+    await OktaLogin.verifyWithEmailCode();
+    const code = await this.a18nClient.getEmailCode(this.credentials.profileId);
+    await OktaLogin.enterCode(code);
+    await OktaLogin.clickVerifyEmail();
+  }
+);
 
-//   const actualValue = await el.getValue();
-//   expect(actualValue).toBe(value);
-// });
+Then(
+  'the app receives and additional token for this ACR value',
+  async function () {
+    const idToken = await TestApp.getIdToken();
+    expect(idToken?.claims?.acr).toBe('urn:okta:loa:2fa:any:ifpossible');
+  }
+);
+
+Then(
+  'the app stores this new token in Token Storage',
+  () => {}
+);
