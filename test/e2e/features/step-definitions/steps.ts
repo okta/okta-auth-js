@@ -1,4 +1,4 @@
-import { Given, When, Then, AfterStep } from '@wdio/cucumber-framework';
+import { Given, When, Then } from '@wdio/cucumber-framework';
 import ActionContext from 'support/context';
 import TestApp from '../../pageobjects/TestApp';
 import OktaLogin from '../../pageobjects/OktaLogin';
@@ -58,6 +58,18 @@ Then(
 );
 
 Then(
+  'the callback is not handled with error {string}',
+  async function (expectedError: string) {
+    await (await TestApp.error).waitForDisplayed({
+      timeout: 3*1000,
+    });
+
+    const errText = await (await TestApp.error).getText();
+    expect(errText).toBe(expectedError);
+  }
+);
+
+Then(
   'the app should construct an authorize request for the protected action, not including an ACR Token in the request or an ACR value',
   async function () {
     await browser.waitUntil(async () => {
@@ -89,6 +101,18 @@ Then(
       const queryStr = url.split('?')[1];
       const params = new URLSearchParams(queryStr);
       return url.includes('/authorize') && !!params.get('acr_values');
+    });
+  }
+)
+
+Then(
+  'the app should construct an authorize request for the protected action, not including an ACR Token in the request but including the bad ACR value',
+  async function () {
+    await browser.waitUntil(async () => {
+      const url = await browser.getUrl();
+      const queryStr = url.split('?')[1];
+      const params = new URLSearchParams(queryStr);
+      return url.includes('/authorize') && params.get('acr_values') === 'bad-value';
     });
   }
 )
@@ -157,6 +181,24 @@ When('she selects {string} into {string}', async function (value, field) {
       throw new Error(`Unknown field ${field}`);
   }
   await f.selectByAttribute('value', value);
+});
+
+When('she selects incorrect value in {string}', async function (field) {
+  let f: string;
+  switch (field) {
+    case 'ACR values':
+      f = 'acrValues';  
+    break;
+    default:
+      throw new Error(`Unknown field ${field}`);
+  }
+
+  const url = await browser.getUrl();
+  const [ baseUrl, queryStr ] = url.split('?');
+  const params = new URLSearchParams(queryStr);
+  params.set(f, 'bad-value');
+  const newUrl = baseUrl + '?' + params.toString();
+  await browser.url(newUrl);
 });
 
 Then('she sees {string} in {string}', async function (value, field) {
