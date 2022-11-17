@@ -42,4 +42,5 @@ export type UserClaims<T extends CustomUserClaims = CustomUserClaims> = T & {
   ver?: number;
   zoneinfo?: string;
   at_hash?: string;
+  acr?: string;
 }

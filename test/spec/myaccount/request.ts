@@ -48,35 +48,6 @@ describe('sendRequest', () => {
     });
   });
 
-  it('throws insufficient_authentication error when has "insufficient_authentication_context" in www-authenticate header', async () => {
-    jest.spyOn(mocked.oidc, 'decodeToken').mockReturnValue({
-      payload: {
-        scp: ['openid', 'okta.myaccount.*']
-      }
-    });
-    jest.spyOn(mocked.oidc, 'getWithRedirect');
-    jest.spyOn(mocked.http, 'httpRequest').mockRejectedValue({
-      xhr: {
-        status: 403,
-        headers: {
-          'www-authenticate': 'Bearer realm="IdpMyAccountAPI", error="insufficient_authentication_context", error_description="The access token requires additional assurance to access the resource", max_age=900'
-        }
-      }
-    });
-    try {
-      await sendRequest(auth, {
-        url: 'https://fake-url.com',
-        method: 'GET',
-        accessToken: 'fake-token'
-      });
-    } catch (err) {
-      expect(err).toBeInstanceOf(AuthApiError);
-      expect((err as any).errorSummary).toEqual('insufficient_authentication_context');
-      expect((err as any).errorCauses).toEqual([{ errorSummary: 'The access token requires additional assurance to access the resource' }]);
-      expect((err as any).meta.max_age).toEqual(900);
-    }
-  });
-
   it('throws AuthApiError', async () => {
     const error = new AuthApiError({
       errorSummary: 'fake-error'

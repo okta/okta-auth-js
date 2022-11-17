@@ -8,7 +8,7 @@ import {
   PhoneTransaction
 } from './transactions';
 import { httpRequest } from '../http';
-import { AuthApiError, AuthSdkError } from '../errors';
+import { AuthSdkError } from '../errors';
 import { MyAccountRequestOptions as RequestOptions } from './types';
 import { OktaAuthOAuthInterface } from '../oidc/types';
 
@@ -30,43 +30,15 @@ type SendRequestOptions = RequestOptions & {
   transactionClassName?: string;
 }
 
-type InsufficientAuthenticationError = {
-  error: string;
-  // eslint-disable-next-line camelcase
-  error_description: string;
-  // eslint-disable-next-line camelcase
-  max_age: string;
-}
-
-const parseInsufficientAuthenticationError = (
-  header: string
-): InsufficientAuthenticationError => {
-  if (!header) {
-    throw new AuthSdkError('Missing header string');
-  }
-
-  return header
-    .split(',')
-    .map(part => part.trim())
-    .map(part => part.split('='))
-    .reduce((acc, curr) => {
-      // unwrap quotes from value
-      acc[curr[0]] = curr[1].replace(/^"(.*)"$/, '$1');
-      return acc;
-    }, {}) as InsufficientAuthenticationError;
-};
-
 /* eslint-disable complexity */
 export async function sendRequest<T extends BaseTransaction> (
   oktaAuth: OktaAuthOAuthInterface, 
   options: SendRequestOptions
 ): Promise<T | T[]> {
   const { 
-    accessToken: accessTokenObj,
-    idToken: idTokenObj 
+    accessToken: accessTokenObj
   } = oktaAuth.tokenManager.getTokensSync();
   
-  const idToken = idTokenObj?.idToken;
   const accessToken = options.accessToken || accessTokenObj?.accessToken;
   const { issuer } = oktaAuth.options;
   const { url, method, payload } = options;
@@ -76,44 +48,13 @@ export async function sendRequest<T extends BaseTransaction> (
     throw new AuthSdkError('AccessToken is required to request MyAccount API endpoints.');
   }
   
-  let res;
-  try {
-    res = await httpRequest(oktaAuth, {
-      headers: { 'Accept': '*/*;okta-version=1.0.0' },
-      accessToken,
-      url: requestUrl,
-      method,
-      ...(payload && { args: payload })
-    });
-  } catch (err) {
-    const errorResp = (err as AuthApiError).xhr;
-    if (idToken && errorResp?.status === 403 && !!errorResp?.headers?.['www-authenticate']) {
-      const { 
-        error, 
-        // eslint-disable-next-line camelcase
-        error_description,
-        // eslint-disable-next-line camelcase
-        max_age 
-      } = parseInsufficientAuthenticationError(errorResp?.headers?.['www-authenticate']);
-      if (error === 'insufficient_authentication_context') {
-        const insufficientAuthenticationError = new AuthApiError(
-          { 
-            errorSummary: error,
-            // eslint-disable-next-line camelcase
-            errorCauses: [{ errorSummary: error_description }]
-          }, 
-          errorResp, 
-          // eslint-disable-next-line camelcase
-          { max_age: +max_age }
-        );
-        throw insufficientAuthenticationError;
-      } else {
-        throw err;
-      }
-    } else {
-      throw err;
-    }
-  }
+  const res = await httpRequest(oktaAuth, {
+    headers: { 'Accept': '*/*;okta-version=1.0.0' },
+    accessToken,
+    url: requestUrl,
+    method,
+    ...(payload && { args: payload })
+  });
 
   const map = {
     EmailTransaction,

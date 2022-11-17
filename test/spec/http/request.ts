@@ -314,5 +314,23 @@ describe('HTTP Requestor', () => {
           expect(storage.delete).toHaveBeenCalledWith(STATE_TOKEN_KEY_NAME);
         });
     });
+    it('can handle insufficient_authentication error when has "insufficient_authentication_context" in www-authenticate header', () => {
+      const response = {
+        status: 403,
+        headers: {
+          'www-authenticate': 'Bearer realm="IdpMyAccountAPI", error="insufficient_authentication_context", error_description="The access token requires additional assurance to access the resource", max_age=900, acr_values="urn:okta:loa:2fa:any:ifpossible"'
+        }
+      };
+      initWithErrorResponse(response);
+      createAuthClient();
+      return httpRequest(sdk, { url })
+        .catch(err => {
+          expect(err).toBeInstanceOf(AuthApiError);
+          expect(err.errorSummary).toBe('insufficient_authentication_context');
+          expect(err.errorCauses).toEqual([{ errorSummary: 'The access token requires additional assurance to access the resource' }]);
+          expect(err.meta.max_age).toEqual(900);
+          expect(err.meta.acr_values).toEqual('urn:okta:loa:2fa:any:ifpossible');
+        });
+    });
   });
 });

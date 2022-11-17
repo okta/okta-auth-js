@@ -52,6 +52,18 @@ const Form = `
   <label for="scopes">Scopes (comma separated)</label><input id="f_scopes" name="scopes" type="text" />
   </div>
   <div class="pure-control-group">
+  <label for="acrValues"><a href="https://developer.okta.com/docs/guides/step-up-authentication/main/">acr_values</a></label>
+  <select id="f_acrValues" name="acrValues">
+    <option value="" selected>None</option>
+    <option value="urn:okta:loa:1fa:pwd">urn:okta:loa:1fa:pwd</option>
+    <option value="urn:okta:loa:1fa:any">urn:okta:loa:1fa:any</option>
+    <option value="urn:okta:loa:2fa:any">urn:okta:loa:2fa:any</option>
+    <option value="urn:okta:loa:2fa:any:ifpossible">urn:okta:loa:2fa:any:ifpossible</option>
+    <option value="phr">phr</option>
+    <option value="phrh">phrh</option>
+  </select>
+  </div>
+  <div class="pure-control-group">
   <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="f_postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" />
   </div>
   <div class="pure-control-group">
@@ -140,6 +152,7 @@ export function updateForm(origConfig: Config): void {
   (document.getElementById('f_redirectUri') as HTMLInputElement).value = config.redirectUri;
   (document.getElementById('f_responseType') as HTMLInputElement).value = config.responseType.join(',');
   (document.getElementById('f_scopes') as HTMLInputElement).value = config.scopes.join(',');
+  (document.getElementById('f_acrValues') as HTMLInputElement).value = config.acrValues || '';
   (document.getElementById('f_postLogoutRedirectUri') as HTMLInputElement).value = config.postLogoutRedirectUri;
   (document.getElementById('f_clientId') as HTMLInputElement).value = config.clientId;
   (document.getElementById('f_clientSecret') as HTMLInputElement).value = config.clientSecret;

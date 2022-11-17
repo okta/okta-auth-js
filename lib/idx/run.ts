@@ -120,6 +120,7 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
     recoveryToken,
     activationToken,
     maxAge,
+    acrValues,
     nonce,
   } = options;
 
@@ -140,6 +141,7 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
         activationToken,
         recoveryToken,
         maxAge,
+        acrValues,
         nonce,
       }); 
       interactionHandle = interactResponse.interactionHandle;

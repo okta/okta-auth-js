@@ -79,6 +79,8 @@ export function createOAuthOptionsConstructor() {
     ignoreSignature: boolean;
     codeChallenge: string;
     codeChallengeMethod: string;
+    acrValues: string;
+    maxAge: string | number;
 
     // Additional options
     tokenManager: TokenManagerOptions;
@@ -122,6 +124,8 @@ export function createOAuthOptionsConstructor() {
       this.ignoreSignature = !!options.ignoreSignature;
       this.codeChallenge = options.codeChallenge;
       this.codeChallengeMethod = options.codeChallengeMethod;
+      this.acrValues = options.acrValues;
+      this.maxAge = options.maxAge;
 
       this.tokenManager = options.tokenManager;
       this.postLogoutRedirectUri = options.postLogoutRedirectUri;

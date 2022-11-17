@@ -81,6 +81,7 @@ export interface TokenVerifyParams {
   ignoreSignature?: boolean;
   nonce?: string;
   accessToken?: string; // raw access token string
+  acrValues?: string;
 }
 
 export interface IDTokenAPI {

@@ -47,7 +47,7 @@ export async function handleOAuthResponse(
   res: OAuthResponse,
   urls?: CustomUrls
 ): Promise<TokenResponse> {
-  var pkce = sdk.options.pkce !== false;
+  const pkce = sdk.options.pkce !== false;
 
   // The result contains an authorization_code and PKCE is enabled 
   // `exchangeCodeForTokens` will call /token then call `handleOauthResponse` recursively with the result
@@ -61,32 +61,32 @@ export async function handleOAuthResponse(
   tokenParams = tokenParams || getDefaultTokenParams(sdk);
   urls = urls || getOAuthUrls(sdk, tokenParams);
 
-  var responseType = tokenParams.responseType || [];
+  let responseType = tokenParams.responseType || [];
   if (!Array.isArray(responseType)) {
     responseType = [responseType];
   }
 
-  var scopes;
+  let scopes;
   if (res.scope) {
     scopes = res.scope.split(' ');
   } else {
     scopes = clone(tokenParams.scopes);
   }
-  var clientId = tokenParams.clientId || sdk.options.clientId;
+  const clientId = tokenParams.clientId || sdk.options.clientId;
 
   // Handling the result from implicit flow or PKCE token exchange
   validateResponse(res, tokenParams);
 
-  var tokenDict = {} as Tokens;
-  var expiresIn = res.expires_in;
-  var tokenType = res.token_type;
-  var accessToken = res.access_token;
-  var idToken = res.id_token;
-  var refreshToken = res.refresh_token;
-  var now = Math.floor(Date.now()/1000);
+  const tokenDict = {} as Tokens;
+  const expiresIn = res.expires_in;
+  const tokenType = res.token_type;
+  const accessToken = res.access_token;
+  const idToken = res.id_token;
+  const refreshToken = res.refresh_token;
+  const now = Math.floor(Date.now()/1000);
 
   if (accessToken) {
-    var accessJwt = sdk.token.decode(accessToken);
+    const accessJwt = sdk.token.decode(accessToken);
     tokenDict.accessToken = {
       accessToken: accessToken,
       claims: accessJwt.payload,
@@ -112,8 +112,8 @@ export async function handleOAuthResponse(
   }
 
   if (idToken) {
-    var idJwt = sdk.token.decode(idToken);
-    var idTokenObj: IDToken = {
+    const idJwt = sdk.token.decode(idToken);
+    const idTokenObj: IDToken = {
       idToken: idToken,
       claims: idJwt.payload,
       expiresAt: idJwt.payload.exp! - idJwt.payload.iat! + now, // adjusting expiresAt to be in local time
@@ -123,11 +123,12 @@ export async function handleOAuthResponse(
       clientId: clientId!
     };
 
-    var validationParams: TokenVerifyParams = {
+    const validationParams: TokenVerifyParams = {
       clientId: clientId!,
       issuer: urls.issuer!,
       nonce: tokenParams.nonce,
-      accessToken: accessToken
+      accessToken: accessToken,
+      acrValues: tokenParams.acrValues
     };
 
     if (tokenParams.ignoreSignature !== undefined) {
