@@ -32,7 +32,7 @@ Given(
 });
 
 When('she clicks the {string} button', async function (buttonName) {
-  let el: WebdriverIO.Element;
+  let el;
   switch (buttonName) {
     case 'Update Config':
       el = await TestApp.submit;
@@ -103,7 +103,7 @@ Then(
       return url.includes('/authorize') && !!params.get('acr_values');
     });
   }
-)
+);
 
 Then(
   'the app should construct an authorize request for the protected action, not including an ACR Token in the request but including the bad ACR value',
@@ -115,7 +115,7 @@ Then(
       return url.includes('/authorize') && params.get('acr_values') === 'bad-value';
     });
   }
-)
+);
 
 Then(
   'she should be redirected to the Okta Sign In Widget',
@@ -172,7 +172,7 @@ When(
 );
 
 When('she selects {string} into {string}', async function (value, field) {
-  let f: WebdriverIO.Element;
+  let f;
   switch (field) {
     case 'ACR values':
       f = await TestApp.acrValues;  
@@ -202,7 +202,7 @@ When('she selects incorrect value in {string}', async function (field) {
 });
 
 Then('she sees {string} in {string}', async function (value, field) {
-  let el: WebdriverIO.Element;
+  let el;
   switch (field) {
     case 'ACR values':
       el = await TestApp.acrValues;  
@@ -251,11 +251,11 @@ Then(
 
 Then(
   'the app stores this new token in Token Storage',
-  () => {}
+  async function() {}
 );
 
 Then(
   'the Sign In Widget validates her token',
-  () => {}
+  async function() {}
 );
 

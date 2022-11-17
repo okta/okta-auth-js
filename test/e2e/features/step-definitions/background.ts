@@ -19,7 +19,6 @@ Given(
   'an App that assigned to a test group',
   { timeout },
   async function(this: ActionContext) {
-    const { issuer } = this.config;
     const appType = 'browser';
 
     this.group = await createGroup(this.config);

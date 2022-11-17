@@ -5,6 +5,7 @@ import deleteSelfEnrolledUser from 'management-api/deleteSelfEnrolledUser';
 
 // Comment out this after hook to persist test context
 // Extend the hook timeout to fight against org rate limit
+/* eslint complexity:[0,10] */
 After({ timeout: 3 * 60 * 10000 }, async function(this: ActionContext) {
   if (this.app) {
     await this.app.deactivate();

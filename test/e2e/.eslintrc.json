@@ -18,6 +18,16 @@
     "jasmine": true
   },
   "rules": {
+    "node/no-unsupported-features/node-builtins": 0,
+    "max-len": [2, 150],
+    "node/no-missing-import": ["error", {
+      "allowModules": [],
+      "resolvePaths": [
+        "../../samples/test",
+        "../../samples/test/support"
+      ],
+      "tryExtensions": [".js", ".ts"]
+    }],
     "jsdoc/newline-after-description": 0,
     "jsdoc/check-types": 0,
     "jsdoc/valid-types": 0,
