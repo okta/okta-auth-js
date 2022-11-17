@@ -6,13 +6,13 @@ import { openPKCE } from '../../util/appUtils';
 
 const ORG_OIE_ENABLED = process.env.ORG_OIE_ENABLED;
 
-When('she logins with {string} and {string}', async function (username, password) {
+When(/^she logins with (\w+) and (.+)$/, async function (username, password) {
   await $('#username').setValue(username);
   await $('#password').setValue(password);
   await $('#login-direct').click();
 });
 
-Then('she should see an error message saying {string}', 
+Then(/^she should see an error message saying (.+)$/, 
   { timeout: 10*1000 }, 
   async function (_errorMessage) {
     await expect($('#error')).toBeExisting();
