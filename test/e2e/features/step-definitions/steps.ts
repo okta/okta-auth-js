@@ -82,6 +82,18 @@ Then(
 );
 
 Then(
+  'the app should construct an authorize request for the protected action, including an ACR Token in the request but including the ACR value',
+  async function () {
+    await browser.waitUntil(async () => {
+      const url = await browser.getUrl();
+      const queryStr = url.split('?')[1];
+      const params = new URLSearchParams(queryStr);
+      return url.includes('/authorize') && !!params.get('acr_values');
+    });
+  }
+)
+
+Then(
   'she should be redirected to the Okta Sign In Widget',
   async function () {
     await OktaLogin.waitForLoad();
@@ -134,18 +146,6 @@ When(
     await browser.refresh();
   }
 );
-
-// When('she enters {string} into {string}', async function (value, field) {
-//   let f: WebdriverIO.Element;
-//   switch (field) {
-//     case 'ACR values':
-//       f = await TestApp.acrValues;  
-//     break;
-//     default:
-//       throw new Error(`Unknown field ${field}`);
-//   }
-//   await f.setValue(value);
-// });
 
 When('she selects {string} into {string}', async function (value, field) {
   let f: WebdriverIO.Element;
@@ -211,3 +211,9 @@ Then(
   'the app stores this new token in Token Storage',
   () => {}
 );
+
+Then(
+  'the Sign In Widget validates her token',
+  () => {}
+);
+
