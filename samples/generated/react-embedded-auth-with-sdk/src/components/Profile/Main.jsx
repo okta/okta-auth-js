@@ -13,7 +13,7 @@ import {
 import ProfileSection from './ProfileSection';
 import EmailSection from './EmailSection';
 import PhoneSection from './PhoneSection';
-import PasswordSection from './PasswordSection';
+// import PasswordSection from './PasswordSection';
 import InfoBox from '../InfoBox';
 import { MyAccountContext, useIdxTransaction } from '../../contexts';
 

@@ -1,6 +1,6 @@
 import { EnrollPasswordPayload, UpdatePasswordPayload, PasswordStatus } from '../types';
 import BaseTransaction from './Base';
-import { generateRequestFnFromLinks, sendRequest } from '../request';
+import { generateRequestFnFromLinks } from '../request';
 
 export default class PasswordTransaction extends BaseTransaction {
   id: string;
