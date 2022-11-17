@@ -10,6 +10,7 @@ setup_service google-chrome-stable 89.0.4389.72-1
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 export CI=true
+export TREX=true
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 # Configuration
