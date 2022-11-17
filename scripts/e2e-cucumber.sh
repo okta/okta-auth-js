@@ -29,6 +29,7 @@ else
   export SPA_CLIENT_ID=0oa17suj5x9khaVH75d7
   get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_sdk_org_api_key OKTA_API_KEY
 fi
+export CLIENT_ID="${SPA_CLIENT_ID}"
 
 if ! yarn test:e2e:cucumber; then
   echo "Cucumber tests failed! Exiting..."

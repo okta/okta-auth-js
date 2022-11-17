@@ -42,6 +42,8 @@ class OktaLogin {
     }
   }
   get verifyBtn() { return $('form[data-se="o-form"] input[type=submit][value=Verify]'); }
+  get authenticatorsList() { return $('form[data-se="o-form"] .authenticator-list'); }
+  get authenticatorEmail() { return $('form[data-se="o-form"] .authenticator-list [data-se="okta_email"] .select-factor'); }
 
   async signin(username, password) {
     await this.waitForLoad();
@@ -72,6 +74,13 @@ class OktaLogin {
 
   async clickSendEmail() {
     await this.submit();
+  }
+
+  async selectEmailAuthenticator() {
+    await browser.waitUntil(async () => {
+      return (await this.authenticatorEmail).isDisplayed();
+    }, 5000, 'wait for email authenticator in list');
+    (await this.authenticatorEmail).click();
   }
 
   async clickVerifyEmail() {

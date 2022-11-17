@@ -222,13 +222,27 @@ Then(
   'she should be challenged to verify her email',
   { timeout: 10*1000 }, 
   async function () {
+    // There can be 2 options:
+    // - page with title "Verify it's you with a security method" and authenticators list with only email availale to select
+    // - page with title "Get a verification email" and button to submit verification request
+    let isEmailVerificationDisplayed, isListDisplayed;
+
     await browser.waitUntil(async () => {
       const header = await OktaLogin.signinFormTitle;
       const title = await header.getText();
-      return title === 'Get a verification email';
+      isEmailVerificationDisplayed = title === 'Get a verification email';
+      const list = await OktaLogin.authenticatorsList;
+      isListDisplayed = await list?.isDisplayed();
+      return isEmailVerificationDisplayed || isListDisplayed;
     }, {
       timeout: 10*1000
     });
+
+    if (isEmailVerificationDisplayed) {
+      await OktaLogin.clickSendEmail();
+    } else if (isListDisplayed) {
+      await OktaLogin.selectEmailAuthenticator();
+    }
   }
 );
 
@@ -236,7 +250,6 @@ When(
   'she verifies her email',
   { timeout: 30*1000 }, 
   async function (this: ActionContext) {
-    await OktaLogin.clickSendEmail();
     await OktaLogin.verifyWithEmailCode();
     const code = await this.a18nClient.getEmailCode(this.credentials.profileId);
     await OktaLogin.enterCode(code);
