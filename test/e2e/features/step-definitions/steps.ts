@@ -40,6 +40,9 @@ When('she clicks the {string} button', async function (buttonName) {
     case 'Login using REDIRECT':
       el = await TestApp.loginRedirectBtn;
     break;
+    case 'Login with ACR':
+      el = await TestApp.loginWithAcrBtn;
+    break;
     case 'Handle callback (Continue Login)':
       el = await TestApp.handleCallbackBtn;
     break;

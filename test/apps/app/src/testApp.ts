@@ -50,7 +50,7 @@ function loginWithAcr(): string {
     <div class="pure-menu">
       <ul class="pure-menu-list actions">
         <li class="pure-menu-item">
-          <a id="login-redirect" href="/" onclick="loginRedirect(event)" class="pure-menu-link">Login with ACR using REDIRECT</a>
+          <a id="login-acr" href="/" onclick="loginRedirect(event)" class="pure-menu-link">Login with ACR using REDIRECT</a>
         </li>
       </ul>
     </div>

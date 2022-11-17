@@ -66,7 +66,7 @@ Scenario: Mary is signed in without ACR, and is challenged with an ACR value
   When she selects "urn:okta:loa:2fa:any" into "ACR values"
     And she clicks the "Update Config" button
   Then she sees "urn:okta:loa:2fa:any" in "ACR values"
-  When she clicks the "Login using REDIRECT" button
+  When she clicks the "Login with ACR" button
   Then the app should construct an authorize request for the protected action, not including an ACR Token in the request but including the ACR value
     And she should be redirected to the Okta Sign In Widget
     And she should be challenged to verify her email
@@ -104,7 +104,7 @@ Scenario: Mary is signed in without ACR, and is challenged with an ACR value, bu
   When she selects "urn:okta:loa:2fa:any" into "ACR values"
     And she clicks the "Update Config" button
   Then she sees "urn:okta:loa:2fa:any" in "ACR values"
-  When she clicks the "Login using REDIRECT" button
+  When she clicks the "Login with ACR" button
   Then the Sign In Widget validates her token
   Then she is redirected to the handle callback page
   When she clicks the "Handle callback (Continue Login)" button

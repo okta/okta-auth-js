@@ -7,7 +7,6 @@ const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
 const LOG = process.env.LOG as WebDriverLogTypes;
 
-const maxInstances = process.env.MAX_INSTANCES ? +process.env.MAX_INSTANCES : 1;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel: WebDriverLogTypes = LOG || 'warn';
 const drivers = USE_FIREFOX ? {
@@ -122,7 +121,7 @@ export const config: Options.Testrunner = {
         // maxInstances can get overwritten per capability. So if you have an in-house Selenium
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
-        maxInstances: maxInstances,
+        maxInstances: 5,
         //
         browserName: USE_FIREFOX ? 'firefox' : 'chrome',
        'goog:chromeOptions': chromeOptions,

@@ -35,6 +35,7 @@ class TestApp {
   get userInfo() { return $('#user-info'); }
   get sessionExpired() { return $('#session-expired'); }
   get testConcurrentGetTokenBtn() { return $('#test-concurrent-get-token'); }
+  get loginWithAcrBtn() { return $('#login-acr'); }
 
   get tokenError() { return $('#token-error'); }
   get tokenMsg() { return $('#token-msg'); }
@@ -85,11 +86,7 @@ class TestApp {
   
   async open(queryObj, openInNewWindow) {
     const qs = toQueryString(queryObj);
-    if (openInNewWindow) {
-      await browser.newWindow(qs, { windowFeatures: 'noopener=yes' });
-    } else {
-      await browser.url('/' + qs);
-    }
+    await openInNewWindow ? browser.newWindow(qs, { windowFeatures: 'noopener=yes' }) : browser.url(qs);
     await browser.waitUntil(async () => this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
   }
 
@@ -105,6 +102,7 @@ class TestApp {
 
   async handleCallback() {
     await this.waitForCallback();
+    await browser.waitUntil(async () => this.handleCallbackBtn.then(el => el.isDisplayed()), 5000, 'wait for handle callback btn');
     await this.handleCallbackBtn.then(el => el.click());
   }
 
@@ -253,8 +251,7 @@ class TestApp {
   }
 
   async waitForCallback() {
-    await browser.waitUntil(async () => this.callbackSelector.then(el => el.isExisting()), 5000, 'wait for callback');
-    await browser.waitUntil(async () => this.handleCallbackBtn.then(el => el.isDisplayed()), 5000, 'wait for handle callback btn');
+    return browser.waitUntil(async () => this.callbackSelector.then(el => el.isExisting()), 5000, 'wait for callback');
   }
 
   async waitForCallbackResult() {
