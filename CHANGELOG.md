@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.1.0
+
+### Features
+
+- [#1343](https://github.com/okta/okta-auth-js/pull/1343) Supports Step Up MFA against `/authorize` and `/interact` endpoints
+
 ## 7.0.1
 
 ### Fixes
