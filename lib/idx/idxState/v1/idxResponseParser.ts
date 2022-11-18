@@ -16,7 +16,6 @@
 import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
 import { generateRemediationFunctions } from './remediationParser';
 import generateIdxAction from './generateIdxAction';
-import { JSONPath } from 'jsonpath-plus';
 
 const SKIP_FIELDS = Object.fromEntries([
   'remediation', // remediations are put into proceed/neededToProceed
@@ -74,9 +73,16 @@ const expandRelatesTo = (idxResponse, value) => {
   Object.keys(value).forEach(k => {
     if (k === 'relatesTo') {
       const query = Array.isArray(value[k]) ? value[k][0] : value[k];
+      const unsupportedOperators = query.match(/[():@?*,]|[.]{2}/);
+      if (unsupportedOperators) {
+        throw new Error(`JSONPath query contains non-trivial operators. Please add implementation for: ${[...unsupportedOperators].join(' ')}`);
+      }
       if (typeof query === 'string') {
-        // eslint-disable-next-line new-cap
-        const result = JSONPath({ path: query, json: idxResponse })[0];
+        const result = query.split('.').slice(1).reduce((result, property) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const [_, propertyName, propertyIndex] = property.match(/([a-zA-Z]+)\[?(\d+)?\]?/);
+          return propertyIndex ? result[propertyName][propertyIndex] : result[propertyName];
+        }, idxResponse);
         if (result) {
           value[k] = result;
           return;

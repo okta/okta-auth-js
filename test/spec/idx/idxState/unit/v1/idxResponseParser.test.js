@@ -164,5 +164,40 @@ describe('idxResponseParser', () => {
       expect( remediations[0]).toMatchSnapshot();
     });
 
+    it('throws an error when encountering JSONPath expression containig operators other than child/index operator', () => {
+      const idxResponse = {
+        'remediation': {
+          'type': 'array',
+          'value': [
+            {
+              'rel': [
+                'create-form'
+              ],
+              'name': 'select-authenticator-authenticate',
+              'href': 'http://localhost:3000/idp/idx/challenge',
+              'method': 'POST',
+              'accepts': 'application/vnd.okta.v1+json',
+              'value': [
+                {
+                  'name': 'authenticator',
+                  'type': 'object',
+                  'options': [
+                    {
+                      'label': 'Okta Password',
+                      'relatesTo': '$.authenticatorEnrollments.value[(1:@.length-1)]'
+                    },
+                  ]
+                },
+              ]
+            }
+          ]
+        },
+      };
+      try {
+        parseIdxResponse( {}, idxResponse);
+      } catch (err) {
+        expect(err.message).toEqual('JSONPath query contains non-trivial operators. Please add implementation for: (');
+      }
+    });
   });
 });
