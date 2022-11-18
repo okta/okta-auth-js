@@ -12,11 +12,62 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { CustomUrls, OAuthResponse, OAuthResponseType, OktaAuthOAuthInterface, TokenParams, TokenResponse } from './types';
+import { 
+  CustomUrls, 
+  OAuthResponse, 
+  OAuthResponseType, 
+  OktaAuthOAuthInterface, 
+  TokenParams, 
+  TokenResponse,
+  OAuthParams,
+} from './types';
 import { getOAuthUrls, getDefaultTokenParams } from './util';
-import { clone } from '../util';
+import { clone, removeNils } from '../util';
 import { postToTokenEndpoint } from './endpoints/token';
 import { handleOAuthResponse } from './handleOAuthResponse';
+import { AuthSdkError } from '../errors';
+
+function validateOptions(options: TokenParams) {
+  // Quick validation
+  if (!options.clientId) {
+    throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to get a token');
+  }
+
+  if (!options.redirectUri) {
+    throw new AuthSdkError('The redirectUri passed to /authorize must also be passed to /token');
+  }
+
+  if (!options.authorizationCode && !options.interactionCode) {
+    throw new AuthSdkError('An authorization code (returned from /authorize) must be passed to /token');
+  }
+
+  if (!options.codeVerifier) {
+    throw new AuthSdkError('The "codeVerifier" (generated and saved by your app) must be passed to /token');
+  }
+}
+
+function getPostData(sdk, options: TokenParams): OAuthParams {
+  // Convert Token params to OAuth params, sent to the /token endpoint
+  var params: OAuthParams = removeNils({
+    'client_id': options.clientId,
+    'redirect_uri': options.redirectUri,
+    'grant_type': options.interactionCode ? 'interaction_code' : 'authorization_code',
+    'code_verifier': options.codeVerifier
+  }) as OAuthParams;
+
+  if (options.interactionCode) {
+    params['interaction_code'] = options.interactionCode;
+  } else if (options.authorizationCode) {
+    params.code = options.authorizationCode;
+  }
+
+  const { clientSecret } = sdk.options;
+  if (clientSecret) {
+    params['client_secret'] = clientSecret;
+  }
+
+  return params;
+}
 
 // codeVerifier is required. May pass either an authorizationCode or interactionCode
 export function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenParams: TokenParams, urls?: CustomUrls): Promise<TokenResponse> {
@@ -43,7 +94,11 @@ export function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenParams: 
     codeVerifier,
   };
 
-  return postToTokenEndpoint(sdk, getTokenOptions, urls)
+  validateOptions(getTokenOptions);
+
+  const postData = getPostData(sdk, getTokenOptions);
+
+  return postToTokenEndpoint(sdk, postData, urls)
     .then((response: OAuthResponse) => {
 
       // `handleOAuthResponse` hanadles responses from both `/authorize` and `/token` endpoints

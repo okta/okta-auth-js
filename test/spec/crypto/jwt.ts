@@ -1,7 +1,7 @@
 import * as nJwt from 'njwt';
 import Rasha from 'rasha';
 import { advanceTo } from 'jest-date-mock';
-import { PEM, INVALID_PEM, JWK, INVALID_JWK } from '@okta/test.support/jwt';
+import { PEM, INVALID_PEM, JWK, INVALID_JWK } from '@okta/test.support/jwt.mjs';
 import { makeJwt } from '../../../lib/crypto/jwt';
 
 describe('JWT', () => {

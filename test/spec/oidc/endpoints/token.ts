@@ -19,15 +19,9 @@ jest.mock('../../../../lib/http', () => {
   };
 });
 
-const mocked = {
-  http: require('../../../../lib/http')
-};
-
-import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
 import { postToTokenEndpoint } from '../../../../lib/oidc/endpoints/token';
 import factory from '@okta/test.support/factory';
-import { CustomUrls } from '../../../../lib/oidc/types';
 
 describe('token endpoint', function() {
   var ISSUER = 'http://example.okta.com';
@@ -73,82 +67,13 @@ describe('token endpoint', function() {
     },
     execute: function (test) {
       return postToTokenEndpoint(test.oa, {
-        clientId: CLIENT_ID,
-        redirectUri: REDIRECT_URI,
-        authorizationCode: authorizationCode,
-        codeVerifier: codeVerifier,
+        client_id: CLIENT_ID,
+        redirect_uri: REDIRECT_URI,
+        code: authorizationCode,
+        code_verifier: codeVerifier,
       }, {
         tokenUrl: ISSUER + endpoint
       });
     }
-  });
-
-  describe('validateOptions', function() {
-    var authClient;
-    var oauthOptions;
-
-    beforeEach(function() {
-      spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
-      authClient = new OktaAuth({
-        issuer: 'https://auth-js-test.okta.com'
-      });
-
-      oauthOptions = {
-        clientId: CLIENT_ID,
-        redirectUri: REDIRECT_URI,
-        authorizationCode: authorizationCode,
-        codeVerifier: codeVerifier,
-      };
-    });
-
-    it('Does not throw if options are valid', function() {
-      var httpRequst = jest.spyOn(mocked.http, 'httpRequest').mockImplementation();
-      var urls = {
-        tokenUrl: 'http://superfake'
-      };
-      postToTokenEndpoint(authClient, oauthOptions, urls);
-      expect(httpRequst).toHaveBeenCalled();
-    });
-
-    it('Throws if no clientId', function() {
-      oauthOptions.clientId = undefined;
-      try {
-        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
-      } catch(e) {
-        expect(e instanceof AuthSdkError).toBe(true);
-        expect((e as Error).message).toBe('A clientId must be specified in the OktaAuth constructor to get a token');
-      }
-    });
-
-    it('Throws if no redirectUri', function() {
-      oauthOptions.redirectUri = undefined;
-      try {
-        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
-      } catch(e) {
-        expect(e instanceof AuthSdkError).toBe(true);
-        expect((e as Error).message).toBe('The redirectUri passed to /authorize must also be passed to /token');
-      }
-    });
-
-    it('Throws if no authorizationCode', function() {
-      oauthOptions.authorizationCode = undefined;
-      try {
-        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
-      } catch(e) {
-        expect(e instanceof AuthSdkError).toBe(true);
-        expect((e as Error).message).toBe('An authorization code (returned from /authorize) must be passed to /token');
-      }
-    });
-
-    it('Throws if no codeVerifier', function() {
-      oauthOptions.codeVerifier = undefined;
-      try {
-        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
-      } catch(e) {
-        expect(e instanceof AuthSdkError).toBe(true);
-        expect((e as Error).message).toBe('The "codeVerifier" (generated and saved by your app) must be passed to /token');
-      }
-    });
-
   });
 });

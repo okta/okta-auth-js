@@ -16,6 +16,7 @@ jest.mock('../../../lib/oidc/endpoints/token', () => { return { postToTokenEndpo
 const handleOAuthResponse = jest.fn();
 jest.mock('../../../lib/oidc/handleOAuthResponse', () => { return { handleOAuthResponse }; });
 
+import { AuthSdkError } from '../../../lib/errors';
 import { exchangeCodeForTokens, getOAuthUrls } from '../../../lib/oidc';
 import { OktaAuthOAuthInterface } from '../../../lib/oidc/types';
 
@@ -46,7 +47,13 @@ describe('exchangeCodeForTokens', () => {
     const tokenParams = { authorizationCode, clientId, codeVerifier, interactionCode, redirectUri };
     const urls = getOAuthUrls(sdk);
     await exchangeCodeForTokens(sdk, tokenParams);
-    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, tokenParams, urls);
+    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, {
+      client_id: 'x',
+      code_verifier: 'y',
+      grant_type: 'interaction_code',
+      interaction_code: 'b',
+      redirect_uri: 'http://localhost',
+    }, urls);
     expect(handleOAuthResponse).toHaveBeenCalledWith(sdk, {
       clientId,
       ignoreSignature: undefined,
@@ -71,7 +78,13 @@ describe('exchangeCodeForTokens', () => {
     const tokenParams = { authorizationCode, clientId, codeVerifier, interactionCode, redirectUri, scopes };
     const urls = getOAuthUrls(sdk);
     await exchangeCodeForTokens(sdk, tokenParams);
-    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, { authorizationCode, clientId, codeVerifier, interactionCode, redirectUri }, urls);
+    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, { 
+      client_id: 'x',
+      code_verifier: 'y',
+      grant_type: 'interaction_code',
+      interaction_code: 'b',
+      redirect_uri: 'http://localhost',
+    }, urls);
     expect(handleOAuthResponse).toHaveBeenCalledWith(sdk, {
       clientId,
       ignoreSignature: undefined,
@@ -79,6 +92,68 @@ describe('exchangeCodeForTokens', () => {
       responseType: ['token'],
       scopes: ['email']
     }, oauthResponse, urls);
+  });
+
+
+  describe('validateOptions', function() {
+    var authClient;
+    var oauthOptions;
+
+    beforeEach(() => {
+      authClient = mockOktaAuth();
+      const oauthResponse = {}; // response from token endpoint
+      const tokenResponse = {}; // response to caller
+      (postToTokenEndpoint as jest.Mock).mockResolvedValue(oauthResponse);
+      (handleOAuthResponse as jest.Mock).mockResolvedValue(tokenResponse);
+      var CLIENT_ID = 'fake';
+      var REDIRECT_URI = 'http://fake.local';
+      var codeVerifier = 'superfake';
+      var authorizationCode = 'notreal';
+      oauthOptions = {
+        clientId: CLIENT_ID,
+        redirectUri: REDIRECT_URI,
+        authorizationCode: authorizationCode,
+        codeVerifier: codeVerifier,
+      };
+    });
+
+    it('Does not throw if options are valid', async function() {
+      await exchangeCodeForTokens(authClient, oauthOptions);
+      expect(postToTokenEndpoint).toHaveBeenCalled();
+    });
+
+    it('Throws if no clientId', async function() {
+      oauthOptions.clientId = undefined;
+      await expect(async () => {
+        await exchangeCodeForTokens(authClient, oauthOptions);
+      }).rejects.toThrow(new AuthSdkError('A clientId must be specified in the OktaAuth constructor to get a token'));
+    });
+
+    // skip this test for browser env
+    // redirectUri is set with default value in browser env
+    if (typeof document === 'undefined') {
+      it('Throws if no redirectUri', async function() {
+        oauthOptions.redirectUri = undefined;
+        await expect(async () => {
+          await exchangeCodeForTokens(authClient, oauthOptions);
+        }).rejects.toThrow(new AuthSdkError('The redirectUri passed to /authorize must also be passed to /token'));
+      });
+    }
+
+    it('Throws if no authorizationCode', async function() {
+      oauthOptions.authorizationCode = undefined;
+      await expect(async () => {
+        await exchangeCodeForTokens(authClient, oauthOptions);
+      }).rejects.toThrow(new AuthSdkError('An authorization code (returned from /authorize) must be passed to /token'));
+    });
+
+    it('Throws if no codeVerifier', async function() {
+      oauthOptions.codeVerifier = undefined;
+      await expect(async () => {
+        await exchangeCodeForTokens(authClient, oauthOptions);
+      }).rejects.toThrow(new AuthSdkError('The "codeVerifier" (generated and saved by your app) must be passed to /token'));
+    });
+
   });
 });
 

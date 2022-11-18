@@ -22,7 +22,7 @@ module.exports = {
     SDK_VERSION
   },
   'transform': {
-    '^.+\\.(js)$': 'babel-jest',
+    '^.+\\.(js|mjs)$': 'babel-jest',
     '^.+\\.(ts|html)$': 'ts-jest'
   },
   'testRunner': 'jest-jasmine2',

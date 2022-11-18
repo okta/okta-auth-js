@@ -11,21 +11,21 @@
  *
  */
 
-jest.mock('../../../lib/http', () => {
+jest.mock('../../../../lib/http', () => {
   return {
     httpRequest: () => {},
   };
 });
 
-import { OktaAuthOAuthInterface } from '../../../lib/oidc/types';
-import { PEM, JWK } from '@okta/test.support/jwt';
+import { OktaAuthOAuthInterface } from '../../../../lib/oidc/types';
+import { PEM, JWK } from '@okta/test.support/jwt.mjs';
 
 const mocked = {
-  http: require('../../../lib/http')
+  http: require('../../../../lib/http')
 };
 
-import { authenticateWithCiba } from '../../../lib/oidc';
-import { AuthSdkError } from '../../../lib/errors';
+import { authenticateClient } from '../../../../lib/oidc/ciba';
+import { AuthSdkError } from '../../../../lib/errors';
 
 function mockOktaAuth(options = {}): OktaAuthOAuthInterface {
   return {
@@ -41,15 +41,15 @@ describe('authenticateWithCiba', () => {
   it('throws if no clientId is available', async () => {
     const authClient = mockOktaAuth();
     await expect(async () => {
-      await authenticateWithCiba(authClient, {});
+      await authenticateClient(authClient, {});
     }).rejects.toThrowError(new AuthSdkError('A clientId must be specified in the OktaAuth constructor to authenticate CIBA client'));
   });
 
   it('throws if neither clientSecret nor privateKey is available', async () => {
     const authClient = mockOktaAuth({ clientId: 'fake-client-id' });
     await expect(async () => {
-      await authenticateWithCiba(authClient, {});
-    }).rejects.toThrowError(new AuthSdkError('A clientSecret or privateKey must be specified in the OktaAuth constructor to authenticate CIBA client'));
+      await authenticateClient(authClient, {});
+    }).rejects.toThrowError(new AuthSdkError('A clientSecret or privateKey must be specified in the OktaAuth constructor to authenticate OIDC client'));
   });
 
   it('throws if no openid in scopes', async () => {
@@ -59,7 +59,7 @@ describe('authenticateWithCiba', () => {
       scopes: [],
     });
     await expect(async () => {
-      await authenticateWithCiba(authClient, {});
+      await authenticateClient(authClient, {});
     }).rejects.toThrowError(new AuthSdkError('openid scope must be specified in the scopes argument to authenticate CIBA client'));
   });
 
@@ -70,7 +70,7 @@ describe('authenticateWithCiba', () => {
       scopes: ['openid'],
     });
     await expect(async () => {
-      await authenticateWithCiba(authClient, {});
+      await authenticateClient(authClient, {});
     }).rejects.toThrowError(new AuthSdkError('A loginHint or idTokenHint must be specified in the function options to authenticate CIBA client'));
   });
 
@@ -82,7 +82,7 @@ describe('authenticateWithCiba', () => {
       scopes: ['openid', 'email'],
     });
 
-    await authenticateWithCiba(authClient, {
+    await authenticateClient(authClient, {
       loginHint: 'user@test.com',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
@@ -103,7 +103,7 @@ describe('authenticateWithCiba', () => {
       scopes: ['openid', 'email'],
     });
 
-    await authenticateWithCiba(authClient, {
+    await authenticateClient(authClient, {
       idTokenHint: 'fake-id-token',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
@@ -124,7 +124,7 @@ describe('authenticateWithCiba', () => {
       scopes: ['openid', 'email'],
     });
 
-    await authenticateWithCiba(authClient, {
+    await authenticateClient(authClient, {
       loginHint: 'user@test.com',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
@@ -154,7 +154,7 @@ describe('authenticateWithCiba', () => {
       scopes: ['openid', 'email'],
     });
 
-    await authenticateWithCiba(authClient, {
+    await authenticateClient(authClient, {
       loginHint: 'user@test.com',
     });
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
@@ -184,7 +184,7 @@ describe('authenticateWithCiba', () => {
       scopes: ['openid', 'email'],
     });
 
-    await authenticateWithCiba(authClient, {
+    await authenticateClient(authClient, {
       loginHint: 'user@test.com',
       acrValues: 'fake:acr',
       bindingMessage: 'fake-binding-message',

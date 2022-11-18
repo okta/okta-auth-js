@@ -13,6 +13,12 @@
         <div class="link selected">Server-side Web App</div>
         <a href="/static" onclick="navigateToApp('/static', event)">Static SPA App</a>
       </div>
+      <div id="form-testenv" class="box">
+        <form method="POST" action="/reload-testenv">
+          <input id="config" type="hidden" name="config"/>
+          <button type="submit">Reload Test Env</button>
+        </form>
+      </div>
       <div id="form" class="box">
         <strong>SignIn</strong>
         <hr/>
@@ -31,7 +37,13 @@
         <form method="POST" action="/ciba/client-auth">
           <input id="config" type="hidden" name="config"/>
           <label for="login_hint">Login Hint:</label><input name="login_hint" id="login_hint" placeholder="login_hint" type="text"/><br/>
-          <input id="submitBtn" type="submit"/>
+          <input id="submitBtn" type="submit" value="Authenticate CIBA Client"/>
+        </form>
+        <hr/>
+        <form method="POST" action="/ciba/poll-token">
+          <input id="config" type="hidden" name="config"/>
+          <label for="auth_req_id">AuthReqId :</label><input name="auth_req_id" id="auth_req_id" placeholder="auth_req_id" type="text"/><br/>
+          <input id="submitBtn" type="submit" value="Poll Token"/>
         </form>
         <hr/>
       </div>
@@ -59,6 +71,10 @@
           <div id="cibaClientAuth"></div>
         </div>
         <div class="box">
+          <strong>Token response</strong><br/>
+          <div id="tokens"></div>
+        </div>
+        <div class="box">
           <strong>Error</strong><br/>
           <div id="error" style="color: red"></div>
         </div>
@@ -71,7 +87,11 @@
       document.querySelectorAll('[name="config"]').forEach(elem => elem.value = JSON.stringify(config));
 
       // form elements
-      ['username', 'password'].forEach(function(param) {
+      [
+        'username', 
+        'password',
+        'auth_req_id',
+      ].forEach(function(param) {
         var value = query.get(param);
         if (!value) return;
         document.getElementById(param).value = value;
@@ -83,6 +103,7 @@
         'status', 
         'sessionToken', 
         'cibaClientAuth',
+        'tokens',
         'error'
       ].forEach(function(param) {
         var value = query.get(param);

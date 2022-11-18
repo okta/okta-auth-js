@@ -13,5 +13,5 @@
 import { AuthSdkError } from '../../errors';
 
 export function makeJwt() {
-  throw new AuthSdkError('This function is not supported in browser bundle.');
+  throw new AuthSdkError('Function makeJwt is not supported in browser environment.');
 }
