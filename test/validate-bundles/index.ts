@@ -99,13 +99,13 @@ describe('OktaAuth (api)', function() {
 
       it('throws when use authenticateWithCiba', async () => {
         await expect(async () => {
-          await auth.authenticateWithCiba({});
+          await auth.ciba.authenticateClient({});
         }).rejects.toThrowError(new AuthSdkError('Function makeJwt is not supported in browser environment.'));
       });
 
       it('throws when use pollTokenWithCiba', async () => {
         await expect(async () => {
-          await auth.pollTokenWithCiba({ authReqId: 'fake-auth-req-id' });
+          await auth.ciba.getTokenPollMode({ authReqId: 'fake-auth-req-id' });
         }).rejects.toThrowError(new AuthSdkError('Function makeJwt is not supported in browser environment.'));
       });
     });

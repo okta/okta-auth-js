@@ -1,5 +1,5 @@
 import { createClient } from '../../util';
-import { authenticateWithCiba, pollTokenWithCiba } from '../../../../lib/oidc';
+import { authenticateClient, getTokenPollMode } from '../../../../lib/oidc/ciba';
 import { OAuthError } from '../../../../lib/errors';
 import { PEM as INVALID_PEM, JWK as INVALID_JWK } from '@okta/test.support/jwt.mjs';
 
@@ -12,12 +12,12 @@ describe('pollTokenWithCiba', () => {
       clientSecret: process.env.CLIENT_SECRET,
       scopes: ['openid']
     });
-    const authResp = await authenticateWithCiba(client, {
+    const authResp = await authenticateClient(client, {
       loginHint: process.env.USERNAME
     });
     // able to get pending for user auth oauth error
     await expect(async () => {
-      await pollTokenWithCiba(client, {
+      await getTokenPollMode(client, {
         authReqId: authResp.auth_req_id,
       });
     }).rejects.toThrowError(new OAuthError('', `The authorization request is still pending as the user hasn't yet been authenticated.`));
@@ -29,12 +29,12 @@ describe('pollTokenWithCiba', () => {
       privateKey: process.env.PEM,
       scopes: ['openid']
     });
-    const authResp = await authenticateWithCiba(client, {
+    const authResp = await authenticateClient(client, {
       loginHint: process.env.USERNAME,
     });
     // able to get pending for user auth oauth error
     await expect(async () => {
-      await pollTokenWithCiba(client, {
+      await getTokenPollMode(client, {
         authReqId: authResp.auth_req_id,
       });
     }).rejects.toThrowError(new OAuthError('', `The authorization request is still pending as the user hasn't yet been authenticated.`));
@@ -46,12 +46,12 @@ describe('pollTokenWithCiba', () => {
       privateKey: process.env.JWK,
       scopes: ['openid']
     });
-    const authResp = await authenticateWithCiba(client, {
+    const authResp = await authenticateClient(client, {
       loginHint: process.env.USERNAME,
     });
     // able to get pending for user auth oauth error
     await expect(async () => {
-      await pollTokenWithCiba(client, {
+      await getTokenPollMode(client, {
         authReqId: authResp.auth_req_id,
       });
     }).rejects.toThrowError(new OAuthError('', `The authorization request is still pending as the user hasn't yet been authenticated.`));
@@ -65,7 +65,7 @@ describe('pollTokenWithCiba', () => {
         scopes: ['openid']
       });
       await expect(async () => {
-        await pollTokenWithCiba(client, {
+        await getTokenPollMode(client, {
           authReqId: 'fake-id',
         });
       }).rejects.toThrowError(new OAuthError('', `The client secret supplied for a confidential client is invalid.`));
@@ -78,7 +78,7 @@ describe('pollTokenWithCiba', () => {
         scopes: ['openid']
       });
       await expect(async () => {
-        await pollTokenWithCiba(client, {
+        await getTokenPollMode(client, {
           authReqId: 'fake-id',
         });
       }).rejects.toThrowError(new OAuthError('', `The client does not have a JWKSet configured, but the client_assertion requires one.`));
@@ -91,7 +91,7 @@ describe('pollTokenWithCiba', () => {
         scopes: ['openid']
       });
       await expect(async () => {
-        await pollTokenWithCiba(client, {
+        await getTokenPollMode(client, {
           authReqId: 'fake-id',
         });
       }).rejects.toThrowError(new OAuthError('', `The client does not have a JWKSet configured, but the client_assertion requires one.`));
@@ -107,7 +107,7 @@ describe('pollTokenWithCiba', () => {
     });
     // able to get pending for user auth oauth error
     await expect(async () => {
-      await pollTokenWithCiba(client, {
+      await getTokenPollMode(client, {
         authReqId: 'fake-auth-req-id',
       });
     }).rejects.toThrowError(new OAuthError('', `The 'auth_req_id' is invalid or has expired. Make a new authentication request.`));
