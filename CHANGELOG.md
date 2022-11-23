@@ -6,6 +6,10 @@
 
 - [#1343](https://github.com/okta/okta-auth-js/pull/1343) Supports Step Up MFA against `/authorize` and `/interact` endpoints
 
+# Other
+
+- [#1342](https://github.com/okta/okta-auth-js/pull/1342) - fixes possible RCE in jsonpath-plus
+
 ## 7.0.1
 
 ### Fixes
