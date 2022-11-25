@@ -92,6 +92,41 @@ describe('AutoRenewService', function() {
       expect(Emitter.prototype.off).toHaveBeenCalledWith('expired', expect.any(Function));
     });
 
+    it('should renew token if expired after service start', async function() {
+      setupSync({
+        tokenManager: { autoRenew: true }
+      }, true);
+      client.tokenManager.renew = jest.fn().mockImplementation(() => Promise.resolve());
+      await client.serviceManager.start();
+      client.emitter.emit('expired');
+      expect(client.tokenManager.renew).toHaveBeenCalledTimes(1);
+    });
+
+    it('should renew token if expired before service start', async function() {
+      // do not become leader, auto renew service would not start
+      util.mockLeader(false);
+      setupSync({
+        tokenManager: { autoRenew: true }
+      }, true);
+      client.tokenManager.renew = jest.fn().mockImplementation(() => Promise.resolve());
+      await client.serviceManager.start();
+      expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
+
+      // add expired token
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      jest.runAllTimers();
+
+      // become leader
+      util.mockLeader(true);
+      await (client.serviceManager.getService('leaderElection') as any)?.onLeader();
+      expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
+      jest.runAllTimers();
+
+      // token should be renewed
+      expect(client.tokenManager.renew).toHaveBeenCalledTimes(1);
+      expect(client.tokenManager.renew).toHaveBeenCalledWith('test-idToken');
+    });
+
     describe('too many renew requests', () => {
       it('should emit too many renew error when latest 10 expired event happen in 30 seconds', async () => {
         setupSync({

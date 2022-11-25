@@ -67,6 +67,7 @@ export class AutoRenewService implements ServiceInterface {
     if (this.canStart()) {
       await this.stop();
       this.tokenManager.on(EVENT_EXPIRED, this.onTokenExpiredHandler);
+      this.tokenManager.resetExpireEventTimeoutAll();
       this.started = true;
     }
   }

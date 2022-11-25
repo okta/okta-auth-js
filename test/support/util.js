@@ -465,8 +465,8 @@ util.disableLeaderElection = function() {
   jest.spyOn(ServiceManager.prototype, 'isLeaderRequired').mockReturnValue(false);
 };
 
-util.mockLeader = function() {
-  jest.spyOn(ServiceManager.prototype, 'isLeader').mockReturnValue(true);
+util.mockLeader = function(isLeader = true) {
+  jest.spyOn(ServiceManager.prototype, 'isLeader').mockReturnValue(isLeader);
 };
 
 export default util;

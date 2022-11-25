@@ -46,6 +46,7 @@ export interface TokenManagerInterface {
   setExpireEventTimeout(key: string, token: Token): void;
   clearExpireEventTimeout(key: string): void;
   clearExpireEventTimeoutAll(): void;
+  resetExpireEventTimeoutAll(): void;
   emitAdded(key: string, token: Token): void;
   emitError(error: Error): void;
   emitRemoved(key: string, token: Token): void;
