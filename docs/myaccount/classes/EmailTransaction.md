@@ -46,7 +46,7 @@
 
 #### Defined in
 
-[transactions/EmailTransaction.ts:19](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L19)
+[myaccount/transactions/EmailTransaction.ts:19](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L19)
 
 ## Properties
 
@@ -64,7 +64,7 @@
 
 #### Defined in
 
-[transactions/EmailTransaction.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L15)
+[myaccount/transactions/EmailTransaction.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L15)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailTransaction.ts:14](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L14)
+[myaccount/transactions/EmailTransaction.ts:14](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L14)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailTransaction.ts:13](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L13)
+[myaccount/transactions/EmailTransaction.ts:13](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L13)
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 #### Defined in
 
-[transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
+[myaccount/transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
 
 ___
 
@@ -124,7 +124,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailTransaction.ts:7](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L7)
+[myaccount/transactions/EmailTransaction.ts:7](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L7)
 
 ___
 
@@ -142,7 +142,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailTransaction.ts:16](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L16)
+[myaccount/transactions/EmailTransaction.ts:16](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L16)
 
 ___
 
@@ -152,7 +152,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailTransaction.ts:8](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L8)
+[myaccount/transactions/EmailTransaction.ts:8](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L8)
 
 ___
 
@@ -162,7 +162,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailTransaction.ts:9](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L9)
+[myaccount/transactions/EmailTransaction.ts:9](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L9)
 
 ___
 
@@ -172,7 +172,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailTransaction.ts:10](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L10)
+[myaccount/transactions/EmailTransaction.ts:10](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L10)
 
 ___
 
@@ -196,4 +196,4 @@ ___
 
 #### Defined in
 
-[transactions/EmailTransaction.ts:17](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L17)
+[myaccount/transactions/EmailTransaction.ts:17](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailTransaction.ts#L17)

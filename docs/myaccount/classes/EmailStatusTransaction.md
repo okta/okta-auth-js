@@ -41,7 +41,7 @@
 
 #### Defined in
 
-[transactions/EmailStatusTransaction.ts:10](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailStatusTransaction.ts#L10)
+[myaccount/transactions/EmailStatusTransaction.ts:10](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailStatusTransaction.ts#L10)
 
 ## Properties
 
@@ -51,7 +51,7 @@
 
 #### Defined in
 
-[transactions/EmailStatusTransaction.ts:6](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailStatusTransaction.ts#L6)
+[myaccount/transactions/EmailStatusTransaction.ts:6](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailStatusTransaction.ts#L6)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
+[myaccount/transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailStatusTransaction.ts:5](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailStatusTransaction.ts#L5)
+[myaccount/transactions/EmailStatusTransaction.ts:5](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailStatusTransaction.ts#L5)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 #### Defined in
 
-[transactions/EmailStatusTransaction.ts:7](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailStatusTransaction.ts#L7)
+[myaccount/transactions/EmailStatusTransaction.ts:7](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailStatusTransaction.ts#L7)
 
 ___
 
@@ -95,4 +95,4 @@ ___
 
 #### Defined in
 
-[transactions/EmailStatusTransaction.ts:8](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailStatusTransaction.ts#L8)
+[myaccount/transactions/EmailStatusTransaction.ts:8](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/EmailStatusTransaction.ts#L8)

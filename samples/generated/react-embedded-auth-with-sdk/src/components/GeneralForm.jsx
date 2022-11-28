@@ -68,7 +68,7 @@ const GeneralForm = () => {
   const canRecoverPassword = !!actions?.['currentAuthenticator-recover'];
   const idps = availableSteps.filter(step => step.name === 'redirect-idp');
   const form = formTransformer(nextStep)({} /* initial form value */);
-  const { inputs, select, text, image } = form;
+  const { inputs, text, image } = form;
 
   return (
     <Box padding="m">
@@ -89,16 +89,18 @@ const GeneralForm = () => {
         <Form.Main>
           {text && <div>{text.value}</div>}
           {image && <img src={image.src} />}
-          {select && (
-            <Select label={select.label} name={select.name} onChange={handleChange}>
-              <Select.Option key="" value="">---</Select.Option>
-              {select.options.map(({ key, label }) => (
-                <Select.Option key={key} value={key}>{label}</Select.Option>
-              ))}
-            </Select>
-          )}
           {inputs && inputs.map((input) => {
-            const { label, name, type, required } = input;
+            const { label, name, type, required, options } = input;
+            if (options) {
+              return (
+                <Select key={label} label={label} name={name} onChange={handleChange}>
+                  <Select.Option key="" value="">---</Select.Option>
+                  {options.map(({ value, label }) => (
+                    <Select.Option key={label} value={value}>{label}</Select.Option>
+                  ))}
+                </Select>
+              );
+            }
             const Comp = type === 'checkbox' ? Checkbox : TextInput;
             return (
               <Comp 

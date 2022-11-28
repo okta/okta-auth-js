@@ -7,7 +7,7 @@ import {
 } from './types';
 
 /**
- * @scope: okta.myaccount.email.read
+ * @scope: okta.myAccount.email.read
  */
 export const getEmails: IAPIFunction<EmailTransaction[]> = async (
   oktaAuth,
@@ -23,7 +23,7 @@ export const getEmails: IAPIFunction<EmailTransaction[]> = async (
 };
 
 /**
- * @scope: okta.myaccount.email.read
+ * @scope: okta.myAccount.email.read
  */
 export const getEmail: IAPIFunction<EmailTransaction> = async (
   oktaAuth, 
@@ -40,7 +40,7 @@ export const getEmail: IAPIFunction<EmailTransaction> = async (
 };
 
 /**
- * @scope: okta.myaccount.email.manage
+ * @scope: okta.myAccount.email.manage
  */
 export const addEmail: IAPIFunction<EmailTransaction> = async (
   oktaAuth, 
@@ -58,7 +58,7 @@ export const addEmail: IAPIFunction<EmailTransaction> = async (
 };
 
 /**
- * @scope: okta.myaccount.email.manage
+ * @scope: okta.myAccount.email.manage
  */
 export const deleteEmail: IAPIFunction<BaseTransaction> = async (
   oktaAuth, 
@@ -74,7 +74,7 @@ export const deleteEmail: IAPIFunction<BaseTransaction> = async (
 };
 
 /**
- * @scope: okta.myaccount.email.read
+ * @scope: okta.myAccount.email.read
  */
 export const sendEmailChallenge: IAPIFunction<EmailChallengeTransaction> = async (
   oktaAuth, 
@@ -91,7 +91,7 @@ export const sendEmailChallenge: IAPIFunction<EmailChallengeTransaction> = async
 };
 
 /**
- * @scope: okta.myaccount.email.read
+ * @scope: okta.myAccount.email.read
  */
 export const getEmailChallenge: IAPIFunction<EmailChallengeTransaction> = async (
   oktaAuth, 
@@ -108,7 +108,7 @@ export const getEmailChallenge: IAPIFunction<EmailChallengeTransaction> = async 
 };
 
 /**
- * @scope: okta.myaccount.email.manage
+ * @scope: okta.myAccount.email.manage
  */
 export const verifyEmailChallenge: IAPIFunction<BaseTransaction> = async (
   oktaAuth,

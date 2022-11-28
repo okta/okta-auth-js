@@ -5,7 +5,8 @@ import {
   EmailChallengeTransaction,
   ProfileTransaction,
   ProfileSchemaTransaction,
-  PhoneTransaction
+  PhoneTransaction,
+  PasswordTransaction
 } from './transactions';
 import { httpRequest } from '../http';
 import { AuthSdkError } from '../errors';
@@ -62,7 +63,8 @@ export async function sendRequest<T extends BaseTransaction> (
     EmailChallengeTransaction,
     ProfileTransaction,
     ProfileSchemaTransaction,
-    PhoneTransaction
+    PhoneTransaction,
+    PasswordTransaction
   };
   const TransactionClass = map[options.transactionClassName!] || BaseTransaction;
 

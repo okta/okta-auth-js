@@ -24,13 +24,14 @@ const config = Object.assign({}, baseConfig, {
   }),
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
     // ingore tests by filename
+    'myaccount/password'
   ]),
   transformIgnorePatterns: [
     'node_modules/(?!(data-uri-to-buffer|formdata-polyfill|fetch-blob|node-fetch)/)',
   ],
   // integration tests need to make network request 
   // extend timeout to 10s for
-  testTimeout: 10 * 1000 
+  testTimeout: 15 * 1000 
 });
 
 module.exports = config;

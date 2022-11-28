@@ -6,7 +6,7 @@ import {
 } from './types';
 
 /**
- * @scope: okta.myaccount.phone.read
+ * @scope: okta.myAccount.phone.read
  */
 export const getPhones: IAPIFunction<PhoneTransaction[]> = async (
   oktaAuth,
@@ -22,7 +22,7 @@ export const getPhones: IAPIFunction<PhoneTransaction[]> = async (
 };
 
 /**
- * @scope: okta.myaccount.phone.read
+ * @scope: okta.myAccount.phone.read
  */
 export const getPhone: IAPIFunction<PhoneTransaction> = async (
   oktaAuth,
@@ -39,7 +39,7 @@ export const getPhone: IAPIFunction<PhoneTransaction> = async (
 };
 
 /**
- * @scope: okta.myaccount.phone.manage
+ * @scope: okta.myAccount.phone.manage
  */
 export const addPhone: IAPIFunction<PhoneTransaction> = async (
   oktaAuth, 
@@ -57,7 +57,7 @@ export const addPhone: IAPIFunction<PhoneTransaction> = async (
 };
 
 /**
- * @scope: okta.myaccount.phone.manage
+ * @scope: okta.myAccount.phone.manage
  */
 export const deletePhone: IAPIFunction<BaseTransaction> = async (
   oktaAuth, 
@@ -73,7 +73,7 @@ export const deletePhone: IAPIFunction<BaseTransaction> = async (
 };
 
 /**
- * @scope: okta.myaccount.phone.manage
+ * @scope: okta.myAccount.phone.manage
  */
 export const sendPhoneChallenge: IAPIFunction<BaseTransaction> = async (
   oktaAuth, 
@@ -90,7 +90,7 @@ export const sendPhoneChallenge: IAPIFunction<BaseTransaction> = async (
 };
 
 /**
- * @scope: okta.myaccount.phone.manage
+ * @scope: okta.myAccount.phone.manage
  */
 export const verifyPhoneChallenge: IAPIFunction<BaseTransaction> = async (
   oktaAuth,

@@ -18,14 +18,20 @@ okta.myAccount.profile.manage
 
 **email:**
 ```
-okta.myaccount.email.read
-okta.myaccount.email.manage
+okta.myAccount.email.read
+okta.myAccount.email.manage
 ```
 
 **phone:**
 ```
-okta.myaccount.phone.read
-okta.myaccount.phone.manage
+okta.myAccount.phone.read
+okta.myAccount.phone.manage
+```
+
+**password:**
+```
+okta.myAccount.password.read
+okta.myAccount.password.manage
 ```
 
 ## Accessing API methods

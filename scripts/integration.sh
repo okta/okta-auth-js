@@ -6,12 +6,16 @@ export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/unit"
 
 export CI=true
-export ISSUER=https://oie-signin-widget.okta.com
+export ISSUER=https://javascript-idx-sdk-idfirst.okta.com
 export USERNAME=george@acme.com
 get_secret prod/okta-sdk-vars/password PASSWORD
 
-# This client has refresh token enabled
-export CLIENT_ID=0oa8lrg7ojTsbJgRQ696
+# for myaccount password API testing
+export PASSWORDLESS_USERNAME=password.optional@mailinator.com
+get_vault_secret_key devex/auth-js-sdk-vars a18n_api_key A18N_API_KEY
+
+# This client has refresh token enabled and password optional
+export CLIENT_ID=0oa3b5fp4h02UIrjZ697
 
 if ! yarn test:integration; then
   echo "integration failed! Exiting..."

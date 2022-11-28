@@ -62,6 +62,9 @@ const InputForm = ({
       if (!transaction) {
         const tx = await onStart(value);
         setTransaction(tx);
+        if (tx.status === 'ACTIVE') {
+          handleFinishTransaction();
+        }
       } else if (transaction.status === 'UNVERIFIED') {
         if (transaction.verify) {
           await transaction.verify({ verificationCode: value });
@@ -131,7 +134,7 @@ const InputForm = ({
       )}
       <Form.Main>
         <TextInput
-          type="text"
+          type={factor === "password" ? "password" : "text"}
           name={inputName}
           label={inputLabel}
           value={value}

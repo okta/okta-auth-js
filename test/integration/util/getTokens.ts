@@ -3,6 +3,8 @@ import waitFor from '@okta/test.support/waitFor';
 import { AuthnTransaction } from '../../../lib/authn';
 import { getWithRedirect, handleOAuthResponse, CustomUrls } from '../../../lib/oidc';
 import { parseOAuthResponseFromUrl } from '../../../lib/oidc/parseFromUrl';
+import A18nClient from '@okta/test.support/a18nClient';
+import { sleep } from './sleep';
 
 function mockGetWithRedirect(client, testContext) {
   jest.spyOn(client, 'getOriginalUri').mockImplementation(() => {});
@@ -57,4 +59,19 @@ export async function signinAndGetTokens(client, tokenParams?, credentials?) {
   const { sessionToken } = tx;
   const tokenResponse = await getTokens(client, Object.assign({ sessionToken }, tokenParams));
   return tokenResponse;
+}
+
+export async function signinAndGetTokensViaEmail(client, options={}) {
+  const a18nClient = new A18nClient({ a18nAPIKey: process.env.A18N_API_KEY });
+  const a18nProfile = await a18nClient.findProfile('myaccount-password');
+
+  const username = process.env.PASSWORDLESS_USERNAME;
+  let transaction = await client.idx.authenticate({ ...options, username });
+  transaction = await client.idx.proceed({ authenticator: { methodType: 'email', id: transaction.nextStep.authenticator.id }});
+
+  await sleep(3000);  // sleep is ugly, but required for correct email (and therefore code) to be retrieved from a18n API
+  const verificationCode = await a18nClient.getEmailCode(a18nProfile.profileId, true);
+
+  transaction = await client.idx.proceed({ verificationCode });
+  return transaction;
 }

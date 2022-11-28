@@ -44,7 +44,7 @@
 
 #### Defined in
 
-[transactions/PhoneTransaction.ts:16](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L16)
+[myaccount/transactions/PhoneTransaction.ts:16](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L16)
 
 ## Properties
 
@@ -68,7 +68,7 @@
 
 #### Defined in
 
-[transactions/PhoneTransaction.ts:13](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L13)
+[myaccount/transactions/PhoneTransaction.ts:13](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L13)
 
 ___
 
@@ -86,7 +86,7 @@ ___
 
 #### Defined in
 
-[transactions/PhoneTransaction.ts:12](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L12)
+[myaccount/transactions/PhoneTransaction.ts:12](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L12)
 
 ___
 
@@ -104,7 +104,7 @@ ___
 
 #### Defined in
 
-[transactions/PhoneTransaction.ts:11](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L11)
+[myaccount/transactions/PhoneTransaction.ts:11](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L11)
 
 ___
 
@@ -118,7 +118,7 @@ ___
 
 #### Defined in
 
-[transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
+[myaccount/transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
 
 ___
 
@@ -128,7 +128,7 @@ ___
 
 #### Defined in
 
-[transactions/PhoneTransaction.ts:6](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L6)
+[myaccount/transactions/PhoneTransaction.ts:6](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L6)
 
 ___
 
@@ -138,7 +138,7 @@ ___
 
 #### Defined in
 
-[transactions/PhoneTransaction.ts:7](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L7)
+[myaccount/transactions/PhoneTransaction.ts:7](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L7)
 
 ___
 
@@ -148,7 +148,7 @@ ___
 
 #### Defined in
 
-[transactions/PhoneTransaction.ts:8](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L8)
+[myaccount/transactions/PhoneTransaction.ts:8](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L8)
 
 ___
 
@@ -172,4 +172,4 @@ ___
 
 #### Defined in
 
-[transactions/PhoneTransaction.ts:14](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L14)
+[myaccount/transactions/PhoneTransaction.ts:14](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/PhoneTransaction.ts#L14)

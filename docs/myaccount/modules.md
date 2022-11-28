@@ -7,6 +7,7 @@
 ### Enumerations
 
 - [EmailRole](enums/EmailRole.md)
+- [PasswordStatus](enums/PasswordStatus.md)
 - [Status](enums/Status.md)
 
 ### Classes
@@ -15,9 +16,14 @@
 - [EmailChallengeTransaction](classes/EmailChallengeTransaction.md)
 - [EmailStatusTransaction](classes/EmailStatusTransaction.md)
 - [EmailTransaction](classes/EmailTransaction.md)
+- [PasswordTransaction](classes/PasswordTransaction.md)
 - [PhoneTransaction](classes/PhoneTransaction.md)
 - [ProfileSchemaTransaction](classes/ProfileSchemaTransaction.md)
 - [ProfileTransaction](classes/ProfileTransaction.md)
+
+### Interfaces
+
+- [OktaAuthMyAccountInterface](interfaces/OktaAuthMyAccountInterface.md)
 
 ### Type Aliases
 
@@ -25,9 +31,11 @@
 - [AddPhonePayload](modules.md#addphonepayload)
 - [ChallengePhonePayload](modules.md#challengephonepayload)
 - [EmailProfile](modules.md#emailprofile)
+- [EnrollPasswordPayload](modules.md#enrollpasswordpayload)
 - [IAPIFunction](modules.md#iapifunction)
 - [MyAccountRequestOptions](modules.md#myaccountrequestoptions)
 - [PhoneProfile](modules.md#phoneprofile)
+- [UpdatePasswordPayload](modules.md#updatepasswordpayload)
 - [UpdateProfilePayload](modules.md#updateprofilepayload)
 - [VerificationPayload](modules.md#verificationpayload)
 
@@ -35,17 +43,23 @@
 
 - [addEmail](modules.md#addemail)
 - [addPhone](modules.md#addphone)
+- [createOktaAuthMyAccount](modules.md#createoktaauthmyaccount)
 - [deleteEmail](modules.md#deleteemail)
+- [deletePassword](modules.md#deletepassword)
 - [deletePhone](modules.md#deletephone)
+- [enrollPassword](modules.md#enrollpassword)
 - [getEmail](modules.md#getemail)
 - [getEmailChallenge](modules.md#getemailchallenge)
 - [getEmails](modules.md#getemails)
+- [getPassword](modules.md#getpassword)
 - [getPhone](modules.md#getphone)
 - [getPhones](modules.md#getphones)
 - [getProfile](modules.md#getprofile)
 - [getProfileSchema](modules.md#getprofileschema)
+- [mixinMyAccount](modules.md#mixinmyaccount)
 - [sendEmailChallenge](modules.md#sendemailchallenge)
 - [sendPhoneChallenge](modules.md#sendphonechallenge)
+- [updatePassword](modules.md#updatepassword)
 - [updateProfile](modules.md#updateprofile)
 - [verifyEmailChallenge](modules.md#verifyemailchallenge)
 - [verifyPhoneChallenge](modules.md#verifyphonechallenge)
@@ -67,7 +81,7 @@
 
 #### Defined in
 
-[types.ts:27](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L27)
+[myaccount/types.ts:39](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L39)
 
 ___
 
@@ -86,7 +100,7 @@ ___
 
 #### Defined in
 
-[types.ts:41](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L41)
+[myaccount/types.ts:53](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L53)
 
 ___
 
@@ -102,7 +116,7 @@ ___
 
 #### Defined in
 
-[types.ts:49](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L49)
+[myaccount/types.ts:61](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L61)
 
 ___
 
@@ -118,13 +132,30 @@ ___
 
 #### Defined in
 
-[types.ts:23](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L23)
+[myaccount/types.ts:35](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L35)
+
+___
+
+### EnrollPasswordPayload
+
+Ƭ **EnrollPasswordPayload**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `profile` | { `password`: `string`  } |
+| `profile.password` | `string` |
+
+#### Defined in
+
+[myaccount/types.ts:69](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L69)
 
 ___
 
 ### IAPIFunction
 
-Ƭ **IAPIFunction**<`T`\>: (`oktaAuth`: `OktaAuthInterface`, `options?`: [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions)) => `Promise`<`T`\>
+Ƭ **IAPIFunction**<`T`\>: (`oktaAuth`: `OktaAuthOAuthInterface`, `options?`: [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions)) => `Promise`<`T`\>
 
 #### Type parameters
 
@@ -140,7 +171,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface` |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 ##### Returns
@@ -149,7 +180,7 @@ ___
 
 #### Defined in
 
-[types.ts:79](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L79)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -169,7 +200,7 @@ ___
 
 #### Defined in
 
-[types.ts:67](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L67)
+[myaccount/types.ts:92](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L92)
 
 ___
 
@@ -186,7 +217,25 @@ ___
 
 #### Defined in
 
-[types.ts:35](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L35)
+[myaccount/types.ts:47](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L47)
+
+___
+
+### UpdatePasswordPayload
+
+Ƭ **UpdatePasswordPayload**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `profile` | { `currentPassword?`: `string` ; `password`: `string`  } |
+| `profile.currentPassword?` | `string` |
+| `profile.password` | `string` |
+
+#### Defined in
+
+[myaccount/types.ts:75](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L75)
 
 ___
 
@@ -206,7 +255,7 @@ ___
 
 #### Defined in
 
-[types.ts:57](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L57)
+[myaccount/types.ts:82](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L82)
 
 ___
 
@@ -222,7 +271,7 @@ ___
 
 #### Defined in
 
-[types.ts:53](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L53)
+[myaccount/types.ts:65](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L65)
 
 ## Functions
 
@@ -230,13 +279,13 @@ ___
 
 ▸ **addEmail**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](classes/EmailTransaction.md)\>
 
-**`scope:`** okta.myaccount.email.manage
+@scope: okta.myAccount.email.manage
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -245,7 +294,7 @@ ___
 
 #### Defined in
 
-[emailApi.ts:45](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L45)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -253,13 +302,13 @@ ___
 
 ▸ **addPhone**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](classes/PhoneTransaction.md)\>
 
-**`scope:`** okta.myaccount.phone.manage
+@scope: okta.myAccount.phone.manage
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -268,7 +317,38 @@ ___
 
 #### Defined in
 
-[phoneApi.ts:44](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L44)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
+
+___
+
+### createOktaAuthMyAccount
+
+▸ **createOktaAuthMyAccount**<`M`, `S`, `O`, `TM`\>(`StorageManagerConstructor`, `OptionsConstructor`, `TransactionManager`): `OktaAuthConstructor`<[`OktaAuthMyAccountInterface`](interfaces/OktaAuthMyAccountInterface.md)<`M`, `S`, `O`\>\>
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `M` | extends `PKCETransactionMeta`<`M`\> = `PKCETransactionMeta` |
+| `S` | extends `OAuthStorageManagerInterface`<`M`, `S`\> = `OAuthStorageManagerInterface`<`M`\> |
+| `O` | extends `OktaAuthCoreOptions`<`O`\> = `OktaAuthCoreOptions` |
+| `TM` | extends `TransactionManagerInterface` = `TransactionManagerInterface` |
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `StorageManagerConstructor` | `StorageManagerConstructor`<`S`\> |
+| `OptionsConstructor` | `OktaAuthOptionsConstructor`<`O`\> |
+| `TransactionManager` | `TransactionManagerConstructor`<`TM`\> |
+
+#### Returns
+
+`OktaAuthConstructor`<[`OktaAuthMyAccountInterface`](interfaces/OktaAuthMyAccountInterface.md)<`M`, `S`, `O`\>\>
+
+#### Defined in
+
+[myaccount/factory.ts:14](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/factory.ts#L14)
 
 ___
 
@@ -276,13 +356,13 @@ ___
 
 ▸ **deleteEmail**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
 
-**`scope:`** okta.myaccount.email.manage
+@scope: okta.myAccount.email.manage
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -291,7 +371,30 @@ ___
 
 #### Defined in
 
-[emailApi.ts:63](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L63)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
+
+___
+
+### deletePassword
+
+▸ **deletePassword**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
+
+@scope: okta.myAccount.password.manage
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
+| `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
+
+#### Returns
+
+`Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
+
+#### Defined in
+
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -299,13 +402,13 @@ ___
 
 ▸ **deletePhone**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
 
-**`scope:`** okta.myaccount.phone.manage
+@scope: okta.myAccount.phone.manage
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -314,7 +417,30 @@ ___
 
 #### Defined in
 
-[phoneApi.ts:62](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L62)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
+
+___
+
+### enrollPassword
+
+▸ **enrollPassword**(`oktaAuth`, `options?`): `Promise`<[`PasswordTransaction`](classes/PasswordTransaction.md)\>
+
+@scope: okta.myAccount.password.manage
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
+| `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
+
+#### Returns
+
+`Promise`<[`PasswordTransaction`](classes/PasswordTransaction.md)\>
+
+#### Defined in
+
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -322,13 +448,13 @@ ___
 
 ▸ **getEmail**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](classes/EmailTransaction.md)\>
 
-**`scope:`** okta.myaccount.email.read
+@scope: okta.myAccount.email.read
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -337,7 +463,7 @@ ___
 
 #### Defined in
 
-[emailApi.ts:28](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L28)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -345,13 +471,13 @@ ___
 
 ▸ **getEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`EmailChallengeTransaction`](classes/EmailChallengeTransaction.md)\>
 
-**`scope:`** okta.myaccount.email.read
+@scope: okta.myAccount.email.read
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -360,7 +486,7 @@ ___
 
 #### Defined in
 
-[emailApi.ts:96](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L96)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -368,13 +494,13 @@ ___
 
 ▸ **getEmails**(`oktaAuth`, `options?`): `Promise`<[`EmailTransaction`](classes/EmailTransaction.md)[]\>
 
-**`scope:`** okta.myaccount.email.read
+@scope: okta.myAccount.email.read
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -383,7 +509,30 @@ ___
 
 #### Defined in
 
-[emailApi.ts:12](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L12)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
+
+___
+
+### getPassword
+
+▸ **getPassword**(`oktaAuth`, `options?`): `Promise`<[`PasswordTransaction`](classes/PasswordTransaction.md)\>
+
+@scope: okta.myAccount.password.read
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
+| `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
+
+#### Returns
+
+`Promise`<[`PasswordTransaction`](classes/PasswordTransaction.md)\>
+
+#### Defined in
+
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -391,13 +540,13 @@ ___
 
 ▸ **getPhone**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](classes/PhoneTransaction.md)\>
 
-**`scope:`** okta.myaccount.phone.read
+@scope: okta.myAccount.phone.read
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -406,7 +555,7 @@ ___
 
 #### Defined in
 
-[phoneApi.ts:27](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L27)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -414,13 +563,13 @@ ___
 
 ▸ **getPhones**(`oktaAuth`, `options?`): `Promise`<[`PhoneTransaction`](classes/PhoneTransaction.md)[]\>
 
-**`scope:`** okta.myaccount.phone.read
+@scope: okta.myAccount.phone.read
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -429,7 +578,7 @@ ___
 
 #### Defined in
 
-[phoneApi.ts:11](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L11)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -437,13 +586,13 @@ ___
 
 ▸ **getProfile**(`oktaAuth`, `options?`): `Promise`<[`ProfileTransaction`](classes/ProfileTransaction.md)\>
 
-**`scope:`** okta.myaccount.profile.read
+@scope: okta.myAccount.profile.read
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -452,7 +601,7 @@ ___
 
 #### Defined in
 
-[profileApi.ts:11](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/profileApi.ts#L11)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -460,13 +609,13 @@ ___
 
 ▸ **getProfileSchema**(`oktaAuth`, `options?`): `Promise`<[`ProfileSchemaTransaction`](classes/ProfileSchemaTransaction.md)\>
 
-**`scope:`** okta.myaccount.profile.read
+@scope: okta.myAccount.profile.read
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -475,7 +624,36 @@ ___
 
 #### Defined in
 
-[profileApi.ts:42](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/profileApi.ts#L42)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
+
+___
+
+### mixinMyAccount
+
+▸ **mixinMyAccount**<`M`, `S`, `O`, `TBase`\>(`Base`): `TBase` & `OktaAuthConstructor`<[`OktaAuthMyAccountInterface`](interfaces/OktaAuthMyAccountInterface.md)<`M`, `S`, `O`\>\>
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `M` | extends `OAuthTransactionMeta`<`M`\> = `PKCETransactionMeta` |
+| `S` | extends `OAuthStorageManagerInterface`<`M`, `S`\> = `OAuthStorageManagerInterface`<`M`\> |
+| `O` | extends `OktaAuthOAuthOptions`<`O`\> = `OktaAuthOAuthOptions` |
+| `TBase` | extends `OktaAuthConstructor`<`OktaAuthOAuthInterface`<`M`, `S`, `O`, `TransactionManagerInterface`\>, `TBase`\> = `OktaAuthConstructor`<`OktaAuthOAuthInterface`<`M`, `S`, `O`, `TransactionManagerInterface`\>\> |
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `Base` | `TBase` |
+
+#### Returns
+
+`TBase` & `OktaAuthConstructor`<[`OktaAuthMyAccountInterface`](interfaces/OktaAuthMyAccountInterface.md)<`M`, `S`, `O`\>\>
+
+#### Defined in
+
+[myaccount/mixin.ts:13](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/mixin.ts#L13)
 
 ___
 
@@ -483,13 +661,13 @@ ___
 
 ▸ **sendEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`EmailChallengeTransaction`](classes/EmailChallengeTransaction.md)\>
 
-**`scope:`** okta.myaccount.email.read
+@scope: okta.myAccount.email.read
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -498,7 +676,7 @@ ___
 
 #### Defined in
 
-[emailApi.ts:79](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L79)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -506,13 +684,13 @@ ___
 
 ▸ **sendPhoneChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
 
-**`scope:`** okta.myaccount.phone.manage
+@scope: okta.myAccount.phone.manage
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -521,7 +699,30 @@ ___
 
 #### Defined in
 
-[phoneApi.ts:78](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L78)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
+
+___
+
+### updatePassword
+
+▸ **updatePassword**(`oktaAuth`, `options?`): `Promise`<[`PasswordTransaction`](classes/PasswordTransaction.md)\>
+
+@scope: okta.myAccount.password.manage
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
+| `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
+
+#### Returns
+
+`Promise`<[`PasswordTransaction`](classes/PasswordTransaction.md)\>
+
+#### Defined in
+
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -529,13 +730,13 @@ ___
 
 ▸ **updateProfile**(`oktaAuth`, `options?`): `Promise`<[`ProfileTransaction`](classes/ProfileTransaction.md)\>
 
-**`scope:`** okta.myaccount.profile.manage
+@scope: okta.myAccount.profile.manage
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -544,7 +745,7 @@ ___
 
 #### Defined in
 
-[profileApi.ts:24](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/profileApi.ts#L24)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -552,13 +753,13 @@ ___
 
 ▸ **verifyEmailChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
 
-**`scope:`** okta.myaccount.email.manage
+@scope: okta.myAccount.email.manage
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -567,7 +768,7 @@ ___
 
 #### Defined in
 
-[emailApi.ts:113](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/emailApi.ts#L113)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)
 
 ___
 
@@ -575,13 +776,13 @@ ___
 
 ▸ **verifyPhoneChallenge**(`oktaAuth`, `options?`): `Promise`<[`BaseTransaction`](classes/BaseTransaction.md)\>
 
-**`scope:`** okta.myaccount.phone.manage
+@scope: okta.myAccount.phone.manage
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `oktaAuth` | `OktaAuthInterface` |
+| `oktaAuth` | `OktaAuthOAuthInterface`<`PKCETransactionMeta`, `OAuthStorageManagerInterface`<`PKCETransactionMeta`\>, `OktaAuthOAuthOptions`, `TransactionManagerInterface`\> |
 | `options?` | [`MyAccountRequestOptions`](modules.md#myaccountrequestoptions) |
 
 #### Returns
@@ -590,4 +791,4 @@ ___
 
 #### Defined in
 
-[phoneApi.ts:95](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/phoneApi.ts#L95)
+[myaccount/types.ts:104](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L104)

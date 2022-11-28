@@ -38,7 +38,7 @@
 
 #### Defined in
 
-[transactions/ProfileSchemaTransaction.ts:6](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileSchemaTransaction.ts#L6)
+[myaccount/transactions/ProfileSchemaTransaction.ts:6](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileSchemaTransaction.ts#L6)
 
 ## Properties
 
@@ -52,7 +52,7 @@
 
 #### Defined in
 
-[transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
+[myaccount/transactions/Base.ts:15](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/Base.ts#L15)
 
 ___
 
@@ -62,4 +62,4 @@ ___
 
 #### Defined in
 
-[transactions/ProfileSchemaTransaction.ts:4](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileSchemaTransaction.ts#L4)
+[myaccount/transactions/ProfileSchemaTransaction.ts:4](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/transactions/ProfileSchemaTransaction.ts#L4)

@@ -13,6 +13,7 @@ export {
   PhoneTransaction,
   ProfileTransaction,
   ProfileSchemaTransaction,
+  PasswordTransaction,
   BaseTransaction
 } from './transactions';
 
@@ -24,6 +25,11 @@ export enum EmailRole {
 export enum Status {
   VERIFIED = 'VERIFIED',
   UNVERIFIED = 'UNVERIFIED'
+}
+
+export enum PasswordStatus {
+  NOT_ENROLLED = 'NOT_ENROLLED',
+  ACTIVE = 'ACTIVE'
 }
 
 export type EmailProfile = {
@@ -60,6 +66,19 @@ export type VerificationPayload = {
   verificationCode: string;
 };
 
+export type EnrollPasswordPayload = {
+  profile: {
+    password: string;
+  }
+}
+
+export type UpdatePasswordPayload = {
+  profile: {
+    password: string;
+    currentPassword?: string;
+  }
+}
+
 export type UpdateProfilePayload = {
   profile: {
     firstName?: string;
@@ -78,7 +97,9 @@ export type MyAccountRequestOptions = {
     | AddPhonePayload 
     | ChallengePhonePayload
     | VerificationPayload 
-    | UpdateProfilePayload;
+    | UpdateProfilePayload
+    | EnrollPasswordPayload
+    | UpdatePasswordPayload;
   accessToken?: string;
 }
 

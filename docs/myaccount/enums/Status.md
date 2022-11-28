@@ -13,18 +13,18 @@
 
 ### UNVERIFIED
 
-• **UNVERIFIED**
+• **UNVERIFIED** = ``"UNVERIFIED"``
 
 #### Defined in
 
-[types.ts:20](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L20)
+[myaccount/types.ts:27](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L27)
 
 ___
 
 ### VERIFIED
 
-• **VERIFIED**
+• **VERIFIED** = ``"VERIFIED"``
 
 #### Defined in
 
-[types.ts:19](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L19)
+[myaccount/types.ts:26](https://github.com/okta/okta-auth-js/blob/master/lib/myaccount/types.ts#L26)
