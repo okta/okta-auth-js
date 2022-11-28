@@ -16,7 +16,7 @@
 import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
 import { generateRemediationFunctions } from './remediationParser';
 import generateIdxAction from './generateIdxAction';
-import { JSONPath } from 'jsonpath-plus';
+import { jsonpath } from '../../../util/jsonpath';
 
 const SKIP_FIELDS = Object.fromEntries([
   'remediation', // remediations are put into proceed/neededToProceed
@@ -75,8 +75,7 @@ const expandRelatesTo = (idxResponse, value) => {
     if (k === 'relatesTo') {
       const query = Array.isArray(value[k]) ? value[k][0] : value[k];
       if (typeof query === 'string') {
-        // eslint-disable-next-line new-cap
-        const result = JSONPath({ path: query, json: idxResponse })[0];
+        const result = jsonpath({ path: query, json: idxResponse })[0];
         if (result) {
           value[k] = result;
           return;
@@ -99,7 +98,7 @@ const convertRemediationAction = (authClient: OktaAuthIdxInterface, remediation,
       action: actionFn,
     };
   }
-  
+
   return remediation;
 };
 
