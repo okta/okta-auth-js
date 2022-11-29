@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.1.1
+
+### Fixes
+
+- [#1355](https://github.com/okta/okta-auth-js/pull/1355) Adds missing type `currentAuthenticatorEnrollment` to `IdxContext`
+
 ## 7.0.1
 
 ### Fixes
