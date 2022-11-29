@@ -6,6 +6,14 @@
 
 - [#1355](https://github.com/okta/okta-auth-js/pull/1355) Adds missing type `currentAuthenticatorEnrollment` to `IdxContext`
 
+## 7.0.2
+
+### Fixes
+
+- [#1335](https://github.com/okta/okta-auth-js/pull/1335) IDX: adds `uiDisplay` property to `IdxContext` type
+- [#1336](https://github.com/okta/okta-auth-js/pull/1319) IDX: adds `deviceKnown` property to `IdxAuthenticator` type
+- [#1337](https://github.com/okta/okta-auth-js/pull/1337) IDX: fixes account activation flow by removing check for `identify` remediation
+
 ## 7.0.1
 
 ### Fixes
