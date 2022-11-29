@@ -102,7 +102,7 @@ describe('AutoRenewService', function() {
       expect(client.tokenManager.renew).toHaveBeenCalledTimes(1);
     });
 
-    it('should renew token if expired before service start', async function() {
+    it('should renew token if expired before becoming leader', async function() {
       // do not become leader, auto renew service would not start
       util.mockLeader(false);
       setupSync({
@@ -115,6 +115,33 @@ describe('AutoRenewService', function() {
       // add expired token
       client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
       jest.runAllTimers();
+
+      // become leader
+      util.mockLeader(true);
+      await (client.serviceManager.getService('leaderElection') as any)?.onLeader();
+      expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
+      jest.runAllTimers();
+
+      // token should be renewed
+      expect(client.tokenManager.renew).toHaveBeenCalledTimes(1);
+      expect(client.tokenManager.renew).toHaveBeenCalledWith('test-idToken');
+    });
+
+    it('should renew token if expired before service start', async function() {
+      // do not become leader
+      util.mockLeader(false);
+      setupSync({
+        tokenManager: { autoRenew: true }
+      }, true);
+      client.tokenManager.renew = jest.fn().mockImplementation(() => Promise.resolve());
+
+      // add expired token
+      client.tokenManager.add('test-idToken', tokens.standardIdTokenParsed);
+      jest.runAllTimers();
+
+      // start services (auto renew service would not start)
+      await client.serviceManager.start();
+      expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
 
       // become leader
       util.mockLeader(true);
