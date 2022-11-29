@@ -28,16 +28,13 @@ export async function register(
 
   // Only check at the beginning of the transaction
   if (!hasSavedInteractionHandle(authClient)) {
-    const { enabledFeatures, availableSteps } = await startTransaction(authClient, {
+    const { enabledFeatures } = await startTransaction(authClient, {
       ...options,
       flow: 'register',
       autoRemediate: false
     });
     if (!options.activationToken && enabledFeatures && !enabledFeatures.includes(IdxFeature.REGISTRATION)) {
       throw new AuthSdkError('Registration is not supported based on your current org configuration.');
-    }
-    if (options.activationToken && availableSteps?.some(({ name }) => name === 'identify')) {
-      throw new AuthSdkError('activationToken is not supported based on your current org configuration.');
     }
   }
 

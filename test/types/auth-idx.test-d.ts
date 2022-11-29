@@ -14,7 +14,7 @@ import {
   IdxResponse,
   IdxTransaction,
   IdxTransactionMeta,
-  IdxTransactionMetaOptions,
+  IdxContextUIDisplay,
   InteractResponse,
   OktaAuth,
 } from '@okta/okta-auth-js';
@@ -30,6 +30,10 @@ expectType<IdxTransaction>(await authClient.idx.start());
 expectType<IdxTransaction>(await authClient.idx.proceed());
 expectType<IdxTransaction>(await authClient.idx.cancel());
 expectType<IdxTransaction>(await authClient.idx.authenticate());
+
+const transaction = await authClient.idx.start();
+expectType<IdxContextUIDisplay | undefined>(transaction.context.uiDisplay);
+expectType<boolean | undefined>(transaction.context.currentAuthenticator.value.deviceKnown);
 
 expectType<InteractResponse>(await authClient.idx.interact());
 expectType<IdxResponse>(await authClient.idx.introspect());
