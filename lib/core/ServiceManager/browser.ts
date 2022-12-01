@@ -83,11 +83,24 @@ implements ServiceManagerInterface
     if (this.started) {
       // Start services that requires leadership
       await this.startServices();
+      await this.options['onLeaderCallback']?.();
     }
+  }
+
+  private async waitForLeader() {
+    return new Promise((resolve) => {
+      this.options['onLeaderCallback'] = () => {
+        resolve(null);
+      };
+    });
   }
 
   isLeader() {
     return (this.getService(LEADER_ELECTION) as LeaderElectionService)?.isLeader();
+  }
+
+  hasLeader() {
+    return (this.getService(LEADER_ELECTION) as LeaderElectionService)?.hasLeader();
   }
 
   isLeaderRequired() {
@@ -100,6 +113,9 @@ implements ServiceManagerInterface
     }
     await this.startServices();
     this.started = true;
+    if (this.isLeaderRequired() && !this.hasLeader()) {
+      await this.waitForLeader();
+    }
   }
   
   async stop() {

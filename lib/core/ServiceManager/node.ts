@@ -44,6 +44,10 @@ implements ServiceManagerInterface
     return false;
   }
 
+  hasLeader() {
+    return false;
+  }
+
   isLeaderRequired() {
     return false;
   }
