@@ -47,10 +47,26 @@ describe('OktaAuth (api)', function() {
     });
 
     describe('start', () => {
-      it('starts the token service', async () => {
+      it('starts the token manager', async () => {
         jest.spyOn(auth.tokenManager, 'start');
         await auth.start();
         expect(auth.tokenManager.start).toHaveBeenCalled(); 
+      });
+      it('starts the service manager', async () => {
+        jest.spyOn(auth.serviceManager, 'start');
+        await auth.start();
+        expect(auth.serviceManager.start).toHaveBeenCalled(); 
+      });
+      it('starts the service manager before token manager', async () => {
+        // see AutoRenewService test 'would not renew token if expired before service start AND token manager was started prior to service'
+        const serviceManagerSpy = jest.spyOn(auth.serviceManager, 'start');
+        const tokenManagerSpy = jest.spyOn(auth.tokenManager, 'start');
+        await auth.start();
+        expect(auth.serviceManager.start).toHaveBeenCalled();
+        expect(auth.tokenManager.start).toHaveBeenCalled();
+        const serviceManagerOrder = serviceManagerSpy.mock.invocationCallOrder[0];
+        const tokenManagerOrder = tokenManagerSpy.mock.invocationCallOrder[0];
+        expect(serviceManagerOrder).toBeLessThan(tokenManagerOrder);
       });
       it('updates auth state', async () => {
         jest.spyOn(auth.authStateManager, 'updateAuthState');

@@ -45,13 +45,6 @@ jest.mock('../../lib/services/LeaderElectionService', () => {
   };
 });
 
-// Run pending microtasks until condition is met
-async function waitFor(cond) {
-  while (!cond()) {
-    await Promise.resolve();
-  }
-}
-
 function createAuth(options) {
   options = options || {};
   options.tokenManager = options.tokenManager || {};
@@ -152,12 +145,13 @@ describe('ServiceManager', () => {
       await client2.serviceManager.stop();
     });
   
-    it('starts autoRenew service after becoming a leader (for syncStorage == true)', async () => {
+    it('waits for leader election to start autoRenew service and resolve serviceManager start promise (for syncStorage == true)', async () => {
       const options = { tokenManager: { syncStorage: true, autoRenew: true } };
       const client = createAuth(options);
       expect(client.serviceManager.isLeaderRequired()).toBeTruthy();
+      expect(client.serviceManager.hasLeader()).toBeFalsy();
+      jest.useRealTimers();
       (client.serviceManager.getService('leaderElection') as any)?._becomeLeaderAfterDelay();
-      jest.runAllTimers();
       await client.serviceManager.start();
       expect(client.serviceManager.isLeader()).toBeTruthy();
       expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
@@ -167,42 +161,6 @@ describe('ServiceManager', () => {
     });
   });
 
-  it('resolves start promise after becoming a leader if any service requires leadership', async () => {
-    const options = { tokenManager: { syncStorage: true, autoRenew: true } };
-    const client = createAuth(options);
-    expect(client.serviceManager.isLeaderRequired()).toBeTruthy();
-    expect(client.serviceManager.hasLeader()).toBeFalsy();
-
-    // leader will be elected in 500ms
-    (client.serviceManager.getService('leaderElection') as any)?._becomeLeaderAfterDelay(500);
-
-    // start service manager, but don't wait to resolve
-    let hasStarted = false;
-    const startPromise = client.serviceManager.start();
-    startPromise.then(() => {
-      hasStarted = true;
-    });
-    
-    // wait until all services are started except autoRenew (waiting for leader)
-    await waitFor(() => (client.serviceManager as any).started);
-    expect(client.serviceManager.isLeader()).toBeFalsy();
-    expect(client.serviceManager.getService('leaderElection')?.isStarted()).toBeTruthy();
-    expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
-    
-    // wait 500ms
-    jest.advanceTimersByTime(500);
-
-    // leader has been elected
-    expect(client.serviceManager.isLeader()).toBeTruthy();
-    // promise should be resolved
-    await waitFor(() => hasStarted);
-    // all services are started now
-    expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeTruthy();
-    expect(client.serviceManager.getService('syncStorage')?.isStarted()).toBeTruthy();
-    expect(client.serviceManager.getService('leaderElection')?.isStarted()).toBeTruthy();
-
-    await client.serviceManager.stop();
-  });
 
   it('can restart', async () => {
     const options = {
