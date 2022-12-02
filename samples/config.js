@@ -133,9 +133,7 @@ const samples = [
     appType: 'browser',
     template: 'react-embedded-auth-with-sdk',
     generateType: GENERATE_TYPE_OVERWRITE,
-    features: process.env.TREX ? [
-      'progressive-profiling-acr-values'
-    ] : [
+    features: [
       // group sms related specs together, so they do not run in parallel
       // this spec takes time to finish, run it first
       [
@@ -145,6 +143,7 @@ const samples = [
       'progressive-profiling-view-profile',
       'progressive-profiling-update-profile-info',
       'progressive-profiling-update-email-address',
+      'progressive-profiling-acr-values',
     ],
     useEnv: true
   },
