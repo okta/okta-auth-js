@@ -4,7 +4,8 @@ DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 source $DIR/setup.sh
 
 # Monolith version to test against
-export MONOLITH_BUILDVERSION=2022.10.1-begin-254-gaefef87dfc4e
+DEFAULT_BUILDVERSION="2022.12.0-begin-223-g8a1b5c30fdda"
+export MONOLITH_BUILDVERSION="${MONOLITH_BUILDVERSION:-$DEFAULT_BUILDVERSION}"
 
 set +e
 if [ -n "${TEST_SUITE_ID}" ]; then
