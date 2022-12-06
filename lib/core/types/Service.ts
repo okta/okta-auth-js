@@ -10,7 +10,6 @@ export interface ServiceInterface {
 export interface ServiceManagerInterface {
   isLeaderRequired(): boolean;
   isLeader(): boolean;
-  hasLeader(): boolean;
   start(): Promise<void>;
   stop(): Promise<void>;
   getService(name: string): ServiceInterface | undefined;

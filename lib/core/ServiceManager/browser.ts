@@ -29,7 +29,6 @@ import { removeNils } from '../../util';
 const AUTO_RENEW = 'autoRenew';
 const SYNC_STORAGE = 'syncStorage';
 const LEADER_ELECTION = 'leaderElection';
-const EVENT_ON_LEADER = 'onLeader';
 
 export class ServiceManager
 <
@@ -84,22 +83,11 @@ implements ServiceManagerInterface
     if (this.started) {
       // Start services that requires leadership
       await this.startServices();
-      this.sdk.emitter.emit(EVENT_ON_LEADER);
     }
-  }
-
-  private async waitForLeader() {
-    return new Promise((resolve) => {
-      this.sdk.emitter.once(EVENT_ON_LEADER, resolve);
-    });
   }
 
   isLeader() {
     return (this.getService(LEADER_ELECTION) as LeaderElectionService)?.isLeader();
-  }
-
-  hasLeader() {
-    return (this.getService(LEADER_ELECTION) as LeaderElectionService)?.hasLeader();
   }
 
   isLeaderRequired() {
@@ -112,9 +100,6 @@ implements ServiceManagerInterface
     }
     await this.startServices();
     this.started = true;
-    if (this.isLeaderRequired() && !this.hasLeader()) {
-      await this.waitForLeader();
-    }
   }
   
   async stop() {

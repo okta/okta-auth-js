@@ -126,12 +126,12 @@ describe('AutoRenewService', function() {
       client.tokenManager.start();
       jest.runAllTimers();
 
-      // token should be renewed because token manager resets expired timeouts on start
+      // token should be renewed
       expect(client.tokenManager.renew).toHaveBeenCalledTimes(1);
       expect(client.tokenManager.renew).toHaveBeenCalledWith('test-idToken');
     });
 
-    it('would not renew token if expired before service start AND token manager was started prior to service', async function() {
+    it('should renew token if expired before service start AND token manager was started prior to service', async function() {
       await setup({
         tokenManager: { autoRenew: true }
       }, false);
@@ -148,8 +148,9 @@ describe('AutoRenewService', function() {
       await service.start();
       jest.runAllTimers();
 
-      // token can't be renewed because expired event was fired before service start
-      expect(client.tokenManager.renew).toHaveBeenCalledTimes(0);
+      // token should be renewed
+      expect(client.tokenManager.renew).toHaveBeenCalledTimes(1);
+      expect(client.tokenManager.renew).toHaveBeenCalledWith('test-idToken');
     });
 
     describe('too many renew requests', () => {

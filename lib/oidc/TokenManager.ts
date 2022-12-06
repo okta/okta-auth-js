@@ -61,6 +61,7 @@ const DEFAULT_OPTIONS = {
 interface TokenManagerState {
   expireTimeouts: Record<string, unknown>;
   renewPromise: Promise<Token | undefined> | null;
+  started?: boolean;
 }
 function defaultState(): TokenManagerState {
   return {
@@ -138,10 +139,16 @@ export class TokenManager implements TokenManagerInterface {
       this.clearPendingRemoveTokens();
     }
     this.setExpireEventTimeoutAll();
+    this.state.started = true;
   }
   
   stop() {
     this.clearExpireEventTimeoutAll();
+    this.state.started = false;
+  }
+
+  isStarted() {
+    return !!this.state.started;
   }
 
   getOptions(): TokenManagerOptions {
