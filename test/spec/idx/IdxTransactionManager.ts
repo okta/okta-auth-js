@@ -165,13 +165,6 @@ describe('IdxTransactionManager', () => {
       expect(res).toBeNull();
     });
     describe('with options.stateHandle', () => {
-      it('returns null if options.stateHandle does not match saved stateHandle', () => {
-        const { transactionManager, idxResponseStorage, savedResponse } = testContext;
-        idxResponseStorage.getStorage.mockReturnValue(savedResponse);
-        const res = transactionManager.loadIdxResponse({ stateHandle: 'a' });
-        expect(idxResponseStorage.getStorage).toHaveBeenCalled();
-        expect(res).toBeNull();
-      });
       it('returns data if options.stateHandle matches saved stateHandle', () => {
         const { transactionManager, idxResponseStorage, savedResponse } = testContext;
         savedResponse.stateHandle = 'a';

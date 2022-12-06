@@ -2,9 +2,14 @@
 
 ## 7.2.0
 
+### Features
+
+- [#1333](https://github.com/okta/okta-auth-js/pull/1333) Adds support for MyAccount API password methods
+
 ### Fixes
 
 - [#1354](https://github.com/okta/okta-auth-js/pull/1354) Fixes token auto renew if token has expired before `AutoRenewService` start
+- [#1359](https://github.com/okta/okta-auth-js/pull/1359) IDX: removes statehandle check when load saved idxResponse
 
 ## 7.1.1
 
