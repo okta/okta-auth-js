@@ -45,6 +45,18 @@ function protectedLink(app: TestApp): string {
   `;
 }
 
+function loginWithAcr(): string {
+  return `
+    <div class="pure-menu">
+      <ul class="pure-menu-list actions">
+        <li class="pure-menu-item">
+          <a id="login-acr" href="/" onclick="loginRedirect(event)" class="pure-menu-link">Login with ACR using REDIRECT</a>
+        </li>
+      </ul>
+    </div>
+  `;
+}
+
 function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
   let protectedPageLink = '';
   if (!onProtectedPage) {
@@ -938,6 +950,7 @@ class TestApp {
                 ${protectedLink(this)}
               </ul>
             </div>
+            ${loginWithAcr()}
             ${logoutLink(this)}
           </div>
           <div class="right-column">

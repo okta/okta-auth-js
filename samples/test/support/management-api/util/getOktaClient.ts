@@ -4,6 +4,7 @@ export type OktaClientConfig = {
   issuer?: string;
   oktaAPIKey?: string;
   scopes?: string[];
+  clientId?: string;
 }
 
 export default function getOktaClient(config: OktaClientConfig) {

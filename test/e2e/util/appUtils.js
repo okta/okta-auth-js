@@ -36,10 +36,10 @@ async function openImplicit(options) {
     assert(isSelected === true);
   }));
   await TestApp.issuer.then(el => el.getValue()).then(value => {
-    assert(value === ISSUER);
+    assert(value === options.issuer);
   });
   await TestApp.clientId.then(el => el.getValue()).then(value => {
-    assert(value === CLIENT_ID);
+    assert(value === options.clientId);
   });
 }
 

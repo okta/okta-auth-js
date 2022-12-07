@@ -14,6 +14,4 @@ export CLIENT_ID=0oa8lrg7ojTsbJgRQ696
 export REFRESH_TOKEN=true
 export ORG_OIE_ENABLED=true 
 
-export RUN_CUCUMBER=1
-
 run_e2e

@@ -35,6 +35,7 @@ class TestApp {
   get userInfo() { return $('#user-info'); }
   get sessionExpired() { return $('#session-expired'); }
   get testConcurrentGetTokenBtn() { return $('#test-concurrent-get-token'); }
+  get loginWithAcrBtn() { return $('#login-acr'); }
 
   get tokenError() { return $('#token-error'); }
   get tokenMsg() { return $('#token-msg'); }
@@ -58,6 +59,8 @@ class TestApp {
   get clientId() { return $('#f_clientId'); }
   get issuer() { return $('#f_issuer'); }
   get interactionCodeOption() { return $('#f_useInteractionCodeFlow-on'); }
+  get acrValues() { return $('#f_acrValues'); }
+  get submit() { return $('#f_submit'); }
 
   // Callback
   get callbackSelector() { return $('#root.rendered.loaded.callback'); }

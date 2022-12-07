@@ -10,6 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+function delay(ms) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, ms);
+  });
+}
 
 /* eslint-disable max-len */
 class OktaLogin {
@@ -26,6 +31,19 @@ class OktaLogin {
   get facebookEmail() { return $('#email');}
   get facebookPassword() { return $('#pass');}
   get facebookSubmitBtn() { return $('#loginbutton');}
+
+  get signinFormTitle() { return $('.okta-form-title.o-form-head'); }
+  get verifyWithEmailCodeButton() { return $('form[data-se="o-form"] button.enter-auth-code-instead-link'); }
+  get code() {
+    if (process.env.ORG_OIE_ENABLED) {
+      return this.OIEsigninPassword;
+    } else { 
+      return this.signinPassword;
+    }
+  }
+  get verifyBtn() { return $('form[data-se="o-form"] input[type=submit][value=Verify]'); }
+  get authenticatorsList() { return $('form[data-se="o-form"] .authenticator-list'); }
+  get authenticatorEmail() { return $('form[data-se="o-form"] .authenticator-list [data-se="okta_email"] .select-factor'); }
 
   async signin(username, password) {
     await this.waitForLoad();
@@ -49,9 +67,57 @@ class OktaLogin {
     await this.signinSubmitBtn.then(el => el.click());
   }
 
+  async submit() {
+    const btn = process.env.ORG_OIE_ENABLED ? this.OIEsigninSubmitBtn : this.signinSubmitBtn;
+    (await btn).click();
+  }
+
+  async clickSendEmail() {
+    await this.submit();
+  }
+
+  async selectEmailAuthenticator() {
+    await browser.waitUntil(async () => {
+      return (await this.authenticatorEmail).isDisplayed();
+    }, 5000, 'wait for email authenticator in list');
+    (await this.authenticatorEmail).click();
+  }
+
+  async clickVerifyEmail() {
+    await browser.waitUntil(async () => {
+      return (await this.verifyBtn).isDisplayed();
+    }, 5000, 'wait for verify btn');
+
+    let verify = await this.verifyBtn;
+    await verify.click();
+
+    // There can be a form validation error, just retry
+    await delay(1000);
+    verify = await this.verifyBtn;
+    if (await verify.isDisplayed() && await verify.isEnabled()) {
+      await this.submit();
+    }
+  }
+
+  async verifyWithEmailCode() {
+    await browser.waitUntil(async () => {
+      return (await this.verifyWithEmailCodeButton).isDisplayed();
+    }, 5000, 'wait for verify with email code btn');
+    (await this.verifyWithEmailCodeButton).click();
+  }
+
+  async enterCode(code) {
+    await browser.waitUntil(async () => {
+      return (await this.code).isDisplayed();
+    }, 5000, 'wait for verify code input');
+    (await this.code).setValue(code);
+  }
+
   async waitForLoad() {
     if (process.env.ORG_OIE_ENABLED) {
-      return browser.waitUntil(async () => this.OIEsigninSubmitBtn.then(el => el.isDisplayed()), 5000, 'wait for signin btn');
+      // With Step Up MFA there can be no Submit button displayed, 
+      //  but authenticator list or prompt to verify authenticator
+      return browser.waitUntil(async () => this.OIEsigninForm.then(el => el.isDisplayed()), 5000, 'wait for signin form');
     } else {
       return browser.waitUntil(async () => this.signinSubmitBtn.then(el => el.isDisplayed()), 5000, 'wait for signin btn');
     }

@@ -17,7 +17,10 @@ const config = [
       'tokens.js',
       'transactionStorage.js'
     ],
-    features: ['login.feature']
+    features: [
+      'login.feature',
+      'acr-values.feature'
+    ]
   },
   {
     name: '@okta/test.app.react-mfa-v1',

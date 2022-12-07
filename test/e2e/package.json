@@ -16,6 +16,7 @@
     "@babel/plugin-transform-async-to-generator": "^7.5.0",
     "@babel/register": "^7.8.2",
     "@okta/okta-auth-js": "*",
+    "@okta/okta-sdk-nodejs": "^6.4.0",
     "@wdio/cli": "^7.24.0",
     "@wdio/cucumber-framework": "^7.25.0",
     "@wdio/jasmine-framework": "^7.24.0",
@@ -25,6 +26,9 @@
     "@wdio/selenium-standalone-service": "^7.24.0",
     "@wdio/spec-reporter": "^7.24.0",
     "cross-spawn-with-kill": "^1.0.0",
+    "junit-report-merger": "^3.0.5",
+    "ts-node": "^9.1.1",
+    "tsconfig-paths": "^4.1.0",
     "regenerator-runtime": "^0.13.3",
     "wait-on": "^6.0.1"
   },

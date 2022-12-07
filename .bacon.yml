@@ -38,6 +38,13 @@ test_suites:
       script_name: e2e
       criteria: MERGE
       queue_name: small
+    - name: e2e-cucumber
+      script_path: ../okta-auth-js/scripts/e2e
+      sort_order: '4'
+      timeout: '20'
+      script_name: e2e-cucumber
+      criteria: MERGE
+      queue_name: small
     - name: e2e-mfa
       script_path: ../okta-auth-js/scripts/e2e
       sort_order: '5'
