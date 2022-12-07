@@ -96,6 +96,10 @@ export const IdxContextFactory = Factory.define<IdxContext>(() => {
       type: 'object',
       value: IdxAuthenticatorFactory.build(),
     },
+    currentAuthenticatorEnrollment: {
+      type: 'object',
+      value: IdxAuthenticatorFactory.build(),
+    },
     authenticators: {
       type: 'array',
       value: []

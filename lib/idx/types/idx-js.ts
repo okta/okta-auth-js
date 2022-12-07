@@ -158,6 +158,10 @@ export interface IdxContext {
     type: string;
     value: IdxAuthenticator;
   };
+  currentAuthenticatorEnrollment: {
+    type: string;
+    value: IdxAuthenticator;
+  };
   authenticators: {
     type: string;
     value: IdxAuthenticator[];
