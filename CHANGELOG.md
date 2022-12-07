@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.1.2
+
+### Fixes
+
+- [#1359](https://github.com/okta/okta-auth-js/pull/1359) IDX: removes statehandle check when load saved idxResponse
+
 ## 7.1.1
 
 ### Fixes
