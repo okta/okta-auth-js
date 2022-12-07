@@ -4,7 +4,7 @@ DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 source $DIR/setup.sh
 
 # Monolith version to test against
-DEFAULT_BUILDVERSION="2022.12.0-begin-223-g8a1b5c30fdda"
+DEFAULT_BUILDVERSION="2022.11.1-begin-466-g7abd4fdc8835"
 export MONOLITH_BUILDVERSION="${MONOLITH_BUILDVERSION:-$DEFAULT_BUILDVERSION}"
 
 set +e
