@@ -47,10 +47,15 @@ describe('OktaAuth (api)', function() {
     });
 
     describe('start', () => {
-      it('starts the token service', async () => {
+      it('starts the token manager', async () => {
         jest.spyOn(auth.tokenManager, 'start');
         await auth.start();
         expect(auth.tokenManager.start).toHaveBeenCalled(); 
+      });
+      it('starts the service manager', async () => {
+        jest.spyOn(auth.serviceManager, 'start');
+        await auth.start();
+        expect(auth.serviceManager.start).toHaveBeenCalled(); 
       });
       it('updates auth state', async () => {
         jest.spyOn(auth.authStateManager, 'updateAuthState');

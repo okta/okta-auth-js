@@ -13,7 +13,7 @@
 
 import { AuthSdkError } from '../errors';
 import { ServiceInterface, ServiceManagerOptions } from '../core/types';
-import { EVENT_EXPIRED, TokenManagerInterface } from '../oidc/types';
+import { EVENT_EXPIRED, TokenManagerInterface, isRefreshToken } from '../oidc/types';
 import { isBrowser } from '../features';
 
 export class AutoRenewService implements ServiceInterface {
@@ -46,6 +46,17 @@ export class AutoRenewService implements ServiceInterface {
     return !!this.options.syncStorage && isBrowser();
   }
 
+  private processExpiredTokens() {
+    const tokenStorage = this.tokenManager.getStorage();
+    const tokens = tokenStorage.getStorage();
+    Object.keys(tokens).forEach(key => {
+      const token = tokens[key];
+      if (!isRefreshToken(token) && this.tokenManager.hasExpired(token)) {
+        this.onTokenExpiredHandler(key);
+      }
+    });
+  }
+
   private onTokenExpiredHandler(key: string) {
     if (this.options.autoRenew) {
       if (this.shouldThrottleRenew()) {
@@ -67,6 +78,11 @@ export class AutoRenewService implements ServiceInterface {
     if (this.canStart()) {
       await this.stop();
       this.tokenManager.on(EVENT_EXPIRED, this.onTokenExpiredHandler);
+      if (this.tokenManager.isStarted()) {
+        // If token manager has been already started, we could miss token expire events,
+        //  so need to process expired tokens manually.
+        this.processExpiredTokens();
+      }
       this.started = true;
     }
   }

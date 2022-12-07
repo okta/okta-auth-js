@@ -1,11 +1,16 @@
 # Changelog
 
+## 7.2.0
+
+### Fixes
+
+- [#1354](https://github.com/okta/okta-auth-js/pull/1354) Fixes token auto renew if token has expired before `AutoRenewService` start
+
 ## 7.1.1
 
 ### Fixes
 
 - [#1355](https://github.com/okta/okta-auth-js/pull/1355) Adds missing type `currentAuthenticatorEnrollment` to `IdxContext`
-
 
 ## 7.1.0
 

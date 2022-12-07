@@ -71,4 +71,5 @@ export interface TokenManagerInterface {
 
   start();
   stop();
+  isStarted(): boolean;
 }

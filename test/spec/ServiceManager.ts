@@ -141,6 +141,7 @@ describe('ServiceManager', () => {
     it('starts autoRenew service after becoming leader (for syncStorage == true)', async () => {
       const options = { tokenManager: { syncStorage: true, autoRenew: true } };
       const client = createAuth(options);
+      expect(client.serviceManager.isLeaderRequired()).toBeTruthy();
       await client.serviceManager.start();
       expect(client.serviceManager.isLeader()).toBeFalsy();
       expect(client.serviceManager.getService('autoRenew')?.isStarted()).toBeFalsy();
