@@ -34,11 +34,12 @@ describe('MyAccount Profile API', () => {
         'profile', 
         'okta.myAccount.profile.manage'
       ];
+      const acrValues = 'urn:okta:loa:2fa:any:ifpossible';
       const { 
         tokens: { 
           accessToken: { accessToken } = {}
         } 
-      } = await signinAndGetTokens(client, { scopes });
+      } = await signinAndGetTokens(client, { scopes, acrValues });
       const { profile } = await getProfile(client, { accessToken });
       const transaction = await updateProfile(client, { 
         accessToken,

@@ -35,7 +35,7 @@ import A18nClient from '../support/management-api/a18nClient';
 import createGroup from '../support/management-api/createGroup';
 import createApp from '../support/management-api/createApp';
 import startApp from '../support/action/startApp';
-import { getConfig } from '../util/configUtils';
+import { getConfig, toQueryString } from '../util';
 
 // NOTE: noop function is used for predefined settings
 
@@ -328,7 +328,22 @@ Given(
   'she is on the Root View in an AUTHENTICATED state', 
   async function(this: ActionContext) {
     await clickButton('login');
-    await checkIsOnPage('Root');
+    await checkIsOnPage('Identify');
+    await loginDirect({
+      username: this.credentials.emailAddress,
+      password: this.credentials.password
+    });
+  }
+);
+
+Given(
+  'she is on the Root View in an AUTHENTICATED state with ACR value {string}', 
+  async function(this: ActionContext, acrValues: string) {
+    await clickButton('login');
+    await browser.url(await browser.getUrl() + toQueryString({
+      acrValues,
+    }));
+    await checkIsOnPage('Identify');
     await loginDirect({
       username: this.credentials.emailAddress,
       password: this.credentials.password

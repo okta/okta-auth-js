@@ -9,11 +9,14 @@ Feature: Update Profile Information
       # And the app has a custom User Profile Schema named "age" // predefined in User (default)
       And a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password as the only factor"
+      And a Policy that defines "MFA Enrollment" with properties
+        | okta_password | REQUIRED |
+      And with a Policy Rule that defines "MFA Enrollment Challenge"
       And a user named "Mary"
 
   Scenario: Mary updates her profile information
     Given she has an account with "active" state in the org
-      And she is on the Root View in an AUTHENTICATED state
+      And she is on the Root View in an AUTHENTICATED state with ACR value "urn:okta:loa:2fa:any:ifpossible"
       And she sees a table with her profile info
       And the cell for the value of "primary email" is shown and contains her "primary email"
       And the cell for the value of "first name" is shown and contains her "first name"
@@ -29,7 +32,7 @@ Feature: Update Profile Information
 
   Scenario: [ERROR CASE] Mary updates her profile information with an invalid input
     Given she has an account with active state in the org and her "age" is "30"
-      And she is on the Root View in an AUTHENTICATED state
+      And she is on the Root View in an AUTHENTICATED state with ACR value "urn:okta:loa:2fa:any:ifpossible"
       And she sees a table with her profile info
       And the cell for the value of "primary email" is shown and contains her "primary email"
       And the cell for the value of "first name" is shown and contains her "first name"
