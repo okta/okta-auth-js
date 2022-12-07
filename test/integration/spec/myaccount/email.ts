@@ -30,7 +30,8 @@ describe('MyAccount Email API', () => {
         'profile',
         'okta.myAccount.email.read',
         'okta.myAccount.email.manage'
-      ]
+      ],
+      acrValues: 'urn:okta:loa:2fa:any:ifpossible',
     });
     token = accessToken;
   });

@@ -26,7 +26,8 @@ describe('MyAccount Phone API', () => {
         'profile',
         'okta.myAccount.phone.read',
         'okta.myAccount.phone.manage'
-      ]
+      ],
+      acrValues: 'urn:okta:loa:2fa:any:ifpossible',
     });
     token = accessToken!;
   });
