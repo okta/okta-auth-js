@@ -16,23 +16,13 @@ import { Page } from './Page';
 const username = 'input[name="username"]';
 const password = 'input[name="password"]';
 const submit = 'button[type="submit"]';
-const formMessages = `#form-messages`;
-const formMessage = `${formMessages}:first-child`;
-const facebookButton = '#idp-buttons #facebook';
-const googleButton = '#idp-buttons #google';
-const oidcIdPButton = '#idp-buttons #oidc';
 
-export class LoginForm implements Page, Selectors {
-  get isDisplayedElementSelector() { return this.username; }
+export class IdentifyForm implements Page, Selectors {
+  get isDisplayedElementSelector() { return this.password; }
 
   get username() { return username; }
   get password() { return password; }
   get submit() { return submit; }
-  get formMessages() { return formMessages; }
-  get formMessage() { return formMessage; }
-  get facebookButton() { return facebookButton; }
-  get googleButton() { return googleButton; }
-  get oidcIdPButton() { return oidcIdPButton; }
 }
 
-export default new LoginForm();
+export default new IdentifyForm();

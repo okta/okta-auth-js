@@ -38,7 +38,7 @@ export default async (pageName?: string) => {
       const text = await el?.getText();
       return text === page.isDisplayedElementText;
     } else {
-      return !!el;
+      return !!el && await el.isDisplayed();
     }
   }, { 
     timeout: 5000,

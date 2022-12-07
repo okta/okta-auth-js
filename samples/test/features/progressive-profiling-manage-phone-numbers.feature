@@ -8,11 +8,15 @@ Feature: Managing Phone Numbers
       And the app is granted "okta.myAccount.phone.manage" scope
       And a Policy that defines "Authentication"
       And with a Policy Rule that defines "Password as the only factor"
+      And a Policy that defines "MFA Enrollment" with properties
+        | okta_password | REQUIRED |
+        | phone_number  | OPTIONAL |
+      And with a Policy Rule that defines "MFA Enrollment Challenge"
       And a user named "Mary"
       And she has an account with "active" state in the org
   
   Scenario: Mary Adds a phone number
-    Given she is on the Root View in an AUTHENTICATED state
+    Given she is on the Root View in an AUTHENTICATED state with ACR value "urn:okta:loa:2fa:any:ifpossible"
     Then she sees a table with her profile info
       And the cell for the value of "primary email" is shown and contains her "primary email"
       And the cell for the value of "first name" is shown and contains her "first name"
@@ -31,7 +35,7 @@ Feature: Managing Phone Numbers
   
 
   Scenario: [ERROR CASE] Mary Adds a phone number and enters the wrong OTP
-    Given she is on the Root View in an AUTHENTICATED state
+    Given she is on the Root View in an AUTHENTICATED state with ACR value "urn:okta:loa:2fa:any:ifpossible"
     Then she sees a table with her profile info
       And the cell for the value of "primary email" is shown and contains her "primary email"
       And the cell for the value of "first name" is shown and contains her "first name"
@@ -48,7 +52,7 @@ Feature: Managing Phone Numbers
     Then she sees a banner message for "add phone number" that "This operation couldn't be completed as requested due to an issue with the specified authenticator."
 
   Scenario: Mary deletes a phone number
-    Given she is on the Root View in an AUTHENTICATED state
+    Given she is on the Root View in an AUTHENTICATED state with ACR value "urn:okta:loa:2fa:any:ifpossible"
       And she has enrolled in the "SMS" factor
     Then she sees a table with her profile info
       And the cell for the value of "primary email" is shown and contains her "primary email"

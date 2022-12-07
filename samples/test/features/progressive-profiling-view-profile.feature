@@ -18,7 +18,7 @@ Feature: View Profile Information
     When she fills in her "username"
       And she fills in her "password"
       And she submits the form
-    Then she is redirected to the "Root" page
+    Then she is redirected to the "MyAccount Root" page
       And she sees a table with her profile info
       And the cell for the value of "primary email" is shown and contains her "primary email"
       And the cell for the value of "first name" is shown and contains her "first name"

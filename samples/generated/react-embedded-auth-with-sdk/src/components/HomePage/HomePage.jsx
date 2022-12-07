@@ -39,6 +39,7 @@ export default function Home() {
         <Box display="flex" className="pure-g">
           <Box paddingRight="s" className="pure-u-1 pure-u-md-1-2">
             <InfoBox 
+              id="oauth-info-box"
               heading="OAuth" 
               icon="settings" 
               renderInfo={() => (

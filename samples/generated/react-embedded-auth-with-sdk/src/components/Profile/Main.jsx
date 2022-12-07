@@ -92,7 +92,7 @@ const Profile = () => {
       <Box id="profile-table" padding="s" borderColor="display" borderRadius="base">
         <MyAccountPanel corsError={corsError}/>
         {
-          !!error && <Modal open={true}>
+          !!error && <Modal open={true} id={`insufficientAuthentication-modal`} >
             <Form
               heading="Insufficient Authentication"
               desc={error.errorCauses[0]?.errorSummary}
