@@ -1331,7 +1331,7 @@ The following configuration options can be included in `token.getWithoutPrompt`,
 | `prompt` | Determines whether the Okta login will be displayed on failure. Use `none` to prevent this behavior. Valid values: `none`, `consent`, `login`, or `consent login`. See [Parameter details](https://developer.okta.com/docs/reference/api/oidc/#parameter-details) for more information.  Special value `enroll_authenticator` is used for [enrollAuthenticator](#endpointsauthorizeenrollauthenticatoroptions). |
 | `maxAge` | Allowable elapsed time, in seconds, since the last time the end user was actively authenticated by Okta. |
 | `acrValues` | [[EA][early-access]] Optional parameter to increase the level of user assurance. See [Predefined ACR values](https://developer.okta.com/docs/guides/step-up-authentication/main/#predefined-parameter-values) for more information. |
-| `enrollAmrValues` | [[EA][early-access]] List of [authentication methods](https://self-issued.info/docs/draft-jones-oauth-amr-values-00.html) used to enroll authenticators with [enrollAuthenticator](#endpointsauthorizeenrollauthenticatoroptions) |
+| `enrollAmrValues` | [[EA][early-access]] List of [authentication methods](https://self-issued.info/docs/draft-jones-oauth-amr-values-00.html) used to enroll authenticators with [enrollAuthenticator](#endpointsauthorizeenrollauthenticatoroptions). See [Parameter details](https://developer.okta.com/docs/reference/api/oidc/#parameter-details) for more information. |
 | `loginHint` | A username to prepopulate if prompting for authentication. |
 
 For more details, see Okta's [Authorize Request API](https://developer.okta.com/docs/api/resources/oidc#request-parameters).
@@ -1339,6 +1339,7 @@ For more details, see Okta's [Authorize Request API](https://developer.okta.com/
 #### `endpoints.authorize.enrollAuthenticator(options)`
 
 > :link: web browser only <br>
+> [Early Access][early-access]
 
 Enroll authenticators using a redirect to [authorizeUrl](#authorizeurl) with special parameters. After a successful enrollment, the browser will be redirected to the configured [redirectUri](#configuration-options). You can use [sdk.handleRedirect](#handleredirectoriginaluri) to handle the redirect on successful enrollment or an error.
 
@@ -1350,7 +1351,7 @@ Enroll authenticators using a redirect to [authorizeUrl](#authorizeurl) with spe
 
   Required options:
 
-  * `enrollAmrValues` - list of [authentication methods](https://self-issued.info/docs/draft-jones-oauth-amr-values-00.html).
+  * `enrollAmrValues` - list of [authentication methods](https://self-issued.info/docs/draft-jones-oauth-amr-values-00.html) to allow the user to enroll in.
 
     List of AMR values:
     | AMR Value     | Authenticator        |
@@ -1364,15 +1365,18 @@ Enroll authenticators using a redirect to [authorizeUrl](#authorizeurl) with spe
     | `symantec`    | Symantec VIP         |
     | `google_otp`  | Google Authenticator |
     | `okta_verify` | Okta Verify          |
+    | `swk`         | Custom App           |
     | `pop`         | WebAuthn             |
     | `oath_otp`    | On-Prem MFA          |
     | `rsa`         | RSA SecurID          |
     | `yubikey`     | Yubikey              |
     | `otp`         | Custom HOTP          |
     | `fed`         | External IdP         |
-    | `sc`          | SmartCard/PIV        |
+    | `sc` + `swk`  | SmartCard/PIV        |
 
-  * `acrValues` - should equal `urn:okta:2fa:any:ifpossible`
+  See [enroll_amr_values parameter details](https://developer.okta.com/docs/reference/api/oidc/#request-parameters) for more information.
+
+  * `acrValues` - must be `urn:okta:2fa:any:ifpossible`, which means the user is prompted for at least one factor before enrollment.
 
 ##### Example
 
