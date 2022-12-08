@@ -905,6 +905,7 @@ class TestApp {
     const options: EnrollAuthenticatorOptions = Object.assign({}, {
       state: this.config.state,
       enrollAmrValues: this.config.enrollAmrValues,
+      acrValues: this.config.acrValues,
     });
     try {
       this.oktaAuth.endpoints.authorize.enrollAuthenticator(options);
@@ -994,14 +995,15 @@ class TestApp {
       `;
   }
 
+  /* eslint-disable complexity */
   callbackHTML(res: TokenResponse): string {
     const tokensReceived = res.tokens ? Object.keys(res.tokens): [];
     const isEnrollSuccess = res.responseType === 'none';
     const success = res.tokens && tokensReceived.length;
-    const errorMessage = isEnrollSuccess ? 'Authenticator enrollment completed' : 
+    const errorMessage = isEnrollSuccess ? '' : 
       success ? '' :  'Tokens not returned. Check error console for more details';
-    const successMessage = success ?
-      'Successfully received tokens on the callback page: ' + tokensReceived.join(', ') : '';
+    const successMessage = isEnrollSuccess ? 'Authenticator enrollment completed' : 
+      success ? 'Successfully received tokens on the callback page: ' + tokensReceived.join(', ') : '';
     const originalUri = this.oktaAuth.getOriginalUri(res.state);
     const content = `
       <div id="callback-result">

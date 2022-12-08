@@ -3,8 +3,13 @@ import ActionContext from 'support/context';
 import TestApp from '../../pageobjects/TestApp';
 import OktaLogin from '../../pageobjects/OktaLogin';
 import { openPKCE } from '../../util/appUtils';
+import listFactors from 'management-api/listFactors';
 
 const ORG_OIE_ENABLED = process.env.ORG_OIE_ENABLED;
+
+interface DataTable {
+  rawTable: string[][]
+}
 
 When(/^she logins with (\w+) and (.+)$/, async function (username, password) {
   await $('#username').setValue(username);
@@ -43,6 +48,9 @@ When('she clicks the {string} button', async function (buttonName) {
     case 'Login with ACR':
       el = await TestApp.loginWithAcrBtn;
     break;
+    case 'Enroll Authenticator':
+      el = await TestApp.enrollAuthenticator;
+    break;
     case 'Handle callback (Continue Login)':
       el = await TestApp.handleCallbackBtn;
     break;
@@ -69,6 +77,18 @@ Then(
 
     const errText = await (await TestApp.error).getText();
     expect(errText).toBe(expectedError);
+  }
+);
+
+Then(
+  'the callback is handled with message {string}',
+  async function (expectedMsg: string) {
+    await (await TestApp.success).waitForDisplayed({
+      timeout: 3*1000,
+    });
+
+    const successText = await (await TestApp.success).getText();
+    expect(successText).toBe(expectedMsg);
   }
 );
 
@@ -121,6 +141,34 @@ Then(
 );
 
 Then(
+  'the app should construct an authorize request with params',
+  async function (dataTable: DataTable) {
+    const expectedParams: Record<string, string> = dataTable?.rawTable.
+      reduce((acc: any, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {});
+
+    await browser.waitUntil(async () => {
+      const url = await browser.getUrl();
+      return url.includes('/authorize');
+    });
+
+    const url = await browser.getUrl();
+    const queryStr = url.split('?')[1];
+    const urlParams = new URLSearchParams(queryStr);
+    const params = {};
+    urlParams.forEach((value, key) => {
+      params[key] = value;
+    });
+  
+    for (const [k, v] of Object.entries(expectedParams)) {
+      expect(params[k]).toBe(v);
+    }
+  }
+);
+
+Then(
   'she should be redirected to the Okta Sign In Widget',
   async function () {
     await OktaLogin.waitForLoad();
@@ -136,7 +184,6 @@ When(
     );
   }
 );
-
 
 Then(
   /^she (?:is redirected to|sees) the default view in an AUTHENTICATED state$/,
@@ -161,6 +208,14 @@ When(
 );
 
 Then(
+  /^she (?:is redirected to|sees) the default view in an UNAUTHENTICATED state$/,
+  { timeout: 10*1000 }, 
+  async function () {
+    await TestApp.assertLoggedOut();
+  }
+);
+
+Then(
   'she sees her ID and Access Tokens',
   async function () {
     await TestApp.assertLoggedIn();
@@ -178,12 +233,24 @@ When('she selects {string} into {string}', async function (value, field) {
   let f;
   switch (field) {
     case 'ACR values':
-      f = await TestApp.acrValues;  
+      f = await TestApp.acrValues;
     break;
     default:
       throw new Error(`Unknown field ${field}`);
   }
   await f.selectByAttribute('value', value);
+});
+
+Given('she enters {string} into {string}', async function (value, field) {
+  let f;
+  switch (field) {
+    case 'Enroll AMR values':
+      f = await TestApp.enrollAmrValues;  
+    break;
+    default:
+      throw new Error(`Unknown field ${field}`);
+  }
+  await f.setValue(value);
 });
 
 When('she selects incorrect value in {string}', async function (field) {
@@ -207,6 +274,9 @@ When('she selects incorrect value in {string}', async function (field) {
 Then('she sees {string} in {string}', async function (value, field) {
   let el;
   switch (field) {
+    case 'Enroll AMR values':
+      el = await TestApp.enrollAmrValues;  
+    break;
     case 'ACR values':
       el = await TestApp.acrValues;  
     break;
@@ -253,7 +323,7 @@ When(
     await OktaLogin.verifyWithEmailCode();
     const code = await this.a18nClient.getEmailCode(this.credentials.profileId);
     await OktaLogin.enterCode(code);
-    await OktaLogin.clickVerifyEmail();
+    await OktaLogin.clickVerify();
   }
 );
 
@@ -275,3 +345,56 @@ Then(
   async function() {}
 );
 
+Then(
+  'she is required to set up authenticator "Security Question"',
+  { timeout: 10*1000 }, 
+  async function () {
+    await browser.waitUntil(async () => {
+      const list = await OktaLogin.authenticatorsList;
+      const isListDisplayed = await list?.isDisplayed();
+      return isListDisplayed;
+    }, {
+      timeout: 10*1000
+    });
+
+    await OktaLogin.selectSecurityQuestionAuthenticator();
+  }
+);
+
+When(
+  'she creates security question answer',
+  { timeout: 20*1000 }, 
+  async function (this: ActionContext) {
+    const answer = 'okta';
+    await OktaLogin.enterAnswer(answer);
+    await OktaLogin.clickVerify();
+  }
+);
+
+Given(
+  'she is enrolled in the {string} factors',
+  { timeout: 30*1000 },
+  async function(this: ActionContext, factorTypesStr: string) {
+    const enrolledFactorTypes = await listFactors(this.config, {
+      userId: this.user.id
+    });
+    const factorTypes = factorTypesStr.split(',').map(f => f.trim());
+    for (const f of factorTypes) {
+      expect(enrolledFactorTypes).toContain(f);
+    }
+  }
+);
+
+Given(
+  'she is not enrolled in the {string} factors',
+  { timeout: 30*1000 },
+  async function(this: ActionContext, factorTypesStr: string) {
+    const enrolledFactorTypes = await listFactors(this.config, {
+      userId: this.user.id
+    });
+    const factorTypes = factorTypesStr.split(',').map(f => f.trim());
+    for (const f of factorTypes) {
+      expect(enrolledFactorTypes).not.toContain(f);
+    }
+  }
+);

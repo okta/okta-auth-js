@@ -905,7 +905,7 @@ This is accomplished by selecting a single tab to handle the network requests to
 * [idx](#idx)
 * [myaccount](#myaccount)
 * [endpoints](#endpoints)
-  * [endpoints.autorize.enrollAuthenticator](#endpointsautorizeenrollauthenticatoroptions)
+  * [endpoints.autorize.enrollAuthenticator](#endpointsauthorizeenrollauthenticatoroptions)
 * [token](#token)
   * [token.getWithoutPrompt](#tokengetwithoutpromptoptions)
   * [token.getWithPopup](#tokengetwithpopupoptions)
@@ -1189,7 +1189,7 @@ if (authClient.isLoginRedirect()) {
 ### `handleLoginRedirect(tokens?, originalUri?)`
 
 > :link: web browser only <br>
-> :hourglass: async
+> :hourglass: async <br>
 > :warning: Deprecated, this method could be removed in next major release, use [sdk.handleRedirect](#handleredirectoriginaluri) instead.
 
 Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options). By default, [originalUri](#getoriginaluristate) will be retrieved from storage, but this can be overridden by passing a value fro `originalUri` to this function in the 2nd parameter.
@@ -1201,10 +1201,10 @@ Stores passed in tokens or tokens from redirect url into storage, then redirect 
 > :link: web browser only <br>
 > :hourglass: async
 
-Handle a redirect to the configured [redirectUri](#configuration-options) that happens on the end of [login](#signInWithRedirectoptions) flow, [enroll authenticator](#endpointsautorizeenrollauthenticatoroptions) flow or on an error.  
+Handle a redirect to the configured [redirectUri](#configuration-options) that happens on the end of [login](#signInWithRedirectoptions) flow, [enroll authenticator](#endpointsauthorizeenrollauthenticatoroptions) flow or on an error.  
 Stores tokens from redirect url into storage (for login flow), then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options). By default, [originalUri](#getoriginaluristate) will be retrieved from storage, but this can be overridden by specifying `originalUri` in the first parameter to this function.
 
-> **Note:** `handleRedirect` throws `OAuthError` or `AuthSdkError` in case there are errors during token retrieval or building URL to enroll authenticator.
+> **Note:** `handleRedirect` throws `OAuthError` or `AuthSdkError` in case there are errors during token retrieval or authenticator enrollment.
 
 ### `setHeaders()`
 
@@ -1252,7 +1252,7 @@ See [authn API](docs/authn.md#sessionsetcookieandredirectsessiontoken-redirectur
 #### `session.exists()`
 
 > :link: web browser only <br>
-> :warning: This method requires access to [third party cookies] <br>(#third-party-cookies)
+> :warning: This method requires access to [third party cookies](#third-party-cookies) <br>
 > :hourglass: async
 
 Returns a promise that resolves with `true` if there is an existing Okta [session](https://developer.okta.com/docs/api/resources/sessions#example), or `false` if not.
@@ -1271,7 +1271,7 @@ authClient.session.exists()
 #### `session.get()`
 
 > :link: web browser only <br>
-> :warning: This method requires access to [third party cookies] <br>(#third-party-cookies)
+> :warning: This method requires access to [third party cookies](#third-party-cookies) <br>
 > :hourglass: async
 
 Gets the active [session](https://developer.okta.com/docs/api/resources/sessions#example).
@@ -1289,7 +1289,7 @@ authClient.session.get()
 #### `session.refresh()`
 
 > :link: web browser only <br>
-> :warning: This method requires access to [third party cookies] <br>(#third-party-cookies)
+> :warning: This method requires access to [third party cookies](#third-party-cookies) <br>
 > :hourglass: async
 
 Refresh the current session by extending its lifetime. This can be used as a keep-alive operation.
@@ -1328,10 +1328,10 @@ The following configuration options can be included in `token.getWithoutPrompt`,
 | `idp` | Identity provider to use if there is no Okta Session. |
 | `idpScope` | A space delimited list of scopes to be provided to the Social Identity Provider when performing [Social Login][social-login] These scopes are used in addition to the scopes already configured on the Identity Provider. |
 | `display` | The display parameter to be passed to the Social Identity Provider when performing [Social Login][social-login]. |
-| `prompt` | Determines whether the Okta login will be displayed on failure. Use `none` to prevent this behavior. Valid values: `none`, `consent`, `login`, or `consent login`. See [Parameter details](https://developer.okta.com/docs/reference/api/oidc/#parameter-details) for more information.  Special value `enroll_authenticator` is used for [enrollAuthenticator](#endpointsautorizeenrollauthenticatoroptions). |
+| `prompt` | Determines whether the Okta login will be displayed on failure. Use `none` to prevent this behavior. Valid values: `none`, `consent`, `login`, or `consent login`. See [Parameter details](https://developer.okta.com/docs/reference/api/oidc/#parameter-details) for more information.  Special value `enroll_authenticator` is used for [enrollAuthenticator](#endpointsauthorizeenrollauthenticatoroptions). |
 | `maxAge` | Allowable elapsed time, in seconds, since the last time the end user was actively authenticated by Okta. |
 | `acrValues` | [[EA][early-access]] Optional parameter to increase the level of user assurance. See [Predefined ACR values](https://developer.okta.com/docs/guides/step-up-authentication/main/#predefined-parameter-values) for more information. |
-| `enrollAmrValues` | [[EA][early-access]] List of [authentication methods](https://self-issued.info/docs/draft-jones-oauth-amr-values-00.html) used to enroll authenticators with [enrollAuthenticator](#endpointsautorizeenrollauthenticatoroptions) |
+| `enrollAmrValues` | [[EA][early-access]] List of [authentication methods](https://self-issued.info/docs/draft-jones-oauth-amr-values-00.html) used to enroll authenticators with [enrollAuthenticator](#endpointsauthorizeenrollauthenticatoroptions) |
 | `loginHint` | A username to prepopulate if prompting for authentication. |
 
 For more details, see Okta's [Authorize Request API](https://developer.okta.com/docs/api/resources/oidc#request-parameters).
@@ -1348,32 +1348,39 @@ Enroll authenticators using a redirect to [authorizeUrl](#authorizeurl) with spe
 
   Options that will be overridden: `responseType: 'none', prompt: 'enroll_authenticator'`.
 
-  ##### `options.enrollAmrValues` - list of [authentication methods](https://self-issued.info/docs/draft-jones-oauth-amr-values-00.html).
+  Required options:
 
-  List of AMR values:
-  | AMR Value     | Authenticator        |
-  | ------------- | -------------------- |
-  | `pwd`         | Okta Password        |
-  | `kba`         | Security question    |
-  | `email`       | Okta Email           |
-  | `sms`         | SMS                  |
-  | `tel`         | Voice call           |
-  | `duo`         | DUO                  |
-  | `symantec`    | Symantec VIP         |
-  | `google_otp`  | Google Authenticator |
-  | `okta_verify` | Okta Verify          |
-  | `pop`         | WebAuthn             |
-  | `oath_otp`    | On-Prem MFA          |
-  | `rsa`         | RSA SecurID          |
-  | `yubikey`     | Yubikey              |
-  | `otp`         | Custom HOTP          |
-  | `fed`         | External IdP         |
-  | `sc`          | SmartCard/PIV        |
+  * `enrollAmrValues` - list of [authentication methods](https://self-issued.info/docs/draft-jones-oauth-amr-values-00.html).
+
+    List of AMR values:
+    | AMR Value     | Authenticator        |
+    | ------------- | -------------------- |
+    | `pwd`         | Okta Password        |
+    | `kba`         | Security question    |
+    | `email`       | Okta Email           |
+    | `sms`         | SMS                  |
+    | `tel`         | Voice call           |
+    | `duo`         | DUO                  |
+    | `symantec`    | Symantec VIP         |
+    | `google_otp`  | Google Authenticator |
+    | `okta_verify` | Okta Verify          |
+    | `pop`         | WebAuthn             |
+    | `oath_otp`    | On-Prem MFA          |
+    | `rsa`         | RSA SecurID          |
+    | `yubikey`     | Yubikey              |
+    | `otp`         | Custom HOTP          |
+    | `fed`         | External IdP         |
+    | `sc`          | SmartCard/PIV        |
+
+  * `acrValues` - should equal `urn:okta:2fa:any:ifpossible`
+
+##### Example
 
 ```javascript
 try {
   authClient.endpoints.authorize.enrollAuthenticator({
-    enrollAmrValues: ['okta_verify']
+    enrollAmrValues: ['okta_verify'],
+    acrValues: 'urn:okta:2fa:any:ifpossible'
   })
 } catch(err) {
   // handle AuthSdkError
@@ -1537,7 +1544,7 @@ console.log(decodedToken.header, decodedToken.payload, decodedToken.signature);
 
 #### `token.renew(tokenToRenew)`
 
-> :warning: This method requires access to [third party cookies](#third-party-cookies)
+> :warning: This method requires access to [third party cookies](#third-party-cookies) <br>
 > :hourglass: async
 
 Returns a new token if the Okta [session](https://developer.okta.com/docs/api/resources/sessions#example) is still valid.

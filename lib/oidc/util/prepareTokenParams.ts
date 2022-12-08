@@ -87,9 +87,10 @@ export async function prepareTokenParams(
   const defaults = getDefaultTokenParams(sdk);
   tokenParams = { ...defaults, ...tokenParams };
 
-  if (tokenParams.pkce) {
-    tokenParams = await preparePKCE(sdk, tokenParams);
+  if (tokenParams.pkce === false) {
+    // Implicit flow or authorization_code without PKCE
+    return tokenParams;
   }
 
-  return tokenParams;
+  return preparePKCE(sdk, tokenParams);
 }

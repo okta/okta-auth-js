@@ -35,7 +35,6 @@ export interface TokenParams extends CustomUrls {
   state?: string;
   nonce?: string;
   scopes?: string[];
-  acrValues?: string;
   enrollAmrValues?: string | string[];
   display?: string;
   ignoreSignature?: boolean;
@@ -70,6 +69,7 @@ export interface TokenManagerOptions {
 
 export interface EnrollAuthenticatorOptions extends TokenParams {
   enrollAmrValues: string | string[];
+  acrValues: string;
 }
 
 export interface SigninWithRedirectOptions extends TokenParams {

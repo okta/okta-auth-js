@@ -23,20 +23,21 @@ function prepareParams(
     // forced params:
     responseType: 'none',
     prompt: 'enroll_authenticator',
+    maxAge: 0,
   };
 
   if (!params.enrollAmrValues) {
     throw new AuthSdkError('enroll_amr_values must be specified');
   }
+  if (!params.acrValues) {
+    // `acr_values` is required and should equal 'urn:okta:2fa:any:ifpossible'
+    // But this can be changed in future
+    throw new AuthSdkError('acr_values must be specified');
+  }
 
-  // scope, nonce must be omitted
+  // `scope`, `nonce` must be omitted
   delete params.scopes;
   delete params.nonce;
-
-  // maxAge is not supported
-  if (params.maxAge && params.maxAge > 0) {
-    delete params.maxAge;
-  }
 
   return params;
 }

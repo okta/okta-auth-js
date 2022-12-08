@@ -25,6 +25,8 @@ jest.mock('../../../../lib/features', () => {
 import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import { prepareEnrollAuthenticatorParams }  from '../../../../lib/oidc';
 
+const DEFAULT_ACR_VALUES = 'urn:okta:2fa:any:ifpossible';
+
 describe('prepareEnrollAuthenticatorParams', function() {
   it('throws an error if enrollAmrValues not specified', () => {
     const sdk = new OktaAuth({
@@ -33,7 +35,8 @@ describe('prepareEnrollAuthenticatorParams', function() {
     let errorThrown = false;
     try {
       prepareEnrollAuthenticatorParams(sdk, {
-        enrollAmrValues: ''
+        enrollAmrValues: '',
+        acrValues: DEFAULT_ACR_VALUES,
       });
     } catch (err) {
       errorThrown = true;
@@ -43,12 +46,31 @@ describe('prepareEnrollAuthenticatorParams', function() {
     expect(errorThrown).toBe(true);
   });
 
+  it('throws an error if acrValues not specified', () => {
+    const sdk = new OktaAuth({
+      issuer: 'https://foo.com'
+    });
+    let errorThrown = false;
+    try {
+      prepareEnrollAuthenticatorParams(sdk, {
+        enrollAmrValues: 'foo',
+        acrValues: '',
+      });
+    } catch (err) {
+      errorThrown = true;
+      expect(err).toBeInstanceOf(AuthSdkError);
+      expect((err as AuthSdkError).message).toEqual('acr_values must be specified');
+    }
+    expect(errorThrown).toBe(true);
+  });
+
   it('sets responseType to none', () => {
     const sdk = new OktaAuth({
       issuer: 'https://foo.com'
     });
     const params = prepareEnrollAuthenticatorParams(sdk, {
-      enrollAmrValues: ['a']
+      enrollAmrValues: ['a'],
+      acrValues: DEFAULT_ACR_VALUES,
     });
     expect(params.responseType).toBe('none');
   });
@@ -59,7 +81,8 @@ describe('prepareEnrollAuthenticatorParams', function() {
     });
     const params = prepareEnrollAuthenticatorParams(sdk, {
       responseType: 'token',
-      enrollAmrValues: ['a']
+      enrollAmrValues: ['a'],
+      acrValues: DEFAULT_ACR_VALUES,
     });
     expect(params.responseType).toBe('none');
   });
@@ -69,7 +92,8 @@ describe('prepareEnrollAuthenticatorParams', function() {
       issuer: 'https://foo.com'
     });
     const params = prepareEnrollAuthenticatorParams(sdk, {
-      enrollAmrValues: ['a']
+      enrollAmrValues: ['a'],
+      acrValues: DEFAULT_ACR_VALUES,
     });
     expect(params.prompt).toBe('enroll_authenticator');
   });
@@ -80,7 +104,8 @@ describe('prepareEnrollAuthenticatorParams', function() {
     });
     const params = prepareEnrollAuthenticatorParams(sdk, {
       prompt: 'login',
-      enrollAmrValues: ['a']
+      enrollAmrValues: ['a'],
+      acrValues: DEFAULT_ACR_VALUES,
     });
     expect(params.prompt).toBe('enroll_authenticator');
   });
@@ -92,7 +117,8 @@ describe('prepareEnrollAuthenticatorParams', function() {
     });
     spyOn(mocked.features, 'isPKCESupported').and.returnValue(true);
     const params = prepareEnrollAuthenticatorParams(sdk, {
-      enrollAmrValues: ['a']
+      enrollAmrValues: ['a'],
+      acrValues: DEFAULT_ACR_VALUES,
     });
     expect(params.codeVerifier).toBe(undefined);
     expect(params.codeChallenge).toBe(undefined);
@@ -106,23 +132,37 @@ describe('prepareEnrollAuthenticatorParams', function() {
     });
     const params = prepareEnrollAuthenticatorParams(sdk, {
       enrollAmrValues: ['a'],
+      acrValues: DEFAULT_ACR_VALUES,
     });
-    expect(params.acrValues).toBe(undefined);
+    expect(params.acrValues).toBe(DEFAULT_ACR_VALUES);
   });
 
-  it('removes scopes, nonce, maxAge', () => {
+  it('removes scopes, nonce', () => {
     const sdk = new OktaAuth({
       issuer: 'https://foo.com'
     });
     const params = prepareEnrollAuthenticatorParams(sdk, {
       enrollAmrValues: ['a'],
+      acrValues: DEFAULT_ACR_VALUES,
       scopes: ['openid','email'],
       nonce: 'fake-nonce',
       maxAge: 100,
     });
     expect(params.scopes).toBe(undefined);
     expect(params.nonce).toBe(undefined);
-    expect(params.maxAge).toBe(undefined);
+    expect(params.maxAge).toBe(0);
+  });
+
+  it('overrides maxAge with 0', () => {
+    const sdk = new OktaAuth({
+      issuer: 'https://foo.com'
+    });
+    const params = prepareEnrollAuthenticatorParams(sdk, {
+      enrollAmrValues: ['a'],
+      acrValues: DEFAULT_ACR_VALUES,
+      maxAge: 100,
+    });
+    expect(params.maxAge).toBe(0);
   });
 
   // Note:

@@ -12,12 +12,7 @@
 
 import { JWTObject } from './JWT';
 import { OAuthTransactionMeta, PKCETransactionMeta } from './meta';
-import {
-  CustomUrls, 
-  OktaAuthOAuthOptions, 
-  SigninWithRedirectOptions, 
-  TokenParams
-} from './options';
+import { CustomUrls, OktaAuthOAuthOptions, SigninWithRedirectOptions, TokenParams } from './options';
 import { OAuthResponseType } from './proto';
 import { OAuthStorageManagerInterface } from './storage';
 import { AccessToken, IDToken, RefreshToken, RevocableToken, Token, Tokens } from './Token';

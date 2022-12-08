@@ -44,6 +44,8 @@ class OktaLogin {
   get verifyBtn() { return $('form[data-se="o-form"] input[type=submit][value=Verify]'); }
   get authenticatorsList() { return $('form[data-se="o-form"] .authenticator-list'); }
   get authenticatorEmail() { return $('form[data-se="o-form"] .authenticator-list [data-se="okta_email"] .select-factor'); }
+  get authenticatorSecurityQuestion() { return $('form[data-se="o-form"] .authenticator-list [data-se="security_question"] .select-factor'); }
+  get securityQuestionAnswer() { return $('form[data-se="o-form"] input[name="credentials.answer"]'); }
 
   async signin(username, password) {
     await this.waitForLoad();
@@ -83,7 +85,14 @@ class OktaLogin {
     (await this.authenticatorEmail).click();
   }
 
-  async clickVerifyEmail() {
+  async selectSecurityQuestionAuthenticator() {
+    await browser.waitUntil(async () => {
+      return (await this.authenticatorSecurityQuestion).isDisplayed();
+    }, 5000, 'wait for email authenticator in list');
+    (await this.authenticatorSecurityQuestion).click();
+  }
+
+  async clickVerify() {
     await browser.waitUntil(async () => {
       return (await this.verifyBtn).isDisplayed();
     }, 5000, 'wait for verify btn');
@@ -111,6 +120,13 @@ class OktaLogin {
       return (await this.code).isDisplayed();
     }, 5000, 'wait for verify code input');
     (await this.code).setValue(code);
+  }
+
+  async enterAnswer(answer) {
+    await browser.waitUntil(async () => {
+      return (await this.securityQuestionAnswer).isDisplayed();
+    }, 5000, 'wait for security question answer');
+    (await this.securityQuestionAnswer).setValue(answer);
   }
 
   async waitForLoad() {

@@ -57,7 +57,7 @@ export function convertTokenParamsToOAuthParams(tokenParams: TokenParams) {
   if (tokenParams.responseType!.indexOf('id_token') !== -1 &&
     tokenParams.scopes!.indexOf('openid') === -1) {
     throw new AuthSdkError('openid scope must be specified in the scopes argument when requesting an id_token');
-  } else if (tokenParams.responseType! !== 'none') {
+  } else if (tokenParams.scopes) {
     oauthParams.scope = tokenParams.scopes!.join(' ');
   }
 
