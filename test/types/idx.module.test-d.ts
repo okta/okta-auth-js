@@ -19,7 +19,8 @@ import {
   OktaAuthIdxOptions,
   IdxStorageManagerInterface,
   IdxAPI,
-  TokenAPI
+  TokenAPI,
+  WebauthnAPI
 } from '@okta/okta-auth-js/idx';
 import { expectType, expectAssignable, expectError } from 'tsd';
 
@@ -41,3 +42,6 @@ expectType<IdxStorageManagerInterface>(authClient.storageManager);
 
 // does not include Authn
 expectError<undefined>(authClient.authn);
+
+// has Webauthn
+expectType<WebauthnAPI>(OktaAuth.webauthn);

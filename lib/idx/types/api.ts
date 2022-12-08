@@ -31,6 +31,8 @@ import {
   IdxActionParams,
   IdpConfig,
   IdxToPersist,
+  ChallengeData,
+  ActivationData,
 } from './idx-js';
 import {
   AccountUnlockOptions,
@@ -47,6 +49,11 @@ import {
 } from './options';
 import { IdxTransactionMeta } from './meta';
 import { IdxStorageManagerInterface, SavedIdxResponse } from './storage';
+import type {
+  WebauthnEnrollValues,
+  WebauthnVerificationValues
+} from '../authenticator';
+import { OktaAuthConstructor } from '../../base/types';
 
 export enum IdxStatus {
   SUCCESS = 'SUCCESS',
@@ -217,6 +224,17 @@ export interface IdxTransactionManagerInterface extends TransactionManagerInterf
 
 export type IdxTransactionManagerConstructor = TransactionManagerConstructor<IdxTransactionManagerInterface>;
 
+export interface WebauthnAPI {
+  getAssertion(credential: PublicKeyCredential): WebauthnVerificationValues;
+  getAttestation(credential: PublicKeyCredential): WebauthnEnrollValues;
+  buildCredentialRequestOptions(
+    challengeData: ChallengeData, authenticatorEnrollments: IdxAuthenticator[]
+  ): CredentialRequestOptions;
+  buildCredentialCreationOptions(
+    activationData: ActivationData, authenticatorEnrollments: IdxAuthenticator[]
+  ): CredentialCreationOptions;
+}
+
 export interface OktaAuthIdxInterface
 <
   M extends IdxTransactionMeta = IdxTransactionMeta,
@@ -228,3 +246,14 @@ export interface OktaAuthIdxInterface
 {
   idx: IdxAPI;
 }
+
+export interface OktaAuthIdxConstructor
+<
+  I extends OktaAuthIdxInterface = OktaAuthIdxInterface
+>
+ extends OktaAuthConstructor<I>
+{
+  new(...args: any[]): I;
+  webauthn: WebauthnAPI;
+}
+
