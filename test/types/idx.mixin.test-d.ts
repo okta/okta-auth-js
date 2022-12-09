@@ -36,7 +36,8 @@ import {
   OktaAuthOauthOptionsConstructor,
   OAuthStorageManagerConstructor,
   createOktaAuthCore,
-  AuthStateManagerInterface
+  AuthStateManagerInterface,
+  WebauthnAPI
 } from '@okta/okta-auth-js';
 
 import { expectType, expectAssignable, expectError } from 'tsd';
@@ -66,6 +67,9 @@ const OAuthBaseWithIdxStorage = createOktaAuthOAuth(IdxStorageManager, IdxOption
 // Add IDX
 const OktaAuthWithIdx = mixinIdx(OAuthBaseWithIdxStorage);
 const idxClient = new OktaAuthWithIdx();
+
+// has Webauthn
+expectType<WebauthnAPI>(OktaAuthWithIdx.webauthn);
 
 // has IDX
 expectType<OktaAuthIdxOptions>(idxClient.options);

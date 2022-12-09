@@ -1,10 +1,16 @@
 import { OktaAuthConstructor } from '../base/types';
 import { OktaAuthOAuthInterface } from '../oidc/types';
-import { IdxAPI, IdxTransactionManagerInterface, OktaAuthIdxInterface, OktaAuthIdxOptions } from './types';
+import {
+  IdxAPI, 
+  IdxTransactionManagerInterface, 
+  OktaAuthIdxInterface, 
+  OktaAuthIdxConstructor, 
+  OktaAuthIdxOptions, 
+  WebauthnAPI
+} from './types';
 import { IdxTransactionMeta } from './types/meta';
 import { IdxStorageManagerInterface } from './types/storage';
 import { createIdxAPI } from './factory/api';
-import { WebauthnAPI } from './webauthn';
 import * as webauthn from './webauthn';
 
 export function mixinIdx
@@ -16,7 +22,7 @@ export function mixinIdx
   TBase extends OktaAuthConstructor<OktaAuthOAuthInterface<M, S, O, TM>>
     = OktaAuthConstructor<OktaAuthOAuthInterface<M, S, O, TM>>
 >
-(Base: TBase): TBase & OktaAuthConstructor<OktaAuthIdxInterface<M, S, O, TM>>
+(Base: TBase): TBase & OktaAuthIdxConstructor<OktaAuthIdxInterface<M, S, O, TM>>
 {
   return class OktaAuthIdx extends Base implements OktaAuthIdxInterface<M, S, O, TM>
   {

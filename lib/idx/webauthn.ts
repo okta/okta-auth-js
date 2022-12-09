@@ -15,21 +15,7 @@ import {
   ActivationData,
   ChallengeData,
   IdxAuthenticator,
-  WebauthnEnrollValues,
-  WebauthnVerificationValues
 } from './types';
-
-
-export interface WebauthnAPI {
-  getAssertion(credential: PublicKeyCredential): WebauthnVerificationValues;
-  getAttestation(credential: PublicKeyCredential): WebauthnEnrollValues;
-  buildCredentialRequestOptions(
-    challengeData: ChallengeData, authenticatorEnrollments: IdxAuthenticator[]
-  ): CredentialRequestOptions;
-  buildCredentialCreationOptions(
-    activationData: ActivationData, authenticatorEnrollments: IdxAuthenticator[]
-  ): CredentialCreationOptions;
-}
 
 
 // Get known credentials from list of enrolled authenticators
