@@ -21,19 +21,23 @@ const mocked = {
 
 describe('getWithRedirect', () => {
   let testContext;
+  let originalLocation;
   beforeEach(() => {
+    originalLocation = global.window.location;
+    delete (global.window as any).location;
+    global.window.location = {
+      protocol: 'https:',
+      hostname: 'somesite.local',
+      href: 'https://somesite.local',
+      assign: jest.fn()
+    } as unknown as Location;
+
     const sdk = {
       options: {
-
       },
       getOriginalUri: () => {},
       transactionManager: {
         save: () => {}
-      },
-      token: {
-        getWithRedirect: {
-          _setLocation: () => {}
-        }
       }
     };
     const tokenParams = {
@@ -57,6 +61,10 @@ describe('getWithRedirect', () => {
     jest.spyOn(mocked.util, 'getOAuthUrls').mockReturnValue(testContext.urls);
     jest.spyOn(mocked.authorize, 'buildAuthorizeParams').mockReturnValue(testContext.authorizeParams);
     jest.spyOn(mocked.util, 'createOAuthMeta').mockReturnValue(testContext.meta);
+  });
+
+  afterEach(() => {
+    global.window.location = originalLocation;
   });
 
   it('throws an error if more than 2 parameters are passed', async () => {
@@ -83,13 +91,19 @@ describe('getWithRedirect', () => {
 
   });
 
-
-  it('redirects to the authorize endpoint', async () => {
+  it('redirects to the authorize endpoint with options.setLocation', async () => {
     const { sdk, tokenParams } = testContext;
-    jest.spyOn(sdk.token.getWithRedirect, '_setLocation');
+    sdk.options.setLocation = jest.fn();
     await getWithRedirect(sdk, {});
     expect(mocked.authorize.buildAuthorizeParams).toHaveBeenCalledWith(tokenParams);
-    expect(sdk.token.getWithRedirect._setLocation).toHaveBeenCalledWith('http://fake-authorize?fake=true');
+    expect(sdk.options.setLocation).toHaveBeenCalledWith('http://fake-authorize?fake=true');
+  });
+
+  it('redirects to the authorize endpoint with window.location.assign if options.setLocation is not set', async () => {
+    const { sdk, tokenParams } = testContext;
+    await getWithRedirect(sdk, {});
+    expect(mocked.authorize.buildAuthorizeParams).toHaveBeenCalledWith(tokenParams);
+    expect(window.location.assign).toHaveBeenCalledWith('http://fake-authorize?fake=true');
   });
 
 });

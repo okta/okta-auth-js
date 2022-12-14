@@ -19,7 +19,8 @@ const config = [
     ],
     features: [
       'login.feature',
-      'acr-values.feature'
+      'acr-values.feature',
+      'enroll-authenticator.feature',
     ]
   },
   {

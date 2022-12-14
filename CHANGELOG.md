@@ -5,6 +5,7 @@
 ### Features
 
 - [#1333](https://github.com/okta/okta-auth-js/pull/1333) Adds support for MyAccount API password methods
+- [#1324](https://github.com/okta/okta-auth-js/pull/1324) Adds `endpoints.authorize.enrollAuthenticator`. Adds `handleRedirect` and deprecates `handleLoginRedirect`.
 
 ### Fixes
 

@@ -32,6 +32,7 @@ export interface OAuthParams {
   code?: string;
   interaction_code?: string;
   acr_values?: string;
+  enroll_amr_values?: string | string[];
 }
 
 export interface OAuthResponse {

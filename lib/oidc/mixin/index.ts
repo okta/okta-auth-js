@@ -25,9 +25,10 @@ import {
   TransactionManagerInterface,
   TransactionManagerConstructor,
   UserClaims,
+  Endpoints,
 } from '../types';
 import PKCE from '../util/pkce';
-import { createTokenAPI } from '../factory';
+import { createEndpoints, createTokenAPI } from '../factory';
 import { TokenManager } from '../TokenManager';
 import { getOAuthUrls, isLoginRedirect } from '../util';
 
@@ -56,6 +57,7 @@ export function mixinOAuth
     tokenManager: TokenManager;
     transactionManager: TM;
     pkce: PkceAPI;
+    endpoints: Endpoints;
 
     _pending: { handleLogin: boolean };
     _tokenQueue: PromiseQueue;
@@ -81,6 +83,8 @@ export function mixinOAuth
 
       // TokenManager
       this.tokenManager = new TokenManager(this, this.options.tokenManager);
+
+      this.endpoints = createEndpoints(this);
     }
 
     // inherited from subclass
@@ -180,15 +184,16 @@ export function mixinOAuth
      * Store parsed tokens from redirect url
      */
     async storeTokensFromRedirect(): Promise<void> {
-      const { tokens } = await this.token.parseFromUrl();
-      this.tokenManager.setTokens(tokens);
+      const { tokens, responseType } = await this.token.parseFromUrl();
+      if (responseType !== 'none') {
+        this.tokenManager.setTokens(tokens);
+      }
     }
   
     isLoginRedirect(): boolean {
       return isLoginRedirect(this);
     }
 
-  
     isPKCE(): boolean {
       return !!this.options.pkce;
     }

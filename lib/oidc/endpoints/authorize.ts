@@ -44,10 +44,11 @@ export function convertTokenParamsToOAuthParams(tokenParams: TokenParams) {
     'sessionToken': tokenParams.sessionToken,
     'state': tokenParams.state,
     'acr_values': tokenParams.acrValues,
+    'enroll_amr_values': tokenParams.enrollAmrValues,
   };
   oauthParams = removeNils(oauthParams) as OAuthParams;
 
-  ['idp_scope', 'response_type'].forEach(function (mayBeArray) {
+  ['idp_scope', 'response_type', 'enroll_amr_values'].forEach(function (mayBeArray) {
     if (Array.isArray(oauthParams[mayBeArray])) {
       oauthParams[mayBeArray] = oauthParams[mayBeArray].join(' ');
     }
@@ -56,7 +57,7 @@ export function convertTokenParamsToOAuthParams(tokenParams: TokenParams) {
   if (tokenParams.responseType!.indexOf('id_token') !== -1 &&
     tokenParams.scopes!.indexOf('openid') === -1) {
     throw new AuthSdkError('openid scope must be specified in the scopes argument when requesting an id_token');
-  } else {
+  } else if (tokenParams.scopes) {
     oauthParams.scope = tokenParams.scopes!.join(' ');
   }
 

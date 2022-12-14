@@ -36,6 +36,7 @@ class TestApp {
   get sessionExpired() { return $('#session-expired'); }
   get testConcurrentGetTokenBtn() { return $('#test-concurrent-get-token'); }
   get loginWithAcrBtn() { return $('#login-acr'); }
+  get enrollAuthenticator() { return $('#enroll-authenticator'); }
 
   get tokenError() { return $('#token-error'); }
   get tokenMsg() { return $('#token-msg'); }
@@ -60,6 +61,7 @@ class TestApp {
   get issuer() { return $('#f_issuer'); }
   get interactionCodeOption() { return $('#f_useInteractionCodeFlow-on'); }
   get acrValues() { return $('#f_acrValues'); }
+  get enrollAmrValues() { return $('#f_enroll_amr_values'); }
   get submit() { return $('#f_submit'); }
 
   // Callback
@@ -86,7 +88,11 @@ class TestApp {
   
   async open(queryObj, openInNewWindow) {
     const qs = toQueryString(queryObj);
-    await openInNewWindow ? browser.newWindow(qs, { windowFeatures: 'noopener=yes' }) : browser.url(qs);
+    if (openInNewWindow) {
+      await browser.newWindow(qs, { windowFeatures: 'noopener=yes' });
+    } else {
+      await browser.url('/' + qs);
+    }
     await browser.waitUntil(async () => this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
   }
 

@@ -16,16 +16,11 @@ describe('oauthMeta', () => {
   beforeEach(() => {
     const sdk = {
       options: {
-
+        setLocation: () => {}
       },
       getOriginalUri: () => {},
       transactionManager: {
         save: () => {}
-      },
-      token: {
-        getWithRedirect: {
-          _setLocation: () => {}
-        }
       }
     };
     const tokenParams = {
@@ -72,6 +67,7 @@ describe('oauthMeta', () => {
       codeChallenge: 'efgh',
       codeChallengeMethod: 'fake',
       acrValues: 'foo',
+      enrollAmrValues: ['a', 'b']
     });
 
     const meta = createOAuthMeta(sdk, tokenParams);

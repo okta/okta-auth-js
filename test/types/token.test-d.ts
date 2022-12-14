@@ -18,6 +18,7 @@ import {
   Tokens,
   UserClaims,
   TokenParams,
+  EnrollAuthenticatorOptions,
   TokenResponse,
   JWTObject,
   RefreshToken,
@@ -64,6 +65,8 @@ const refreshTokenExample = {
 };
 expectAssignable<RefreshToken>(refreshTokenExample);
 
+const DEFAULT_ACR_VALUES = 'urn:okta:2fa:any:ifpossible';
+
 const tokens = {
   accessToken: accessTokenExample,
   idToken: idTokenExample,
@@ -85,6 +88,33 @@ const tokens = {
   expectType<TokenResponse>(await authClient.token.getWithPopup(authorizeOptions));
   expectType<void>(await authClient.token.getWithRedirect(authorizeOptions));
   expectType<TokenResponse>(await authClient.token.parseFromUrl());
+
+  const enrollAuthenticatorOptons: EnrollAuthenticatorOptions = {
+    enrollAmrValues: ['email', 'kba'],
+    acrValues: DEFAULT_ACR_VALUES
+  };
+  const enrollAuthenticatorOptons2: EnrollAuthenticatorOptions = {
+    enrollAmrValues: 'email',
+    acrValues: DEFAULT_ACR_VALUES,
+    responseType: 'none'
+  };
+  expectType<void>(await authClient.endpoints.authorize.enrollAuthenticator(enrollAuthenticatorOptons));
+  expectType<void>(await authClient.endpoints.authorize.enrollAuthenticator(enrollAuthenticatorOptons2));
+  expectError(async () => {
+    // missing acrValues
+    await authClient.endpoints.authorize.enrollAuthenticator({
+      enrollAmrValues: ['email', 'kba'],
+    });
+  });
+  expectError(async () => {
+    // missing enrollAmrValues
+    await authClient.endpoints.authorize.enrollAuthenticator({
+      acrValues: DEFAULT_ACR_VALUES
+    });
+  });
+  expectError(async () => {
+    await authClient.endpoints.authorize.enrollAuthenticator();
+  });
 
   const customUrls = {
     issuer: 'https://{yourOktaDomain}/oauth2/{authorizationServerId}',

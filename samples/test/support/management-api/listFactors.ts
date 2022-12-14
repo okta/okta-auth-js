@@ -6,25 +6,28 @@
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *
+ * 
  * See the License for the specific language governing permissions and limitations under the License.
- *
  */
 
 
-export * from './browser';
-export * from './defaultTokenParams';
-export * from './defaultEnrollAuthenticatorParams';
-export * from './errors';
-export * from './loginRedirect';
-export * from './oauth';
-export * from './oauthMeta';
-export * from './enrollAuthenticatorMeta';
-import pkce from './pkce';
-export { pkce };
-export * from './prepareTokenParams';
-export * from './prepareEnrollAuthenticatorParams';
-export * from './refreshToken';
-export * from './urlParams';
-export * from './validateClaims';
-export * from './validateToken';
+import { UserFactor } from '@okta/okta-sdk-nodejs';
+import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
+
+type Options = {
+  userId: string;
+};
+
+export default async function(config: OktaClientConfig, options: Options) {
+  const client = getOktaClient(config);
+  const factors = await client.listFactors(options.userId);
+
+  const factorTypes = [];
+  for await (let f of factors) {
+    if (f) {
+      factorTypes.push((f as UserFactor).factorType);
+    }
+  }
+
+  return factorTypes;
+}

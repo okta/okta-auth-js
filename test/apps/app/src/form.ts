@@ -64,6 +64,9 @@ const Form = `
   </select>
   </div>
   <div class="pure-control-group">
+  <label for="enrollAmrValues">Enroll AMR values (coma separated)</label><input id="f_enroll_amr_values" name="enrollAmrValues" type="text" />
+  </div>
+  <div class="pure-control-group">
   <label for="postLogoutRedirectUri">Post Logout Redirect URI</label><input id="f_postLogoutRedirectUri" name="postLogoutRedirectUri" type="text" />
   </div>
   <div class="pure-control-group">
@@ -153,6 +156,7 @@ export function updateForm(origConfig: Config): void {
   (document.getElementById('f_responseType') as HTMLInputElement).value = config.responseType.join(',');
   (document.getElementById('f_scopes') as HTMLInputElement).value = config.scopes.join(',');
   (document.getElementById('f_acrValues') as HTMLInputElement).value = config.acrValues || '';
+  (document.getElementById('f_enroll_amr_values') as HTMLInputElement).value = (config.enrollAmrValues || []).join(',');
   (document.getElementById('f_postLogoutRedirectUri') as HTMLInputElement).value = config.postLogoutRedirectUri;
   (document.getElementById('f_clientId') as HTMLInputElement).value = config.clientId;
   (document.getElementById('f_clientSecret') as HTMLInputElement).value = config.clientSecret;

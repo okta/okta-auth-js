@@ -13,12 +13,14 @@
 import { JWTObject } from './JWT';
 import { OAuthTransactionMeta, PKCETransactionMeta } from './meta';
 import { CustomUrls, OktaAuthOAuthOptions, SigninWithRedirectOptions, TokenParams } from './options';
+import { OAuthResponseType } from './proto';
 import { OAuthStorageManagerInterface } from './storage';
 import { AccessToken, IDToken, RefreshToken, RevocableToken, Token, Tokens } from './Token';
 import { TokenManagerInterface } from './TokenManager';
 import { CustomUserClaims, UserClaims } from './UserClaims';
 import { TransactionManagerInterface } from './TransactionManager';
 import { OktaAuthSessionInterface } from '../../session/types';
+import { Endpoints } from './endpoints';
 
 export interface PopupParams {
   popupTitle?: string;
@@ -29,6 +31,7 @@ export interface TokenResponse {
   tokens: Tokens;
   state: string;
   code?: string;
+  responseType?: OAuthResponseType | OAuthResponseType[] | 'none';
 }
 
 export interface ParseFromUrlOptions {
@@ -48,10 +51,6 @@ export type GetWithRedirectFunction = (params?: TokenParams) => Promise<void>;
 
 export type SetLocationFunction = (loc: string) => void;
 
-export interface GetWithRedirectAPI extends GetWithRedirectFunction {
-  _setLocation: SetLocationFunction;
-}
-
 export interface BaseTokenAPI {
   decode(token: string): JWTObject;
   prepareTokenParams(params?: TokenParams): Promise<TokenParams>;
@@ -63,7 +62,7 @@ export interface TokenAPI extends BaseTokenAPI {
     accessToken?: AccessToken,
     idToken?: IDToken
   ): Promise<UserClaims<S>>;
-  getWithRedirect: GetWithRedirectAPI;
+  getWithRedirect: GetWithRedirectFunction;
   parseFromUrl: ParseFromUrlInterface;
   getWithoutPrompt(params?: TokenParams): Promise<TokenResponse>;
   getWithPopup(params?: TokenParams): Promise<TokenResponse>;
@@ -134,6 +133,7 @@ export interface OktaAuthOAuthInterface
   tokenManager: TokenManagerInterface;
   pkce: PkceAPI;
   transactionManager: TM;
+  endpoints: Endpoints;
   
   isPKCE(): boolean;
   getIdToken(): string | undefined;

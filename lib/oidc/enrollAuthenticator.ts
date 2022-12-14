@@ -11,22 +11,20 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { AuthSdkError } from '../errors';
-import { OktaAuthOAuthInterface, TokenParams } from './types';
+import { OktaAuthOAuthInterface, EnrollAuthenticatorOptions } from './types';
 import { clone } from '../util';
-import { prepareTokenParams, createOAuthMeta } from './util';
+import { prepareEnrollAuthenticatorParams, createEnrollAuthenticatorMeta } from './util';
 import { buildAuthorizeParams } from './endpoints/authorize';
 
-export async function getWithRedirect(sdk: OktaAuthOAuthInterface, options?: TokenParams): Promise<void> {
-  if (arguments.length > 2) {
-    return Promise.reject(new AuthSdkError('As of version 3.0, "getWithRedirect" takes only a single set of options'));
-  }
-
+export function enrollAuthenticator(
+  sdk: OktaAuthOAuthInterface, 
+  options: EnrollAuthenticatorOptions
+): void {
   options = clone(options) || {};
 
-  const tokenParams = await prepareTokenParams(sdk, options);
-  const meta = createOAuthMeta(sdk, tokenParams);
-  const requestUrl = meta.urls.authorizeUrl + buildAuthorizeParams(tokenParams);
+  const params = prepareEnrollAuthenticatorParams(sdk, options);
+  const meta = createEnrollAuthenticatorMeta(sdk, params);
+  const requestUrl = meta.urls.authorizeUrl + buildAuthorizeParams(params);
   sdk.transactionManager.save(meta);
   if (sdk.options.setLocation) {
     sdk.options.setLocation(requestUrl);

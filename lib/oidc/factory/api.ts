@@ -26,16 +26,17 @@ import { revokeToken } from '../revokeToken';
 import {
   AccessToken,
   CustomUserClaims,
-  GetWithRedirectAPI,
   GetWithRedirectFunction,
   IDToken,
   OktaAuthOAuthInterface,
   ParseFromUrlInterface,
   TokenAPI,
-  UserClaims
+  UserClaims,
+  Endpoints,
 } from '../types';
 import { isLoginRedirect, prepareTokenParams } from '../util';
 import { verifyToken } from '../verifyToken';
+import { enrollAuthenticator } from '../enrollAuthenticator';
 
 // Factory
 export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue): TokenAPI {
@@ -44,16 +45,7 @@ export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue)
   };
 
   const getWithRedirectFn = useQueue(getWithRedirect.bind(null, sdk)) as GetWithRedirectFunction;
-  const getWithRedirectApi: GetWithRedirectAPI = Object.assign(getWithRedirectFn, {
-    // This is exposed so we can set window.location in our tests
-    _setLocation: (url) => {
-      if (sdk.options.setLocation) {
-        sdk.options.setLocation(url);
-      } else {
-        window.location = url;
-      }
-    }
-  });
+
   // eslint-disable-next-line max-len
   const parseFromUrlFn = useQueue(parseFromUrl.bind(null, sdk)) as ParseFromUrlInterface;
   const parseFromUrlApi: ParseFromUrlInterface = Object.assign(parseFromUrlFn, {
@@ -78,7 +70,7 @@ export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue)
     exchangeCodeForTokens: exchangeCodeForTokens.bind(null, sdk),
     getWithoutPrompt: getWithoutPrompt.bind(null, sdk),
     getWithPopup: getWithPopup.bind(null, sdk),
-    getWithRedirect: getWithRedirectApi,
+    getWithRedirect: getWithRedirectFn,
     parseFromUrl: parseFromUrlApi,
     decode: decodeToken,
     revoke: revokeToken.bind(null, sdk),
@@ -110,4 +102,12 @@ export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue)
   });
 
   return token;
+}
+
+export function createEndpoints(sdk: OktaAuthOAuthInterface): Endpoints {
+  return {
+    authorize: {
+      enrollAuthenticator: enrollAuthenticator.bind(null, sdk),
+    }
+  };
 }
