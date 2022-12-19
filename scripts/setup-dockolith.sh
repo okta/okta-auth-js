@@ -4,7 +4,7 @@ DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 source $DIR/setup.sh
 
 # Monolith version to test against
-DEFAULT_BUILDVERSION="2022.11.1-begin-466-g7abd4fdc8835"
+DEFAULT_BUILDVERSION="2022.12.0-begin-504-gf31d745fb1b2"
 export MONOLITH_BUILDVERSION="${MONOLITH_BUILDVERSION:-$DEFAULT_BUILDVERSION}"
 
 set +e
@@ -37,3 +37,9 @@ create_dockolith_test_org () {
   source ./scripts/monolith/create-e2e-env.sh
   finish_log_group $?
 }
+
+# https://stackoverflow.com/questions/29966449/what-is-the-bash-equivalent-to-pythons-if-name-main
+# only run this block when script is executed directly (similar to python's __name__ == 'main')
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    create_dockolith_test_org "$@"
+fi
