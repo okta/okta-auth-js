@@ -9,6 +9,49 @@ async function bootstrap() {
   const subDomain = process.env.TEST_ORG_SUBDOMAIN || 'authjs-test-' + Date.now();
   const outputFilePath = path.join(__dirname, '../../../', 'testenv.local');
 
+  const options = {
+    enableFFs: [
+      'API_ACCESS_MANAGEMENT',
+      'ENG_ENABLE_SSU_FOR_OIE',
+    ],
+    disableFFs: [
+      'REQUIRE_PKCE_FOR_OIDC_APPS'
+    ],
+    users: [
+      {
+        firstName: 'Saml',
+        lastName: 'Jackson',
+        email: 'george@acme.com',
+        password: 'Abcd1234'
+      },
+      {
+        firstName: 'Alexander',
+        lastName: 'Hamilton',
+        email: 'mary@acme.com',
+        password: 'Abcd1234'
+      }
+    ],
+    apps: [
+      {
+        label: 'AUTHJS WEB APP',
+        appType: 'web',
+        interactionCode: true
+      },
+      {
+        label: 'AUTHJS SPA APP',
+        appType: 'browser',
+        interactionCode: true,
+        refreshToken: true
+      }
+    ],
+    origins: [
+      {
+        name: 'AuthJS Test App',
+        origin: 'http://localhost:8080',
+      }
+    ]
+  };
+
   console.error(`Bootstrap starting: ${subDomain}`);
 
   const config = await dockolith.createTestOrg({
@@ -29,6 +72,16 @@ async function bootstrap() {
   await dockolith.enableOIE(orgId);
   await dockolith.activateOrgFactor(config, 'okta_email');
   await dockolith.disableStepUpForPasswordRecovery(config);
+  await dockolith.enableEmbeddedLogin(config);
+
+  // Set Feature flags
+  console.error('Setting feature flags...');
+  for (const option of options.enableFFs) {
+    await dockolith.enableFeatureFlag(config, orgId, option);
+  }
+  for (const option of options.disableFFs) {
+    await dockolith.disableFeatureFlag(config, orgId, option);
+  }
 
   // Enable interaction_code grant on the default authorization server
   const authServer = await dockolith.getDefaultAuthorizationServer(config);
@@ -77,58 +130,6 @@ async function bootstrap() {
     }
   };
   catchAll.update(spaPolicy.id);
-
-  const options = {
-    enableFFs: [
-      'API_ACCESS_MANAGEMENT',
-      'ENG_ENABLE_SSU_FOR_OIE',
-    ],
-    disableFFs: [
-      'REQUIRE_PKCE_FOR_OIDC_APPS'
-    ],
-    users: [
-      {
-        firstName: 'Saml',
-        lastName: 'Jackson',
-        email: 'george@acme.com',
-        password: 'Abcd1234'
-      },
-      {
-        firstName: 'Alexander',
-        lastName: 'Hamilton',
-        email: 'mary@acme.com',
-        password: 'Abcd1234'
-      }
-    ],
-    apps: [
-      {
-        label: 'AUTHJS WEB APP',
-        appType: 'web',
-        interactionCode: true
-      },
-      {
-        label: 'AUTHJS SPA APP',
-        appType: 'browser',
-        interactionCode: true,
-        refreshToken: true
-      }
-    ],
-    origins: [
-      {
-        name: 'AuthJS Test App',
-        origin: 'http://localhost:8080',
-      }
-    ]
-  };
-
-  // Set Feature flags
-  console.error('Setting feature flags...');
-  for (const option of options.enableFFs) {
-    await dockolith.enableFeatureFlag(config, orgId, option);
-  }
-  for (const option of options.disableFFs) {
-    await dockolith.disableFeatureFlag(config, orgId, option);
-  }
 
   // Add Trusted origins
   for (const option of options.origins) {
