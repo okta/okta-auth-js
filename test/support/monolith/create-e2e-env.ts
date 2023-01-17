@@ -83,6 +83,7 @@ async function bootstrap() {
     await dockolith.disableFeatureFlag(config, orgId, option);
   }
 
+  console.error('Enabling embedded login');
   await dockolith.enableEmbeddedLogin(config);
 
   // Enable interaction_code grant on the default authorization server

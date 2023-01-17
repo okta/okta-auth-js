@@ -7,6 +7,8 @@ source $DIR/setup.sh
 DEFAULT_BUILDVERSION="2023.01.0-begin-178-g3c9d16dc4c1a"
 export MONOLITH_BUILDVERSION="${MONOLITH_BUILDVERSION:-$DEFAULT_BUILDVERSION}"
 
+export MONOLITH_PROFILES_ACTIVE="ci_test_shared_credentials,ci"
+
 set +e
 if [ -n "${TEST_SUITE_ID}" ]; then
 # if running on bacon
