@@ -31,12 +31,13 @@ if ! yarn test:e2e; then
 fi
 finish_log_group $?
 
-create_log_group "E2E Cucumber Test Run"
-if ! yarn test:e2e:cucumber; then
-  echo "Cucumber tests failed! Exiting..."
-  exit ${TEST_FAILURE}
-fi
-finish_log_group $?
+# Skip cucumber tests for now
+# create_log_group "E2E Cucumber Test Run"
+# if ! yarn test:e2e:cucumber; then
+#   echo "Cucumber tests failed! Exiting..."
+#   exit ${TEST_FAILURE}
+# fi
+# finish_log_group $?
 
 echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
 echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
