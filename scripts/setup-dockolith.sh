@@ -32,6 +32,7 @@ create_dockolith_test_org () {
   if [[ -n ${DOCKOLITH_CI} ]]; then
     # this command does not work locally
     echo "${DOCKER_HOST_CONTAINER_IP} ${TEST_ORG_SUBDOMAIN}.okta1.com" >> /etc/hosts
+    echo "${DOCKER_HOST_CONTAINER_IP} ${TEST_ORG_SUBDOMAIN}-admin.okta1.com" >> /etc/hosts
   fi
 
   source ./scripts/monolith/create-e2e-env.sh

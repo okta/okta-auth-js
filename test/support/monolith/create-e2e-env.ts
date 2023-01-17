@@ -13,6 +13,7 @@ async function bootstrap() {
     enableFFs: [
       'API_ACCESS_MANAGEMENT',
       'ENG_ENABLE_SSU_FOR_OIE',
+      'OKTA_MFA_POLICY'
     ],
     disableFFs: [
       'REQUIRE_PKCE_FOR_OIDC_APPS'
