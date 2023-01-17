@@ -72,7 +72,6 @@ async function bootstrap() {
   await dockolith.enableOIE(orgId);
   await dockolith.activateOrgFactor(config, 'okta_email');
   await dockolith.disableStepUpForPasswordRecovery(config);
-  await dockolith.enableEmbeddedLogin(config);
 
   // Set Feature flags
   console.error('Setting feature flags...');
@@ -82,6 +81,8 @@ async function bootstrap() {
   for (const option of options.disableFFs) {
     await dockolith.disableFeatureFlag(config, orgId, option);
   }
+
+  await dockolith.enableEmbeddedLogin(config);
 
   // Enable interaction_code grant on the default authorization server
   const authServer = await dockolith.getDefaultAuthorizationServer(config);
@@ -103,33 +104,6 @@ async function bootstrap() {
       });
     }
   });
-
-  const spaPolicy = await oktaClient.createPolicy({
-    name: 'Widget SPA Policy',
-    type: 'ACCESS_POLICY',
-    status : 'ACTIVE'
-  });
-
-  // Modify catch-all rule to enforce password only
-  const catchAll = await dockolith.getCatchAllRule(config, spaPolicy.id);
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-ignore
-  catchAll.actions.appSignOn = {
-    access: 'ALLOW',
-    verificationMethod: {
-        factorMode: '1FA',
-        type: 'ASSURANCE',
-        reauthenticateIn: 'PT12H',
-        constraints: [{
-          knowledge: {
-            types: [
-              'password'
-            ]
-          }
-        }]
-    }
-  };
-  catchAll.update(spaPolicy.id);
 
   // Add Trusted origins
   for (const option of options.origins) {
@@ -178,6 +152,33 @@ async function bootstrap() {
   }
   const webApp = createdApps[0];
   const spaApp = createdApps[1];
+
+  const spaPolicy = await oktaClient.createPolicy({
+    name: 'Widget SPA Policy',
+    type: 'ACCESS_POLICY',
+    status : 'ACTIVE'
+  });
+
+  // Modify catch-all rule to enforce password only
+  const catchAll = await dockolith.getCatchAllRule(config, spaPolicy.id);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  catchAll.actions.appSignOn = {
+    access: 'ALLOW',
+    verificationMethod: {
+        factorMode: '1FA',
+        type: 'ASSURANCE',
+        reauthenticateIn: 'PT12H',
+        constraints: [{
+          knowledge: {
+            types: [
+              'password'
+            ]
+          }
+        }]
+    }
+  };
+  catchAll.update(spaPolicy.id);
 
   // Assign sign-on policy to SPA app
   dockolith.setPolicyForApp(config, spaApp.id, spaPolicy.id);
