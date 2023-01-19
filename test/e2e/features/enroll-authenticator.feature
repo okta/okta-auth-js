@@ -9,10 +9,12 @@ Background:
     And a Policy that defines "MFA Enrollment" with properties
      | okta_password      | REQUIRED |
      | okta_email         | REQUIRED |
+     | phone_number       | OPTIONAL |
      | security_question  | OPTIONAL |
      And with a Policy Rule that defines "MFA Enrollment Challenge"
     And a user named "Mary"
      And she has an account with "active" state in the org
+     And she has enrolled in the "SMS" factor
 
 Scenario: Mary Enrolls into Security Question
   Given Mary is on the default view in an UNAUTHENTICATED state
@@ -31,8 +33,8 @@ Scenario: Mary Enrolls into Security Question
      | max_age           | 0                               |
   And she should be redirected to the Okta Sign In Widget
   When she inputs her username and password in widget
-  Then she should be challenged to verify her email
-  When she verifies her email
+  Then she should be challenged to verify her "sms"
+  When she verifies her sms
   Then she is required to set up authenticator "Security Question"
   When she creates security question answer
   Then she is redirected to the handle callback page
