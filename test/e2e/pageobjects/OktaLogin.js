@@ -44,6 +44,7 @@ class OktaLogin {
   get verifyBtn() { return $('form[data-se="o-form"] input[type=submit][value=Verify]'); }
   get authenticatorsList() { return $('form[data-se="o-form"] .authenticator-list'); }
   get authenticatorEmail() { return $('form[data-se="o-form"] .authenticator-list [data-se="okta_email"] .select-factor'); }
+  get authenticatorSms() { return $('form[data-se="o-form"] .authenticator-list [data-se="phone_number"] .select-factor'); }
   get authenticatorSecurityQuestion() { return $('form[data-se="o-form"] .authenticator-list [data-se="security_question"] .select-factor'); }
   get securityQuestionAnswer() { return $('form[data-se="o-form"] input[name="credentials.answer"]'); }
 
@@ -74,8 +75,37 @@ class OktaLogin {
     (await btn).click();
   }
 
-  async clickSendEmail() {
+  async clickSendVerificationCode() {
     await this.submit();
+  }
+
+  getFactorVerificationTitle(factor) {
+    switch (factor) {
+      case 'email':
+        return 'Get a verification email';
+      case 'sms':
+        return 'Verify with your phone';
+      default:
+        return undefined;
+    }
+  }
+
+  async selectAuthenticator(factor) {
+    switch (factor) {
+      case 'email':
+        return await this.selectEmailAuthenticator();
+      case 'sms':
+        return await this.selectSmsAuthenticator();
+      default:
+        return undefined;
+    }
+  }
+
+  async selectSmsAuthenticator() {
+    await browser.waitUntil(async () => {
+      return (await this.authenticatorSms).isDisplayed();
+    }, 5000, 'wait for sms authenticator in list');
+    (await this.authenticatorSms).click();
   }
 
   async selectEmailAuthenticator() {

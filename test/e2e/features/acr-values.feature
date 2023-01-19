@@ -7,9 +7,11 @@ Background:
     And a Policy that defines "MFA Enrollment" with properties
     | okta_password | REQUIRED |
     | okta_email    | REQUIRED |
+    | phone_number  | OPTIONAL |
     And with a Policy Rule that defines "MFA Enrollment Challenge"
     And a user named "Mary"
     And she has an account with "active" state in the org
+    And she has enrolled in the "SMS" factor
 
 Scenario: Mary logs in with the initial App Authentication Policy
   Given Mary is on the default view in an UNAUTHENTICATED state
@@ -36,8 +38,8 @@ Scenario: Mary logs in with an ACR value in the Authorize request
   Then the app should construct an authorize request for the protected action, not including an ACR Token in the request but including the ACR value
     And she should be redirected to the Okta Sign In Widget
   When she inputs her username and password in widget
-  Then she should be challenged to verify her email
-  When she verifies her email
+  Then she should be challenged to verify her "sms"
+  When she verifies her sms
   Then she is redirected to the handle callback page
   When she clicks the "Handle callback (Continue Login)" button
   Then the callback is handled
@@ -69,8 +71,8 @@ Scenario: Mary is signed in without ACR, and is challenged with an ACR value
   When she clicks the "Login with ACR" button
   Then the app should construct an authorize request for the protected action, not including an ACR Token in the request but including the ACR value
     And she should be redirected to the Okta Sign In Widget
-    And she should be challenged to verify her email
-  When she verifies her email
+    And she should be challenged to verify her "sms"
+  When she verifies her sms
   Then she is redirected to the handle callback page
   When she clicks the "Handle callback (Continue Login)" button
   Then the callback is handled
@@ -93,8 +95,8 @@ Scenario: Mary is signed in without ACR, and is challenged with an ACR value, bu
   Then the app should construct an authorize request for the protected action, not including an ACR Token in the request but including the ACR value
    And she should be redirected to the Okta Sign In Widget
   When she inputs her username and password in widget
-  Then she should be challenged to verify her email
-  When she verifies her email
+  Then she should be challenged to verify her "sms"
+  When she verifies her sms
   Then she is redirected to the handle callback page
   When she clicks the "Handle callback (Continue Login)" button
   Then the callback is handled

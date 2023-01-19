@@ -70,7 +70,7 @@ describe('E2E login', () => {
       });
 
       it('can specify acr_values', async () => {
-        const acrValues = 'urn:okta:loa:2fa:any:ifpossible';
+        const acrValues = 'urn:okta:loa:1fa:any';
         await bootstrap({ acrValues });
         await loginRedirect(flow);
         await TestApp.getUserInfo();

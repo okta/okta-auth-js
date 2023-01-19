@@ -289,30 +289,40 @@ Then('she sees {string} in {string}', async function (value, field) {
 });
 
 Then(
-  'she should be challenged to verify her email',
+  'she should be challenged to verify her {string}',
   { timeout: 10*1000 }, 
-  async function () {
+  async function (factor: 'email' | 'sms') {
     // There can be 2 options:
     // - page with title "Verify it's you with a security method" and authenticators list with only email availale to select
     // - page with title "Get a verification email" and button to submit verification request
-    let isEmailVerificationDisplayed, isListDisplayed;
+    let isVerificationDisplayed, isListDisplayed;
 
     await browser.waitUntil(async () => {
       const header = await OktaLogin.signinFormTitle;
       const title = await header.getText();
-      isEmailVerificationDisplayed = title === 'Get a verification email';
+      isVerificationDisplayed = title === OktaLogin.getFactorVerificationTitle(factor);
       const list = await OktaLogin.authenticatorsList;
       isListDisplayed = await list?.isDisplayed();
-      return isEmailVerificationDisplayed || isListDisplayed;
+      return isVerificationDisplayed || isListDisplayed;
     }, {
       timeout: 10*1000
     });
 
-    if (isEmailVerificationDisplayed) {
-      await OktaLogin.clickSendEmail();
+    if (isVerificationDisplayed) {
+      await OktaLogin.clickSendVerificationCode();
     } else if (isListDisplayed) {
-      await OktaLogin.selectEmailAuthenticator();
+      await OktaLogin.selectAuthenticator(factor);
     }
+  }
+);
+
+When(
+  'she verifies her sms',
+  { timeout: 30*1000 }, 
+  async function (this: ActionContext) {
+    const code = await this.a18nClient.getSMSCode(this.credentials.profileId);
+    await OktaLogin.enterCode(code);
+    await OktaLogin.clickVerify();
   }
 );
 
