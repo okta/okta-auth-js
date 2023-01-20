@@ -10,7 +10,8 @@ export MONOLITH_BUILDVERSION="${MONOLITH_BUILDVERSION:-$DEFAULT_BUILDVERSION}"
 # causes test failures when https is active
 export MONOLITH_PROFILES_ACTIVE="ci_test_shared_credentials,ci"
 
-set +e
+echo $TEST_SUITE_ID
+# set +e
 if [ -n "${TEST_SUITE_ID}" ]; then
 # if running on bacon
   setup_service java 1.8.222
@@ -18,7 +19,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
 
   export CI=true
 fi
-set -e
+# set -e
 
 create_dockolith_test_org () {
   # Start monolith
