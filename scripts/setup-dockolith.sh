@@ -4,7 +4,7 @@ DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 source $DIR/setup.sh
 
 # Monolith version to test against
-DEFAULT_BUILDVERSION="2022.12.0-begin-273-g47d4b168d1af"
+DEFAULT_BUILDVERSION="2023.01.0-begin-194-gb515dc829aa6"
 export MONOLITH_BUILDVERSION="${MONOLITH_BUILDVERSION:-$DEFAULT_BUILDVERSION}"
 
 # causes test failures when https is active
