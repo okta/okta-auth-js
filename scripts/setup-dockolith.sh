@@ -11,10 +11,11 @@ export MONOLITH_BUILDVERSION="${MONOLITH_BUILDVERSION:-$DEFAULT_BUILDVERSION}"
 export MONOLITH_PROFILES_ACTIVE="ci_test_shared_credentials,ci"
 
 echo $TEST_SUITE_ID
+echo 'Installing chrome and java'
 # set +e
 if [ -n "${TEST_SUITE_ID}" ]; then
 # if running on bacon
-  setup_service java 1.8.222
+  setup_service java 1.8.322
   setup_service google-chrome-stable 106.0.5249.61-1
 
   export CI=true
