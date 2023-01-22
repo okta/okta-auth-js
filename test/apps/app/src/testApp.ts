@@ -89,6 +89,9 @@ function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
         <a id="get-token" href="/" onclick="getToken(event)" class="pure-menu-link">Get Token (without prompt)</a>
         </li>
         <li class="pure-menu-item">
+          <a id="get-session" href="/" onclick="getSession(event)" class="pure-menu-link">Get Session</a>
+        </li>
+        <li class="pure-menu-item">
           <a id="test-concurrent-login" href="/" onclick="testConcurrentLogin(event)" class="pure-menu-link">Test Concurrent Login</a>
         </li>
         <li class="pure-menu-item">
@@ -169,6 +172,7 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     activateUser: testApp.activateUser.bind(testApp),
     activateUserWithWidget: testApp.activateUserWithWidget.bind(testApp),
     getToken: testApp.getToken.bind(testApp, {}),
+    getSession: testApp.getSession.bind(testApp, {}),
     clearTokens: testApp.clearTokens.bind(testApp),
     logoutRedirect: testApp.logoutRedirect.bind(testApp),
     logoutXHR: testApp.logoutXHR.bind(testApp),
@@ -705,6 +709,13 @@ class TestApp {
     });
   }
 
+  async getSession(): Promise<void> {
+    return this.oktaAuth.session.get()
+    .then(res => {
+      document.getElementById('session-info').innerHTML = JSON.stringify(res);
+    });
+  }
+
   async refreshSession(): Promise<object> {
     return this.oktaAuth.session.refresh();
   }
@@ -931,7 +942,7 @@ class TestApp {
     if (idToken || accessToken) {
       // Authenticated user home page
       return `
-        <strong>Authenticated</strong>
+        <strong id="is-authenticated">Authenticated</strong>
         <div class="flex-row">
           <div class="left-column">
             <div class="actions authenticated pure-menu">
@@ -947,6 +958,9 @@ class TestApp {
                 </li>
                 <li class="pure-menu-item">
                   <a id="get-token" href="/" onclick="getToken(event)" class="pure-menu-link">Get Token (without prompt)</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="get-session" href="/" onclick="getSession(event)" class="pure-menu-link">Get Session</a>
                 </li>
                 <li class="pure-menu-item"> 
                   <a id="clear-tokens" href="/" onclick="clearTokens(event)" class="pure-menu-link">Clear Tokens</a>
@@ -980,6 +994,7 @@ class TestApp {
           </div>
           <div class="right-column">
             <div id="user-info"></div>
+            <div id="session-info"></div>
             ${ tokensHTML({idToken, accessToken, refreshToken})}
           </div>
         </div>
@@ -989,9 +1004,16 @@ class TestApp {
     // Unauthenticated user, Login page
     return `
       <div class="box">
-      <strong>Unauthenticated</strong>
+      <strong id="is-authenticated">Unauthenticated</strong>
       </div>
-      ${loginLinks(this)}
+      <div class="flex-row">
+        <div class="left-column">
+          ${loginLinks(this)}
+        </div>
+        <div class="right-column">
+          <div id="session-info"></div>
+        </div>
+      </div>
       `;
   }
 

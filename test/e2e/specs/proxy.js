@@ -16,16 +16,12 @@ import { openPKCE } from '../util/appUtils';
 import { loginRedirect } from '../util/loginUtils';
 import { getIssuer, getBaseUrl } from '../util/browserUtils';
 
+const proxyIssuer = getIssuer().replace(getBaseUrl(), 'http://localhost:8082');
+
 describe('E2E through proxy', () => {
-  // Proxy tests are disabled on OIE org, pending a fix for OKTA-416683
-  if (process.env.ORG_OIE_ENABLED) {
-    return;
-  }
-  
   beforeEach(async function bootstrap() {
-    const issuer = getIssuer().replace(getBaseUrl(), 'http://localhost:8080');
     await openPKCE({
-      issuer
+      issuer: proxyIssuer
     });
     await TestApp.issuer.then(el => el.getValue()).then(val => {
       assert(val.indexOf('http://localhost') === 0);
@@ -34,11 +30,28 @@ describe('E2E through proxy', () => {
   });
 
   afterEach(async function teardown() {
-    await TestApp.logoutRedirect();
+    if (await TestApp.isAuthenticated()) {
+      await TestApp.logoutRedirect();
+    }
   });
 
   it('can login and receive tokens', async () => {
     await TestApp.assertLoggedIn();
+  });
+
+  it('should end SSO session on logout', async () => {
+    await TestApp.assertLoggedIn();
+
+    // SSO session should exist
+    await TestApp.getSessionInfo();
+    await TestApp.assertSessionExists();
+    
+    // Logout
+    await TestApp.logoutXHR();
+
+    // SSO session should NOT exist
+    await TestApp.getSessionInfo();
+    await TestApp.assertSessionNotExists();
   });
 
   it('can renew all tokens (using refresh token)', async () => {

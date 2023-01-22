@@ -15,10 +15,10 @@
 
 require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 
-const createProxyMiddleware = require('./proxyMiddleware');
 const loginMiddleware = require('./loginMiddleware');
 const callbackMiddleware = require('./callbackMiddleware');
 const renderWidget = require('./renderWidget');
+const createProxyApp = require('./proxy');
 
 const path = require('path');
 const SIW_DIST = path.resolve(path.dirname(require.resolve('@okta/okta-signin-widget')), '..');
@@ -31,11 +31,6 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 const app = express();
 const config = require('../webpack.config.js');
 const compiler = webpack(config);
-
-// Set a proxy in front of Okta
-const proxyMiddleware = createProxyMiddleware();
-app.use('/oauth2', proxyMiddleware);
-app.use('/app', proxyMiddleware);
 
 // Tell express to use the webpack-dev-middleware and use the webpack.config.js
 // configuration file as a base.
@@ -56,4 +51,11 @@ app.get('/authorization-code/callback', callbackMiddleware);
 const port = config.devServer.port;
 app.listen(port, function () {
   console.log(`Test app running at http://localhost:${port}!\n`);
+});
+
+// Set a proxy in front of Okta
+const proxyPort = config.devServer.proxyPort;
+const proxyApp = createProxyApp({ proxyPort });
+proxyApp.listen(proxyPort, function () {
+  console.log(`Test app running at http://localhost:${proxyPort}!\n`);
 });
