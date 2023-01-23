@@ -37,7 +37,7 @@ module.exports = function proxyMiddlewareFactory({ proxyPort, origin }) {
     onProxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
       const response = responseBuffer.toString('utf8');
       let patchedResponse = response;
-      if (req.url.includes('/oauth2/v1/authorize') ) {
+      if (req.url.includes('/v1/authorize') ) {
         patchedResponse = patchedResponse.replace(
           buildRegexForUri(origin),
           escapeUri(`http://localhost:${proxyPort}`)
