@@ -11,13 +11,13 @@
   },
   "dependencies": {
     "@okta/okta-auth-js": "*",
-    "@okta/okta-signin-widget": "^6.8.2"
+    "@okta/okta-signin-widget": "^7.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.8.0",
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/preset-env": "^7.8.2",
-    "babel-loader": "^8.0.6",
+    "babel-loader": "^9.1.2",
     "express": "^4.17.1",
     "source-map-loader": "^1.1.3",
     "webpack": "^5.60.0",

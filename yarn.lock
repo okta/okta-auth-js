@@ -1644,6 +1644,28 @@
     webcrypto-shim "^0.1.5"
     xhr2 "0.1.3"
 
+"@okta/okta-auth-js@~7.0.0":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@okta/okta-auth-js/-/okta-auth-js-7.0.2.tgz#cd47008d3a24d3db5c89e0521d5ace5760fe47c7"
+  integrity sha512-7hftbeFCJeWOSIyOpK3fjqVD36OBJSK/Vpx8N2Ow6EMBvc9NeXwH3/vp59orP3rmLbi/kwTWUxqnyEQuPn97Ow==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@peculiar/webcrypto" "^1.4.0"
+    Base64 "1.1.0"
+    atob "^2.1.2"
+    broadcast-channel "~4.17.0"
+    btoa "^1.2.1"
+    core-js "^3.6.5"
+    cross-fetch "^3.1.5"
+    js-cookie "^3.0.1"
+    jsonpath-plus "^6.0.1"
+    node-cache "^5.1.2"
+    p-cancelable "^2.0.0"
+    text-encoding "^0.7.0"
+    tiny-emitter "1.1.0"
+    webcrypto-shim "^0.1.5"
+    xhr2 "0.1.3"
+
 "@okta/okta-react@^6.4.3":
   version "6.7.0"
   resolved "https://registry.yarnpkg.com/@okta/okta-react/-/okta-react-6.7.0.tgz#6d57de781b163cbe8ed31a3bece4fed136d37b54"
@@ -1699,6 +1721,32 @@
     clipboard "^1.5.16"
     cross-fetch "^3.1.5"
     handlebars "^4.7.7"
+    parse-ms "^2.0.0"
+    q "1.4.1"
+    u2f-api-polyfill "0.4.3"
+    underscore "1.13.1"
+  optionalDependencies:
+    fsevents "*"
+
+"@okta/okta-signin-widget@^7.2.1":
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/@okta/okta-signin-widget/-/okta-signin-widget-7.2.1.tgz#407abe3ef0189a173e5f1b6155b97df9905714bb"
+  integrity sha512-MvPlnmtRSjIKhvR6Aq6EKN3k4MkaNJzQwaUYHtlSVSD6vqzqBoNDJhXg6aLKvqeLDEZZCSSBYkedIWlF4I2Ofg==
+  dependencies:
+    "@okta/okta-auth-js" "~7.0.0"
+    "@sindresorhus/to-milliseconds" "^1.0.0"
+    "@types/backbone" "^1.4.15"
+    "@types/jquery" "^3.5.14"
+    "@types/jqueryui" "^1.12.16"
+    "@types/q" "^1.5.5"
+    "@types/selectize" "^0.12.35"
+    "@types/underscore" "^1.11.4"
+    chokidar "^3.5.1"
+    clipboard "^1.5.16"
+    cross-fetch "^3.1.5"
+    ejs "^3.1.7"
+    handlebars "^4.7.7"
+    jquery "^3.6.0"
     parse-ms "^2.0.0"
     q "1.4.1"
     u2f-api-polyfill "0.4.3"
@@ -2144,7 +2192,7 @@
     "@types/parse5" "^6.0.3"
     "@types/tough-cookie" "*"
 
-"@types/json-schema@*", "@types/json-schema@^7.0.5", "@types/json-schema@^7.0.8", "@types/json-schema@^7.0.9":
+"@types/json-schema@*", "@types/json-schema@^7.0.8", "@types/json-schema@^7.0.9":
   version "7.0.11"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.11.tgz#d421b6c527a3037f7c84433fd2c4229e016863d3"
   integrity sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==
@@ -3442,15 +3490,13 @@ babel-jest@^28.1.3:
     graceful-fs "^4.2.9"
     slash "^3.0.0"
 
-babel-loader@^8.0.6, babel-loader@^8.2.2:
-  version "8.2.5"
-  resolved "https://registry.yarnpkg.com/babel-loader/-/babel-loader-8.2.5.tgz#d45f585e654d5a5d90f5350a779d7647c5ed512e"
-  integrity sha512-OSiFfH89LrEMiWd4pLNqGz4CwJDtbs2ZVc+iGu2HrkRfPxId9F2anQj38IxWpmRfsUY0aBZYi1EFcd3mhtRMLQ==
+babel-loader@^9.1.2:
+  version "9.1.2"
+  resolved "https://registry.yarnpkg.com/babel-loader/-/babel-loader-9.1.2.tgz#a16a080de52d08854ee14570469905a5fc00d39c"
+  integrity sha512-mN14niXW43tddohGl8HPu5yfQq70iUThvFL/4QzESA7GcZoC0eVOhvWdQ8+3UlSjaDE9MVtsW9mxDY07W7VpVA==
   dependencies:
-    find-cache-dir "^3.3.1"
-    loader-utils "^2.0.0"
-    make-dir "^3.1.0"
-    schema-utils "^2.6.5"
+    find-cache-dir "^3.3.2"
+    schema-utils "^4.0.0"
 
 babel-plugin-add-module-exports@^1.0.2:
   version "1.0.4"
@@ -4024,7 +4070,7 @@ chokidar@^2.0.0:
   optionalDependencies:
     fsevents "^1.2.7"
 
-chokidar@^3.0.0, chokidar@^3.4.0, chokidar@^3.5.2, chokidar@^3.5.3:
+chokidar@^3.0.0, chokidar@^3.4.0, chokidar@^3.5.1, chokidar@^3.5.2, chokidar@^3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.3.tgz#1cf37c8707b932bd1af1ae22c0432e2acd1903bd"
   integrity sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==
@@ -5072,7 +5118,7 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
-ejs@^3.0.1:
+ejs@^3.0.1, ejs@^3.1.7:
   version "3.1.8"
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-3.1.8.tgz#758d32910c78047585c7ef1f92f9ee041c1c190b"
   integrity sha512-/sXZeMlhS0ArkfX2Aw780gJzXSMPnKjtspYZv+f3NiKLlubezAHDU5+9xz6gd3/NhG3txQCo6xlglmTS+oTGEQ==
@@ -6128,7 +6174,7 @@ find-cache-dir@^2.0.0:
     make-dir "^2.0.0"
     pkg-dir "^3.0.0"
 
-find-cache-dir@^3.3.1:
+find-cache-dir@^3.3.1, find-cache-dir@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/find-cache-dir/-/find-cache-dir-3.3.2.tgz#b30c5b6eff0730731aea9bbd9dbecbd80256d64b"
   integrity sha512-wXZV5emFEjrridIgED11OoUKLxiYjAcqot/NJdAkOhlJ+vGzwhOAfcG5OX1jP+S0PcjEn8bdMJv+g2jwQ3Onig==
@@ -8260,6 +8306,11 @@ joi@^17.6.0:
     "@sideway/address" "^4.1.3"
     "@sideway/formula" "^3.0.0"
     "@sideway/pinpoint" "^2.0.0"
+
+jquery@^3.6.0:
+  version "3.6.3"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.3.tgz#23ed2ffed8a19e048814f13391a19afcdba160e6"
+  integrity sha512-bZ5Sy3YzKo9Fyc8wH2iIQK4JImJ6R0GWI9kL1/k7Z91ZBNgkRXE6U0JfHIizZbort8ZunhSI3jw9I6253ahKfg==
 
 js-cleanup@^1.2.0:
   version "1.2.0"
@@ -11080,15 +11131,6 @@ scheduler@^0.20.2:
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-
-schema-utils@^2.6.5:
-  version "2.7.1"
-  resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-2.7.1.tgz#1ca4f32d1b24c590c203b8e7a50bf0ea4cd394d7"
-  integrity sha512-SHiNtMOUGWBQJwzISiVYKu82GiV4QYGePp3odlY1tuKO7gPtphAT5R/py0fA6xtbgLL/RvtJZnU9b8s0F1q0Xg==
-  dependencies:
-    "@types/json-schema" "^7.0.5"
-    ajv "^6.12.4"
-    ajv-keywords "^3.5.2"
 
 schema-utils@^3.0.0, schema-utils@^3.1.0, schema-utils@^3.1.1:
   version "3.1.1"

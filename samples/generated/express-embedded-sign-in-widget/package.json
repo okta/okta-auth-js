@@ -7,8 +7,8 @@
     "node": ">=14.0.0"
   },
   "scripts": {
-    "start": "SIW_VERSION=${SIW_VERSION-6.8.2} node ./web-server/server.js",
-    "dev": "SIW_VERSION=${SIW_VERSION-6.8.2} nodemon ./web-server/server.js --watch ../../../build/cjs"
+    "start": "SIW_VERSION=${SIW_VERSION-7.2.1} node ./web-server/server.js",
+    "dev": "SIW_VERSION=${SIW_VERSION-7.2.1} nodemon ./web-server/server.js --watch ../../../build/cjs"
   },
   "dependencies": {
     "express": "^4.17.1",
@@ -18,7 +18,7 @@
     "js-yaml": "^4.1.0",
     "dotenv": "^10.0.0",
     "@okta/okta-auth-js": "*",
-    "@okta/okta-signin-widget": "^6.8.2"
+    "@okta/okta-signin-widget": "^7.2.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.19",
