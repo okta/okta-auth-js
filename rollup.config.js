@@ -89,7 +89,7 @@ const getPlugins = (env, entryName) => {
   let plugins = [
     replace({
       'SDK_VERSION': JSON.stringify(pkg.version),
-      'global.': 'window.',
+      ...(env === 'browser' && { 'global.': 'window.' }),
       preventAssignment: true
     }),
     (env === 'browser' && alias({
@@ -120,7 +120,7 @@ const getPlugins = (env, entryName) => {
         }
       }
     }),
-    multiInput({ 
+    multiInput({
       relative: 'lib/',
     }),
     createPackageJson(outputDir)
