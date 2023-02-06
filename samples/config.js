@@ -103,7 +103,6 @@ const samples = [
       'mfa-password-and-question',
       // This feature is not well defined and introduce flakiness, disable it
       // 'social-login-mfa',
-      'social-idp',
       'totp-signup',
       'totp-signin',
       'security-questions-enrollment',
