@@ -89,21 +89,22 @@ const samples = [
       // group sms related specs together, so they do not run in parallel
       // this spec takes time to finish, run it first
       [
-        'self-service-registration',
+        // fix affected tests: https://oktainc.atlassian.net/browse/OKTA-574495
+        // 'self-service-registration',
         'mfa-password-and-sms',
       ],
       'root-page', 
       'basic-auth', 
       'identifier-first-auth',
       'self-service-password-recovery', 
-      'self-service-registration-custom-attribute',
+      // fix affected tests: https://oktainc.atlassian.net/browse/OKTA-574495
+      // 'self-service-registration-custom-attribute',
       'self-service-registration-activation-token',
       'mfa-password-and-email',
       'mfa-password-and-email-magic-link',
       'mfa-password-and-question',
       // This feature is not well defined and introduce flakiness, disable it
       // 'social-login-mfa',
-      'social-idp',
       'totp-signup',
       'totp-signin',
       'security-questions-enrollment',
