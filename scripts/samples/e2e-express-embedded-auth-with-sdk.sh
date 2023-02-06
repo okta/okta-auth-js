@@ -3,7 +3,7 @@
 source $(dirname "${BASH_SOURCE[0]}")/../setup-e2e.sh
 
 # NOTE: this test suite runs against a separate test org on OK14
-# export USE_OK_14=1
+export USE_OK_14=1
 setup_sample_tests
 
 export SAMPLE_NAME=@okta/samples.express-embedded-auth-with-sdk
