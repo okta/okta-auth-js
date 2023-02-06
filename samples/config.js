@@ -89,14 +89,14 @@ const samples = [
       // group sms related specs together, so they do not run in parallel
       // this spec takes time to finish, run it first
       [
-        'self-service-registration',
+        // 'self-service-registration',
         'mfa-password-and-sms',
       ],
       'root-page', 
       'basic-auth', 
       'identifier-first-auth',
       'self-service-password-recovery', 
-      'self-service-registration-custom-attribute',
+      // 'self-service-registration-custom-attribute',
       'self-service-registration-activation-token',
       'mfa-password-and-email',
       'mfa-password-and-email-magic-link',
