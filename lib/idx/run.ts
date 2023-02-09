@@ -15,6 +15,7 @@
 /* eslint-disable max-statements, complexity, max-depth */
 import { interact } from './interact';
 import { introspect } from './introspect';
+import { getDeviceChallenge } from './getDeviceChallenge';
 import { remediate } from './remediate';
 import { getFlowSpecification } from './flow';
 import * as remediators from './remediators';
@@ -32,6 +33,7 @@ import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta'
 import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from './util';
 import { Tokens } from '../oidc/types';
 import { APIError } from '../errors/types';
+import { DeviceIdentificationChallenge } from './remediators';
 declare interface RunData {
   options: RunOptions;
   values: remediators.RemediationValues;
@@ -152,6 +154,24 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
     idxResponse = await introspect(authClient, { withCredentials, version, interactionHandle });
   }
   return { ...data, idxResponse, meta };
+}
+
+async function getDataFromDeviceChallenge(authClient, data: RunData): Promise<RunData> {
+  const { options } = data;
+  const {
+    withCredentials,
+    version
+  } = options;
+
+  const remediations = data.idxResponse?.rawIdxState.remediation?.value;
+  remediations?.forEach(async remediation => {
+    if (remediation['name'] == DeviceIdentificationChallenge.remediationName) {
+      // get challenge from Google VA api
+      const idxResponse = await getDeviceChallenge(authClient, remediation, { withCredentials, version });
+      return { ...data, idxResponse };
+    }
+  });
+  return data;
 }
 
 async function getDataFromRemediate(authClient, data: RunData): Promise<RunData> {
@@ -308,6 +328,7 @@ export async function run(
 
   data = initializeData(authClient, data);
   data = await getDataFromIntrospect(authClient, data);
+  data = await getDataFromDeviceChallenge(authClient, data);
   data = await getDataFromRemediate(authClient, data);
   data = await finalizeData(authClient, data);
 
