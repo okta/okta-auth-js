@@ -22,6 +22,7 @@ export {
 export { interact } from './interact';
 export { introspect } from './introspect';
 export { getDeviceChallenge } from './getDeviceChallenge';
+export { getDeviceChallengeResponse } from './getDeviceChallengeResponse';
 export { poll } from './poll';
 export { proceed, canProceed } from './proceed';
 export { register } from './register';

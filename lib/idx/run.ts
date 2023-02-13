@@ -16,6 +16,7 @@
 import { interact } from './interact';
 import { introspect } from './introspect';
 import { getDeviceChallenge } from './getDeviceChallenge';
+import { getDeviceChallengeResponse } from './getDeviceChallengeResponse';
 import { remediate } from './remediate';
 import { getFlowSpecification } from './flow';
 import * as remediators from './remediators';
@@ -156,7 +157,7 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
   return { ...data, idxResponse, meta };
 }
 
-async function getDataFromDeviceChallenge(authClient, data: RunData): Promise<RunData> {
+async function getDataFromDeviceChallenge(authClient, data: RunData): Promise<any> {
   const { options } = data;
   const {
     withCredentials,
@@ -168,10 +169,13 @@ async function getDataFromDeviceChallenge(authClient, data: RunData): Promise<Ru
     if (remediation['name'] == DeviceIdentificationChallenge.remediationName) {
       // get challenge from Google VA api
       const idxResponse = await getDeviceChallenge(authClient, remediation, { withCredentials, version });
-      return { ...data, idxResponse };
+      // Managed Chrome should generate challenge-response, send it as the value of 
+      // x-device-challenge-response header, okta-core will verify the challenge-response 
+      // and get device signals from Google VA api
+      await getDeviceChallengeResponse(authClient, idxResponse, { withCredentials, version });
+      return idxResponse;
     }
   });
-  return data;
 }
 
 async function getDataFromRemediate(authClient, data: RunData): Promise<RunData> {
@@ -328,7 +332,10 @@ export async function run(
 
   data = initializeData(authClient, data);
   data = await getDataFromIntrospect(authClient, data);
-  data = await getDataFromDeviceChallenge(authClient, data);
+
+  // data = await getDataFromDeviceChallenge(authClient, data);
+ await getDataFromDeviceChallenge(authClient, data);
+
   data = await getDataFromRemediate(authClient, data);
   data = await finalizeData(authClient, data);
 
