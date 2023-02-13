@@ -53,7 +53,6 @@ export async function getDeviceChallenge (
     } catch (err) {
       if (isAuthApiError(err) && err.xhr && isRawIdxResponse(err.xhr.responseJSON)) {
         rawIdxResponse = err.xhr.responseJSON;
-        // requestDidSucceed = false;
       } else {
         throw err;
       }

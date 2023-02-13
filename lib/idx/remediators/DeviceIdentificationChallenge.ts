@@ -11,7 +11,6 @@
  */
 
 
-// import { Credentials } from '../authenticator';
 import { Remediator, RemediationValues } from './Base/Remediator';
 export class DeviceIdentificationChallenge extends Remediator<RemediationValues> {
   static remediationName = 'device-identification-challenge';

@@ -168,12 +168,14 @@ async function getDataFromDeviceChallenge(authClient, data: RunData): Promise<an
   remediations?.forEach(async remediation => {
     if (remediation['name'] == DeviceIdentificationChallenge.remediationName) {
       // get challenge from Google VA api
-      const idxResponse = await getDeviceChallenge(authClient, remediation, { withCredentials, version });
+      const redirectUrl = await getDeviceChallenge(authClient, remediation, { withCredentials, version });
       // Managed Chrome should generate challenge-response, send it as the value of 
       // x-device-challenge-response header, okta-core will verify the challenge-response 
       // and get device signals from Google VA api
-      await getDeviceChallengeResponse(authClient, idxResponse, { withCredentials, version });
-      return idxResponse;
+      if (redirectUrl) {
+        await getDeviceChallengeResponse(authClient, redirectUrl, { withCredentials, version });
+      }
+      return redirectUrl;
     }
   });
 }
@@ -333,8 +335,7 @@ export async function run(
   data = initializeData(authClient, data);
   data = await getDataFromIntrospect(authClient, data);
 
-  // data = await getDataFromDeviceChallenge(authClient, data);
- await getDataFromDeviceChallenge(authClient, data);
+  await getDataFromDeviceChallenge(authClient, data);
 
   data = await getDataFromRemediate(authClient, data);
   data = await finalizeData(authClient, data);
