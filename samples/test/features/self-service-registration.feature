@@ -21,17 +21,17 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And she fills out her Email
   And she submits the form
   Then she is redirected to the "Select Authenticator" page
+  When she selects the "Email" factor
+  And she submits the form
+  Then she sees a page to input a code for email authenticator enrollment
+  When she inputs the correct code from her "Email"
+  And she submits the form
+  Then she is redirected to the "Select Authenticator" page
   When she selects the "Password" factor
   And she submits the form
   Then she sees the set new password form
   And she fills out her Password
   And she confirms her Password
-  And she submits the form
-  Then she is redirected to the "Select Authenticator" page
-  When she selects the "Email" factor
-    And she submits the form
-  Then she sees a page to input a code for email authenticator enrollment
-  When she inputs the correct code from her "Email"
   And she submits the form
   Then she is redirected to the "Select Authenticator" page
   When she selects "Skip" on SMS
@@ -47,17 +47,17 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
     And she fills out her Email
     And she submits the form
   Then she is redirected to the "Select Authenticator" page
+  When she selects the "Email" factor
+    And she submits the form
+  Then she sees a page to input a code for email authenticator enrollment
+  When she inputs the correct code from her "Email"
+    And she submits the form
+  Then she is redirected to the "Select Authenticator" page
   When she selects the "Password" factor
     And she submits the form
   Then she sees the set new password form
     And she fills out her Password
     And she confirms her Password
-    And she submits the form
-  Then she is redirected to the "Select Authenticator" page
-  When she selects the "Email" factor
-    And she submits the form
-  Then she sees a page to input a code for email authenticator enrollment
-  When she inputs the correct code from her "Email"
     And she submits the form
   Then she is redirected to the "Select Authenticator" page
   When she selects the "Phone" factor
@@ -90,18 +90,18 @@ Scenario: Mary signs up for an account with Password, sets up required Email fac
   And she fills out her Email
     And she submits the form
   Then she is redirected to the "Select Authenticator" page
+  When she selects the "Email" factor
+    And she submits the form
+  Then she sees a page to input a code for email authenticator enrollment
+  When she inputs the correct code from her "Email"
+    And she submits the form
+  Then she is redirected to the "Select Authenticator" page
   When she selects the "Password" factor
     And she submits the form
   Then she sees the set new password form
   And she fills out her Password
   And she confirms her Password
   And she submits the form
-  Then she is redirected to the "Select Authenticator" page
-  When she selects the "Email" factor
-    And she submits the form
-  Then she sees a page to input a code for email authenticator enrollment
-  When she inputs the correct code from her "Email"
-    And she submits the form
   Then she is redirected to the "Select Authenticator" page
   When she selects the "Phone" factor
     And she submits the form
@@ -118,17 +118,17 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And she fills out her Email
   And she submits the form
   Then she is redirected to the "Select Authenticator" page
+  When she selects the "Email" factor
+    And she submits the form
+  Then she sees a page to input a code for email authenticator enrollment
+  When she clicks the Email magic link for email verification
+  Then she is redirected to the "Select Authenticator" page
   When she selects the "Password" factor
   And she submits the form
   Then she sees the set new password form
   And she fills out her Password
   And she confirms her Password
   And she submits the form
-  Then she is redirected to the "Select Authenticator" page
-  When she selects the "Email" factor
-    And she submits the form
-  Then she sees a page to input a code for email authenticator enrollment
-  When she clicks the Email magic link for email verification
   Then she is redirected to the "Select Authenticator" page
   When she selects "Skip" on SMS
   Then she is redirected to the "Root" page
