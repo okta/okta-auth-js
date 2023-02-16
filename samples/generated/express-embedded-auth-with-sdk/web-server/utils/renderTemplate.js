@@ -27,6 +27,7 @@ module.exports = function renderTemplate(req, res, template, options = {}) {
       } = {}
     } = {} 
   } = req.getFlowStates();
+  const hasContextualDataForAuthenticator = contextualData?.qrcode || contextualData?.sharedSecret;
   const authenticatorEnrollmentsJSON = authenticatorEnrollments ? JSON.stringify(authenticatorEnrollments) : null;
   const activationData = contextualData ? JSON.stringify(contextualData.activationData) : null;
   const challengeData = contextualData ? JSON.stringify(contextualData.challengeData) : null;
@@ -38,6 +39,7 @@ module.exports = function renderTemplate(req, res, template, options = {}) {
     cancelAction: getFormActionPath(req, '/cancel'),
     selectStepAction: getFormActionPath(req, options.selectStepAction),
     contextualData,
+    hasContextualDataForAuthenticator,
     activationData,
     challengeData,
     authenticatorEnrollments: authenticatorEnrollmentsJSON,

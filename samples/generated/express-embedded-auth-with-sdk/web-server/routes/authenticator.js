@@ -102,6 +102,21 @@ router.post('/verify-authenticator/okta_email', async (req, res, next) => {
 });
 
 // Handle enroll authenticator -- email
+router.get('/enroll-authenticator/okta_email/enrollment-data', (req, res) => {
+  const { 
+    idx: { nextStep: { inputs } }
+  } = req.getFlowStates();
+  const { options } = inputs[0];
+  renderPage({ 
+    req, res,
+    render: () => renderTemplate(req, res, 'select-authenticator', {
+      options,
+      action: '/enroll-authenticator/okta_email/enrollment-data',
+      canSkip: false,
+    })
+  });
+});
+
 router.get('/enroll-authenticator/okta_email', (req, res) => {
   renderPage({
     req, res,
@@ -115,6 +130,12 @@ router.get('/enroll-authenticator/okta_email', (req, res) => {
       }
     })
   });
+});
+
+router.post('/enroll-authenticator/okta_email/enrollment-data', async (req, res, next) => {
+  const authClient = getAuthClient(req);
+  const transaction = await authClient.idx.proceed({ authenticator: 'okta_email' });
+  handleTransaction({ req, res, next, authClient, transaction });
 });
 
 router.post('/enroll-authenticator/okta_email', async (req, res, next) => {

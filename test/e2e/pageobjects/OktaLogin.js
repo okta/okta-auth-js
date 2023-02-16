@@ -34,6 +34,7 @@ class OktaLogin {
 
   get signinFormTitle() { return $('.okta-form-title.o-form-head'); }
   get verifyWithEmailCodeButton() { return $('form[data-se="o-form"] button.enter-auth-code-instead-link'); }
+  get receiveCodeViaSmsButton() { return $('form[data-se="o-form"] input[type=submit]'); }
   get code() {
     if (process.env.ORG_OIE_ENABLED) {
       return this.OIEsigninPassword;
@@ -143,6 +144,13 @@ class OktaLogin {
       return (await this.verifyWithEmailCodeButton).isDisplayed();
     }, 5000, 'wait for verify with email code btn');
     (await this.verifyWithEmailCodeButton).click();
+  }
+
+  async receiveCodeViaSms() {
+    await browser.waitUntil(async () => {
+      return (await this.receiveCodeViaSmsButton).isDisplayed();
+    }, 5000, 'wait for receive a code via sms btn');
+    (await this.receiveCodeViaSmsButton).click();
   }
 
   async enterCode(code) {

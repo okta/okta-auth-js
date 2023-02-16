@@ -54,7 +54,8 @@ export default class A18nClient {
 
     const match = response?.content?.match(/Enter a code instead: (?<code>\d+)/) 
       || response?.content?.match(/enter this code: <b>(?<code>\d+)<\/b>/)
-      || response?.content?.match(/please contact your system administrator immediately.[\s\S]\s*(?<code>\d+)/);
+      || response?.content?.match(/please contact your system administrator immediately.[\s\S]\s*(?<code>\d+)/)
+      || response?.content?.match(/enter the verification code: <strong>(?<code>\d+)<\/strong>/);
     const code = match?.groups?.code;
     if (!code) {
       throw new Error('Unable to retrieve code from email.');
@@ -107,7 +108,8 @@ export default class A18nClient {
       --retryAttemptsRemaining;
     }
 
-    const match = response?.content?.match(/<a id="email-activation-button" href="(?<url>\S+)"/);
+    const match = response?.content?.match(/<a id="email-activation-button" href="(?<url>\S+)"/)
+      || response?.content?.match(/<a id="registration-activation-link" href="(?<url>\S+)"/);
     const url = match?.groups?.url;
     if (!url) {
       throw new Error('Unable to retrieve magic link from email.');
