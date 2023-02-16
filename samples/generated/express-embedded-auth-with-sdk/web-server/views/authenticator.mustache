@@ -18,7 +18,7 @@
         {{>formMessages}}
       </div>
 
-      {{#contextualData}}
+      {{#hasContextualDataForAuthenticator}}
         <div class="ui segments">
           <div class="ui segment">
             {{#contextualData.qrcode}}
@@ -34,7 +34,7 @@
             {{/contextualData.sharedSecret}}
           </div>
         </div>
-      {{/contextualData}}
+      {{/hasContextualDataForAuthenticator}}
 
       <div class="row">
         <form id="challenge-authenticator-form" class="ui large form" action="{{action}}" method="POST">
