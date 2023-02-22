@@ -15,8 +15,8 @@ import { validateVersionConfig } from './idxState';
 import { IntrospectOptions, OktaAuthIdxInterface } from './types';
 import { isRawIdxResponse } from './types/idx-js';
 import { IDX_API_VERSION } from '../constants';
-import { httpRequest } from '../http';
 import { isAuthApiError } from '../errors';
+import { loadInvisibleFrame } from '../oidc/util/browser';
 
 export async function getDeviceChallengeResponse (
   authClient: OktaAuthIdxInterface,
@@ -25,22 +25,17 @@ export async function getDeviceChallengeResponse (
 ): Promise<void> {
   let rawIdxResponse;
 
+  // try load from storage first
+  const savedIdxResponse = authClient.transactionManager.loadIdxResponse(options);
+  if (savedIdxResponse) {
+    rawIdxResponse = savedIdxResponse.rawIdxResponse;
+  }
+
   if (!rawIdxResponse) {
     const version = options.version || IDX_API_VERSION;
-    const withCredentials = false;
     try {
       validateVersionConfig(version);
-      const headers = {
-        'Content-Type': `application/ion+json; okta-version=${version}`,
-        Accept: `application/ion+json; okta-version=${version}`
-      };
-      // Managed Chrome should add the x-device-challenge-response header
-      rawIdxResponse = await httpRequest(authClient, {
-        method: 'GET',
-        url,
-        headers,
-        withCredentials
-      });
+      loadInvisibleFrame(url, 'deviceChallengeResponseIFrameId');
     } catch (err) {
       if (isAuthApiError(err) && err.xhr && isRawIdxResponse(err.xhr.responseJSON)) {
         rawIdxResponse = err.xhr.responseJSON;

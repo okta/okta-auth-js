@@ -157,7 +157,7 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
   return { ...data, idxResponse, meta };
 }
 
-async function getDataFromDeviceChallenge(authClient, data: RunData): Promise<any> {
+async function collectChromeDeviceSignals(authClient, data: RunData): Promise<any> {
   const { options } = data;
   const {
     withCredentials,
@@ -168,14 +168,16 @@ async function getDataFromDeviceChallenge(authClient, data: RunData): Promise<an
   remediations?.forEach(async remediation => {
     if (remediation['name'] == DeviceIdentificationChallenge.remediationName) {
       // get challenge from Google VA api
-      const redirectUrl = await getDeviceChallenge(authClient, remediation, { withCredentials, version });
-      // Managed Chrome should generate challenge-response, send it as the value of 
-      // x-device-challenge-response header, okta-core will verify the challenge-response 
-      // and get device signals from Google VA api
-      if (redirectUrl) {
+      await getDeviceChallenge(authClient, remediation, { withCredentials, version });
+      const redirectUrl = remediation.href?.replace('/challenge', '/challenge-response');
+      console.log('2nd get endpoint: ' + redirectUrl);
+      if (redirectUrl) { // TODO: error check in case getDeviceChallenge errors out
+        // Managed Chrome should generate challenge-response, send it as the value of
+        // x-device-challenge-response header, okta-core will verify the challenge-response
+        // and get device signals from Google VA api
+        // TODO: make use of the idxResponse here
         await getDeviceChallengeResponse(authClient, redirectUrl, { withCredentials, version });
       }
-      return redirectUrl;
     }
   });
 }
@@ -335,7 +337,7 @@ export async function run(
   data = initializeData(authClient, data);
   data = await getDataFromIntrospect(authClient, data);
 
-  await getDataFromDeviceChallenge(authClient, data);
+  await collectChromeDeviceSignals(authClient, data);
 
   data = await getDataFromRemediate(authClient, data);
   data = await finalizeData(authClient, data);
