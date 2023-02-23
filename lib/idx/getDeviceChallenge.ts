@@ -37,11 +37,8 @@ export async function getDeviceChallenge (
       validateVersionConfig(version);
       const url = remediation.href;
 
-      // Test if this triggers Cross-Document Navigations
       const iFrameId = 'deviceChallengeIFrameId';
       response = loadInvisibleFrame(url, iFrameId);
-      // TODO: need to figure out how to get the content of the iFrame (basically the url for the next GET endpoint)
-      // var iFrame = document.getElementById(iFrameId);
     } catch (err) {
       if (isAuthApiError(err) && err.xhr && isRawIdxResponse(err.xhr.responseJSON)) {
         return JSON.stringify(err.xhr.responseJSON);

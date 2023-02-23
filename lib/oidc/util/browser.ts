@@ -49,10 +49,6 @@ export function loadInvisibleFrame(src, id) {
   iframe.style.position = 'absolute';
   iframe.style.border = '0';
 
-  iframe.onload = function() {
-    console.log('+++location=' + iframe.contentWindow?.location);
-  };
-
   return document.body.appendChild(iframe);
 }
 
