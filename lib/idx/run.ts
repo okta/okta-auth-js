@@ -16,7 +16,6 @@
 import { interact } from './interact';
 import { introspect } from './introspect';
 import { getDeviceChallenge } from './getDeviceChallenge';
-import { getDeviceChallengeResponse } from './getDeviceChallengeResponse';
 import { remediate } from './remediate';
 import { getFlowSpecification } from './flow';
 import * as remediators from './remediators';
@@ -167,17 +166,7 @@ async function collectChromeDeviceSignals(authClient, data: RunData): Promise<an
   const remediations = data.idxResponse?.rawIdxState.remediation?.value;
   remediations?.forEach(async remediation => {
     if (remediation['name'] == DeviceIdentificationChallenge.remediationName) {
-      // get challenge from Google VA api
       await getDeviceChallenge(authClient, remediation, { withCredentials, version });
-      const redirectUrl = remediation.href?.replace('/challenge', '/challenge-response');
-      console.log('2nd get endpoint: ' + redirectUrl);
-      if (redirectUrl) { // TODO: error check in case getDeviceChallenge errors out
-        // Managed Chrome should generate challenge-response, send it as the value of
-        // x-device-challenge-response header, okta-core will verify the challenge-response
-        // and get device signals from Google VA api
-        // TODO: make use of the idxResponse here
-        await getDeviceChallengeResponse(authClient, redirectUrl, { withCredentials, version });
-      }
     }
   });
 }
