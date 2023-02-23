@@ -166,6 +166,7 @@ async function collectChromeDeviceSignals(authClient, data: RunData): Promise<an
   const remediations = data.idxResponse?.rawIdxState.remediation?.value;
   remediations?.forEach(async remediation => {
     if (remediation['name'] == DeviceIdentificationChallenge.remediationName) {
+      // TODO: get the idxResopnse from the 2nd GET endpoint (1st GET receives a 302) and process it as usual
       await getDeviceChallenge(authClient, remediation, { withCredentials, version });
     }
   });
