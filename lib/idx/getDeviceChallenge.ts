@@ -16,13 +16,14 @@ import { IntrospectOptions, OktaAuthIdxInterface } from './types';
 import { IdxRemediation, isRawIdxResponse } from './types/idx-js';
 import { IDX_API_VERSION } from '../constants';
 import { isAuthApiError } from '../errors';
-import { loadInvisibleFrame } from '../oidc/util/browser';
+// import { loadInvisibleFrame } from '../oidc/util/browser';
+import { redirect } from '../oidc/util/browser';
 
 export async function getDeviceChallenge (
   authClient: OktaAuthIdxInterface,
   remediation: IdxRemediation,
   options: IntrospectOptions = {}
-): Promise<string> {
+): Promise<void> {
   let response;
 
   // try load from storage first
@@ -36,16 +37,16 @@ export async function getDeviceChallenge (
     try {
       validateVersionConfig(version);
       const url = remediation.href;
-
-      const iFrameId = 'deviceChallengeIFrameId';
-      response = loadInvisibleFrame(url, iFrameId);
+      redirect(url);
+      // const iFrameId = 'deviceChallengeIFrameId';
+      // response = loadInvisibleFrame(url, iFrameId);
     } catch (err) {
       if (isAuthApiError(err) && err.xhr && isRawIdxResponse(err.xhr.responseJSON)) {
-        return JSON.stringify(err.xhr.responseJSON);
+        console.log(err.xhr.responseJSON);
+        throw new Error('Auth Api Error');
       } else {
         throw err;
       }
     }
   }
-  return response.contentWindow?.document.body.innerHTML;
 }

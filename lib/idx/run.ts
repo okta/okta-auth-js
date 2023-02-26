@@ -158,7 +158,9 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
 
 async function collectChromeDeviceSignals(authClient, data: RunData): Promise<any> {
   const { options } = data;
+  let idxResponse;
   const {
+    stateHandle,
     withCredentials,
     version
   } = options;
@@ -166,8 +168,11 @@ async function collectChromeDeviceSignals(authClient, data: RunData): Promise<an
   const remediations = data.idxResponse?.rawIdxState.remediation?.value;
   remediations?.forEach(async remediation => {
     if (remediation['name'] == DeviceIdentificationChallenge.remediationName) {
-      // TODO: get the idxResopnse from the 2nd GET endpoint (1st GET receives a 302) and process it as usual
       await getDeviceChallenge(authClient, remediation, { withCredentials, version });
+      // TODO: the following calls /idp/idx/introspect again right after the 1st GET returns, before hitting the 2nd GET
+      // TODO: Is it ok to reuse the remediation from the previous introspect? If so there is no need to call it again
+      idxResponse = await introspect(authClient, { withCredentials, version, stateHandle });
+      return { ...data, idxResponse };
     }
   });
 }
@@ -327,6 +332,7 @@ export async function run(
   data = initializeData(authClient, data);
   data = await getDataFromIntrospect(authClient, data);
 
+  // collect device signals if elibigle
   await collectChromeDeviceSignals(authClient, data);
 
   data = await getDataFromRemediate(authClient, data);
