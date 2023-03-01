@@ -158,9 +158,9 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
 
 async function collectChromeDeviceSignals(authClient, data: RunData): Promise<any> {
   const { options } = data;
-  let idxResponse;
+  // let idxResponse;
   const {
-    stateHandle,
+    // stateHandle,
     withCredentials,
     version
   } = options;
@@ -171,8 +171,8 @@ async function collectChromeDeviceSignals(authClient, data: RunData): Promise<an
       await getDeviceChallenge(authClient, remediation, { withCredentials, version });
       // TODO: the following calls /idp/idx/introspect again right after the 1st GET returns, before hitting the 2nd GET
       // TODO: Is it ok to reuse the remediation from the previous introspect? If so there is no need to call it again
-      idxResponse = await introspect(authClient, { withCredentials, version, stateHandle });
-      return { ...data, idxResponse };
+      // idxResponse = await introspect(authClient, { withCredentials, version, stateHandle });
+      // return { ...data, idxResponse };
     }
   });
 }
