@@ -30,7 +30,7 @@ import { isBrowser } from '../features';
 import { warn } from '../util';
 
 export function logServerSideMemoryStorageWarning(options: StorageOptions) {
-  if (!isBrowser() && !options.storageProvider && !options.storageProvider) {
+  if (!isBrowser() && !options.storageProvider && !options.storageKey) {
     // eslint-disable-next-line max-len
     warn('Memory storage can only support simple single user use case on server side, please provide custom storageProvider or storageKey if advanced scenarios need to be supported.');
   }
