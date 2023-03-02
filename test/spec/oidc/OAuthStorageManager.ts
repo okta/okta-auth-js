@@ -260,6 +260,21 @@ describe('OAuthStorageManager', () => {
       const storageManager = setup();
       storageManager.getTransactionStorage();
       expect(mocked.util.warn).toHaveBeenCalledWith('Memory storage can only support simple single user use case on server side, please provide custom storageProvider or storageKey if advanced scenarios need to be supported.');
+
+      // Should not log warning if storageKey is provided
+      mocked.util.warn.mockClear();
+      storageManager.getTransactionStorage({
+        storageKey: 'foo'
+      });
+      expect(mocked.util.warn).not.toHaveBeenCalled();
+
+      // Should not log warning if storageProvider is provided
+      mocked.util.warn.mockClear();
+      const storageProvider = {} as unknown as StorageProvider;
+      storageManager.getTransactionStorage({
+        storageProvider
+      });
+      expect(mocked.util.warn).not.toHaveBeenCalled();
     });
 
   }); 
@@ -299,6 +314,21 @@ describe('OAuthStorageManager', () => {
       const storageManager = setup();
       storageManager.getTransactionStorage();
       expect(mocked.util.warn).toHaveBeenCalledWith('Memory storage can only support simple single user use case on server side, please provide custom storageProvider or storageKey if advanced scenarios need to be supported.');
+
+      // Should not log warning if storageKey is provided
+      mocked.util.warn.mockClear();
+      storageManager.getTransactionStorage({
+        storageKey: 'foo'
+      });
+      expect(mocked.util.warn).not.toHaveBeenCalled();
+
+      // Should not log warning if storageProvider is provided
+      mocked.util.warn.mockClear();
+      const storageProvider = {} as unknown as StorageProvider;
+      storageManager.getTransactionStorage({
+        storageProvider
+      });
+      expect(mocked.util.warn).not.toHaveBeenCalled();
     });
   }); 
 
