@@ -41,7 +41,7 @@ export async function sendRequest<T extends BaseTransaction> (
   } = oktaAuth.tokenManager.getTokensSync();
   
   const accessToken = options.accessToken || accessTokenObj?.accessToken;
-  const { issuer } = oktaAuth.options;
+  const issuer = oktaAuth.getIssuerOrigin();
   const { url, method, payload } = options;
   const requestUrl = url.startsWith(issuer!) ? url : `${issuer}${url}`;
 
