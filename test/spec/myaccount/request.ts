@@ -36,15 +36,43 @@ const mocked = {
 // only test error cases here
 describe('sendRequest', () => {
   let auth;
-  beforeEach(function () {
+
+  function createOktaAuth(opts = {}) {
     const issuer = 'http://my-okta-domain';
-    auth = new OktaAuth({ issuer, pkce: false });
+    const auth = new OktaAuth({ issuer, pkce: false, ...opts });
     auth.tokenManager.getTokensSync = jest.fn().mockReturnValue({
       idToken: { idToken: 'fake-idToken' },
       accessToken: { accessToken: 'fake-idToken' }
     });
     auth._oktaUserAgent.getHttpHeader = jest.fn().mockReturnValue({
       'X-Okta-User-Agent-Extended': 'fake-okta-ua'
+    });
+    return auth;
+  }
+
+  beforeEach(function () {
+    auth = createOktaAuth();
+  });
+
+  it('uses issuer origin to build url', async () => {
+    auth = createOktaAuth({
+      issuer: 'http://my-okta-domain/oauth2/default',
+    });
+    jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue({
+      fake: 'fake-response'
+    });
+    await sendRequest(auth, {
+      url: '/idp/myaccount/profile',
+      method: 'GET',
+      accessToken: 'fake-token'
+    });
+    expect(mocked.http.httpRequest).toHaveBeenCalledWith(auth, {
+      url: 'http://my-okta-domain/idp/myaccount/profile',
+      method: 'GET',
+      accessToken: 'fake-token',
+      headers: {
+        Accept: '*/*;okta-version=1.0.0'
+      }
     });
   });
 
