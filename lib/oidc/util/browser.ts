@@ -52,10 +52,6 @@ export function loadInvisibleFrame(src, id) {
   return document.body.appendChild(iframe);
 }
 
-export function redirect(url) {
-  window.location.href = url;
-}
-
 export function loadPopup(src, options) {
   var title = options.popupTitle || 'External Identity Provider User Authentication';
   var appearance = 'toolbar=no, scrollbars=yes, resizable=yes, ' +

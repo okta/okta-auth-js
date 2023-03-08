@@ -34,6 +34,7 @@ import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTermi
 import { Tokens } from '../oidc/types';
 import { APIError } from '../errors/types';
 import { DeviceIdentificationChallenge } from './remediators';
+import { makeIdxState } from './idxState';
 declare interface RunData {
   options: RunOptions;
   values: remediators.RemediationValues;
@@ -158,24 +159,55 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
 
 async function collectChromeDeviceSignals(authClient, data: RunData): Promise<any> {
   const { options } = data;
-  // let idxResponse;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let idxResponse;
   const {
-    // stateHandle,
     withCredentials,
     version
   } = options;
 
   const remediations = data.idxResponse?.rawIdxState.remediation?.value;
-  remediations?.forEach(async remediation => {
+  remediations?.forEach(async remediation => { // TODO: only if 1st remediation is DeviceIdentificationChallenge
     if (remediation['name'] == DeviceIdentificationChallenge.remediationName) {
       await getDeviceChallenge(authClient, remediation, { withCredentials, version });
-      // TODO: the following calls /idp/idx/introspect again right after the 1st GET returns, before hitting the 2nd GET
-      // TODO: Is it ok to reuse the remediation from the previous introspect? If so there is no need to call it again
-      // idxResponse = await introspect(authClient, { withCredentials, version, stateHandle });
-      // return { ...data, idxResponse };
+      idxResponse = await new Promise((resolve) => {
+        window.addEventListener('message', async function (e) {
+          // 3 resolve promise with idx object
+          // TODO: security enhancement on origin and source (e.source must be the one from iFrame)
+          // This is no longer needed as we will go with idx polling
+          if (e && !e.data.messageType) { // filters out the iframe load event
+            const parsed = JSON.parse(e.data);
+            try {
+              idxResponse = makeIdxState(authClient, parsed, { withCredentials }, true);
+              removeIframe();
+              resolve(parsed);
+            } catch(e) {
+              console.log('invalid json in event ' + JSON.stringify(e));
+              removeIframe();
+              return data;
+            }
+          }
+        });
+        // optionally reject with a `setTimeout` to set a time-limit
+      });
     }
   });
+
+  // remove the 1st remediations, regardless if we collect device signals successfully or not.
+  // backend will have log, syslog and Splunk monitor set up.
+  // This is not needed when backend has correct logic to add DeviceIdentificationChallenge
+  data.idxResponse?.rawIdxState.remediation?.value?.shift();
+  data.idxResponse?.neededToProceed.shift();
+  return data;
 }
+
+function removeIframe() {
+  const iFrame = document.getElementById('deviceChallengeIFrameId');
+  if (iFrame) {
+    iFrame.parentElement?.removeChild(iFrame);
+  }
+}
+
 
 async function getDataFromRemediate(authClient, data: RunData): Promise<RunData> {
   let {
@@ -333,7 +365,7 @@ export async function run(
   data = await getDataFromIntrospect(authClient, data);
 
   // collect device signals if elibigle
-  await collectChromeDeviceSignals(authClient, data);
+  data = await collectChromeDeviceSignals(authClient, data);
 
   data = await getDataFromRemediate(authClient, data);
   data = await finalizeData(authClient, data);
