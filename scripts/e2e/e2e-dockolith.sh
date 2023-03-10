@@ -6,8 +6,8 @@ export CI=true
 # export SKIP_SETUP_BUILD=1
 source $LOCAL_DIR/../setup-dockolith.sh
 
-# setup::install;
-# setup::build;
+setup::install;
+setup::build;
 setup::create_dockolith_test_org;
 
 create_log_group "E2E Setup"
