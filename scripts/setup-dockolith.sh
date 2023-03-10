@@ -32,9 +32,12 @@ setup::build;
 finish_log_group $?
 
 # Start monolith
-create_log_group "Install/Start Monolith"
+create_log_group "Install Dockolith"
 source ./scripts/monolith/install-dockolith.sh
 export DOCKOLITH_HOME="${OKTA_HOME}/${REPO}/scripts/dockolith"
+finish_log_group $?
+
+create_log_group "Start Dockolith"
 source ./scripts/monolith/start-dockolith.sh
 docker exec -it mono_app cat /etc/hosts
 finish_log_group $?
