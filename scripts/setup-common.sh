@@ -118,15 +118,12 @@ function verify_workspace_versions () {
 }
 
 function setup::install() {
-  create_log_group "Yarn Install"
   # Install dependences. --ignore-scripts will prevent chromedriver from attempting to install
   if ! yarn install --frozen-lockfile --ignore-scripts; then
     echo "yarn install failed! Exiting..."
     exit ${FAILED_SETUP}
   fi
-  finish_log_group $?
 
-  create_log_group "Beta SIW Install"
   if [ ! -z "$WIDGET_VERSION" ]; then
     echo "Installing WIDGET_VERSION: ${WIDGET_VERSION}"
 
@@ -145,11 +142,9 @@ function setup::install() {
     verify_workspace_versions @okta/okta-signin-widget
     echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"
   fi
-  finish_log_group $?
 }
 
 function setup::build() {
-  create_log_group "Yarn Build"
   if [ -z "$SKIP_SETUP_BUILD" ]; then
     if ! yarn build; then
       echo "build failed! Exiting..."
@@ -158,5 +153,4 @@ function setup::build() {
   else
     echo '`SKIP_SETUP_BUILD` set, skipping build...'
   fi
-  finish_log_group $?
 }

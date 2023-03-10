@@ -19,34 +19,44 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   export CI=true
 fi
 
-function setup::create_dockolith_test_org () {
-  cd ${OKTA_HOME}/${REPO}
+# function setup::create_dockolith_test_org () {
+cd ${OKTA_HOME}/${REPO}
 
-  # Start monolith
-  create_log_group "Install/Start Monolith"
-  source ./scripts/monolith/install-dockolith.sh
-  export DOCKOLITH_HOME="${OKTA_HOME}/${REPO}/scripts/dockolith"
-  source ./scripts/monolith/start-dockolith.sh
-  finish_log_group $?
 
-  # Create test org and save environment variables in "testenv"
-  create_log_group "Create Test Org"
-  # Add widget test host to /etc/hosts
-  export TEST_ORG_SUBDOMAIN="authjs-test-1"
+create_log_group "Yarn Install"
+setup::install;
+finish_log_group $?
 
-  if [[ -n ${DOCKOLITH_CI} ]]; then
-    # this command does not work locally
-    echo "${DOCKER_HOST_CONTAINER_IP} ${TEST_ORG_SUBDOMAIN}.okta1.com" >> /etc/hosts
-    echo "${DOCKER_HOST_CONTAINER_IP} ${TEST_ORG_SUBDOMAIN}-admin.okta1.com" >> /etc/hosts
-  fi
+create_log_group "Yarn Build"
+setup::build;
+finish_log_group $?
 
-  source ./scripts/monolith/create-e2e-env.sh
-  export ORG_OIE_ENABLED=true
-  finish_log_group $?
-}
+# Start monolith
+create_log_group "Install/Start Monolith"
+source ./scripts/monolith/install-dockolith.sh
+export DOCKOLITH_HOME="${OKTA_HOME}/${REPO}/scripts/dockolith"
+source ./scripts/monolith/start-dockolith.sh
+docker exec -it mono_app cat /etc/hosts
+finish_log_group $?
 
-# https://stackoverflow.com/questions/29966449/what-is-the-bash-equivalent-to-pythons-if-name-main
-# only run this block when script is executed directly (similar to python's __name__ == 'main')
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    create_dockolith_test_org "$@"
+# Create test org and save environment variables in "testenv"
+create_log_group "Create Test Org"
+# Add widget test host to /etc/hosts
+export TEST_ORG_SUBDOMAIN="authjs-test-1"
+
+if [[ -n ${DOCKOLITH_CI} ]]; then
+  # this command does not work locally
+  echo "${DOCKER_HOST_CONTAINER_IP} ${TEST_ORG_SUBDOMAIN}.okta1.com" >> /etc/hosts
+  echo "${DOCKER_HOST_CONTAINER_IP} ${TEST_ORG_SUBDOMAIN}-admin.okta1.com" >> /etc/hosts
 fi
+
+source ./scripts/monolith/create-e2e-env.sh
+export ORG_OIE_ENABLED=true
+finish_log_group $?
+# }
+# 
+# # https://stackoverflow.com/questions/29966449/what-is-the-bash-equivalent-to-pythons-if-name-main
+# # only run this block when script is executed directly (similar to python's __name__ == 'main')
+# if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+#     create_dockolith_test_org "$@"
+# fi

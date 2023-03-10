@@ -8,6 +8,10 @@ export WIDGET_VERSION=""
 SCRIPTS_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 source $SCRIPTS_DIR/setup-common.sh
 
+create_log_group "Yarn Install"
 setup::install;
+finish_log_group $?
 
+create_log_group "Yarn Build"
 setup::build;
+finish_log_group $?
