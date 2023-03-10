@@ -24,7 +24,7 @@ function setup::create_dockolith_test_org () {
 
   # Start monolith
   create_log_group "Install/Start Monolith"
-  # source ./scripts/monolith/install-dockolith.sh
+  source ./scripts/monolith/install-dockolith.sh
   export DOCKOLITH_HOME="${OKTA_HOME}/${REPO}/scripts/dockolith"
   source ./scripts/monolith/start-dockolith.sh
   finish_log_group $?
