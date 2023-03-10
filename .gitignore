@@ -17,5 +17,6 @@ coverage
 dist
 .bacon.env
 scripts/dockolith
+dockolith
 
 !.gitkeep

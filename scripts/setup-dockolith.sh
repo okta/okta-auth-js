@@ -1,31 +1,31 @@
 #!/bin/bash
 
-DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
-source $DIR/setup.sh
+export LOCAL_MONOLITH=true
+export DOCKOLITH_BRANCH=${DOCKOLITH_BRANCH:-dockolith-1.6.0}
 
-# Monolith version to test against
-DEFAULT_BUILDVERSION="2023.01.2-begin-289-g43b0d0091779"
-export MONOLITH_BUILDVERSION="${MONOLITH_BUILDVERSION:-$DEFAULT_BUILDVERSION}"
+SCRIPTS_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+source $SCRIPTS_DIR/setup-common.sh
+cd ${OKTA_HOME}/${REPO}
 
-# causes test failures when https is active
-export MONOLITH_PROFILES_ACTIVE="ci_test_shared_credentials,ci"
-
-echo $TEST_SUITE_ID
-echo 'Installing chrome and java'
-# set +e
 if [ -n "${TEST_SUITE_ID}" ]; then
 # if running on bacon
   # setup_service java 1.8.322
+  echo $TEST_SUITE_ID
+  echo 'Installing chrome and java'
+  set +e
   setup_service google-chrome-stable 106.0.5249.61-1
+  set -e
 
   export CI=true
 fi
-# set -e
 
-create_dockolith_test_org () {
+function setup::create_dockolith_test_org () {
+  cd ${OKTA_HOME}/${REPO}
+
   # Start monolith
   create_log_group "Install/Start Monolith"
-  source ./scripts/monolith/install-dockolith.sh
+  # source ./scripts/monolith/install-dockolith.sh
+  export DOCKOLITH_HOME="${OKTA_HOME}/${REPO}/scripts/dockolith"
   source ./scripts/monolith/start-dockolith.sh
   finish_log_group $?
 
@@ -41,6 +41,7 @@ create_dockolith_test_org () {
   fi
 
   source ./scripts/monolith/create-e2e-env.sh
+  export ORG_OIE_ENABLED=true
   finish_log_group $?
 }
 

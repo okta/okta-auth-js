@@ -3,10 +3,12 @@
 LOCAL_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
 export CI=true
-export SKIP_SETUP_BUILD=1
+# export SKIP_SETUP_BUILD=1
 source $LOCAL_DIR/../setup-dockolith.sh
 
-create_dockolith_test_org
+# setup::install;
+# setup::build;
+setup::create_dockolith_test_org;
 
 create_log_group "E2E Setup"
 export DBUS_SESSION_BUS_ADDRESS=/dev/null
