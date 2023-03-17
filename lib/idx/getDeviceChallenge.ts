@@ -13,31 +13,29 @@
 
 import { validateVersionConfig } from './idxState';
 import { IntrospectOptions, OktaAuthIdxInterface } from './types';
-import { IdxRemediation, isRawIdxResponse } from './types/idx-js';
+import { isRawIdxResponse } from './types/idx-js';
 import { IDX_API_VERSION } from '../constants';
 import { isAuthApiError } from '../errors';
 import { loadInvisibleFrame } from '../oidc/util/browser';
 
 export async function getDeviceChallenge (
   authClient: OktaAuthIdxInterface,
-  remediation: IdxRemediation,
+  href: string,
   options: IntrospectOptions = {}
 ): Promise<void> {
-  let response;
 
-  // try load from storage first
-  const savedIdxResponse = authClient.transactionManager.loadIdxResponse(options);
-  if (savedIdxResponse) {
-    response = savedIdxResponse.rawIdxResponse;
-  }
+  // try load from storage first, TODO: delete this
+  // const savedIdxResponse = authClient.transactionManager.loadIdxResponse(options);
+  // if (savedIdxResponse) {
+  //   response = savedIdxResponse.rawIdxResponse;
+  // }
 
-  if (!response) {
+  // if (!response) {
     const version = options.version || IDX_API_VERSION;
     try {
       validateVersionConfig(version);
-      const url = remediation.href;
       const iFrameId = 'deviceChallengeIFrameId';
-      response = loadInvisibleFrame(url, iFrameId);
+      loadInvisibleFrame(href, iFrameId); // SIW will init polling, no reponse needed
     } catch (err) {
       if (isAuthApiError(err) && err.xhr && isRawIdxResponse(err.xhr.responseJSON)) {
         console.log(err.xhr.responseJSON);
@@ -46,5 +44,5 @@ export async function getDeviceChallenge (
         throw err;
       }
     }
-  }
+  // }
 }
