@@ -1047,8 +1047,12 @@ Signs the user out of their current [Okta session](https://developer.okta.com/do
 ```javascript
 await authClient.revokeAccessToken(); // strongly recommended
 authClient.closeSession()
-  .then(() => {
-    window.location.reload(); // optional
+  .then((sessionClosed) => {
+    if (sessionClosed) {
+      window.location.reload(); // optional
+    } else {
+      // Session does not exist or has already been closed
+    }
   })
   .catch(e => {
     if (e.xhr && e.xhr.status === 429) {

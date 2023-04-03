@@ -26,16 +26,17 @@ export function mixinSession
     }
 
     // Ends the current Okta SSO session without redirecting to Okta.
-    closeSession(): Promise<unknown> {
+    closeSession(): Promise<boolean> {
       return this.session.close() // DELETE /api/v1/sessions/me
       .then(async () => {
         // Clear all local tokens
         this.clearStorage();
+        return true;
       })
       .catch(function(e) {
         if (e.name === 'AuthApiError' && e.errorCode === 'E0000007') {
           // Session does not exist or has already been closed
-          return null;
+          return false;
         }
         throw e;
       });
