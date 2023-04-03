@@ -24,5 +24,5 @@ export interface OktaAuthSessionInterface
   extends OktaAuthHttpInterface<S, O>
 {
   session: SessionAPI;
-  closeSession(): Promise<unknown>;
+  closeSession(): Promise<boolean>;
 }

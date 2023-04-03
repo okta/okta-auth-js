@@ -242,11 +242,11 @@ ___
 
 ### closeSession
 
-▸ **closeSession**(): `Promise`<`unknown`\>
+▸ **closeSession**(): `Promise`<`boolean`\>
 
 #### Returns
 
-`Promise`<`unknown`\>
+`Promise`<`boolean`\>
 
 #### Inherited from
 

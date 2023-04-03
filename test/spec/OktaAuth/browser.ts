@@ -217,7 +217,7 @@ describe('OktaAuth (browser)', function() {
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
         spyOn(auth, 'revokeRefreshToken').and.returnValue(Promise.resolve());
-        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
+        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve(true));
       }
 
       beforeEach(() => {
@@ -368,7 +368,7 @@ describe('OktaAuth (browser)', function() {
       });
 
       it('Default options: will revokeAccessToken and fallback to closeSession and redirect to window.location.origin', function() {
-        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
+        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve(true));
         return auth.signOut()
           .then(function() {
             expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(4);
@@ -379,7 +379,7 @@ describe('OktaAuth (browser)', function() {
       });
 
       it('Default options: if href===origin will reload the page', function() {
-        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
+        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve(true));
         global.window.location.href = origin;
         return auth.signOut()
           .then(function() {
@@ -408,7 +408,7 @@ describe('OktaAuth (browser)', function() {
 
       it('with postLogoutRedirectUri: will call window.location.assign', function() {
         const postLogoutRedirectUri = 'http://someother';
-        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
+        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve(true));
         return auth.signOut({ postLogoutRedirectUri })
           .then(function() {
             expect(window.location.assign).toHaveBeenCalledWith(postLogoutRedirectUri);

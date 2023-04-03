@@ -135,7 +135,7 @@ const authorizeOptions2: TokenParams = {
     revokeRefreshToken: false,
     accessToken: tokens.accessToken,
   }));
-  expectAssignable<unknown>(await authClient.closeSession());
+  expectAssignable<boolean>(await authClient.closeSession());
   expectType<unknown>(await authClient.revokeAccessToken(tokens.accessToken));
   expectType<unknown>(await authClient.revokeRefreshToken(tokens.refreshToken));
 })();
