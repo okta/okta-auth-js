@@ -1036,7 +1036,7 @@ authClient.signOut({
 > :warning: This method requires access to [third party cookies](#third-party-cookies) <br>
 > :hourglass: async
 
-Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. This method is an XHR-based alternative to [signOut](#signout), which will redirect to Okta before returning to your application. Here are some points to consider when using this method:
+Signs the user out of their current [Okta session](https://developer.okta.com/docs/api/resources/sessions) and clears all tokens stored locally in the `TokenManager`. Returns a promise that resolves with `true` if an existing Okta session have been closed, or `false` if a session does not exist or has already been closed. This method is an XHR-based alternative to [signOut](#signout), which will redirect to Okta before returning to your application. Here are some points to consider when using this method:
 
 * Executes in the background. The user will see not any change to `window.location`.
 * The method will fail to sign the user out if 3rd-party cookies are blocked by the browser.

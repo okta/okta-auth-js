@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.2.1
+
+### Fixes
+
+- [#1395](https://github.com/okta/okta-auth-js/pull/1395) Changes resolve value of `closeSession()` to boolean
+
 ## 7.2.0
 
 ### Features
