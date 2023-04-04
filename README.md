@@ -991,6 +991,7 @@ Signs the user out of their current [Okta session](https://developer.okta.com/do
 * Will redirect to an Okta-hosted page before returning to your app.
 * If a `postLogoutRedirectUri` has not been specified or configured, `window.location.origin` will be used as the return URI. This URI must be listed in the Okta application's [Login redirect URIs](#login-redirect-uris). If the URI is unknown or invalid the redirect will end on a 400 error page from Okta. This error will be visible to the user and cannot be handled by the app.
 * Requires a valid ID token. If an ID token is not available, `signOut` will fallback to using the XHR-based [closeSession](#closesession) method. This method may fail to sign the user out if 3rd-party cookies have been blocked by the browser.
+* If a fallback to [closeSession](#closesession) is used, `signOut()` returns a promise that resolves with the result of [closeSession](#closesession) (`true` if an existing Okta session have been closed or `false` if a session does not exist or has already been closed). Otherwise a promise resolves with `true`.
 * For more information, see [Logout](https://developer.okta.com/docs/reference/api/oidc/#logout) in the OIDC API documentation.
 
 `signOut` takes the following options:

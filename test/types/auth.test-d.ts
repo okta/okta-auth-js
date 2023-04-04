@@ -126,8 +126,8 @@ const authorizeOptions2: TokenParams = {
   expectType<void>(await authClient.handleRedirect(`${window.location.href}`));
 
   // signOut
-  expectType<void>(await authClient.signOut());
-  expectType<void>(await authClient.signOut({
+  expectType<boolean>(await authClient.signOut());
+  expectType<boolean>(await authClient.signOut({
     postLogoutRedirectUri: `${window.location.origin}/logout/callback`,
     state: '1234',
     idToken: tokens.idToken,

@@ -585,7 +585,7 @@ ___
 
 ### signOut
 
-▸ **signOut**(`opts?`): `Promise`<`void`\>
+▸ **signOut**(`opts?`): `Promise`<`boolean`\>
 
 #### Parameters
 
@@ -595,7 +595,7 @@ ___
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`<`boolean`\>
 
 #### Inherited from
 

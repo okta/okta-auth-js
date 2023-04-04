@@ -4,7 +4,7 @@
 
 ### Fixes
 
-- [#1395](https://github.com/okta/okta-auth-js/pull/1395) Changes resolve value of `closeSession()` to boolean
+- [#1395](https://github.com/okta/okta-auth-js/pull/1395) Changes resolve value of `closeSession()` and `signOut()` to boolean
 
 ## 7.2.0
 

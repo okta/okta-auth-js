@@ -280,8 +280,8 @@ export function mixinOAuth
     }
 
     // Revokes refreshToken or accessToken, clears all local tokens, then redirects to Okta to end the SSO session.
-    // eslint-disable-next-line complexity
-    async signOut(options?: SignoutOptions): Promise<void> {
+    // eslint-disable-next-line complexity, max-statements
+    async signOut(options?: SignoutOptions): Promise<boolean> {
       options = Object.assign({}, options);
     
       // postLogoutRedirectUri must be whitelisted in Okta Admin UI
@@ -322,12 +322,13 @@ export function mixinOAuth
       if (!logoutUri) {
         // local tokens are cleared once session is closed
         return this.closeSession() // can throw if the user cannot be signed out
-        .then(function() {
+        .then(function(sessionClosed) {
           if (postLogoutRedirectUri === currentUri) {
             window.location.reload(); // force a hard reload if URI is not changing
           } else {
             window.location.assign(postLogoutRedirectUri);
           }
+          return sessionClosed;
         });
       } else {
         if (options.clearTokensBeforeRedirect) {
@@ -338,6 +339,7 @@ export function mixinOAuth
         }
         // Flow ends with logout redirect
         window.location.assign(logoutUri);
+        return true;
       }
     }
 

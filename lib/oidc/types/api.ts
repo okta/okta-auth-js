@@ -141,7 +141,7 @@ export interface OktaAuthOAuthInterface
   getRefreshToken(): string | undefined;
 
   isAuthenticated(options?: IsAuthenticatedOptions): Promise<boolean>;
-  signOut(opts?: SignoutOptions): Promise<void>;
+  signOut(opts?: SignoutOptions): Promise<boolean>;
   isLoginRedirect(): boolean;
   storeTokensFromRedirect(): Promise<void>;
   getUser<T extends CustomUserClaims = CustomUserClaims>(): Promise<UserClaims<T>>;
