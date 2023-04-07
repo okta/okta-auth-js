@@ -75,14 +75,16 @@ describe('SyncStorageService', () => {
     }
   });
 
-  async function createInstance(options?) {
-    tokenManager = new TokenManager(sdkMock, options);
+  async function createInstance(startService = true) {
+    tokenManager = new TokenManager(sdkMock);
     tokenManager.start();
     service = new SyncStorageService(tokenManager, {
       ...tokenManager.getOptions(), 
       syncChannelName: 'syncChannel'
     });
-    await service.start();
+    if (startService) {
+      await service.start();
+    }
     // Create another channel with same name for communication
     channel = new BroadcastChannel('syncChannel');
     return tokenManager;
@@ -108,6 +110,16 @@ describe('SyncStorageService', () => {
       await expect(async () => {
         await service.start();
       }).rejects.toThrowError(new AuthSdkError('SyncStorageService is not supported in current browser.'));
+    });
+
+    it('calling start twice creates only 1 channel', async () => {
+      await createInstance(false);
+      const spy = jest.spyOn(BroadcastChannel.prototype, 'addEventListener');
+      await Promise.all([
+        service.start(),
+        service.start()
+      ]);
+      expect(spy).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -90,6 +90,17 @@ describe('AutoRenewService', function() {
       expect(Emitter.prototype.off).toHaveBeenCalledWith('expired', expect.any(Function));
     });
 
+    it('calling start twice should register listener for "expired" event once', async () => {
+      await setup({ tokenManager: { autoRenew: true } }, false);
+      jest.spyOn(client.tokenManager, 'on');
+      await Promise.all([
+        service.start(),
+        service.start()
+      ]);
+      expect(client.tokenManager.on).toHaveBeenCalledWith('expired', expect.any(Function));
+      expect(client.tokenManager.on).toHaveBeenCalledTimes(1);
+    });
+
     it('should renew token if expired after service start', async function() {
       await setup({
         tokenManager: { autoRenew: true }

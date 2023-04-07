@@ -53,7 +53,7 @@ export class LeaderElectionService implements ServiceInterface {
 
   async start() {
     await this.stop();
-    if (this.canStart() && !this.started) {
+    if (this.canStart()) {
       const { electionChannelName } = this.options;
       this.channel = new BroadcastChannel(electionChannelName as string);
       this.elector = createLeaderElection(this.channel);
@@ -88,7 +88,7 @@ export class LeaderElectionService implements ServiceInterface {
   }
 
   canStart() {
-    return isBrowser();
+    return isBrowser() && !this.started;
   }
 
 }
