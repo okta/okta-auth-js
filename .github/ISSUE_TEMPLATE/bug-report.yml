@@ -5,23 +5,10 @@ body:
   - type: textarea
     id: problem
     attributes:
-      label: Describe the bug?
+      label: Describe the bug
       description: |
         Please be as detailed as possible. This will help us address the bug in a timely manner.
-    validations:
-      required: true
-
-  - type: textarea
-    id: expected
-    attributes:
-      label: What is expected to happen?
-    validations:
-      required: true
-
-  - type: textarea
-    id: actual
-    attributes:
-      label: What is the actual behavior?
+      placeholder: What is expected to happen... What is the actual behavior?
     validations:
       required: true
 
@@ -40,18 +27,7 @@ body:
     attributes:
       label: SDK Versions
       description: |
-        Please provide versions of all `@okta/` scoped packages used in application,
-        as well as any relevant non-Okta packages
-    validations:
-      required: true
-
-  - type: textarea
-    id: execEnv
-    attributes:
-      label: Execution Environment
-      description: |
-        Please description the application's execution environment
-        For example: browser(s), NodeJS, and OS versions
+        Output of `npx envinfo --system --npmPackages '{@okta/*,}' --binaries --browsers`
     validations:
       required: true
 
