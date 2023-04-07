@@ -49,9 +49,9 @@ describe('LeaderElectionService', () => {
     return service;
   }
 
-  function createElectorWithLeadership() {
+  function createElectorWithLeadership(isLeader = true) {
     return {
-      isLeader: true,
+      isLeader,
       awaitLeadership: jest.fn().mockReturnValue(new Promise(() => {})),
       die: jest.fn(),
     };
@@ -92,6 +92,22 @@ describe('LeaderElectionService', () => {
       await service.start();
       expect(service.isStarted()).toBeTruthy();
       expect(elector.die).toHaveBeenCalledTimes(1);
+    });
+
+    it('calling start twice creates only 1 elector', async () => {
+      let electors: any[] = [];
+      jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockImplementation(() => {
+        const elector = createElectorWithLeadership(electors.length === 0);
+        electors.push(elector);
+        return elector;
+      });
+      const service = createService();
+      await Promise.all([
+        service.start(),
+        service.start()
+      ]);
+      expect(service.isLeader()).toBeTruthy();
+      expect(electors.length).toBe(1);
     });
   });
 

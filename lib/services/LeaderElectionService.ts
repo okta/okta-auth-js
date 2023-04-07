@@ -55,10 +55,14 @@ export class LeaderElectionService implements ServiceInterface {
     await this.stop();
     if (this.canStart()) {
       const { electionChannelName } = this.options;
-      this.channel = new BroadcastChannel(electionChannelName as string);
-      this.elector = createLeaderElection(this.channel);
-      this.elector.onduplicate = this.onLeaderDuplicate;
-      this.elector.awaitLeadership().then(this.onLeader);
+      if (!this.channel) {
+        this.channel = new BroadcastChannel(electionChannelName as string);
+      }
+      if (!this.elector) {
+        this.elector = createLeaderElection(this.channel);
+        this.elector.onduplicate = this.onLeaderDuplicate;
+        this.elector.awaitLeadership().then(this.onLeader);
+      }
       this.started = true;
     }
   }
