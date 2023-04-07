@@ -53,16 +53,12 @@ export class LeaderElectionService implements ServiceInterface {
 
   async start() {
     await this.stop();
-    if (this.canStart()) {
+    if (this.canStart() && !this.started) {
       const { electionChannelName } = this.options;
-      if (!this.channel) {
-        this.channel = new BroadcastChannel(electionChannelName as string);
-      }
-      if (!this.elector) {
-        this.elector = createLeaderElection(this.channel);
-        this.elector.onduplicate = this.onLeaderDuplicate;
-        this.elector.awaitLeadership().then(this.onLeader);
-      }
+      this.channel = new BroadcastChannel(electionChannelName as string);
+      this.elector = createLeaderElection(this.channel);
+      this.elector.onduplicate = this.onLeaderDuplicate;
+      this.elector.awaitLeadership().then(this.onLeader);
       this.started = true;
     }
   }
