@@ -165,23 +165,25 @@ describe('OktaAuth (api)', function() {
   });
 
   describe('closeSession', function() {
-    it('Default options: clears TokenManager, closes session', function() {
+    it('Default options: clears TokenManager, closes session, resolves with true', function() {
       spyOn(auth.session, 'close').and.returnValue(Promise.resolve());
       spyOn(auth.tokenManager, 'clear');
       return auth.closeSession()
-        .then(function() {
+        .then(function(sessionClosed) {
           expect(auth.tokenManager.clear).toHaveBeenCalled();
           expect(auth.session.close).toHaveBeenCalled();
+          expect(sessionClosed).toBeTruthy();
         });
     });
-    it('catches and absorbs "AuthApiError" errors with errorCode E0000007 (RESOURCE_NOT_FOUND_EXCEPTION)', function() {
+    it('catches and absorbs "AuthApiError" errors with errorCode E0000007 (RESOURCE_NOT_FOUND_EXCEPTION), resolves with false', function() {
       var testError = new AuthApiError({ errorCode: 'E0000007' } as unknown as APIError);
       spyOn(auth.session, 'close').and.callFake(function() {
         return Promise.reject(testError);
       });
       return auth.closeSession()
-      .then(function() {
+      .then(function(sessionClosed) {
         expect(auth.session.close).toHaveBeenCalled();
+        expect(sessionClosed).toBeFalsy();
       });
     });
     it('will throw unknown errors', function() {

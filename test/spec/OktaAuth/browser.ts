@@ -217,7 +217,7 @@ describe('OktaAuth (browser)', function() {
         spyOn(auth.tokenManager, 'clear');
         spyOn(auth, 'revokeAccessToken').and.returnValue(Promise.resolve());
         spyOn(auth, 'revokeRefreshToken').and.returnValue(Promise.resolve());
-        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
+        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve(true));
       }
 
       beforeEach(() => {
@@ -228,11 +228,12 @@ describe('OktaAuth (browser)', function() {
 
       it('Default options when no refreshToken: will revokeAccessToken and use window.location.origin for postLogoutRedirectUri', function() {
         return auth.signOut()
-          .then(function() {
+          .then(function(signOutSuccess) {
             expect(auth.revokeRefreshToken).not.toHaveBeenCalled();
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.closeSession).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
+            expect(signOutSuccess).toBeTruthy();
           });
       });
 
@@ -241,11 +242,12 @@ describe('OktaAuth (browser)', function() {
         auth.tokenManager.getTokensSync = jest.fn().mockReturnValue({ accessToken, idToken, refreshToken });
 
         return auth.signOut()
-          .then(function() {
+          .then(function(signOutSuccess) {
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.revokeRefreshToken).toHaveBeenCalledWith(refreshToken);
             expect(auth.closeSession).not.toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(`${issuer}/oauth2/v1/logout?id_token_hint=${idToken.idToken}&post_logout_redirect_uri=${encodedOrigin}`);
+            expect(signOutSuccess).toBeTruthy();
           });
       });
 
@@ -368,25 +370,27 @@ describe('OktaAuth (browser)', function() {
       });
 
       it('Default options: will revokeAccessToken and fallback to closeSession and redirect to window.location.origin', function() {
-        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
+        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve(true));
         return auth.signOut()
-          .then(function() {
+          .then(function(signOutSuccess) {
             expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(4);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.assign).toHaveBeenCalledWith(window.location.origin);
+            expect(signOutSuccess).toBeTruthy();
           });
       });
 
       it('Default options: if href===origin will reload the page', function() {
-        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
+        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve(true));
         global.window.location.href = origin;
         return auth.signOut()
-          .then(function() {
+          .then(function(signOutSuccess) {
             expect(auth.tokenManager.getTokensSync).toHaveBeenCalledTimes(4);
             expect(auth.revokeAccessToken).toHaveBeenCalledWith(accessToken);
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.reload).toHaveBeenCalled();
+            expect(signOutSuccess).toBeTruthy();
           });
       });
 
@@ -408,10 +412,11 @@ describe('OktaAuth (browser)', function() {
 
       it('with postLogoutRedirectUri: will call window.location.assign', function() {
         const postLogoutRedirectUri = 'http://someother';
-        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve());
+        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve(true));
         return auth.signOut({ postLogoutRedirectUri })
-          .then(function() {
+          .then(function(signOutSuccess) {
             expect(window.location.assign).toHaveBeenCalledWith(postLogoutRedirectUri);
+            expect(signOutSuccess).toBeTruthy();
           });
       });
 
@@ -429,6 +434,26 @@ describe('OktaAuth (browser)', function() {
             expect(e).toBe(testError);
             expect(auth.closeSession).toHaveBeenCalled();
             expect(window.location.assign).not.toHaveBeenCalled();
+          });
+      });
+
+      it('if closeSession resolves with true, signOut resolves with true', function() {
+        const postLogoutRedirectUri = 'http://someother';
+        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve(true));
+        return auth.signOut({ postLogoutRedirectUri })
+          .then(function(signOutSuccess) {
+            expect(window.location.assign).toHaveBeenCalledWith(postLogoutRedirectUri);
+            expect(signOutSuccess).toBeTruthy();
+          });
+      });
+
+      it('if closeSession resolves with false (session does not exist), signOut resolves with false', function() {
+        const postLogoutRedirectUri = 'http://someother';
+        spyOn(auth, 'closeSession').and.returnValue(Promise.resolve(false));
+        return auth.signOut({ postLogoutRedirectUri })
+          .then(function(signOutSuccess) {
+            expect(window.location.assign).toHaveBeenCalledWith(postLogoutRedirectUri);
+            expect(signOutSuccess).toBeFalsy();
           });
       });
     });
