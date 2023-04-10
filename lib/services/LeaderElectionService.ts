@@ -52,7 +52,6 @@ export class LeaderElectionService implements ServiceInterface {
   }
 
   async start() {
-    await this.stop();
     if (this.canStart()) {
       const { electionChannelName } = this.options;
       this.channel = new BroadcastChannel(electionChannelName as string);

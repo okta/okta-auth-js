@@ -58,7 +58,6 @@ export class SyncStorageService implements ServiceInterface {
   }
 
   async start() {
-    await this.stop();
     if (!this.canStart()) {
       return;
     }

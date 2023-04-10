@@ -91,19 +91,19 @@ describe('SyncStorageService', () => {
   }
 
   describe('start', () => {
-    it('stops service if already started, closes and recreates channel', async () => {
-      await createInstance();
-      const oldChannel = (service as any).channel;
-      jest.spyOn(oldChannel, 'close');
-      await service.start(); // restart
-      const newChannel = (service as any).channel;
+    it('does not stop service if already started', async () => {
+      await createInstance(false);
+      await service.start();
+      const channel = (service as any).channel;
+      jest.spyOn(channel, 'close');
+      await service.start(); // start again
       expect(service.isStarted()).toBeTruthy();
-      expect(oldChannel.close).toHaveBeenCalledTimes(1);
-      expect(newChannel).not.toStrictEqual(oldChannel);
+      expect((service as any).channel).toStrictEqual(channel);
+      expect(channel.close).toHaveBeenCalledTimes(0);
     });
 
     it('throws AuthSdkError when no sync method is supported in browser', async () => {
-      await createInstance();
+      await createInstance(false);
       jest.spyOn(mocked.broadcastChannel, 'BroadcastChannel').mockImplementationOnce(() => {
         throw new Error('Not supported');
       });
@@ -124,6 +124,15 @@ describe('SyncStorageService', () => {
   });
 
   describe('stop', () => {
+    it('should close channel', async () => {
+      await createInstance();
+      const channel = (service as any).channel;
+      jest.spyOn(channel, 'close');
+      await service.stop();
+      expect(service.isStarted()).toBeFalsy();
+      expect(channel.close).toHaveBeenCalledTimes(1);
+    });
+
     it('can be called twice without error', async () => {
       await createInstance();
       await Promise.race([

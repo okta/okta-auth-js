@@ -84,14 +84,14 @@ describe('LeaderElectionService', () => {
       expect(elector.awaitLeadership).toHaveBeenCalledTimes(1);
     });
 
-    it('stops service if already started', async () => {
+    it('does not stop service if already started', async () => {
       const elector = createElectorWithLeadership();
       jest.spyOn(mocked.broadcastChannel, 'createLeaderElection').mockReturnValue(elector);
       const service = createService();
       await service.start();
-      await service.start();
+      await service.start(); // start again
       expect(service.isStarted()).toBeTruthy();
-      expect(elector.die).toHaveBeenCalledTimes(1);
+      expect(elector.die).toHaveBeenCalledTimes(0);
     });
 
     it('calling start twice creates only 1 elector', async () => {
