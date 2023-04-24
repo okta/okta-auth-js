@@ -54,15 +54,13 @@ export class SyncStorageService implements ServiceInterface {
   }
 
   canStart() {
-    return !!this.options.syncStorage && isBrowser();
+    return !!this.options.syncStorage && isBrowser() && !this.started;
   }
 
   async start() {
     if (!this.canStart()) {
       return;
     }
-
-    await this.stop();
     
     const { syncChannelName } = this.options;
     try {

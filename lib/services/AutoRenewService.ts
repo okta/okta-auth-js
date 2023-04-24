@@ -71,12 +71,11 @@ export class AutoRenewService implements ServiceInterface {
   }
 
   canStart() {
-    return (!!this.options.autoRenew || !!this.options.autoRemove);
+    return (!!this.options.autoRenew || !!this.options.autoRemove) && !this.started;
   }
 
   async start() {
     if (this.canStart()) {
-      await this.stop();
       this.tokenManager.on(EVENT_EXPIRED, this.onTokenExpiredHandler);
       if (this.tokenManager.isStarted()) {
         // If token manager has been already started, we could miss token expire events,

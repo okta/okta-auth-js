@@ -75,33 +75,35 @@ describe('SyncStorageService', () => {
     }
   });
 
-  async function createInstance(options?) {
-    tokenManager = new TokenManager(sdkMock, options);
+  async function createInstance(startService = true) {
+    tokenManager = new TokenManager(sdkMock);
     tokenManager.start();
     service = new SyncStorageService(tokenManager, {
       ...tokenManager.getOptions(), 
       syncChannelName: 'syncChannel'
     });
-    await service.start();
+    if (startService) {
+      await service.start();
+    }
     // Create another channel with same name for communication
     channel = new BroadcastChannel('syncChannel');
     return tokenManager;
   }
 
   describe('start', () => {
-    it('stops service if already started, closes and recreates channel', async () => {
-      await createInstance();
-      const oldChannel = (service as any).channel;
-      jest.spyOn(oldChannel, 'close');
-      await service.start(); // restart
-      const newChannel = (service as any).channel;
+    it('does not stop service if already started', async () => {
+      await createInstance(false);
+      await service.start();
+      const channel = (service as any).channel;
+      jest.spyOn(channel, 'close');
+      await service.start(); // start again
       expect(service.isStarted()).toBeTruthy();
-      expect(oldChannel.close).toHaveBeenCalledTimes(1);
-      expect(newChannel).not.toStrictEqual(oldChannel);
+      expect((service as any).channel).toStrictEqual(channel);
+      expect(channel.close).toHaveBeenCalledTimes(0);
     });
 
     it('throws AuthSdkError when no sync method is supported in browser', async () => {
-      await createInstance();
+      await createInstance(false);
       jest.spyOn(mocked.broadcastChannel, 'BroadcastChannel').mockImplementationOnce(() => {
         throw new Error('Not supported');
       });
@@ -109,9 +111,28 @@ describe('SyncStorageService', () => {
         await service.start();
       }).rejects.toThrowError(new AuthSdkError('SyncStorageService is not supported in current browser.'));
     });
+
+    it('calling start twice creates only 1 channel', async () => {
+      await createInstance(false);
+      const spy = jest.spyOn(BroadcastChannel.prototype, 'addEventListener');
+      await Promise.all([
+        service.start(),
+        service.start()
+      ]);
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('stop', () => {
+    it('should close channel', async () => {
+      await createInstance();
+      const channel = (service as any).channel;
+      jest.spyOn(channel, 'close');
+      await service.stop();
+      expect(service.isStarted()).toBeFalsy();
+      expect(channel.close).toHaveBeenCalledTimes(1);
+    });
+
     it('can be called twice without error', async () => {
       await createInstance();
       await Promise.race([
