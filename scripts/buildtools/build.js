@@ -92,7 +92,7 @@ function removeBuildDir(val) {
 }
 
 // Remove "build/" from the entrypoint paths.
-['main', 'module', 'browser', 'types', 'exports'].forEach(function(key) {
+['main', 'module', 'browser', 'types', 'exports', 'react-native'].forEach(function(key) {
   packageJSON[key] = removeBuildDir(packageJSON[key]);
 });
 

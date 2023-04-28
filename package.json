@@ -8,6 +8,7 @@
   "main": "build/cjs/exports/default.js",
   "module": "build/esm/node/exports/exports/default.js",
   "browser": "build/umd/default.js",
+  "react-native": "build/esm/browser/exports/exports/default.js",
   "types": "build/types/lib/exports/default.d.ts",
   "exports": {
     ".": {

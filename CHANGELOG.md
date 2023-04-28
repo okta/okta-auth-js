@@ -1,10 +1,15 @@
 # Changelog
 
-## 7.2.1
+## 7.3.0
+
+### Features
+
+- [#1404](https://github.com/okta/okta-auth-js/pull/1404) Adds `react-native` to `package.json`
+- [#1395](https://github.com/okta/okta-auth-js/pull/1395) Changes resolve value of `closeSession()` and `signOut()` to boolean
 
 ### Fixes
 
-- [#1395](https://github.com/okta/okta-auth-js/pull/1395) Changes resolve value of `closeSession()` and `signOut()` to boolean
+- [#1398](https://github.com/okta/okta-auth-js/pull/1398) Fixes race condition in `LeaderElectionService` start
 
 ## 7.2.0
 
