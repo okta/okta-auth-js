@@ -812,7 +812,7 @@ const config = {
 };
 
 const authClient = new OktaAuth(config);
-const tokens = await authClient.token.getWithoutPrompt();
+const { tokens } = await authClient.token.getWithoutPrompt();
 authClient.tokenManager.setTokens(tokens); // storageProvider.setItem
 
 ```
