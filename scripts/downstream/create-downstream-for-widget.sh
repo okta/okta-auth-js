@@ -18,3 +18,5 @@ echo "Update okta-signin-widget version in scripts/setup.sh to ${WIDGET_VERSION}
 sed -i "s/\(WIDGET_VERSION\=\).*/\1\"${WIDGET_VERSION}\"/g" setup.sh
 
 popd > /dev/null
+
+
