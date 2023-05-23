@@ -13,8 +13,9 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   export CI=true
 else
 # if running locally
-  # https://gist.github.com/mihow/9c7f559807069a03e302605691f85572
-  export $(cat $DIR/../.bacon.env | xargs)    # this might not work if the .ini files contains special characters
+  set -a
+  source $DIR/../.bacon.env
+  set +a
 
   # moves `testenv` so it does not change env of test apps ran during e2e tests
   mv $DIR/../testenv $DIR/../testenv.bak
@@ -44,17 +45,16 @@ run_e2e () {
       echo "Cucumber tests failed! Exiting..."
       exit ${TEST_FAILURE}
     fi
-  else
-    if ! yarn test:e2e; then
-      echo "OIE e2e tests failed! Exiting..."
-      exit ${TEST_FAILURE}
-    fi
   fi
+  if ! yarn test:e2e; then
+    echo "OIE e2e tests failed! Exiting..."
+    exit ${TEST_FAILURE}
+  fi
+  finish_log_group $?
 
   echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
   echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
   exit ${PUBLISH_TYPE_AND_RESULT_DIR}
-  finish_log_group $?
 }
 
 setup_sample_tests () {
@@ -105,9 +105,9 @@ run_sample_tests () {
     echo "tests failed! Exiting..."
     exit ${TEST_FAILURE}
   fi
+  finish_log_group $?
 
   echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
   echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
   exit ${PUBLISH_TYPE_AND_RESULT_DIR}
-  finish_log_group $?
 }

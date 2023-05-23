@@ -35,6 +35,10 @@ describe('SSO', () => {
   });
 
   it('starts an SSO session', async () => {
+    if (process.env.LOCAL_MONOLITH) {
+      return pending();
+    }
+
     // open 2 tabs: app & okta
     await openPKCE(testContext.options);
     await openOktaHome();
@@ -74,6 +78,10 @@ describe('SSO', () => {
   });
 
   it('another instance of the app can signin without entering credentials', async () => {
+    if (process.env.LOCAL_MONOLITH) {
+      return pending();
+    }
+    
     await openPKCE(testContext.options);
     await loginDirect();
     await TestApp.getUserInfo();

@@ -39,6 +39,10 @@ describe('interaction flow', () => {
     if (!ORG_OIE_ENABLED) {
       return; // interaction_required only supported on OIE orgs
     }
+
+    if (process.env.LOCAL_MONOLITH) {
+      return pending();
+    }
     
     await openPKCE({});
     await TestApp.loginRedirect(); // will create transaction Meta

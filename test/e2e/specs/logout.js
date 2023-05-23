@@ -26,6 +26,10 @@ describe('E2E logout', () => {
 
     describe('logoutApp', () => {
       it('can clear app session, keeping remote SSO session open', async () => {
+        if (process.env.LOCAL_MONOLITH) {
+          return pending();
+        }
+
         await TestApp.logoutApp();
   
         // We should still be logged into Okta
@@ -71,6 +75,10 @@ describe('E2E logout', () => {
 
     describe('logoutXHR', () => {
       it('can logout from okta using XHR, ending remote user session', async() => {
+        if (process.env.LOCAL_MONOLITH) {
+          return pending();
+        }
+
         await TestApp.logoutXHR();
   
         // We should not be logged into Okta

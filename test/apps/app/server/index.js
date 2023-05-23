@@ -15,6 +15,13 @@
 
 require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 
+if (!process.env.DEBUG) {
+  /* eslint-disable @typescript-eslint/no-empty-function */
+  console.log = (()=>{});
+  console.error = (()=>{});
+  /* eslint-enable @typescript-eslint/no-empty-function */
+}
+
 const createProxyMiddleware = require('./proxyMiddleware');
 const loginMiddleware = require('./loginMiddleware');
 const callbackMiddleware = require('./callbackMiddleware');

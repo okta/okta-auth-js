@@ -108,6 +108,10 @@ describe('cross tabs AuthState update', () => {
   });
 
   it('should update tokens cross tabs', async () => {
+    if (process.env.LOCAL_MONOLITH) {
+      return pending();
+    }
+
     const preTabTokenMap = {};
     const currentTabTokenMap = {};
     await assertSameTokensInTabs(preTabTokenMap, handles);
