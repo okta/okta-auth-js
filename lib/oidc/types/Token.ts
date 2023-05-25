@@ -47,7 +47,7 @@ export enum TokenKind {
   ACCESS = 'accessToken',
   ID = 'idToken',
   REFRESH = 'refreshToken',
-};
+}
 
 export function isToken(obj: any): obj is Token {
   if (obj &&

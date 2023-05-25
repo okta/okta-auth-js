@@ -16,7 +16,7 @@ import { getWellKnown } from './endpoints/well-known';
 import { post } from '../http';
 import { toQueryString } from '../util';
 import { btoa } from '../crypto';
-import { AccessToken, Token, TokenKind } from './types';
+import { Token, TokenKind } from './types';
 
 const hintMap = {
   accessToken: 'access_token',
@@ -24,6 +24,7 @@ const hintMap = {
   refreshToken: 'refresh_token'
 };
 
+/* eslint complexity: [2, 9] */
 export async function oidcIntrospect (sdk, kind: TokenKind, token?: Token) {
   let issuer: string;
   let clientId: string = sdk.options.clientId;
@@ -33,13 +34,15 @@ export async function oidcIntrospect (sdk, kind: TokenKind, token?: Token) {
     token = sdk.tokenManager.getTokens()[kind];
   }
 
+  if (!token) {
+    throw new AuthSdkError(`unable to find ${kind} in storage or fn params`);
+  }
+
   if (kind !== TokenKind.ACCESS) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    issuer = (token! as any).issuer;
+    issuer = (token as any)?.issuer;
   }
   else {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    issuer = (token as AccessToken).claims.iss!;
+    issuer = (token as any)?.claims?.iss;
   }
   issuer ??= sdk.options.issuer;
 
@@ -47,13 +50,10 @@ export async function oidcIntrospect (sdk, kind: TokenKind, token?: Token) {
     throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to introspect a token');
   }
   if (!issuer) {
-    return Promise.reject(new AuthSdkError('Unable to find issuer'));
-  }
-  if (!kind || !token) {
-    return Promise.reject(new AuthSdkError(`${kind} token not found`));
+    throw new AuthSdkError('Unable to find issuer');
   }
 
-  const { introspect_endpoint: introspectUrl } = await getWellKnown(sdk, issuer);
+  const { introspection_endpoint: introspectUrl }  = await getWellKnown(sdk, issuer);
   const authHeader = clientSecret ? btoa(`${clientId}:${clientSecret}`) : btoa(clientId);
   const args = toQueryString({
     // eslint-disable-next-line camelcase
