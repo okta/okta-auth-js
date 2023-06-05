@@ -232,7 +232,8 @@
   },
   "resolutions": {
     "**/request/qs": "^6.10.5",
-    "**/globule/minimatch": "^3.1.2"
+    "**/globule/minimatch": "^3.1.2",
+    "**/cacheable-request/http-cache-semantics": "^4.0.0"
   },
   "workspaces": {
     "packages": [
