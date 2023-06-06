@@ -233,7 +233,9 @@
   "resolutions": {
     "**/request/qs": "^6.10.5",
     "**/globule/minimatch": "^3.1.2",
-    "**/cacheable-request/http-cache-semantics": "^4.0.0"
+    "**/cacheable-request/http-cache-semantics": "^4.0.0",
+    "**/has-ansi/ansi-regex": "^3.0.1",
+    "**/strip-ansi/ansi-regex": "^3.0.1"
   },
   "workspaces": {
     "packages": [
