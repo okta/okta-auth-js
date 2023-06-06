@@ -8,7 +8,7 @@ export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/unit"
 export CI=true
 export ISSUER=https://javascript-idx-sdk-idfirst.okta.com
 export USERNAME=george@acme.com
-get_secret prod/okta-sdk-vars/password PASSWORD
+get_vault_secret_key repo_gh-okta-okta-auth-js/default password PASSWORD
 
 # for myaccount password API testing
 export PASSWORDLESS_USERNAME=password.optional@mailinator.com
