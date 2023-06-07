@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^1.0.7",
-    "vite": "^2.9.2",
+    "vite": "^2.9.16",
     "rollup-plugin-visualizer": "~5.5.4",
     "eslint": "^8.10.0",
     "eslint-plugin-react": "^7.29.3",
