@@ -69,9 +69,6 @@ fi
 
 cd ${OKTA_HOME}/${REPO}
 
-# todo
-export WIDGET_VERSION="7.6.0-g355a6da"
-
 create_log_group "Yarn Install"
 # Install dependencies. --ignore-scripts will prevent chromedriver from attempting to install
 if ! yarn install --frozen-lockfile --ignore-scripts; then
