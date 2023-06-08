@@ -85,9 +85,11 @@ install_siw_platform_scripts () {
   orig_registry=$(yarn config get @okta:registry)
   REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-topic"
   update_yarn_config () {
-    yarn config set @okta:registry ${REGISTRY}
-    yarn config set strict-ssl false
-    trap restore_yarn_config EXIT
+    if [ "$SIW_PLATFORM_ENV" == "local" ] ; then
+      yarn config set @okta:registry ${REGISTRY}
+      yarn config set strict-ssl false
+      trap restore_yarn_config EXIT
+    fi
   }
   restore_yarn_config () {
     if [ "$SIW_PLATFORM_ENV" == "local" ] ; then
@@ -102,14 +104,14 @@ install_siw_platform_scripts () {
 
   update_yarn_config
   if ! yarn global add @okta/siw-platform-scripts ; then
-    echo "siw-platform-scripts could not be installed via artifactory"
+    echo "siw-platform-scripts could not be installed"
     exit ${FAILED_SETUP}
   fi
   restore_yarn_config
 }
 
 artifactory_siw_install () {
-  if ! siw-platform install-artifact -e local -n @okta/okta-signin-widget -v ${WIDGET_VERSION} ; then
+  if ! siw-platform install-artifact -e ${SIW_PLATFORM_ENV} -n @okta/okta-signin-widget -v ${WIDGET_VERSION} ; then
     echo "WIDGET_VERSION could not be installed via siw-platform: ${WIDGET_VERSION}"
     exit ${FAILED_SETUP}
   fi
