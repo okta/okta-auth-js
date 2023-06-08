@@ -7,7 +7,7 @@ source $(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)/foreac
 
 replace_workspace_version () {
   # $1 = workspace path
-  # #2 = package name
+  # $2 = package name
   # $3 = version
   json=$(cat $1/package.json |  jq --arg pkg $2 --arg version $3 'if 
       .dependencies | has("\($pkg)") then .dependencies["\($pkg)"] = $version
@@ -17,11 +17,52 @@ replace_workspace_version () {
   printf '%s\n' "${json}" > $1/package.json
 }
 
+replace_workspace_dev_version () {
+  # $1 = workspace path
+  # $2 = package name
+  # $3 = version
+  json=$(cat $1/package.json |  jq --arg pkg $2 --arg version $3 '
+    if  .dependencies | has("\($pkg)") then
+     del(.dependencies["\($pkg)"]) | .devDependencies["\($pkg)"] = $version
+    elif .devDependencies | has("\($pkg)") then
+     .devDependencies["\($pkg)"] = $version
+    else . end') && \
+  printf '%s\n' "${json}" > $1/package.json
+}
+
+has_package () {
+  # $1 = workspace path
+  # $2 = package name
+  result=$(cat $1/package.json | jq --arg pkg $2 '
+    (.devDependencies | has("\($pkg)")) or (.dependencies | has("\($pkg)"))
+  ')
+  [[ "$result" == "true" ]]
+}
+
+install_artifact () {
+  # $1 = workspace path
+  # $2 = package name
+  # $3 = version
+  if has_package $1 $2; then
+    replace_workspace_dev_version $1 $2 $3
+    if ! siw-platform install-artifact -e ${SIW_PLATFORM_ENV} -n $2 -v $3 ; then
+      echo "$2 could not be installed via siw-platform: $3"
+      exit ${FAILED_SETUP}
+    fi
+  fi
+}
+
 install_beta_pkg () {
   # $1 = package name
   # $2 = version
   foreach_workspace -p replace_workspace_version $1 $2
   yarn --ignore-scripts
+}
+
+install_artifact_in_workspaces () {
+  # $1 = package name
+  # $2 = version
+  foreach_workspace -p install_artifact $1 $2
 }
 
 if [ $sourced -ne 1 ]; then

@@ -9,6 +9,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # This is available from the "downstream artifact" menu on any okta-auth-js build in Bacon.
   # DO NOT MERGE ANY CHANGES TO THIS LINE!!
   export WIDGET_VERSION=""
+  export SIW_PLATFORM_ENV="bacon"
 
   # Add yarn to the $PATH so npm cli commands do not fail
   export PATH="${PATH}:$(yarn global bin)"
@@ -18,13 +19,13 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   setup_service node "${1:-v14.18.0}"
   # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
   setup_service yarn 1.21.1 /etc/pki/tls/certs/ca-bundle.crt
-
 else
   # bacon defines OKTA_HOME and REPO, define these relative to this file
   export OKTA_HOME=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd)
   export REPO="."
   export TEST_SUITE_TYPE_FILE=/dev/null
   export TEST_RESULT_FILE_DIR_FILE=/dev/null
+  export SIW_PLATFORM_ENV="local"
 
   ### (known) Bacon exit codes
   # success
@@ -64,12 +65,32 @@ else
   }
 
   set -x  # when running locally, might as well see all the commands being ran
+
+  # to install @okta/siw-platform-scripts locally
+  REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-topic"
+  orig_ssl=$(yarn config get strict-ssl)
+  orig_registry=$(yarn config get @okta:registry)
+  yarn config set @okta:registry ${REGISTRY}
+  yarn config set "strict-ssl" false
+  onexit () {
+    yarn config set @okta:registry ${orig_registry}
+    yarn config set strict-ssl ${orig_ssl}
+  }
+  trap onexit EXIT
 fi
 
 cd ${OKTA_HOME}/${REPO}
 
+# todo
+export WIDGET_VERSION="7.6.0-g355a6da"
+
 create_log_group "Yarn Install"
-# Install dependences. --ignore-scripts will prevent chromedriver from attempting to install
+# Install SIW Platform scripts
+if ! yarn global add @okta/siw-platform-scripts ; then
+  echo "siw-platform-scripts could not be installed via artifactory"
+  exit ${FAILED_SETUP}
+fi
+# Install dependencies. --ignore-scripts will prevent chromedriver from attempting to install
 if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
@@ -77,17 +98,10 @@ fi
 finish_log_group $?
 
 artifactory_siw_install () {
-  REGISTRY="https://artifacts.aue1d.saasure.com/artifactory/npm-topic/@okta/okta-signin-widget/-/@okta"
-
-  ssl=$(npm config get strict-ssl)
-  npm config set strict-ssl false
-  pkg_uri="${REGISTRY}/okta-signin-widget-${WIDGET_VERSION}.tgz"
-  if ! yarn add -DW --force --ignore-scripts $pkg_uri &>/dev/null; then
-    echo "WIDGET_VERSION could not be installed via artifactory: ${WIDGET_VERSION}"
+  if ! siw-platform install-artifact -e local -n @okta/okta-signin-widget -v ${WIDGET_VERSION} ; then
+    echo "WIDGET_VERSION could not be installed via siw-platform: ${WIDGET_VERSION}"
     exit ${FAILED_SETUP}
   fi
-  npm config set strict-ssl $ssl
-  echo $pkg_uri
 }
 
 npm_siw_install () {
@@ -135,12 +149,12 @@ if [ ! -z "$WIDGET_VERSION" ]; then
   if [ "$WIDGET_VERSION" = "$SHA" ]; then
     # no sha found, install from npm
     INSTALLED_VERSION=$(npm_siw_install)
+    install_beta_pkg @okta/okta-signin-widget "$INSTALLED_VERSION"
   else
     # sha found, install from artifactory
-    INSTALLED_VERSION=$(artifactory_siw_install)
+    artifactory_siw_install
+    install_artifact_in_workspaces @okta/okta-signin-widget "$WIDGET_VERSION"
   fi
-
-  install_beta_pkg @okta/okta-signin-widget "$INSTALLED_VERSION"
 
   verify_workspace_versions @okta/okta-signin-widget
   echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"
