@@ -21,6 +21,7 @@ replace_workspace_dev_version () {
   # $1 = workspace path
   # $2 = package name
   # $3 = version
+  # package should be moved to `devDependencies` cause `siw-platform` uses `--dev`
   json=$(cat $1/package.json |  jq --arg pkg $2 --arg version $3 '
     if  .dependencies | has("\($pkg)") then
      del(.dependencies["\($pkg)"]) | .devDependencies["\($pkg)"] = $version
