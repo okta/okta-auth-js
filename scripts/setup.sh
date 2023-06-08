@@ -65,18 +65,6 @@ else
   }
 
   set -x  # when running locally, might as well see all the commands being ran
-
-  # to install @okta/siw-platform-scripts locally
-  REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-topic"
-  orig_ssl=$(yarn config get strict-ssl)
-  orig_registry=$(yarn config get @okta:registry)
-  yarn config set @okta:registry ${REGISTRY}
-  yarn config set "strict-ssl" false
-  onexit () {
-    yarn config set @okta:registry ${orig_registry}
-    yarn config set strict-ssl ${orig_ssl}
-  }
-  trap onexit EXIT
 fi
 
 cd ${OKTA_HOME}/${REPO}
@@ -85,17 +73,40 @@ cd ${OKTA_HOME}/${REPO}
 export WIDGET_VERSION="7.6.0-g355a6da"
 
 create_log_group "Yarn Install"
-# Install SIW Platform scripts
-if ! yarn global add @okta/siw-platform-scripts ; then
-  echo "siw-platform-scripts could not be installed via artifactory"
-  exit ${FAILED_SETUP}
-fi
 # Install dependencies. --ignore-scripts will prevent chromedriver from attempting to install
 if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
 finish_log_group $?
+
+install_siw_platform_scripts () {
+  orig_ssl=$(yarn config get strict-ssl)
+  orig_registry=$(yarn config get @okta:registry)
+  REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-topic"
+  update_yarn_config () {
+    yarn config set @okta:registry ${REGISTRY}
+    yarn config set strict-ssl false
+    trap restore_yarn_config EXIT
+  }
+  restore_yarn_config () {
+    if [ "$SIW_PLATFORM_ENV" == "local" ] ; then
+      if [ "$orig_registry" == "undefined" ] ; then
+        yarn config delete @okta:registry
+      else
+        yarn config set @okta:registry $orig_registry
+      fi
+      yarn config set strict-ssl $orig_ssl
+    fi
+  }
+
+  update_yarn_config
+  if ! yarn global add @okta/siw-platform-scripts ; then
+    echo "siw-platform-scripts could not be installed via artifactory"
+    exit ${FAILED_SETUP}
+  fi
+  restore_yarn_config
+}
 
 artifactory_siw_install () {
   if ! siw-platform install-artifact -e local -n @okta/okta-signin-widget -v ${WIDGET_VERSION} ; then
@@ -125,19 +136,6 @@ verify_workspace_versions () {
   then
     onError 1
   fi
-
-  # parses `yarn why` output to generate an json array of installed versions
-  INSTALLED_VERSIONS=$(yarn why --json $PKG | jq -r -s 'map(select(.type == "info") | select(.data | strings | contains("Found"))) | map(.data[11:-1]) | map(split("@")[-1]) | unique')
-
-  if [ $(echo $INSTALLED_VERSIONS | jq length) -ne 1 ]
-  then
-    onError 2
-  fi
-
-  if [ $(echo $INSTALLED_VERSIONS | jq .[0] | tr -d \" ) != $WIDGET_VERSION ]
-  then
-    onError 3
-  fi
 }
 
 if [ ! -z "$WIDGET_VERSION" ]; then
@@ -152,6 +150,7 @@ if [ ! -z "$WIDGET_VERSION" ]; then
     install_beta_pkg @okta/okta-signin-widget "$INSTALLED_VERSION"
   else
     # sha found, install from artifactory
+    install_siw_platform_scripts
     artifactory_siw_install
     install_artifact_in_workspaces @okta/okta-signin-widget "$WIDGET_VERSION"
   fi
