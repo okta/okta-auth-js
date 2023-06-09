@@ -9,7 +9,6 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # This is available from the "downstream artifact" menu on any okta-auth-js build in Bacon.
   # DO NOT MERGE ANY CHANGES TO THIS LINE!!
   export WIDGET_VERSION=""
-  export SIW_PLATFORM_ENV="bacon"
 
   # Add yarn to the $PATH so npm cli commands do not fail
   export PATH="${PATH}:$(yarn global bin)"
@@ -25,7 +24,6 @@ else
   export REPO="."
   export TEST_SUITE_TYPE_FILE=/dev/null
   export TEST_RESULT_FILE_DIR_FILE=/dev/null
-  export SIW_PLATFORM_ENV="local"
 
   ### (known) Bacon exit codes
   # success

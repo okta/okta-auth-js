@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# if running on bacon
+if [ -n "${TEST_SUITE_ID}" ]; then
+  export SIW_PLATFORM_ENV="bacon"
+else
+  export SIW_PLATFORM_ENV="local"
+fi
+
 orig_ssl=$(yarn config get strict-ssl)
 orig_registry=$(yarn config get @okta:registry)
 REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-topic"
