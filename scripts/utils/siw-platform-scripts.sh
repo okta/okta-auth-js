@@ -44,7 +44,7 @@ install_artifact () {
   # $2 = version
   update_yarn_config
   if ! siw-platform install-artifact -e ${SIW_PLATFORM_ENV} -n $1 -v $2 ; then
-    echo "$1 could not be installed via siw-platform: $1"
+    echo "$1 $2 could not be installed via siw-platform"
     exit ${FAILED_SETUP}
   fi
   restore_yarn_config
