@@ -40,16 +40,12 @@ has_package () {
   [[ "$result" == "true" ]]
 }
 
-install_artifact () {
+use_artifact () {
   # $1 = workspace path
   # $2 = package name
   # $3 = version
   if has_package $1 $2; then
     replace_workspace_dev_version $1 $2 $3
-    if ! siw-platform install-artifact -e ${SIW_PLATFORM_ENV} -n $2 -v $3 ; then
-      echo "$2 could not be installed via siw-platform: $3"
-      exit ${FAILED_SETUP}
-    fi
   fi
 }
 
@@ -60,10 +56,10 @@ install_beta_pkg () {
   yarn --ignore-scripts
 }
 
-install_artifact_in_workspaces () {
+use_artifact_in_workspaces () {
   # $1 = package name
   # $2 = version
-  foreach_workspace -p install_artifact $1 $2
+  foreach_workspace -p use_artifact $1 $2
 }
 
 if [ $sourced -ne 1 ]; then

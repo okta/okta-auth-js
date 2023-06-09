@@ -77,43 +77,6 @@ if ! yarn install --frozen-lockfile --ignore-scripts; then
 fi
 finish_log_group $?
 
-install_siw_platform_scripts () {
-  orig_ssl=$(yarn config get strict-ssl)
-  orig_registry=$(yarn config get @okta:registry)
-  REGISTRY="${ARTIFACTORY_URL}/api/npm/npm-topic"
-  update_yarn_config () {
-    if [ "$SIW_PLATFORM_ENV" == "local" ] ; then
-      yarn config set @okta:registry ${REGISTRY}
-      yarn config set strict-ssl false
-      trap restore_yarn_config EXIT
-    fi
-  }
-  restore_yarn_config () {
-    if [ "$SIW_PLATFORM_ENV" == "local" ] ; then
-      if [ "$orig_registry" == "undefined" ] ; then
-        yarn config delete @okta:registry
-      else
-        yarn config set @okta:registry $orig_registry
-      fi
-      yarn config set strict-ssl $orig_ssl
-    fi
-  }
-
-  update_yarn_config
-  if ! yarn global add @okta/siw-platform-scripts ; then
-    echo "siw-platform-scripts could not be installed"
-    exit ${FAILED_SETUP}
-  fi
-  restore_yarn_config
-}
-
-artifactory_siw_install () {
-  if ! siw-platform install-artifact -e ${SIW_PLATFORM_ENV} -n @okta/okta-signin-widget -v ${WIDGET_VERSION} ; then
-    echo "WIDGET_VERSION could not be installed via siw-platform: ${WIDGET_VERSION}"
-    exit ${FAILED_SETUP}
-  fi
-}
-
 npm_siw_install () {
   if ! yarn add -DW --force --ignore-scripts @okta/okta-signin-widget@${WIDGET_VERSION} ; then
     echo "WIDGET_VERSION could not be installed via npm: ${WIDGET_VERSION}"
@@ -150,8 +113,8 @@ if [ ! -z "$WIDGET_VERSION" ]; then
   else
     # sha found, install from artifactory
     install_siw_platform_scripts
-    artifactory_siw_install
-    install_artifact_in_workspaces @okta/okta-signin-widget "$WIDGET_VERSION"
+    use_artifact_in_workspaces @okta/okta-signin-widget "$WIDGET_VERSION"
+    install_artifact @okta/okta-signin-widget "$WIDGET_VERSION"
   fi
 
   verify_workspace_versions @okta/okta-signin-widget
