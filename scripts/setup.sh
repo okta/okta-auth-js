@@ -113,7 +113,7 @@ if [ ! -z "$WIDGET_VERSION" ]; then
   else
     # sha found, install from artifactory
     install_siw_platform_scripts
-    use_artifact_in_workspaces @okta/okta-signin-widget "$WIDGET_VERSION"
+    use_beta_pkg @okta/okta-signin-widget "$WIDGET_VERSION"
     install_artifact @okta/okta-signin-widget "$WIDGET_VERSION"
   fi
 
