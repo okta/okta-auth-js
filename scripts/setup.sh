@@ -8,7 +8,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # Can be used to run a canary build against a beta AuthJS version that has been published to artifactory.
   # This is available from the "downstream artifact" menu on any okta-auth-js build in Bacon.
   # DO NOT MERGE ANY CHANGES TO THIS LINE!!
-  export WIDGET_VERSION=""
+  export WIDGET_VERSION="7.6.0-g355a6da"
 
   # Add yarn to the $PATH so npm cli commands do not fail
   export PATH="${PATH}:$(yarn global bin)"
