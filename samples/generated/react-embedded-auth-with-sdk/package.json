@@ -15,7 +15,7 @@
     "react-router-dom": "^5.2.0",
     "@okta/okta-react": "^6.4.3",
     "@okta/odyssey-react": "0.10.0",
-    "@okta/okta-signin-widget": "^6.8.2",
+    "@okta/okta-signin-widget": "^7.2.1",
     "@okta/okta-auth-js": "*"
   },
   "devDependencies": {
