@@ -7,7 +7,7 @@ source $(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)/foreac
 
 replace_workspace_version () {
   # $1 = workspace path
-  # #2 = package name
+  # $2 = package name
   # $3 = version
   json=$(cat $1/package.json |  jq --arg pkg $2 --arg version $3 'if 
       .dependencies | has("\($pkg)") then .dependencies["\($pkg)"] = $version
@@ -22,6 +22,12 @@ install_beta_pkg () {
   # $2 = version
   foreach_workspace -p replace_workspace_version $1 $2
   yarn --ignore-scripts
+}
+
+use_beta_pkg () {
+  # $1 = package name
+  # $2 = version
+  foreach_workspace -p replace_workspace_version $1 $2
 }
 
 if [ $sourced -ne 1 ]; then

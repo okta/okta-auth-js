@@ -18,7 +18,6 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   setup_service node "${1:-v14.18.0}"
   # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
   setup_service yarn 1.21.1 /etc/pki/tls/certs/ca-bundle.crt
-
 else
   # bacon defines OKTA_HOME and REPO, define these relative to this file
   export OKTA_HOME=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd)
@@ -73,26 +72,12 @@ fi
 cd ${OKTA_HOME}/${REPO}
 
 create_log_group "Yarn Install"
-# Install dependences. --ignore-scripts will prevent chromedriver from attempting to install
+# Install dependencies. --ignore-scripts will prevent chromedriver from attempting to install
 if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
 finish_log_group $?
-
-artifactory_siw_install () {
-  REGISTRY="https://artifacts.aue1d.saasure.com/artifactory/npm-topic/@okta/okta-signin-widget/-/@okta"
-
-  ssl=$(npm config get strict-ssl)
-  npm config set strict-ssl false
-  pkg_uri="${REGISTRY}/okta-signin-widget-${WIDGET_VERSION}.tgz"
-  if ! yarn add -DW --force --ignore-scripts $pkg_uri &>/dev/null; then
-    echo "WIDGET_VERSION could not be installed via artifactory: ${WIDGET_VERSION}"
-    exit ${FAILED_SETUP}
-  fi
-  npm config set strict-ssl $ssl
-  echo $pkg_uri
-}
 
 npm_siw_install () {
   if ! yarn add -DW --force --ignore-scripts @okta/okta-signin-widget@${WIDGET_VERSION} ; then
@@ -115,19 +100,6 @@ verify_workspace_versions () {
   then
     onError 1
   fi
-
-  # parses `yarn why` output to generate an json array of installed versions
-  INSTALLED_VERSIONS=$(yarn why --json $PKG | jq -r -s 'map(select(.type == "info") | select(.data | strings | contains("Found"))) | map(.data[11:-1]) | map(split("@")[-1]) | unique')
-
-  if [ $(echo $INSTALLED_VERSIONS | jq length) -ne 1 ]
-  then
-    onError 2
-  fi
-
-  if [ $(echo $INSTALLED_VERSIONS | jq .[0] | tr -d \" ) != $WIDGET_VERSION ]
-  then
-    onError 3
-  fi
 }
 
 if [ ! -z "$WIDGET_VERSION" ]; then
@@ -139,12 +111,13 @@ if [ ! -z "$WIDGET_VERSION" ]; then
   if [ "$WIDGET_VERSION" = "$SHA" ]; then
     # no sha found, install from npm
     INSTALLED_VERSION=$(npm_siw_install)
+    install_beta_pkg @okta/okta-signin-widget "$INSTALLED_VERSION"
   else
     # sha found, install from artifactory
-    INSTALLED_VERSION=$(artifactory_siw_install)
+    install_siw_platform_scripts
+    use_beta_pkg @okta/okta-signin-widget "$WIDGET_VERSION"
+    install_artifact @okta/okta-signin-widget "$WIDGET_VERSION"
   fi
-
-  install_beta_pkg @okta/okta-signin-widget "$INSTALLED_VERSION"
 
   verify_workspace_versions @okta/okta-signin-widget
   echo "WIDGET_VERSION installed: ${WIDGET_VERSION}"

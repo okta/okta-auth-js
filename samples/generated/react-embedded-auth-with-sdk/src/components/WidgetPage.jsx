@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import OktaSignIn from '@okta/okta-signin-widget';
 import { useOktaAuth } from '@okta/okta-react';
-import '@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';
+import '@okta/okta-signin-widget/css/okta-sign-in.min.css';
 import oidcConfig from '../config';
 
 const WidgetPage = () => {

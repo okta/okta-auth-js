@@ -3,7 +3,7 @@
 # NOTE: MUST BE RAN *AFTER* THE PUBLISH SUITE
 
 # Install required node version
-export REGISTRY="https://artifacts.aue1d.saasure.com/artifactory/npm-topic"
+export REGISTRY="${ARTIFACTORY_URL}/npm-topic"
 
 cd ${OKTA_HOME}/${REPO}
 
