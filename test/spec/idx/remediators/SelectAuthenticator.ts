@@ -15,7 +15,7 @@ describe('remediators/Base/SelectAuthenticator', () => {
               PhoneAuthenticatorOptionFactory.params({
                 // prevent resolving of authenticator by `relatesTo` in purpose
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                _authenticator: "cant_be_resolved" as any
+                _authenticator: 'cant_be_resolved' as any
               }).build(),
             ]
           })
