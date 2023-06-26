@@ -70,5 +70,17 @@ describe('authenticator/util', () => {
       const res = findMatchedOption([authenticator], [option]);
       expect(res).toBe(undefined);
     });
+    it('will not match if key is missing', () => {
+      const authenticator = {
+        id: 'a'
+      };
+      const option = {
+        relatesTo: {
+          id: 'a'
+        }
+      };
+      const res = findMatchedOption([authenticator], [option]);
+      expect(res).toBe(undefined);
+    });
   });
 });

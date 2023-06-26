@@ -21,6 +21,11 @@ const mockComplexContextIdxResponse = require('../../mocks/poll-for-password');
 const mockTerminalIdxResponse = require('../../mocks/terminal-return-email');
 const mockMessageIdxResponse = require('../../mocks/unknown-user');
 const mockSuccessIdxResponse = require('../../mocks/success');
+const mockIdxResponseWithBadRelationship = () => {
+  const mock = require('../../mocks/authenticator-verification-password');
+  mock.remediation.value[1].value[0].options[0].relatesTo = '$.authenticatorEnrollments.value[999]';
+  return mock;
+};
 
 jest.mock('../../../../../../lib/idx/idxState/v1/generateIdxAction');
 jest.mock('../../../../../../lib/idx/idxState/v1/remediationParser');
@@ -164,5 +169,9 @@ describe('idxResponseParser', () => {
       expect( remediations[0]).toMatchSnapshot();
     });
 
+    it('throws error if relatesTo can\'t be resolved', () => {
+      const fn = () => parseIdxResponse( {}, mockIdxResponseWithBadRelationship() );
+      expect(fn).toThrowError('Cannot resolve relatesTo: $.authenticatorEnrollments.value[999]');
+    });
   });
 });
