@@ -35,7 +35,7 @@ export function findMatchedOption(authenticators, options) {
   let option;
   for (let authenticator of authenticators) {
     option = options
-      .find(({ relatesTo }) => relatesTo.key === authenticator.key);
+      .find(({ relatesTo }) => relatesTo.key && relatesTo.key === authenticator.key);
     if (option) {
       break;
     }

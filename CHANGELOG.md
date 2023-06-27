@@ -1,5 +1,15 @@
 # Changelog
 
+## 7.4.0
+
+### Fixes
+
+- [#1421](https://github.com/okta/okta-auth-js/pull/1421) Throw error if there is incorrect `relatesTo` in IDX response
+
+### Other
+
+- [#1409](https://github.com/okta/okta-auth-js/pull/1409) Adds password page to React myaccount sample app
+
 ## 7.3.0
 
 ### Features
@@ -35,7 +45,7 @@
 
 - [#1343](https://github.com/okta/okta-auth-js/pull/1343) Supports Step Up MFA against `/authorize` and `/interact` endpoints
 
-# Other
+### Other
 
 - [#1342](https://github.com/okta/okta-auth-js/pull/1342) - fixes possible RCE in jsonpath-plus
 
