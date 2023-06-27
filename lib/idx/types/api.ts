@@ -86,6 +86,7 @@ export type Input = {
   options?: IdxOption[];
   mutable?: boolean;
   visible?: boolean;
+  customLabel?: boolean
 }
 
 
