@@ -9,6 +9,7 @@
 ### Other
 
 - [#1409](https://github.com/okta/okta-auth-js/pull/1409) Adds password page to React myaccount sample app
+- [#1422](https://github.com/okta/okta-auth-js/pull/1422) IDX: add `customLabel` to `Input` type
 
 ## 7.3.0
 
