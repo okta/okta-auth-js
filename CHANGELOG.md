@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.3.1
+
+### Fixes
+
+- [#1426](https://github.com/okta/okta-auth-js/pull/1426) fix: Don't auto remediate SelectAuthenticator with current authenticator
+
 ## 7.3.0
 
 ### Features
