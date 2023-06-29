@@ -3,7 +3,7 @@ import * as remediators from './remediators';
 import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
 import { GenericRemediator } from './remediators/GenericRemediator';
 import { OktaAuthIdxInterface, IdxFeature, NextStep, RemediateOptions, RemediationResponse, RunOptions } from './types';
-import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse } from './types/idx-js';
+import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse, IdxContext } from './types/idx-js';
 
 export function isTerminalResponse(idxResponse: IdxResponse) {
   const { neededToProceed, interactionCode } = idxResponse;
@@ -213,6 +213,7 @@ export function getRemediator(
   idxRemediations: IdxRemediation[],
   values: RemediationValues,
   options: RemediateOptions,
+  context?: IdxContext,
 ): Remediator | undefined {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const remediators = options.remediators!;
@@ -247,7 +248,7 @@ export function getRemediator(
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const T = getRemediatorClass(remediation, options)!;
       remediator = new T(remediation, values, options);
-      if (remediator.canRemediate()) {
+      if (remediator.canRemediate(context)) {
         // found the remediator
         return remediator;
       }
@@ -284,7 +285,7 @@ export function handleFailedResponse(
   if (terminal) {
     return { idxResponse, terminal, messages };
   } else {
-    const remediator = getRemediator(idxResponse.neededToProceed, {}, options);
+    const remediator = getRemediator(idxResponse.neededToProceed, {}, options, idxResponse.context);
     const nextStep = remediator && getNextStep(authClient, remediator, idxResponse);
     return {
       idxResponse,

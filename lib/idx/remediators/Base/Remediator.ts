@@ -94,7 +94,7 @@ export class Remediator<T extends RemediationValues = RemediationValues> {
 
   // Override this method to provide custom check
   /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
-  canRemediate(): boolean {
+  canRemediate(context?: IdxContext): boolean {
     const required = getRequiredValues(this.remediation);
     const needed = required!.find((key) => !this.hasData(key));
     if (needed) {
