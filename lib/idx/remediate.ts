@@ -67,7 +67,7 @@ export async function remediate(
   values: RemediationValues,
   options: RemediateOptions
 ): Promise<RemediationResponse> {
-  let { neededToProceed, interactionCode } = idxResponse;
+  let { neededToProceed, interactionCode, context } = idxResponse;
   const { flow } = options;
 
   // If the response contains an interaction code, there is no need to remediate
@@ -75,7 +75,7 @@ export async function remediate(
     return { idxResponse };
   }
 
-  const remediator = getRemediator(neededToProceed, values, options);
+  const remediator = getRemediator(neededToProceed, values, options, context);
 
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
@@ -175,7 +175,7 @@ export async function remediate(
   // return nextStep directly
   if (options.useGenericRemediator && !idxResponse.interactionCode && !isTerminalResponse(idxResponse)) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const gr = getRemediator(idxResponse.neededToProceed, values, options)!;
+    const gr = getRemediator(idxResponse.neededToProceed, values, options, idxResponse.context)!;
     const nextStep = getNextStep(authClient, gr, idxResponse);
     return {
       idxResponse,
