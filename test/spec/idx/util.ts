@@ -218,75 +218,83 @@ describe('idx/util', () => {
 
     describe('A Remediator exists that matches one of the idx remediations', () => {
       beforeEach(() => {
-        const idxRemediations = [{
+        const neededToProceed = [{
           name: 'foo'
         }, {
           name: 'bar'
         }];
+        const idxResponse = {
+          neededToProceed
+        } as IdxResponse;
         testContext = {
           ...testContext,
-          idxRemediations
+          neededToProceed,
+          idxResponse
         };
       });
 
       it('if first Remediator can remediate, returns the first Remediator instance', () => {
-        const { idxRemediations, values, options, FooRemediator } = testContext;
+        const { idxResponse, neededToProceed, values, options, FooRemediator } = testContext;
         FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(true);
-        expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(FooRemediator);
-        expect(FooRemediator).toHaveBeenCalledWith(idxRemediations[0], values, options);
+        expect(getRemediator(idxResponse, values, options)).toBeInstanceOf(FooRemediator);
+        expect(FooRemediator).toHaveBeenCalledWith(neededToProceed[0], values, options);
       });
 
       it('if first matched Remediator cannot remediate, but 2nd Remediator can, returns the 2nd Remediator', () => {
-        const { idxRemediations, values, options, FooRemediator, BarRemediator } = testContext;
+        const { idxResponse, neededToProceed, values, options, FooRemediator, BarRemediator } = testContext;
         FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
         BarRemediator.prototype.canRemediate = jest.fn().mockReturnValue(true);
-        expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(BarRemediator);
-        expect(BarRemediator).toHaveBeenCalledWith(idxRemediations[1], values, options);
+        expect(getRemediator(idxResponse, values, options)).toBeInstanceOf(BarRemediator);
+        expect(BarRemediator).toHaveBeenCalledWith(neededToProceed[1], values, options);
       });
       it('if no Remediator can remediate, returns the first matching Remediator instance', () => {
-        const { idxRemediations, values, options, FooRemediator, BarRemediator } = testContext;
+        const { idxResponse, neededToProceed, values, options, FooRemediator, BarRemediator } = testContext;
         FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
         BarRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
-        expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(FooRemediator);
-        expect(FooRemediator).toHaveBeenCalledWith(idxRemediations[0], values, options);
+        expect(getRemediator(idxResponse, values, options)).toBeInstanceOf(FooRemediator);
+        expect(FooRemediator).toHaveBeenCalledWith(neededToProceed[0], values, options);
       });
 
       describe('with options.step', () => {
 
         it('returns a remediator instance if a Remediator exists that matches the idx remediation with the given step name', () => {
-          const { idxRemediations, values, options, BarRemediator } = testContext;
+          const { idxResponse, neededToProceed, values, options, BarRemediator } = testContext;
           options.step = 'bar';
-          expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(BarRemediator);
-          expect(BarRemediator).toHaveBeenCalledWith(idxRemediations[1], values, options);
+          expect(getRemediator(idxResponse, values, options)).toBeInstanceOf(BarRemediator);
+          expect(BarRemediator).toHaveBeenCalledWith(neededToProceed[1], values, options);
         });
         it('returns undefined if no Remediator could be found matching the idx remediation with the given step name', () => {
-          const { idxRemediations, values, options } = testContext;
+          const { idxResponse, values, options } = testContext;
           options.step = 'bar';
           options.remediators = {
             'other': jest.fn()
           };
-          expect(getRemediator(idxRemediations, values, options)).toBe(undefined);
+          expect(getRemediator(idxResponse, values, options)).toBe(undefined);
         });
         it('returns undefined if no idx remediation is found matching the given step name', () => {
-          const { values, options } = testContext;
+          const { idxResponse, values, options } = testContext;
           options.step = 'bar';
-          const idxRemediations = [{
+          const neededToProceed = [{
             name: 'other'
           }];
-          expect(getRemediator(idxRemediations, values, options)).toBe(undefined);
+          idxResponse.neededToProceed = neededToProceed;
+          expect(getRemediator(idxResponse, values, options)).toBe(undefined);
         });
       });
     });
 
     it('returns undefined if no Remediator exists that matches the idx remediations', () => {
       const { values, options } = testContext;
-      const idxRemediations = [{
+      const neededToProceed = [{
         name: 'unknown'
       }];
+      const idxResponse = {
+        neededToProceed
+      } as IdxResponse;
       options.remediators = {
         other: jest.fn()
       };
-      expect(getRemediator(idxRemediations, values, options)).toBe(undefined);
+      expect(getRemediator(idxResponse, values, options)).toBe(undefined);
     });
 
     describe('with options.useGenericRemediator', () => {
@@ -295,56 +303,61 @@ describe('idx/util', () => {
           ...testContext.options, 
           useGenericRemediator: true 
         };
-        const idxRemediations = [{
+        const neededToProceed = [{
           name: 'foo'
         }, {
           name: 'bar'
         }];
+        const idxResponse = {
+          neededToProceed
+        } as IdxResponse;
         testContext = {
           ...testContext,
-          idxRemediations,
+          neededToProceed,
+          idxResponse,
           options
         };
       });
 
       describe('with options.step', () => {
         it('returns GenericRemediator instance if one idx remediation can match the given step name', () => {
-          const { idxRemediations, values, options } = testContext;
+          const { idxResponse, neededToProceed, values, options } = testContext;
           options.step = 'bar';
-          expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(GenericRemediator);
-          expect(GenericRemediator).toHaveBeenCalledWith(idxRemediations[1], values, options);
+          expect(getRemediator(idxResponse, values, options)).toBeInstanceOf(GenericRemediator);
+          expect(GenericRemediator).toHaveBeenCalledWith(neededToProceed[1], values, options);
         });
         it('returns undefined if no idx remediation is found matching the given step name', () => {
-          const { values, options } = testContext;
+          const { idxResponse, values, options } = testContext;
           options.step = 'bar';
-          const idxRemediations = [{
+          const neededToProceed = [{
             name: 'other'
           }];
-          expect(getRemediator(idxRemediations, values, options)).toBe(undefined);
+          idxResponse.neededToProceed = neededToProceed;
+          expect(getRemediator(idxResponse, values, options)).toBe(undefined);
         });
       });
 
       describe('without options.step', () => {
         it('if first Remediator can remediate, returns the first Remediator instance', () => {
-          const { idxRemediations, values, options, FooRemediator } = testContext;
+          const { idxResponse, neededToProceed, values, options, FooRemediator } = testContext;
           FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(true);
-          expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(GenericRemediator);
-          expect(GenericRemediator).toHaveBeenCalledWith(idxRemediations[0], values, options);
+          expect(getRemediator(idxResponse, values, options)).toBeInstanceOf(GenericRemediator);
+          expect(GenericRemediator).toHaveBeenCalledWith(neededToProceed[0], values, options);
         });
 
         it('if first matched Remediator cannot remediate, but 2nd Remediator can, returns the first Remediator instance', () => {
-          const { idxRemediations, values, options, FooRemediator, BarRemediator } = testContext;
+          const { idxResponse, neededToProceed, values, options, FooRemediator, BarRemediator } = testContext;
           FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
           BarRemediator.prototype.canRemediate = jest.fn().mockReturnValue(true);
-          expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(GenericRemediator);
-          expect(GenericRemediator).toHaveBeenCalledWith(idxRemediations[0], values, options);
+          expect(getRemediator(idxResponse, values, options)).toBeInstanceOf(GenericRemediator);
+          expect(GenericRemediator).toHaveBeenCalledWith(neededToProceed[0], values, options);
         });
         it('if no Remediator can remediate, returns the first Remediator instance', () => {
-          const { idxRemediations, values, options, FooRemediator, BarRemediator } = testContext;
+          const { idxResponse, neededToProceed, values, options, FooRemediator, BarRemediator } = testContext;
           FooRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
           BarRemediator.prototype.canRemediate = jest.fn().mockReturnValue(false);
-          expect(getRemediator(idxRemediations, values, options)).toBeInstanceOf(GenericRemediator);
-          expect(GenericRemediator).toHaveBeenCalledWith(idxRemediations[0], values, options);
+          expect(getRemediator(idxResponse, values, options)).toBeInstanceOf(GenericRemediator);
+          expect(GenericRemediator).toHaveBeenCalledWith(neededToProceed[0], values, options);
         });
       });
 
