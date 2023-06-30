@@ -210,14 +210,14 @@ function getRemediatorClass(remediation: IdxRemediation, options: RemediateOptio
 // Return first match idxRemediation in allowed remediators
 // eslint-disable-next-line complexity
 export function getRemediator(
-  idxRemediations: IdxRemediation[],
+  idxResponse: IdxResponse,
   values: RemediationValues,
   options: RemediateOptions,
-  context?: IdxContext,
 ): Remediator | undefined {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const remediators = options.remediators!;
   const useGenericRemediator = options.useGenericRemediator;
+  const {neededToProceed: idxRemediations, context} = idxResponse;
 
   let remediator: Remediator;
   // remediation name specified by caller - fast-track remediator lookup 
@@ -285,7 +285,7 @@ export function handleFailedResponse(
   if (terminal) {
     return { idxResponse, terminal, messages };
   } else {
-    const remediator = getRemediator(idxResponse.neededToProceed, {}, options, idxResponse.context);
+    const remediator = getRemediator(idxResponse, {}, options);
     const nextStep = remediator && getNextStep(authClient, remediator, idxResponse);
     return {
       idxResponse,
