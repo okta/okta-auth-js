@@ -3,7 +3,7 @@ import * as remediators from './remediators';
 import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
 import { GenericRemediator } from './remediators/GenericRemediator';
 import { OktaAuthIdxInterface, IdxFeature, NextStep, RemediateOptions, RemediationResponse, RunOptions } from './types';
-import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse, IdxContext } from './types/idx-js';
+import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse } from './types/idx-js';
 
 export function isTerminalResponse(idxResponse: IdxResponse) {
   const { neededToProceed, interactionCode } = idxResponse;
