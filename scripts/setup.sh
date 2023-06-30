@@ -38,16 +38,12 @@ else
   export PUBLISH_ARTIFACTORY_FAILURE=1
 
   # bacon commands
-  get_secret () {
+  get_vault_secret_key () {
     # ensures the env var is set
-    if [ -z "$(echo "$2")" ]; then
-      echo "$2 is not defined. Exiting..."
+    if [ -z "$(echo "$3")" ]; then
+      echo "$3 is not defined. Exiting..."
       exit 1
     fi
-  }
-
-  get_vault_secret_key () {
-    get_secret $1 $3
   }
 
   junit () {

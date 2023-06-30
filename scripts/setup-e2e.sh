@@ -33,7 +33,7 @@ setup_e2e () {
 
   export ISSUER=https://samples-javascript.okta.com/oauth2/default
   export USERNAME=george@acme.com
-  get_secret prod/okta-sdk-vars/password PASSWORD
+  get_vault_secret_key repo_gh-okta-okta-auth-js/default password PASSWORD
   finish_log_group $?
 }
 
@@ -64,7 +64,7 @@ setup_sample_tests () {
   export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 
   export USERNAME=mary@acme.com
-  get_secret prod/okta-sdk-vars/password PASSWORD
+  get_vault_secret_key repo_gh-okta-okta-auth-js/default password PASSWORD
 
   export ORG_OIE_ENABLED=true
   get_vault_secret_key devex/auth-js-sdk-vars a18n_api_key A18N_API_KEY
