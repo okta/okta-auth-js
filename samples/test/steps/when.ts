@@ -20,6 +20,7 @@ import enterLiveUserEmail from '../support/action/context-enabled/live-user/ente
 import enterRecoveryEmail from '../support/action/context-enabled/live-user/enterRecoveyEmail';
 import submitForm from '../support/action/submitForm';
 import selectAuthenticator from '../support/action/selectAuthenticator';
+import selectAuthenticatorMethod from '../support/action/selectAuthenticatorMethod';
 import selectEnrollmentChannel from '../support/action/selectEnrollmentChannel';
 import inputInvalidEmail from '../support/action/inputInvalidEmail';
 import enterRegistrationField from '../support/action/context-enabled/live-user/enterRegistrationField';
@@ -163,6 +164,13 @@ When(
       throw new Error(`Unknown authenticator ${authenticator}`);
     }
     await selectAuthenticator(authenticatorKey);
+  }
+);
+
+When(
+  'she selects the {string} method',
+  async (methodType: string) => {
+    await selectAuthenticatorMethod(methodType);
   }
 );
 

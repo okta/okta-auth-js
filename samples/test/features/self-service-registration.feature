@@ -20,8 +20,8 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And she fills out her Last Name
   And she fills out her Email
   And she submits the form
-  Then she is redirected to the "Select Authenticator" page
-  When she selects the "Email" factor
+  Then she is redirected to the "Select Authenticator Method" page
+  When she selects the "email" method
   And she submits the form
   Then she sees a page to input a code for email authenticator enrollment
   When she inputs the correct code from her "Email"
@@ -46,8 +46,8 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
     And she fills out her Last Name
     And she fills out her Email
     And she submits the form
-  Then she is redirected to the "Select Authenticator" page
-  When she selects the "Email" factor
+  Then she is redirected to the "Select Authenticator Method" page
+  When she selects the "email" method
     And she submits the form
   Then she sees a page to input a code for email authenticator enrollment
   When she inputs the correct code from her "Email"
@@ -89,8 +89,8 @@ Scenario: Mary signs up for an account with Password, sets up required Email fac
   And she fills out her Last Name
   And she fills out her Email
     And she submits the form
-  Then she is redirected to the "Select Authenticator" page
-  When she selects the "Email" factor
+  Then she is redirected to the "Select Authenticator Method" page
+  When she selects the "email" method
     And she submits the form
   Then she sees a page to input a code for email authenticator enrollment
   When she inputs the correct code from her "Email"
@@ -117,8 +117,8 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And she fills out her Last Name
   And she fills out her Email
   And she submits the form
-  Then she is redirected to the "Select Authenticator" page
-  When she selects the "Email" factor
+  Then she is redirected to the "Select Authenticator Method" page
+  When she selects the "email" method
     And she submits the form
   Then she sees a page to input a code for email authenticator enrollment
   When she clicks the Email magic link for email verification

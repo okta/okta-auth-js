@@ -12,18 +12,18 @@
 
 
 import { ElementArray } from 'webdriverio';
-import SelectAuthenticator from '../selectors/SelectAuthenticator';
+import SelectAuthenticatorMethod from '../selectors/SelectAuthenticatorMethod';
 import selectOption from './selectOption';
 
-export default async (authenticatorKey: string) => {
-  const $select = await $(SelectAuthenticator.options);
+export default async (methodType: string) => {
+  const $select = await $(SelectAuthenticatorMethod.options);
   const options = await $select.$$('option') as ElementArray;
   const optionsStr = (await Promise.all(options.map(async el => {
     const value = await el.getAttribute('value');
     const text = await el.getText();
     return `${value}: ${text}`;
   }))).join(', ');
-  console.log(`[debug] Should select authenticator ${authenticatorKey}. Available options: ${optionsStr}`);
+  console.log(`[debug] Should select method ${methodType}. Available options: ${optionsStr}`);
 
-  await selectOption('value', authenticatorKey, SelectAuthenticator.options);
+  await selectOption('value', methodType, SelectAuthenticatorMethod.options);
 };
