@@ -61,7 +61,9 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
       // Don't select current authenticator (OKTA-612939)
       const isCurrentAuthenticator = context?.currentAuthenticator
         && context?.currentAuthenticator.value.id === matchedOption.relatesTo?.id;
-      return !isCurrentAuthenticator;
+      const isCurrentAuthenticatorEnrollment = context?.currentAuthenticatorEnrollment
+        && context?.currentAuthenticatorEnrollment.value.id === matchedOption.relatesTo?.id;
+      return !isCurrentAuthenticator && !isCurrentAuthenticatorEnrollment;
     }
     
     return false;
