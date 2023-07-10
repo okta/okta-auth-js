@@ -11,19 +11,9 @@
  */
 
 
-import { ElementArray } from 'webdriverio';
 import SelectAuthenticator from '../selectors/SelectAuthenticator';
 import selectOption from './selectOption';
 
 export default async (authenticatorKey: string) => {
-  const $select = await $(SelectAuthenticator.options);
-  const options = await $select.$$('option') as ElementArray;
-  const optionsStr = (await Promise.all(options.map(async el => {
-    const value = await el.getAttribute('value');
-    const text = await el.getText();
-    return `${value}: ${text}`;
-  }))).join(', ');
-  console.log(`[debug] Should select authenticator ${authenticatorKey}. Available options: ${optionsStr}`);
-
   await selectOption('value', authenticatorKey, SelectAuthenticator.options);
 };
