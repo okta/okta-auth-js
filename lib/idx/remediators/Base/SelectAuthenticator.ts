@@ -41,6 +41,7 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
     return option;
   }
 
+  /* eslint complexity:[0,9] */
   canRemediate(context?: IdxContext) {
     const { authenticators, authenticator } = this.values;
     const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
