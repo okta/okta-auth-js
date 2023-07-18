@@ -109,10 +109,11 @@ router.get('/enroll-authenticator/okta_email/enrollment-data', (req, res) => {
   const { options } = inputs[0];
   renderPage({ 
     req, res,
-    render: () => renderTemplate(req, res, 'select-authenticator', {
+    render: () => renderTemplate(req, res, 'select-authenticator-method', {
       options,
       action: '/enroll-authenticator/okta_email/enrollment-data',
       canSkip: false,
+      title: 'Select authenticator method'
     })
   });
 });
@@ -134,7 +135,8 @@ router.get('/enroll-authenticator/okta_email', (req, res) => {
 
 router.post('/enroll-authenticator/okta_email/enrollment-data', async (req, res, next) => {
   const authClient = getAuthClient(req);
-  const transaction = await authClient.idx.proceed({ authenticator: 'okta_email' });
+  const { methodType } = req.body;
+  const transaction = await authClient.idx.proceed({ methodType });
   handleTransaction({ req, res, next, authClient, transaction });
 });
 

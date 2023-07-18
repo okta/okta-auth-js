@@ -14,7 +14,7 @@
 
 import { Remediator, RemediationValues } from './Remediator';
 import { getAuthenticatorFromRemediation } from '../util';
-import { IdxRemediationValue } from '../../types/idx-js';
+import { IdxRemediationValue, IdxContext, IdxOption } from '../../types/idx-js';
 import { Authenticator, isAuthenticator } from '../../types/api';
 import { compareAuthenticators, findMatchedOption} from '../../authenticator/util';
 
@@ -30,7 +30,7 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
 
   // Find matched authenticator in provided order
   findMatchedOption(authenticators, options) {
-    let option;
+    let option: IdxOption | undefined;
     for (let authenticator of authenticators) {
       option = options
         .find(({ relatesTo }) => relatesTo.key === authenticator.key);
@@ -41,7 +41,8 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
     return option;
   }
 
-  canRemediate() {
+  /* eslint complexity:[0,9] */
+  canRemediate(context?: IdxContext) {
     const { authenticators, authenticator } = this.values;
     const authenticatorFromRemediation = getAuthenticatorFromRemediation(this.remediation);
     const { options } = authenticatorFromRemediation;
@@ -56,9 +57,14 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
     }
 
     // Proceed with provided authenticators
-    const matchedOption = this.findMatchedOption(authenticators, options);
+    const matchedOption = this.findMatchedOption(authenticators, options!);
     if (matchedOption) {
-      return true;
+      // Don't select current authenticator (OKTA-612939)
+      const isCurrentAuthenticator = context?.currentAuthenticator
+        && context?.currentAuthenticator.value.id === matchedOption.relatesTo?.id;
+      const isCurrentAuthenticatorEnrollment = context?.currentAuthenticatorEnrollment
+        && context?.currentAuthenticatorEnrollment.value.id === matchedOption.relatesTo?.id;
+      return !isCurrentAuthenticator && !isCurrentAuthenticatorEnrollment;
     }
     
     return false;
