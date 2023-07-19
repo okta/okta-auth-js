@@ -21,6 +21,7 @@ import Unauth from './Unauth';
 import UserHome from './UserHome';
 import PasswordRecover from './PasswordRecover';
 import SelectAuthenticator from './SelectAuthenticator';
+import SelectAuthenticatorMethod from './SelectAuthenticatorMethod';
 import PasswordReset from './PasswordReset';
 import Home from './Home';
 import { Page } from './Page';
@@ -59,6 +60,7 @@ const pages: { [key: string]: Page } = {
   'Self Service Password Reset View': PasswordRecover,
   'Self Service Password Reset': PasswordRecover,
   'Select Authenticator': SelectAuthenticator,
+  'Select Authenticator Method': SelectAuthenticatorMethod,
   'Enter Code': ChallengeEmailAuthenticator,
   'Challenge email authenticator': ChallengeEmailAuthenticator,
   'Challenge Password Authenticator': ChallengePasswordAuthenticator,

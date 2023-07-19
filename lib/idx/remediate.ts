@@ -75,7 +75,7 @@ export async function remediate(
     return { idxResponse };
   }
 
-  const remediator = getRemediator(neededToProceed, values, options);
+  const remediator = getRemediator(idxResponse, values, options);
 
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
@@ -175,7 +175,7 @@ export async function remediate(
   // return nextStep directly
   if (options.useGenericRemediator && !idxResponse.interactionCode && !isTerminalResponse(idxResponse)) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const gr = getRemediator(idxResponse.neededToProceed, values, options)!;
+    const gr = getRemediator(idxResponse, values, options)!;
     const nextStep = getNextStep(authClient, gr, idxResponse);
     return {
       idxResponse,
