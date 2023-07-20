@@ -55,8 +55,8 @@ export interface TokenManagerInterface {
   hasExpired(token: Token): boolean;
   getExpireTime(token: Token): number;
 
-  get(key): Promise<Token>;
-  getSync(key): Token;
+  get(key): Promise<Token | undefined>;
+  getSync(key): Token | undefined;
   getTokens(): Promise<Tokens>;
   getTokensSync(): Tokens;
   setTokens({ accessToken, idToken, refreshToken }: Tokens, accessTokenCb?: AccessTokenCallback, idTokenCb?: IDTokenCallback, refreshTokenCb?: RefreshTokenCallback): void;
