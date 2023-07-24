@@ -106,8 +106,7 @@ const samples = [
       'totp-signup',
       'totp-signin',
       'security-questions-enrollment',
-      // TODO: enable test OKTA-597533
-      // 'self-service-registration-password-optional',
+      'self-service-registration-password-optional',
       'account-unlock',
       'totp-okta-verify-signup',
       'totp-okta-verify-signin',
