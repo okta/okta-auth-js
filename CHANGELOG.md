@@ -2,6 +2,12 @@
 
 ## 7.4.0
 
+### Features
+
+- [#1412](https://github.com/okta/okta-auth-js/pull/1412)
+  * Adds oauth2 introspect method, exposed as `authClient.token.introspect`
+  * Adds optional `tokens` param to `renewTokens`
+
 ### Fixes
 
 - [#1421](https://github.com/okta/okta-auth-js/pull/1421) Throw error if there is incorrect `relatesTo` in IDX response

@@ -61,6 +61,7 @@ export interface WellKnownResponse {
   id_token_signing_alg_values_supported: string[];
   scopes_supported: string[];
   claims_supported: string[];
+  introspection_endpoint: string;
 }
 
 

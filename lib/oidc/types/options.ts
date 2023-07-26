@@ -15,6 +15,7 @@ import { OktaAuthHttpOptions } from '../../http/types';
 import { SimpleStorage } from '../../storage/types';
 import { OktaAuthOAuthInterface, SetLocationFunction } from './api';
 import { OAuthResponseMode, OAuthResponseType } from './proto';
+import { Tokens } from './Token';
 import { TransactionManagerOptions } from './Transaction';
 
 export interface CustomUrls {
@@ -74,6 +75,10 @@ export interface EnrollAuthenticatorOptions extends TokenParams {
 
 export interface SigninWithRedirectOptions extends TokenParams {
   originalUri?: string;
+}
+
+export interface RenewTokensParams extends TokenParams {
+  tokens?: Tokens
 }
 
 export interface OktaAuthOAuthOptions extends

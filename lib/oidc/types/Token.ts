@@ -43,6 +43,11 @@ export type Token = AccessToken | IDToken | RefreshToken;
 export type RevocableToken = AccessToken | RefreshToken;
 
 export type TokenType = 'accessToken' | 'idToken' | 'refreshToken';
+export enum TokenKind {
+  ACCESS = 'accessToken',
+  ID = 'idToken',
+  REFRESH = 'refreshToken',
+}
 
 export function isToken(obj: any): obj is Token {
   if (obj &&

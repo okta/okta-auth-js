@@ -59,7 +59,7 @@ describe('token.renewTokens', function() {
 
   describe('using token endpoint', () => {
     it('will renew using refresh token if it exists, passing along options', async () => {
-      const { renewWithRefreshResponse } = testContext;
+      const { renewWithRefreshResponse,  } = testContext;
       const refreshToken = 'fake';
       const tokens = {
         refreshToken
@@ -74,6 +74,22 @@ describe('token.renewTokens', function() {
       const res = await renewTokens(sdk, options);
       expect(res).toBe(renewWithRefreshResponse);
       expect(mocked.renewTokensWithRefresh.renewTokensWithRefresh).toHaveBeenCalledWith(sdk, options, refreshToken);
+
+      // with passing token values directly
+      const accessToken = {
+        accessToken: 'access',
+        scopes: ['access'],
+        authorizeUrl: 'access',
+        userinfoUrl: 'access',
+      } as any;
+      const refresh = {
+        refreshToken
+      } as any;
+      const opts = { tokens: { refreshToken: refresh, accessToken }};
+      const directRes = await renewTokens(sdk, opts);
+      expect(directRes).toBe(renewWithRefreshResponse);
+      expect(mocked.renewTokensWithRefresh.renewTokensWithRefresh).toHaveBeenCalledTimes(2);
+      expect(mocked.renewTokensWithRefresh.renewTokensWithRefresh).toHaveBeenNthCalledWith(2, sdk, opts, refresh);
     });
   });
 
@@ -119,6 +135,16 @@ describe('token.renewTokens', function() {
       getWihoutPromptResponse.tokens = tokens;
       const res = await renewTokens(sdk, {});
       expect(res).toBe(tokens);
+    });
+
+    it('returns tokens without accessing TokenManager', async () => {
+      const { sdk, getWihoutPromptResponse, accessToken } = testContext;
+      const getTokensSpy = jest.spyOn(sdk.tokenManager, 'getTokensSync');
+      const tokens = { fake: true };
+      getWihoutPromptResponse.tokens = tokens;
+      const res = await renewTokens(sdk, { tokens: { accessToken } });
+      expect(res).toBe(tokens);
+      expect(getTokensSpy).not.toHaveBeenCalled();
     });
 
     describe('responseType', () => {

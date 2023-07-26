@@ -23,6 +23,7 @@ import { renewToken } from '../renewToken';
 import { renewTokens } from '../renewTokens';
 import { renewTokensWithRefresh } from '../renewTokensWithRefresh';
 import { revokeToken } from '../revokeToken';
+import { oidcIntrospect } from '../introspect';
 import {
   AccessToken,
   CustomUserClaims,
@@ -84,7 +85,8 @@ export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue)
       return getUserInfo(sdk, accessTokenObject, idTokenObject);
     },
     verify: verifyToken.bind(null, sdk),
-    isLoginRedirect: isLoginRedirect.bind(null, sdk)
+    isLoginRedirect: isLoginRedirect.bind(null, sdk),
+    introspect: oidcIntrospect.bind(null, sdk),
   };
 
   // Wrap certain async token API methods using PromiseQueue to avoid issues with concurrency
