@@ -4,6 +4,12 @@
 
 ### Features
 
+- [#1440](https://github.com/okta/okta-auth-js/pull/1440) Fixes type of `tokenManager.getSync`
+
+- [#1439](https://github.com/okta/okta-auth-js/pull/1439) `.signOut` improvements
+  * Passing `postLogoutRedirectUri: null` to `.signOut` now omits the param from `/logout` call and will observe the behavior of `/logout`
+  * `state` is now returned as a query param to the `postLogoutRedirectUri` when `.signOut` falls back to `.closeSession`
+
 - [#1412](https://github.com/okta/okta-auth-js/pull/1412)
   * Adds oauth2 introspect method, exposed as `authClient.token.introspect`
   * Adds optional `tokens` param to `renewTokens`

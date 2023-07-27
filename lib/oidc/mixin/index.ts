@@ -261,7 +261,7 @@ export function mixinOAuth
       if (!idToken) {
         return '';
       }
-      if (!postLogoutRedirectUri) {
+      if (postLogoutRedirectUri === undefined) {
         postLogoutRedirectUri = this.options.postLogoutRedirectUri;
       }
 
@@ -285,16 +285,23 @@ export function mixinOAuth
       options = Object.assign({}, options);
     
       // postLogoutRedirectUri must be whitelisted in Okta Admin UI
-      var defaultUri = window.location.origin;
-      var currentUri = window.location.href;
-      var postLogoutRedirectUri = options.postLogoutRedirectUri
+      const defaultUri = window.location.origin;
+      const currentUri = window.location.href;
+      // Fix for issue/1410 - allow for no postLogoutRedirectUri to be passed, resulting in /logout default behavior
+      //    "If no Okta session exists, this endpoint has no effect and the browser is redirected immediately to the
+      //    Okta sign-in page or the post_logout_redirect_uri (if specified)."
+      // - https://developer.okta.com/docs/reference/api/oidc/#logout
+      const postLogoutRedirectUri = options.postLogoutRedirectUri === null ? null :
+        (options.postLogoutRedirectUri
         || this.options.postLogoutRedirectUri
-        || defaultUri;
+        || defaultUri);
+      const state = options?.state;
+      
     
-      var accessToken = options.accessToken;
-      var refreshToken = options.refreshToken;
-      var revokeAccessToken = options.revokeAccessToken !== false;
-      var revokeRefreshToken = options.revokeRefreshToken !== false;
+      let accessToken = options.accessToken;
+      let refreshToken = options.refreshToken;
+      const revokeAccessToken = options.revokeAccessToken !== false;
+      const revokeRefreshToken = options.revokeRefreshToken !== false;
     
       if (revokeRefreshToken && typeof refreshToken === 'undefined') {
         refreshToken = this.tokenManager.getTokensSync().refreshToken as RefreshToken;
@@ -321,15 +328,18 @@ export function mixinOAuth
       // Fallback to XHR signOut, then simulate a redirect to the post logout uri
       if (!logoutUri) {
         // local tokens are cleared once session is closed
-        return this.closeSession() // can throw if the user cannot be signed out
-        .then(function(sessionClosed) {
-          if (postLogoutRedirectUri === currentUri) {
-            window.location.reload(); // force a hard reload if URI is not changing
-          } else {
-            window.location.assign(postLogoutRedirectUri);
-          }
-          return sessionClosed;
-        });
+        const sessionClosed = await this.closeSession();   // can throw if the user cannot be signed out
+        const redirectUri = new URL(postLogoutRedirectUri || defaultUri); // during fallback, redirectUri cannot be null
+        if (state) {
+          redirectUri.searchParams.append('state', state);
+        }
+        if (postLogoutRedirectUri === currentUri) {
+          // window.location.reload(); // force a hard reload if URI is not changing
+          window.location.href = redirectUri.href;
+        } else {
+          window.location.assign(redirectUri.href);
+        }
+        return sessionClosed;
       } else {
         if (options.clearTokensBeforeRedirect) {
           // Clear all local tokens

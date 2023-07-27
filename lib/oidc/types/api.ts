@@ -101,7 +101,7 @@ export interface IsAuthenticatedOptions {
 }
 
 export interface SignoutRedirectUrlOptions {
-  postLogoutRedirectUri?: string;
+  postLogoutRedirectUri?: string | null;
   idToken?: IDToken;
   state?: string;
 }

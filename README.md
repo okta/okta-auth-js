@@ -996,7 +996,7 @@ Signs the user out of their current [Okta session](https://developer.okta.com/do
 
 `signOut` takes the following options:
 
-* `postLogoutRedirectUri` - Setting a value will override the `postLogoutRedirectUri` configured on the SDK.
+* `postLogoutRedirectUri` - Setting a value will override the `postLogoutRedirectUri` configured on the SDK. This will default to `window.location.origin` if no value is provided. To prevent this explicitly pass `null` to leverage the default behavior of `/logout`. If `signOut` falls back to `closeSession` `window.location.origin` will still be used as the default value, even if `null` is passed.
 * `state` - An optional value, used along with `postLogoutRedirectUri`. If set, this value will be returned as a query parameter during the redirect to the `postLogoutRedirectUri`
 * `idToken` - Specifies the ID token object. By default, `signOut` will look for a token object named `idToken` within the `TokenManager`. If you have stored the id token object in a different location, you should retrieve it first and then pass it here.
 * `clearTokensBeforeRedirect` - If `true` (default: `false`) local tokens will be removed before the logout redirect happens. Otherwise a flag (`pendingRemove`) will be added to each local token instead of clearing them immediately. Calling `oktaAuth.start()` after logout redirect will clear local tokens if flags are found. **Use this option with care**: removing local tokens before fully terminating the Okta SSO session can result in logging back in again when using [`@okta/okta-react`](https://www.npmjs.com/package/@okta/okta-react)'s [`SecureRoute`](https://github.com/okta/okta-react#secureroute) component.
