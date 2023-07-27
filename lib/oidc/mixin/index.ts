@@ -329,7 +329,7 @@ export function mixinOAuth
       if (!logoutUri) {
         // local tokens are cleared once session is closed
         const sessionClosed = await this.closeSession();   // can throw if the user cannot be signed out
-        const redirectUri = new URL(postLogoutRedirectUri || defaultUri);   // during fallback, redirectUri cannot be null
+        const redirectUri = new URL(postLogoutRedirectUri || defaultUri); // during fallback, redirectUri cannot be null
         if (state) {
           redirectUri.searchParams.append('state', state);
         }
