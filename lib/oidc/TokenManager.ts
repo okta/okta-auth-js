@@ -250,12 +250,12 @@ export class TokenManager implements TokenManagerInterface {
     this.setExpireEventTimeout(key, token);
   }
   
-  getSync(key): Token {
+  getSync(key): Token | undefined {
     var tokenStorage = this.storage.getStorage();
     return tokenStorage[key];
   }
   
-  async get(key): Promise<Token> {
+  async get(key): Promise<Token | undefined> {
     return this.getSync(key);
   }
   
@@ -439,7 +439,7 @@ export class TokenManager implements TokenManagerInterface {
         this.setTokens(tokens);
 
         // resolve token based on the key
-        const tokenType = this.getTokenType(token);
+        const tokenType = this.getTokenType(token!);
         return tokens[tokenType];
       })
       .catch(err => {
