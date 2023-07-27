@@ -261,7 +261,7 @@ export function mixinOAuth
       if (!idToken) {
         return '';
       }
-      if (!postLogoutRedirectUri) {
+      if (postLogoutRedirectUri === undefined) {
         postLogoutRedirectUri = this.options.postLogoutRedirectUri;
       }
 
@@ -287,9 +287,14 @@ export function mixinOAuth
       // postLogoutRedirectUri must be whitelisted in Okta Admin UI
       const defaultUri = window.location.origin;
       const currentUri = window.location.href;
-      const postLogoutRedirectUri = options.postLogoutRedirectUri
+      // Fix for issue/1410 - allow for no postLogoutRedirectUri to be passed, resulting in /logout default behavior
+      //    "If no Okta session exists, this endpoint has no effect and the browser is redirected immediately to the
+      //    Okta sign-in page or the post_logout_redirect_uri (if specified)."
+      // - https://developer.okta.com/docs/reference/api/oidc/#logout
+      const postLogoutRedirectUri = options.postLogoutRedirectUri === null ? null :
+        (options.postLogoutRedirectUri
         || this.options.postLogoutRedirectUri
-        || defaultUri;
+        || defaultUri);
       const state = options?.state;
       
     
@@ -324,7 +329,7 @@ export function mixinOAuth
       if (!logoutUri) {
         // local tokens are cleared once session is closed
         const sessionClosed = await this.closeSession();   // can throw if the user cannot be signed out
-        const redirectUri = new URL(postLogoutRedirectUri);
+        const redirectUri = new URL(postLogoutRedirectUri || defaultUri);   // during fallback, redirectUri cannot be null
         if (state) {
           redirectUri.searchParams.append('state', state);
         }
@@ -332,7 +337,7 @@ export function mixinOAuth
           // window.location.reload(); // force a hard reload if URI is not changing
           window.location.href = redirectUri.href;
         } else {
-          window.location.assign(redirectUri);
+          window.location.assign(redirectUri.href);
         }
         return sessionClosed;
       } else {
