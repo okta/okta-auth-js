@@ -67,19 +67,19 @@ export function getMessagesFromResponse(idxResponse: IdxResponse, options: RunOp
         messages = [...messages, ...fieldMessages] as never;
       }
     }
-
-    // API may return identical error on same field, filter by i18n key
-    const seen = {};
-    messages = messages.reduce((filtered, message) => {
-      const key = message.i18n?.key;
-      if (key && seen[key]) {
-        return filtered;
-      }
-      seen[key] = message;
-      filtered = [...filtered, message] as never;
-      return filtered;
-    }, []);
   }
+
+  // API may return identical error on same field, filter by i18n key
+  const seen = {};
+  messages = messages.reduce((filtered, message) => {
+    const key = message.i18n?.key;
+    if (key && seen[key] && message.message === seen[key].message) {
+      return filtered;
+    }
+    seen[key] = message;
+    filtered = [...filtered, message] as never;
+    return filtered;
+  }, []);
 
   return messages;
 }
