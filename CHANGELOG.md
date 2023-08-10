@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.4.1
+
+### Bug Fix
+
+- [#1446](https://github.com/okta/okta-auth-js/pull/1446) Fix: prevents incorrectly removing idx message duplicates
+
 ## 7.4.0
 
 ### Features
