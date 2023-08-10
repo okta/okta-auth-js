@@ -120,7 +120,7 @@ describe('idx/util', () => {
       }]);
     });
 
-    it('returns messages at the top level', () => {
+    it('removes duplicate messages', () => {
       const expected = [
         {
           class: 'ERROR',
