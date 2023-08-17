@@ -96,7 +96,7 @@ require('@okta/okta-auth-js/polyfill');
 The built polyfill bundle is also available on our global CDN. Include the following script in your HTML file to load before any other scripts:
 
 ```html
-<script src="https://global.oktacdn.com/okta-auth-js/7.0.0/okta-auth-js.polyfill.js" type="text/javascript"></script>
+<script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.polyfill.js" type="text/javascript"></script>
 ```
 
 > :warning: The version shown in this sample may be older than the current version. We recommend using the highest version available
@@ -171,7 +171,7 @@ If you are using the JS on a web page from the browser, you can copy the `node_m
 The built library bundle is also available on our global CDN. Include the following script in your HTML file to load before your application script:
 
 ```html
-<script src="https://global.oktacdn.com/okta-auth-js/7.0.0/okta-auth-js.min.js" type="text/javascript"></script>
+<script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js" type="text/javascript"></script>
 ```
 
 > :warning: The version shown in this sample may be older than the current version. We recommend using the highest version available
@@ -812,7 +812,7 @@ const config = {
 };
 
 const authClient = new OktaAuth(config);
-const tokens = await authClient.token.getWithoutPrompt();
+const { tokens } = await authClient.token.getWithoutPrompt();
 authClient.tokenManager.setTokens(tokens); // storageProvider.setItem
 
 ```
