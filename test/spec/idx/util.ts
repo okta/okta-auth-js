@@ -120,6 +120,46 @@ describe('idx/util', () => {
       }]);
     });
 
+    it('removes duplicate messages', () => {
+      const expected = [
+        {
+          class: 'ERROR',
+          i18n: {
+            key: 'security.access_denied'
+          },
+          message: 'You do not have permission to perform the requested action.'
+        },
+        {
+          class: 'ERROR',
+          i18n: {
+            key: 'security.access_denied'
+          },
+          message: 'some random text'
+        }
+      ];
+
+      const rawIdxState = RawIdxResponseFactory.build({
+        messages: IdxMessagesFactory.build({
+          value: [
+            IdxErrorAccessDeniedFactory.build(),
+            IdxErrorAccessDeniedFactory.build(),
+            IdxErrorAccessDeniedFactory.build(),
+            IdxErrorAccessDeniedFactory.build({
+              message: 'some random text'
+            })
+          ]
+        })
+      });
+      const idxResponse = IdxResponseFactory.build({
+        rawIdxState
+      });
+      const res = getMessagesFromResponse(idxResponse, {});
+      expect(res).toEqual(expected);
+
+      const genericRemRes = getMessagesFromResponse(idxResponse, { useGenericRemediator: true });
+      expect(genericRemRes).toEqual(expected);
+    });
+
     describe('form level messages', () => {
       let idxResponse;
       beforeEach(() => {

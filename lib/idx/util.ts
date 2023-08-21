@@ -73,13 +73,14 @@ export function getMessagesFromResponse(idxResponse: IdxResponse, options: RunOp
   const seen = {};
   messages = messages.reduce((filtered, message) => {
     const key = message.i18n?.key;
-    if (key && seen[key]) {
+    if (key && seen[key] && message.message === seen[key].message) {
       return filtered;
     }
     seen[key] = message;
     filtered = [...filtered, message] as never;
     return filtered;
   }, []);
+
   return messages;
 }
 
