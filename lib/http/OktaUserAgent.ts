@@ -20,6 +20,7 @@ export class OktaUserAgent {
   constructor() {
     // add base sdk env
     this.environments = [`okta-auth-js/${SDK_VERSION}`];
+    this.maybeAddNodeEnvironment();
   }
 
   addEnvironment(env: string) {
@@ -27,7 +28,6 @@ export class OktaUserAgent {
   }
 
   getHttpHeader() {
-    this.maybeAddNodeEnvironment();
     return { 'X-Okta-User-Agent-Extended': this.environments.join(' ') };
   }
 
