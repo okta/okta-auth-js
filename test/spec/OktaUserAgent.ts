@@ -68,7 +68,6 @@ describe('OktaUserAgent', () => {
   describe('node env', () => {
     beforeEach(() => {
       mocked.isBrowser.mockReturnValue(false);
-      (global as any).node = NODE_VERSION;
       context.expected = `okta-auth-js/${SDK_VERSION} nodejs/${NODE_VERSION}`;
       context.oktaUserAgent = new OktaUserAgent();
     });
