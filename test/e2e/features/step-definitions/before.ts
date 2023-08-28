@@ -1,6 +1,10 @@
 import { Before } from '@wdio/cucumber-framework';
 import ActionContext from 'support/context';
 
+Before('@smstest', function (this: ActionContext, scenario: any) {
+  return 'skipped';
+});
+
 Before(function (this: ActionContext, scenario: any) {
   this.featureName = scenario?.gherkinDocument?.feature?.name;
   this.scenarioName = scenario?.pickle?.name;

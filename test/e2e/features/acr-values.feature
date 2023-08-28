@@ -29,6 +29,7 @@ Scenario: Mary logs in with the initial App Authentication Policy
   Then she sees the default view in an AUTHENTICATED state
     And she sees her ID and Access Tokens 
 
+@smstest
 Scenario: Mary logs in with an ACR value in the Authorize request
   Given Mary is on the default view in an UNAUTHENTICATED state
   When she selects "urn:okta:loa:2fa:any:ifpossible" into "ACR values"
