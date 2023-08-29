@@ -14,7 +14,7 @@
 import { Before } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
 
-Before('@smstest', function (this: ActionContext, scenario: any) {
+Before('@smstest', function () {
   if (process.env.SKIP_SMS === 'true') {
     return 'skipped';
   }
