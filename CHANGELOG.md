@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.4.2
+
+### Bug Fix
+
+- [#1448](https://github.com/okta/okta-auth-js/pull/1448) Fix: UA string in Node no longer continuously extends
+
 ## 7.4.1
 
 ### Bug Fix

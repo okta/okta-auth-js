@@ -14,12 +14,19 @@
 var OktaAuth = '<rootDir>/lib/exports/default';
 var SDK_VERSION = require('../../../package.json').version;
 
+const { node: NODE_VERSION } = process.versions; 
+
 module.exports = {
   'coverageDirectory': '<rootDir>/build2/reports/coverage-browser',
   'collectCoverage': true,
   'collectCoverageFrom': ['./lib/**','!./test/**'],
   'globals': {
-    SDK_VERSION
+    SDK_VERSION,
+    NODE_VERSION,
+    'ts-jest': {
+      SDK_VERSION,
+      NODE_VERSION
+    }
   },
   'transform': {
     '^.+\\.(js)$': 'babel-jest',
