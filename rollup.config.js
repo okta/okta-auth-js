@@ -2,9 +2,11 @@ import replace from '@rollup/plugin-replace';
 import alias from '@rollup/plugin-alias';
 import cleanup from 'rollup-plugin-cleanup';
 import typescript from 'rollup-plugin-typescript2';
+import { getBabelOutputPlugin } from '@rollup/plugin-babel';
 import license from 'rollup-plugin-license';
 import multiInput from 'rollup-plugin-multi-input';
 import { visualizer } from 'rollup-plugin-visualizer';
+import resolve from '@rollup/plugin-node-resolve';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import pkg from './package.json';
 
@@ -12,11 +14,12 @@ const path = require('path');
 
 let platforms = ['browser', 'node'];
 let entries = {
+  'worker': 'lib/workers/TimerWorker.worker.ts',
   'okta-auth-js': 'lib/exports/default.ts',
   'core': 'lib/exports/core.ts',
   'authn': 'lib/exports/authn.ts',
   'idx': 'lib/exports/idx.ts',
-  'myaccount': 'lib/exports/myaccount.ts'
+  'myaccount': 'lib/exports/myaccount.ts',
 };
 let preserveModules = true;
 const combinedOutputDir = true; // all entries share an output dir
@@ -89,6 +92,7 @@ const getPlugins = (env, entryName) => {
   let plugins = [
     replace({
       'SDK_VERSION': JSON.stringify(pkg.version),
+      'BUNDLER': JSON.stringify('rollup'),
       'global.': 'window.',
       preventAssignment: true
     }),
@@ -97,18 +101,25 @@ const getPlugins = (env, entryName) => {
         { find: /.\/node$/, replacement: './browser' }
       ]
     })),
+    entryName === 'worker' && {
+      name: 'worker-to-string',
+      renderChunk(code) {
+        return `export default \`${code}\`;`;
+      },
+    },
     typescript({
       // eslint-disable-next-line node/no-unpublished-require
       typescript: require('typescript'),
       tsconfigOverride: {
         compilerOptions: {
           sourceMap: true,
-          target: 'ES2017', // skip async/await transpile,
+          target: entryName === 'worker' ? 'ES3' : 'ES2017', // skip async/await transpile,
           module: 'ES2020', // support dynamic import
           declaration: false
         }
       }
     }),
+    entryName === 'worker' && resolve(),
     cleanup({
       extensions,
       comments: 'none'
@@ -120,10 +131,14 @@ const getPlugins = (env, entryName) => {
         }
       }
     }),
+    replace({
+      'TimerWorker.workerSource.js': 'TimerWorker.worker.js',
+      preventAssignment: true
+    }),
     multiInput({ 
       relative: 'lib/',
     }),
-    createPackageJson(outputDir)
+    createPackageJson(outputDir),
   ];
 
   // if ANALZYE env var is passed, output analyzer html
@@ -140,19 +155,33 @@ const getPlugins = (env, entryName) => {
   return plugins;
 };
 
+
 export default Object.keys(entries).reduce((res, entryName) => {
   const entryValue = entries[entryName];
   return res.concat(platforms.map((type) => {
-    return {
+    return ({
       input: Array.isArray(entryValue) ? entryValue : [entryValue],
       external: makeExternalPredicate(type),
       plugins: getPlugins(type, entryName),
       output: [
         {
           ...output,
-          dir: getOuptutDir(entryName, type)
+          dir: getOuptutDir(entryName, type),
+          ...(entryName === 'worker' ? {
+            plugins: [
+              getBabelOutputPlugin({
+                presets: [
+                  '@babel/preset-env',
+                ],
+              })
+            ],
+            preserveModules: false,
+            sourcemap: false, // sourcemaps do not work with `worker-to-string` plugin
+            exports: 'none',
+          } : {
+          })
         }
       ]
-    };
+    });
   }));
 }, []);
