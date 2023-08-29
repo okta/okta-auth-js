@@ -1,5 +1,12 @@
 # Changelog
 
+## 7.5.0
+
+### Other
+
+ - [#1449](https://github.com/okta/okta-auth-js/pull/1449) chore: bump `broadcast-channel` version to `5.3.0`
+
+
 ## 7.4.2
 
 ### Bug Fix
