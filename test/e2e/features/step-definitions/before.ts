@@ -2,7 +2,9 @@ import { Before } from '@wdio/cucumber-framework';
 import ActionContext from 'support/context';
 
 Before('@smstest', function (this: ActionContext, scenario: any) {
-  return 'skipped';
+  if (process.env.SKIP_SMS === 'true') {
+    return 'skipped';
+  }
 });
 
 Before(function (this: ActionContext, scenario: any) {

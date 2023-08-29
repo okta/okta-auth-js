@@ -39,6 +39,7 @@ Scenario: Mary signs up for an account with Password, setups up required Email f
   And she sees a table with her profile info
   And the cell for the value of "email" is shown and contains her "email"
 
+@smstest
 Scenario: Mary signs up for an account with Password, setups up required Email factor, And sets up optional SMS
   When she clicks the 'signup' button
   Then she is redirected to the "Self Service Registration" page

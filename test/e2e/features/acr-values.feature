@@ -53,6 +53,7 @@ Scenario: Mary logs in with an ACR value in the Authorize request
   Then she sees the default view in an AUTHENTICATED state
     And she sees her ID and Access Tokens 
 
+@smstest
 Scenario: Mary is signed in without ACR, and is challenged with an ACR value
   # Authenticate using SIW
   Given Mary is on the default view in an UNAUTHENTICATED state
@@ -86,6 +87,7 @@ Scenario: Mary is signed in without ACR, and is challenged with an ACR value
   Then she sees the default view in an AUTHENTICATED state
     And she sees her ID and Access Tokens 
 
+@smstest
 Scenario: Mary is signed in without ACR, and is challenged with an ACR value, but has a valid ACR Token
   # Authenticate using SIW with ACR values 'urn:okta:loa:2fa:any:ifpossible'
   Given Mary is on the default view in an UNAUTHENTICATED state

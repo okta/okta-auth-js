@@ -31,6 +31,7 @@ Feature: TOTP Support (Okta Verify) Sign In
     #   And the cell for the value of "email" is shown and contains her "email"
     #   And the cell for the value of "name" is shown and contains her "first name and last name"
 
+  @smstest
   Scenario: Mary signs in to an account and enrolls in Password and Okta Verify by clicking a link in a text message
     When she clicks the "login" button
     Then she is redirected to the "Login" page

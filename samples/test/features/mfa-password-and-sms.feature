@@ -11,6 +11,7 @@ Feature: Multi-Factor Authentication with Password and SMS
       And a user named "Mary"
       And she has an account with "active" state in the org
 	  
+  @smstest
   Scenario: Enroll in SMS Factor prompt when authenticating
     When she clicks the "login" button
     Then she is redirected to the "Login" page
@@ -58,6 +59,7 @@ Feature: Multi-Factor Authentication with Password and SMS
       And she submits the form
     Then she should see a message "Invalid Phone Number."
 
+  @smstest
   Scenario: 2FA Login with SMS
     Given she has enrolled in the "SMS" factor
     When she clicks the "login" button

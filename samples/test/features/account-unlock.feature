@@ -38,6 +38,7 @@ Feature: Account Unlock with Single factor (Email, Phone, Okta Verify Push)
     When she clicks the Email magic link for unlock
     Then she should see a message containing "unlocked!"
 
+  @smstest
   Scenario: Mary recovers from a locked account with Phone SMS OTP
     Given she has enrolled in the "SMS" factor
      And Mary has entered an incorrect password to trigger an account lockout
