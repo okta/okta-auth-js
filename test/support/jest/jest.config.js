@@ -19,7 +19,8 @@ module.exports = {
   'collectCoverage': true,
   'collectCoverageFrom': ['./lib/**','!./test/**'],
   'globals': {
-    SDK_VERSION
+    SDK_VERSION,
+    BUNDLER: 'jest',
   },
   'transform': {
     '^.+\\.(js)$': 'babel-jest',
@@ -29,6 +30,7 @@ module.exports = {
   'restoreMocks': true,
   'clearMocks': true,
   'moduleNameMapper': {
+    'workers/(.*?)\.emptyWorker': '<rootDir>/build/esm/browser/workers/$1.worker.js',
     '^@okta/okta-auth-js$': OktaAuth,
     '^lib/(.*)$': '<rootDir>/lib/$1',
     '^jsonpath-plus$': '<rootDir>/node_modules/jsonpath-plus/dist/index-browser-umd.cjs'

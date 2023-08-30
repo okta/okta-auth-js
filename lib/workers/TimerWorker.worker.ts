@@ -1,10 +1,13 @@
+// /// <reference no-default-lib="true"/>
+// /// <reference lib="webworker" />
+// declare var self: DedicatedWorkerGlobalScope;
 import type { TimerWorkerInMessage, TimerWorkerOutMessage } from '../services/TimerService';
 
 const timerIdToTimeout = {};
 
 function handleSetTimeout(data: TimerWorkerInMessage) {
   const { timerId, timeout } = data;
-  const timeoutId = self.setTimeout(() => {
+  const timeoutId = setTimeout(() => {
     self.postMessage({
       action: 'timeoutCallback',
       timerId,
@@ -18,7 +21,7 @@ function handleClearTimeout(data: TimerWorkerInMessage) {
   const { timerId } = data;
   const timeoutId = timerIdToTimeout[timerId];
   if (timeoutId) {
-    self.clearTimeout(timeoutId);
+    clearTimeout(timeoutId);
     delete timerIdToTimeout[timerId];
   }
 }

@@ -209,6 +209,7 @@
     "jest-runner": "^28.1.0",
     "jest-runner-tsd": "^3.0.0",
     "json-loader": "0.5.4",
+    "jsdom-worker": "^0.3.0",
     "lodash": "4.17.21",
     "rollup": "^2.70.2",
     "rollup-plugin-cleanup": "^3.2.1",

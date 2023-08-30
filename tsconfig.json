@@ -25,7 +25,8 @@
     "baseUrl": "./"
   },
   "lib": [
-    "dom"
+    "dom",
+    "webworker"
   ],
   "files": [
     "package.json"
