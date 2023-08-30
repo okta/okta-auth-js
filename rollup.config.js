@@ -104,7 +104,7 @@ const getPlugins = (env, entryName) => {
     entryName === 'worker' && {
       name: 'worker-to-string',
       renderChunk(code) {
-        return `export default \`${code}\`;`;
+        return `var workerSrc = \`${code}\`; export default { workerSrc };`;
       },
     },
     typescript({
@@ -132,7 +132,7 @@ const getPlugins = (env, entryName) => {
       }
     }),
     replace({
-      'TimerWorker.workerSource.js': 'TimerWorker.worker.js',
+      'TimerWorker.emptyWorker.js': 'TimerWorker.worker.js',
       preventAssignment: true
     }),
     multiInput({ 

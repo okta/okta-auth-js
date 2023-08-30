@@ -40,7 +40,7 @@ module.exports = {
         test: /\TimerService.[jt]s$/,
         loader: 'string-replace-loader',
         options: {
-          search: 'TimerWorker.workerSource',
+          search: 'TimerWorker.emptyWorker',
           replace: 'TimerWorker.worker',
         }
       },

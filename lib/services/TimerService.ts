@@ -1,4 +1,4 @@
-import workerSource from '../workers/TimerWorker.workerSource';
+import timerWorker from '../workers/TimerWorker.emptyWorker';
 
 /* global BUNDLER */
 
@@ -26,10 +26,10 @@ export class TimerService {
     // @ts-ignore
     if (BUNDLER === 'webpack') {
       // webpack build (umd/cdn)
-      const TimerWorker = workerSource as any;
+      const TimerWorker = timerWorker as any;
       this.timerWorker = new TimerWorker() as Worker;
     } else {
-      if (workerSource === '') {
+      if (!timerWorker?.workerSrc) {
         // babel build (cjs), for node - use fallback
       } else {
         // rollup build (esm)
@@ -41,7 +41,7 @@ export class TimerService {
   }
 
   private getWorkerURL(): string {
-    const workerBlob = new Blob([workerSource], { type: 'text/javascript' });
+    const workerBlob = new Blob([timerWorker.workerSrc], { type: 'text/javascript' });
     return URL.createObjectURL(workerBlob);
   }
 
