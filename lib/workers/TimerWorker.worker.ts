@@ -6,7 +6,7 @@ function handleSetTimeout(data: TimerWorkerInMessage) {
   const { timerId, timeout } = data;
   const timeoutId = self.setTimeout(() => {
     self.postMessage({
-      action: "timeoutCallback",
+      action: 'timeoutCallback',
       timerId,
     } as TimerWorkerOutMessage);
     delete timerIdToTimeout[timerId];
@@ -23,13 +23,13 @@ function handleClearTimeout(data: TimerWorkerInMessage) {
   }
 }
 
-self.addEventListener("message", function(ev: MessageEvent<TimerWorkerInMessage>) {
+self.addEventListener('message', function(ev: MessageEvent<TimerWorkerInMessage>) {
   const data = ev.data;
   switch (data.action) {
-    case "setTimeout":
+    case 'setTimeout':
       handleSetTimeout.call(this, data);
       break;
-    case "clearTimeout":
+    case 'clearTimeout':
       handleClearTimeout.call(this, data);
       break;
     default:
@@ -38,5 +38,5 @@ self.addEventListener("message", function(ev: MessageEvent<TimerWorkerInMessage>
 });
 
 self.postMessage({
-  action: "init",
+  action: 'init',
 } as TimerWorkerOutMessage);

@@ -14,7 +14,7 @@ export interface TimerWorkerInMessage {
 
 export class TimerService {
   private timerWorker?: Worker;
-  private timersHandlers: Record<number, Function>;
+  private timersHandlers: Record<number, () => void>;
   private timerId: number;
   private timerWorkerReady: boolean;
 
@@ -23,6 +23,7 @@ export class TimerService {
     this.timerId = 0;
     this.timerWorkerReady = false;
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (BUNDLER === 'webpack') {
       // webpack build (umd/cdn)
@@ -42,6 +43,7 @@ export class TimerService {
 
   private getWorkerURL(): string {
     const workerBlob = new Blob([timerWorker.workerSrc], { type: 'text/javascript' });
+    // eslint-disable-next-line compat/compat
     return URL.createObjectURL(workerBlob);
   }
 
@@ -67,7 +69,7 @@ export class TimerService {
     }
   }
 
-  setTimeout(handler: Function, timeout: number) {
+  setTimeout(handler: () => void, timeout: number) {
     if (this.timerWorker && this.timerWorkerReady) {
       const timerId = this.timerId++;
       this.timersHandlers[timerId] = handler.bind(this);

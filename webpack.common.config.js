@@ -37,7 +37,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\TimerService.[jt]s$/,
+        test: /TimerService.[jt]s$/,
         loader: 'string-replace-loader',
         options: {
           search: 'TimerWorker.emptyWorker',
