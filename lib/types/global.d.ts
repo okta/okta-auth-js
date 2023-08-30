@@ -2,6 +2,8 @@
 
 declare const SDK_VERSION: string;
 
+declare const BUNDLER: string;
+
 declare interface PromiseConstructor {
   // eslint-disable-next-line max-len, @typescript-eslint/member-delimiter-style
   allSettled(promises: Array<Promise<any>>): Promise<Array<{status: 'fulfilled' | 'rejected', value?: any, reason?: any}>>;

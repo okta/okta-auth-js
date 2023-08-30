@@ -37,11 +37,28 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /TimerService.[jt]s$/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'TimerWorker.emptyWorker',
+          replace: 'TimerWorker.worker',
+        }
+      },
+      {
+        test: /\.worker\.[jt]s$/,
+        use: [ {
+          loader: 'worker-loader',
+          options: {
+            inline: 'no-fallback'
+          }
+       } ],
+      },
+      {
         test: /\.[jt]s$/,
         exclude: babelExclude,
         loader: 'babel-loader',
         options: babelOptions
-      }
+      },
     ]
   },
   resolve: {
@@ -52,7 +69,8 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      SDK_VERSION: JSON.stringify(SDK_VERSION)
+      SDK_VERSION: JSON.stringify(SDK_VERSION),
+      BUNDLER: JSON.stringify('webpack'),
     })
   ]
 };

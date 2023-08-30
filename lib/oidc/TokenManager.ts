@@ -45,6 +45,7 @@ import {
 import { REFRESH_TOKEN_STORAGE_KEY, TOKEN_STORAGE_NAME } from '../constants';
 import { EventEmitter } from '../base/types';
 import { StorageOptions, StorageProvider, StorageType } from '../storage/types';
+import { TimerService } from '../services/TimerService';
 
 const DEFAULT_OPTIONS = {
   // TODO: remove in next major version - OKTA-473815
@@ -76,6 +77,7 @@ export class TokenManager implements TokenManagerInterface {
   private storage: StorageProvider;
   private state: TokenManagerState;
   private options: TokenManagerOptions;
+  private timerService: TimerService;
 
   on(event: typeof EVENT_RENEWED, handler: TokenManagerRenewEventHandler, context?: object): void;
   on(event: typeof EVENT_ERROR, handler: TokenManagerErrorEventHandler, context?: object): void;
@@ -132,6 +134,7 @@ export class TokenManager implements TokenManagerInterface {
     this.storage = sdk.storageManager.getTokenStorage({...storageOptions, useSeparateCookies: true});
     this.clock = SdkClock.create(/* sdk, options */);
     this.state = defaultState();
+    this.timerService = new TimerService();
   }
 
   start() {
@@ -141,7 +144,7 @@ export class TokenManager implements TokenManagerInterface {
     this.setExpireEventTimeoutAll();
     this.state.started = true;
   }
-  
+
   stop() {
     this.clearExpireEventTimeoutAll();
     this.state.started = false;
@@ -187,7 +190,7 @@ export class TokenManager implements TokenManagerInterface {
   }
   
   clearExpireEventTimeout(key) {
-    clearTimeout(this.state.expireTimeouts[key] as any);
+    this.timerService.clearTimeout(this.state.expireTimeouts[key] as any);
     delete this.state.expireTimeouts[key];
   
     // Remove the renew promise (if it exists)
@@ -215,14 +218,14 @@ export class TokenManager implements TokenManagerInterface {
     // Clear any existing timeout
     this.clearExpireEventTimeout(key);
   
-    var expireEventTimeout = setTimeout(() => {
+    var expireEventTimeout = this.timerService.setTimeout(() => {
       this.emitExpired(key, token);
     }, expireEventWait);
-  
+
     // Add a new timeout
     this.state.expireTimeouts[key] = expireEventTimeout;
   }
-  
+
   setExpireEventTimeoutAll() {
     var tokenStorage = this.storage.getStorage();
     for(var key in tokenStorage) {
