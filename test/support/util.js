@@ -129,7 +129,7 @@ function mockAjax(pairs) {
 
   const origFetch = global.fetch;
   jest.spyOn(global, 'fetch').mockImplementation(function (url, args) {
-    if(url.startsWith('blob:')) {
+    if (url.startsWith('blob:')) {
       // called by 'jsdom-worker'
       return origFetch(url, args);
     }
