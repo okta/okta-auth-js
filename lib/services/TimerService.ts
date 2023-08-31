@@ -21,22 +21,24 @@ export class TimerService {
     this.timersHandlers = {};
     this.timerId = 0;
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    if (BUNDLER === 'webpack') {
-      // webpack build (umd/cdn)
-      const TimerWorker = timerWorker as any;
-      this.timerWorker = new TimerWorker() as Worker;
-    } else {
-      if (!timerWorker?.workerSrc) {
-        // babel build (cjs), for node - use fallback
+    if (typeof Worker !== 'undefined') {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (BUNDLER === 'webpack') {
+        // webpack build (umd/cdn)
+        const TimerWorker = timerWorker as any;
+        this.timerWorker = new TimerWorker() as Worker;
       } else {
-        // rollup build (esm)
-        this.timerWorker = new Worker(this.getWorkerURL());
+        if (!timerWorker?.workerSrc) {
+          // babel build (cjs), for node - use fallback
+        } else {
+          // rollup build (esm)
+          this.timerWorker = new Worker(this.getWorkerURL());
+        }
       }
-    }
 
-    this.timerWorker?.addEventListener('message', this.handleWorkerEvent.bind(this));
+      this.timerWorker?.addEventListener('message', this.handleWorkerEvent.bind(this));
+    }
   }
 
   private getWorkerURL(): string {

@@ -141,8 +141,8 @@ describe('base token API', function() {
         });
       },
       expectations: function () {
-        expect(fetch).toHaveBeenCalledTimes(1);
-        const args = fetch.mock.calls[0][1];
+        expect(fetch).toHaveBeenCalledTimes(1+1); // +1 for jsdom-worker
+        const args = fetch.mock.calls[1][1];
         const params = util.parseQueryParams(args.body); // decode form body
         expect(params).toEqual(    {
           'client_id': CLIENT_ID,
@@ -165,8 +165,8 @@ describe('base token API', function() {
         });
       },
       expectations: function () {
-        expect(fetch).toHaveBeenCalledTimes(1);
-        const args = fetch.mock.calls[0][1];
+        expect(fetch).toHaveBeenCalledTimes(1+1); // +1 for jsdom-worker
+        const args = fetch.mock.calls[1][1];
         const params = util.parseQueryParams(args.body); // decode form body
         expect(params).toEqual(    {
           'client_id': CLIENT_ID,

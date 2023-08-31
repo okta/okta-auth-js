@@ -14,7 +14,8 @@ const config = Object.assign({}, baseConfig, {
     '<rootDir>/test/spec/features/server'
   ]),
   moduleNameMapper: Object.assign({}, baseConfig.moduleNameMapper, {
-    '^./node$': './browser'
+    '^./node$': './browser',
+    'workers/(.*?)\.emptyWorker': '<rootDir>/build/esm/browser/workers/$1.worker.js',
   })
 });
 
