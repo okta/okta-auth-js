@@ -9,8 +9,7 @@ const config = Object.assign({}, baseConfig, {
   'setupFiles': [
     '<rootDir>/test/support/nodeExceptions.js',
     '<rootDir>/test/support/disableFetch.js',
-    '<rootDir>/test/support/jest/jest.setup.js',
-    'jsdom-worker'
+    '<rootDir>/test/support/jest/jest.setup.js'
   ],
   globals: Object.assign({}, baseConfig.globals, {
     'ts-jest': {

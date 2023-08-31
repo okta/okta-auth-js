@@ -16,12 +16,10 @@ export class TimerService {
   private timerWorker?: Worker;
   private timersHandlers: Record<number, () => void>;
   private timerId: number;
-  private timerWorkerReady: boolean;
 
   constructor() {
     this.timersHandlers = {};
     this.timerId = 0;
-    this.timerWorkerReady = false;
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -54,7 +52,6 @@ export class TimerService {
         this.handleTimeoutCallback(data);
         break;
       case 'init':
-        this.timerWorkerReady = true;
         break;
       default:
         break;
@@ -70,7 +67,7 @@ export class TimerService {
   }
 
   setTimeout(handler: () => void, timeout: number) {
-    if (this.timerWorker && this.timerWorkerReady) {
+    if (this.timerWorker) {
       const timerId = this.timerId++;
       this.timersHandlers[timerId] = handler.bind(this);
       this.timerWorker?.postMessage({
@@ -80,18 +77,20 @@ export class TimerService {
       } as TimerWorkerInMessage);
       return timerId;
     } else {
+      // fallback
       return setTimeout(handler, timeout);
     }
   }
 
   clearTimeout(timerId: number) {
-    if (this.timerWorker && this.timerWorkerReady) {
+    if (this.timerWorker) {
       this.timerWorker?.postMessage({
         action: 'clearTimeout',
         timerId: timerId,
       } as TimerWorkerInMessage);
       delete this.timersHandlers[this.timerId];
     } else {
+      // fallback
       return clearTimeout(timerId);
     }
   }

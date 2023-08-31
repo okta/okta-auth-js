@@ -127,7 +127,12 @@ function mockAjax(pairs) {
     setNextPair(pairs);
   }
 
+  const origFetch = global.fetch;
   jest.spyOn(global, 'fetch').mockImplementation(function (url, args) {
+    if(url.startsWith('blob:')) {
+      // called by 'jsdom-worker'
+      return origFetch(url, args);
+    }
     var pair = allPairs.shift();
     if (!pair) {
       throw new Error('We are making a request that we have not anticipated: ' + url);

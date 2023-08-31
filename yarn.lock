@@ -8305,10 +8305,9 @@ jsdoctypeparser@^6.1.0:
   resolved "https://registry.yarnpkg.com/jsdoctypeparser/-/jsdoctypeparser-6.1.0.tgz#acfb936c26300d98f1405cb03e20b06748e512a8"
   integrity sha512-UCQBZ3xCUBv/PLfwKAJhp6jmGOSLFNKzrotXGNgbKhWvz27wPsCsVeP7gIcHPElQw2agBmynAitXqhxR58XAmA==
 
-jsdom-worker@^0.3.0:
+jsdom-worker@denysoblohin-okta/jsdom-worker#sync-blob:
   version "0.3.0"
-  resolved "https://registry.yarnpkg.com/jsdom-worker/-/jsdom-worker-0.3.0.tgz#aff32ec089d17f56a5a344a426b6fb2f56e7de54"
-  integrity sha512-nlPmN0i93+e6vxzov8xqLMR+MBs/TAYeSviehivzqovHH0AgooVx9pQ/otrygASppPvdR+V9Jqx5SMe8+FcADg==
+  resolved "https://codeload.github.com/denysoblohin-okta/jsdom-worker/tar.gz/0bb38c92042dedfd89b9db79e784e337889f16c9"
   dependencies:
     mitt "^3.0.0"
     uuid-v4 "^0.1.0"

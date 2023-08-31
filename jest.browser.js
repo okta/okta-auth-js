@@ -6,6 +6,9 @@ const config = Object.assign({}, baseConfig, {
   globals: Object.assign({}, baseConfig.globals, {
     USER_AGENT
   }),
+  setupFiles: baseConfig.setupFiles.concat([
+    'jsdom-worker'
+  ]),
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
     '<rootDir>/test/spec/serverStorage.js',
     '<rootDir>/test/spec/features/server'
