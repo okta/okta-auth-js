@@ -49,8 +49,6 @@ export interface FetchResponse {
   text(): Promise<string>;
 }
 
-export type HttpRequestClient = (method: string, url: string, options: FetchOptions) => Promise<any>;
-
 export interface HttpResponse {
   responseText: string;
   status: number;
@@ -60,6 +58,8 @@ export interface HttpResponse {
   };
   headers: HeadersInit;
 }
+
+export type HttpRequestClient = (method: string, url: string, options: FetchOptions) => Promise<HttpResponse>;
 
 // HTTP API
 export interface HttpAPI {
