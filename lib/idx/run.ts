@@ -81,6 +81,7 @@ function initializeData(authClient, data: RunData): RunData {
     withCredentials,
     remediators,
     actions,
+    useGenericRemediator
   } = options;
 
   const status = IdxStatus.PENDING;
@@ -89,7 +90,7 @@ function initializeData(authClient, data: RunData): RunData {
   flow = flow || authClient.idx.getFlow() || 'default';
   if (flow) {
     authClient.idx.setFlow(flow);
-    const flowSpec = getFlowSpecification(authClient, flow);
+    const flowSpec = getFlowSpecification(authClient, flow, useGenericRemediator);
     // Favor option values over flow spec
     withCredentials = (typeof withCredentials !== 'undefined') ? withCredentials : flowSpec.withCredentials;
     remediators = remediators || flowSpec.remediators;

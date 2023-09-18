@@ -15,7 +15,8 @@ export interface FlowSpecification {
 // eslint-disable-next-line complexity
 export function getFlowSpecification(
   oktaAuth: OktaAuthIdxInterface,
-  flow: FlowIdentifier = 'default'
+  flow: FlowIdentifier = 'default',
+  useGenericRemediation: boolean = false
 ): FlowSpecification {
   let remediators, actions, withCredentials = true;
   switch (flow) {
@@ -23,6 +24,11 @@ export function getFlowSpecification(
     case 'signup':
     case 'enrollProfile':
       remediators = RegistrationFlow;
+      if (useGenericRemediation) {
+        actions = [
+          'select-enroll-profile'
+        ];
+      }
       withCredentials = false;
       break;
     case 'recoverPassword':
