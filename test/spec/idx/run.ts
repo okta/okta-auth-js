@@ -156,7 +156,7 @@ describe('idx/run', () => {
       const { authClient } = testContext;
       jest.spyOn(mocked.FlowSpecification, 'getFlowSpecification');
       await run(authClient, { flow: 'signup' });
-      expect(mocked.FlowSpecification.getFlowSpecification).toHaveBeenCalledWith(authClient, 'signup');
+      expect(mocked.FlowSpecification.getFlowSpecification).toHaveBeenCalledWith(authClient, 'signup', undefined);
     });
   });
 
@@ -232,8 +232,9 @@ describe('idx/run', () => {
       password, 
       stateHandle: idxResponse.rawIdxState.stateHandle 
     };
-    const flowSpec = mocked.FlowSpecification.getFlowSpecification(authClient, flow);
+    const flowSpec = mocked.FlowSpecification.getFlowSpecification(authClient, flow, options.useGenericRemediator);
     const { remediators, actions, flowMonitor } = flowSpec;
+    expect(actions).toEqual(['select-enroll-profile']);     // GenericRemediator now returns register as action
     await run(authClient, options);
     expect(mocked.remediate.remediate).toHaveBeenCalledWith(authClient, idxResponse, values, {
       remediators,
@@ -267,7 +268,7 @@ describe('idx/run', () => {
       password, 
       stateHandle: idxResponse.rawIdxState.stateHandle 
     };
-    const flowSpec = mocked.FlowSpecification.getFlowSpecification(authClient, flow);
+    const flowSpec = mocked.FlowSpecification.getFlowSpecification(authClient, flow, true);
     const { remediators, actions, flowMonitor } = flowSpec;
     await run(authClient, options);
     expect(mocked.remediate.remediate).toHaveBeenCalledWith(authClient, idxResponse, values, {

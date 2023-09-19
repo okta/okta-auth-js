@@ -16,7 +16,7 @@ export interface FlowSpecification {
 export function getFlowSpecification(
   oktaAuth: OktaAuthIdxInterface,
   flow: FlowIdentifier = 'default',
-  useGenericRemediation: boolean = false
+  useGenericRemediation = false
 ): FlowSpecification {
   let remediators, actions, withCredentials = true;
   switch (flow) {
