@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
 
