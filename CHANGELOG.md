@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.4.3
+
+- [#1457](https://github.com/okta/okta-auth-js/pull/1457) Fix: `flow: register` now works with `useGenericRemediator: true`
+
 ## 7.4.2
 
 ### Bug Fix
