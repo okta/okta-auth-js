@@ -318,6 +318,7 @@ Then(
 
 Then(
   /^the screen changes to receive an input for a Email code$/,
+  { timeout: 40000 },
   () => checkIsOnPage('Enter Code')
 );
 

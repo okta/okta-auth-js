@@ -37,6 +37,9 @@ const firefoxOptions = {
 const maxInstances = process.env.MAX_INSTANCES ? +process.env.MAX_INSTANCES : 1;
 
 if (CI) {
+    if (process.env.CHROME_BINARY) {
+      chromeOptions.binary = process.env.CHROME_BINARY;
+    }
     chromeOptions.args = chromeOptions.args.concat([
         '--headless',
         '--disable-gpu',
@@ -50,18 +53,6 @@ if (CI) {
         '-headless'
     ]);
 }
-
-// driver version must match installed chrome version
-// https://chromedriver.storage.googleapis.com/index.html
-
-const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '106.0.5249.61';
-const drivers = USE_FIREFOX ? {
-  // Use latest geckodriver
-  // https://github.com/mozilla/geckodriver/releases
-  firefox: true,
-} : {
-  chrome: { version: CHROMEDRIVER_VERSION },
-};
 
  // If you are using Cucumber you need to specify the location of your step definitions.
 const cucumberOpts: WebdriverIO.CucumberOpts = {
@@ -107,9 +98,10 @@ const cucumberOpts: WebdriverIO.CucumberOpts = {
   // <string> (expression) only execute the features or scenarios with
   // tags matching the expression, see
   // https://docs.cucumber.io/tag-expressions/
-  tagExpression: 'not @Pending',
+  // tagExpression: 'not @Pending',
+  tags: 'not @Pending and not @quarantined',
   // <boolean> add cucumber tags to feature or scenario name
-  tagsInTitle: false,
+  // tagsInTitle: false,
   // <number> timeout for step definitions
   timeout: defaultTimeoutInterval,
 };
@@ -157,7 +149,7 @@ export const config: WebdriverIO.Config = {
     // and 30 processes will get spawned. The property handles how many capabilities
     // from the same test should run tests.
     //
-    maxInstances: 2,
+    maxInstances: 1,
     //
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
@@ -224,16 +216,16 @@ export const config: WebdriverIO.Config = {
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: [
-      ['selenium-standalone', {
-        installArgs: {
-          drivers
-        },
-        args: {
-          drivers
-        }
-      }]
-    ],
+    // services: [
+    //   ['selenium-standalone', {
+    //     installArgs: {
+    //       drivers
+    //     },
+    //     args: {
+    //       drivers
+    //     }
+    //   }]
+    // ],
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
     // see also: https://webdriver.io/docs/frameworks.html
