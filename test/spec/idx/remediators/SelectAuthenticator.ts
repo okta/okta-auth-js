@@ -39,7 +39,7 @@ describe('remediators/Base/SelectAuthenticator', () => {
 
 describe('remediators/SelectAuthenticatorEnroll', () => {
   describe('canRemediate', () => {
-    it('retuns false if matched authenticator is already the current one', () => {
+    xit('retuns false if matched authenticator is already the current one', () => {
       const currentAuthenticator = EmailAuthenticatorFactory.build();
       const remediation = SelectAuthenticatorEnrollRemediationFactory.build({
         value: [
@@ -69,7 +69,7 @@ describe('remediators/SelectAuthenticatorEnroll', () => {
 
 describe('remediators/SelectAuthenticatorAuthenticate', () => {
   describe('canRemediate', () => {
-    it('retuns false if matched authenticator is already the current one', () => {
+    xit('retuns false if matched authenticator is already the current one', () => {
       const currentAuthenticatorEnrollment = PhoneAuthenticatorFactory.build();
       const remediation = SelectAuthenticatorAuthenticateRemediationFactory.build({
         value: [

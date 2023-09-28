@@ -60,16 +60,18 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
     const matchedOption = this.findMatchedOption(authenticators, options!);
     if (matchedOption) {
 
-      const isAuthenticatorCurrent = (auth) => {
-        return auth && !auth.value?.resend
-          && auth.value.id === matchedOption.relatesTo?.id;
-      };
+      // const isAuthenticatorCurrent = (auth) => {
+      //   return auth && !auth.value?.resend
+      //     && auth.value.id === matchedOption.relatesTo?.id;
+      // };
 
-      // Don't select current authenticator (OKTA-612939)
-      // Follow up: OKTA-646147 - original fix caused different issue
-      const isCurrentAuthenticator = isAuthenticatorCurrent(context?.currentAuthenticator);                          // false
-      const isCurrentAuthenticatorEnrollment = isAuthenticatorCurrent(context?.currentAuthenticatorEnrollment);      // true
-      return !isCurrentAuthenticator && !isCurrentAuthenticatorEnrollment;                                           // false
+      // // Don't select current authenticator (OKTA-612939)
+      // // Follow up: OKTA-646147 - original fix caused different issue
+      // const isCurrentAuthenticator = isAuthenticatorCurrent(context?.currentAuthenticator);                          // false
+      // const isCurrentAuthenticatorEnrollment = isAuthenticatorCurrent(context?.currentAuthenticatorEnrollment);      // true
+      // return !isCurrentAuthenticator && !isCurrentAuthenticatorEnrollment;                                           // false
+    
+      return true;
     }
     
     return false;
@@ -110,7 +112,8 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
       .filter(authenticator => {
         return compareAuthenticators(authenticator, this.selectedAuthenticator) !== true;
       });
-    return { ...this.values, authenticators };
+    return { ...this.values, authenticators, authenticator: undefined };
+    // return { ...this.values, authenticators };
   }
 
 }
