@@ -8,6 +8,7 @@ import {
   IdxContextFactory,
   PhoneAuthenticatorFactory,
   EmailAuthenticatorFactory,
+  ResendAuthenticatorFactory
 } from '@okta/test.support/idx';
 
 describe('remediators/Base/SelectAuthenticator', () => {
@@ -91,6 +92,40 @@ describe('remediators/SelectAuthenticatorAuthenticate', () => {
       ];
       const r = new SelectAuthenticatorAuthenticate(remediation, { authenticators });
       expect(r.canRemediate(context)).toBe(false);
+      expect(r.canRemediate()).toBe(true);
+    });
+
+    it('returns true if matched authenticator has a resend form', () => {
+      const phoneAuthenticator = PhoneAuthenticatorFactory.build();
+      const remediation = SelectAuthenticatorAuthenticateRemediationFactory.build({
+        value: [
+          AuthenticatorValueFactory.build({
+            options: [
+              PhoneAuthenticatorOptionFactory.params({
+                _authenticator: phoneAuthenticator,
+              }).build(),
+            ]
+          }),
+        ]
+      });
+      const context = IdxContextFactory.build({
+        currentAuthenticatorEnrollment: {
+          value: {
+            ...phoneAuthenticator,
+            resend: ResendAuthenticatorFactory.build(),
+          }
+        },
+        authenticatorEnrollments: {
+          value: [phoneAuthenticator]
+        },
+        currentAuthenticator: {}
+      });
+
+      const authenticators = [
+        phoneAuthenticator,
+      ];
+      const r = new SelectAuthenticatorAuthenticate(remediation, { authenticators });
+      expect(r.canRemediate(context)).toBe(true);
       expect(r.canRemediate()).toBe(true);
     });
   });

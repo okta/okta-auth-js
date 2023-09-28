@@ -59,12 +59,17 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
     // Proceed with provided authenticators
     const matchedOption = this.findMatchedOption(authenticators, options!);
     if (matchedOption) {
+
+      const isAuthenticatorCurrent = (auth) => {
+        return auth && !auth.value?.resend
+          && auth.value.id === matchedOption.relatesTo?.id;
+      };
+
       // Don't select current authenticator (OKTA-612939)
-      const isCurrentAuthenticator = context?.currentAuthenticator
-        && context?.currentAuthenticator.value.id === matchedOption.relatesTo?.id;
-      const isCurrentAuthenticatorEnrollment = context?.currentAuthenticatorEnrollment
-        && context?.currentAuthenticatorEnrollment.value.id === matchedOption.relatesTo?.id;
-      return !isCurrentAuthenticator && !isCurrentAuthenticatorEnrollment;
+      // Follow up: OKTA-646147 - original fix caused different issue
+      const isCurrentAuthenticator = isAuthenticatorCurrent(context?.currentAuthenticator);                          // false
+      const isCurrentAuthenticatorEnrollment = isAuthenticatorCurrent(context?.currentAuthenticatorEnrollment);      // true
+      return !isCurrentAuthenticator && !isCurrentAuthenticatorEnrollment;                                           // false
     }
     
     return false;
