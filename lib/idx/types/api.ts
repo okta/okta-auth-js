@@ -300,16 +300,3 @@ export type GetFlowSpecification = (
   oktaAuth: OktaAuthIdxInterface,
   flow: FlowIdentifier
 ) => FlowSpecification;
-
-export type MixinIdx
-<
-  M extends IdxTransactionMeta,
-  S extends IdxStorageManagerInterface<M>,
-  O extends OktaAuthIdxOptions,
-  TM extends IdxTransactionManagerInterface,
-  TBase extends OktaAuthConstructor<OktaAuthOAuthInterface<M, S, O, TM>>
-> = (
-  Base: TBase
-) => TBase & OktaAuthIdxConstructor<
-  OktaAuthIdxInterface<M, S, O, TM> & OktaAuthOAuthInterface<M, S, O, TM>
->;
