@@ -1,6 +1,5 @@
 import { warn, split2 } from '../util';
-import * as remediators from './remediators';
-import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
+import { RemediationValues, Remediator, RemediatorConstructor } from './remediators/Base/Remediator';
 import { GenericRemediator } from './remediators/GenericRemediator';
 import { OktaAuthIdxInterface, IdxFeature, NextStep, RemediateOptions, RemediationResponse, RunOptions } from './types';
 import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse } from './types/idx-js';
@@ -115,7 +114,7 @@ export function getAvailableSteps(
 ): NextStep[] {
   const res: NextStep[] = [];
 
-  const remediatorMap: Record<string, RemediatorConstructor> = Object.values(remediators)
+  const remediatorMap: Record<string, RemediatorConstructor> = Object.values(authClient.idx.allRemediators)
     .reduce((map, remediatorClass) => {
       // Only add concrete subclasses to the map
       if (remediatorClass.remediationName) {

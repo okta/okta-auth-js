@@ -62,6 +62,19 @@
         "default": "./build/esm/browser/exports/exports/idx.js"
       }
     },
+    "./idx-lite": {
+      "node": {
+        "types": "./build/types/lib/exports/idx-lite.d.ts",
+        "import": "./build/esm/node/exports/exports/idx-lite.js",
+        "require": "./build/cjs/exports/idx-lite.js"
+      },
+      "default": {
+        "types": "./build/types/lib/exports/idx-lite.d.ts",
+        "import": "./build/esm/browser/exports/exports/idx-lite.js",
+        "require": "./build/umd/idx-lite.js",
+        "default": "./build/esm/browser/exports/exports/idx-lite.js"
+      }
+    },
     "./myaccount": {
       "node": {
         "types": "./build/types/lib/exports/myaccount.d.ts",

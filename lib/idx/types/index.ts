@@ -29,6 +29,7 @@ export type {
 } from './idx-js';
 export * from './meta';
 export type { FlowIdentifier } from './FlowIdentifier';
+export type { FlowSpecification } from './FlowSpecification';
 export type { WebauthnEnrollValues } from '../authenticator/WebauthnEnrollment';
 export type { WebauthnVerificationValues } from '../authenticator/WebauthnVerification';
 export * from './storage';

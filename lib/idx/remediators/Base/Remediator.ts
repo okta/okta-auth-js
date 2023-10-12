@@ -30,6 +30,7 @@ export interface RemediationValues {
 }
 
 export interface RemediatorConstructor {
+  remediationName: string;
   new<T extends RemediationValues>(
     remediation: IdxRemediation, 
     values?: T, 

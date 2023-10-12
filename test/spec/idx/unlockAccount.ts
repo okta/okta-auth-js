@@ -14,6 +14,8 @@
 import { unlockAccount } from '../../../lib/idx/unlockAccount';
 import { IdxStatus, AuthenticatorKey } from '../../../lib/idx/types';
 import { AuthSdkError } from '../../../lib/errors';
+import { getFlowSpecification } from '../../../lib/idx/flow';
+import * as allRemediators from '../../../lib/idx/remediators';
 
 import {
   chainResponses,
@@ -101,7 +103,9 @@ describe('/idx/unlockAccout', () => {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
       },
       idx: {
-        setFlow: () => {}
+        setFlow: () => {},
+        getFlowSpecification,
+        allRemediators,
       }
     };
 

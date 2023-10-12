@@ -1,16 +1,8 @@
-import { OktaAuthIdxInterface, FlowIdentifier } from '../types';
+import { OktaAuthIdxInterface, FlowIdentifier, FlowSpecification } from '../types';
 import { AuthenticationFlow } from './AuthenticationFlow';
 import { PasswordRecoveryFlow } from './PasswordRecoveryFlow';
 import { RegistrationFlow } from './RegistrationFlow';
 import { AccountUnlockFlow } from './AccountUnlockFlow';
-import { RemediationFlow } from './RemediationFlow';
-
-export interface FlowSpecification {
-  flow: FlowIdentifier;
-  remediators: RemediationFlow;
-  actions?: string[];
-  withCredentials?: boolean;
-}
 
 // eslint-disable-next-line complexity
 export function getFlowSpecification(

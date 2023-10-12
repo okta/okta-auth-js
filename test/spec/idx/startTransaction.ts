@@ -13,6 +13,8 @@
 
 import { startTransaction } from '../../../lib/idx/startTransaction';
 import { IdxFeature, IdxStatus } from '../../../lib/idx/types';
+import { getFlowSpecification } from '../../../lib/idx/flow';
+import * as allRemediators from '../../../lib/idx/remediators';
 
 import { 
   IdxResponseFactory,
@@ -64,7 +66,9 @@ describe('idx/startTransaction', () => {
       },
       idx: {
         getFlow: () => {},
-        setFlow: () => {}
+        setFlow: () => {},
+        getFlowSpecification,
+        allRemediators,
       },
       token: {
         exchangeCodeForTokens: () => {}

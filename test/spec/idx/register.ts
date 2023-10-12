@@ -16,6 +16,8 @@ import { register } from '../../../lib/idx/register';
 import { proceed } from '../../../lib/idx/proceed';
 import { IdxStatus, AuthenticatorKey } from '../../../lib/idx/types';
 import { AuthSdkError } from '../../../lib/errors';
+import { getFlowSpecification } from '../../../lib/idx/flow';
+import * as allRemediators from '../../../lib/idx/remediators';
 
 import {
   IdxResponseFactory,
@@ -124,7 +126,9 @@ describe('idx/register', () => {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
       },
       idx: {
-        setFlow: () => {}
+        setFlow: () => {},
+        getFlowSpecification,
+        allRemediators,
       }
     };
     jest.spyOn(mocked.interact, 'interact').mockResolvedValue({ 

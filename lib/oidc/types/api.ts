@@ -120,6 +120,22 @@ export interface OriginalUriApi {
   removeOriginalUri(state?: string): void;
 }
 
+export interface OktaAuthOAuthInterfaceLite
+<
+  M extends OAuthTransactionMeta = PKCETransactionMeta,
+  S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
+  O extends OktaAuthOAuthOptions = OktaAuthOAuthOptions,
+  TM extends TransactionManagerInterface = TransactionManagerInterface
+> 
+  extends OktaAuthSessionInterface<S, O>
+{
+  token: TokenAPI;
+  transactionManager: TM;
+
+  isPKCE(): boolean;
+  isLoginRedirect(): boolean;
+}
+
 export interface OktaAuthOAuthInterface
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
@@ -127,23 +143,18 @@ export interface OktaAuthOAuthInterface
   O extends OktaAuthOAuthOptions = OktaAuthOAuthOptions,
   TM extends TransactionManagerInterface = TransactionManagerInterface
 > 
-  extends OktaAuthSessionInterface<S, O>,
-  OriginalUriApi
+  extends OriginalUriApi, OktaAuthOAuthInterfaceLite<M, S, O, TM>
 {
-  token: TokenAPI;
   tokenManager: TokenManagerInterface;
   pkce: PkceAPI;
-  transactionManager: TM;
   endpoints: Endpoints;
   
-  isPKCE(): boolean;
   getIdToken(): string | undefined;
   getAccessToken(): string | undefined;
   getRefreshToken(): string | undefined;
 
   isAuthenticated(options?: IsAuthenticatedOptions): Promise<boolean>;
   signOut(opts?: SignoutOptions): Promise<boolean>;
-  isLoginRedirect(): boolean;
   storeTokensFromRedirect(): Promise<void>;
   getUser<T extends CustomUserClaims = CustomUserClaims>(): Promise<UserClaims<T>>;
   signInWithRedirect(opts?: SigninWithRedirectOptions): Promise<void>;

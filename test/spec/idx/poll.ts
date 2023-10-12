@@ -22,6 +22,8 @@ import {
 import { poll } from '../../../lib/idx';
 import { proceed } from '../../../lib/idx/proceed';
 import { IdxStatus } from '../../../lib/idx/types';
+import { getFlowSpecification } from '../../../lib/idx/flow';
+import * as allRemediators from '../../../lib/idx/remediators';
 
 const mocked = {
   interact: require('../../../lib/idx/interact'),
@@ -72,7 +74,9 @@ describe('idx/poll', () => {
       },
       idx: {
         getFlow: () => {},
-        setFlow: () => {}
+        setFlow: () => {},
+        getFlowSpecification,
+        allRemediators,
       }
     };
 
