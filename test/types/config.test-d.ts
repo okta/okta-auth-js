@@ -99,7 +99,11 @@ const config: OktaAuthOptions = {
     window.location.href = toRelativeUrl(originalUri, window.location.origin);
   },
   httpRequestClient: function(method, url, args) {
-    return Promise.resolve(null);
+    return Promise.resolve({
+      responseText: 'fake',
+      status: 200,
+      headers: []
+    });
   }
 };
 
