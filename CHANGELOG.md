@@ -2,6 +2,10 @@
 
 ## 7.5.0
 
+### Bug Fix
+
+ - [#1462](https://github.com/okta/okta-auth-js/pull/1462) Fixes ESM build for Node.js
+
 ### Other
 
  - [#1449](https://github.com/okta/okta-auth-js/pull/1449) chore: bump `broadcast-channel` version to `5.3.0`
