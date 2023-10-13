@@ -9,6 +9,7 @@
 ### Other
 
  - [#1449](https://github.com/okta/okta-auth-js/pull/1449) chore: bump `broadcast-channel` version to `5.3.0`
+ - [#1463](https://github.com/okta/okta-auth-js/pull/1463) chore: Updates type definitions for `HttpRequestClient` and `IdentifyValues`
 
 
 ## 7.4.2
