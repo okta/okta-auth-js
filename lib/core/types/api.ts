@@ -1,7 +1,6 @@
 import {
   OAuthStorageManagerInterface,
   OktaAuthOAuthInterface,
-  OktaAuthOAuthInterfaceLite,
   OktaAuthOAuthOptions,
   PKCETransactionMeta,
   Tokens,
@@ -23,16 +22,6 @@ export interface OktaAuthCoreOptions extends OktaAuthOAuthOptions
 export type CoreStorageManagerInterface<
   M extends PKCETransactionMeta = PKCETransactionMeta
 > = OAuthStorageManagerInterface<M>;
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface OktaAuthCoreInterfaceLite<
-  M extends PKCETransactionMeta = PKCETransactionMeta,
-  S extends CoreStorageManagerInterface<M> = CoreStorageManagerInterface<M>,
-  O extends OktaAuthCoreOptions = OktaAuthCoreOptions,
-  TM extends TransactionManagerInterface = TransactionManagerInterface
-> 
-extends OktaAuthOAuthInterfaceLite<M, S, O, TM>
-{}
 
 // an instance of AuthJS with OAuth and Services
 export interface OktaAuthCoreInterface<

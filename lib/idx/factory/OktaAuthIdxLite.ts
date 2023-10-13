@@ -5,9 +5,8 @@ import { IdxTransactionManagerInterface, OktaAuthIdxInterfaceLite, OktaAuthIdxCo
 import { IdxTransactionMeta } from '../types/meta';
 import { IdxStorageManagerInterface } from '../types/storage';
 import { OktaAuthIdxOptions } from '../types/options';
-import { TransactionManagerConstructor } from '../../oidc/types';
+import { TransactionManagerConstructor, OktaAuthOAuthInterfaceLite } from '../../oidc/types';
 import { mixinIdxLite } from '../mixinLite';
-import { OktaAuthCoreInterfaceLite } from '../../core/types';
 
 export function createOktaAuthIdxLite<
   M extends IdxTransactionMeta = IdxTransactionMeta,
@@ -21,7 +20,7 @@ export function createOktaAuthIdxLite<
 )
 : OktaAuthIdxConstructorLite<
   OktaAuthIdxInterfaceLite<M, S, O, TM> &
-  OktaAuthCoreInterfaceLite<M, S, O, TM>
+  OktaAuthOAuthInterfaceLite<M, S, O, TM>
 >
 {
   const Core = createOktaAuthCoreLite<M, S, O, TM>(
