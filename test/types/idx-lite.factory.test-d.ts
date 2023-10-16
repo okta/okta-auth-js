@@ -12,7 +12,6 @@
  *
  */
 import {
-  OktaAuthOptions,
   OktaAuthHttpInterface,
   HttpAPI,
   OktaAuthIdxOptions,
@@ -24,14 +23,17 @@ import {
   createIdxOptionsConstructor,
   createIdxStorageManager,
   createIdxTransactionManager,
+  OktaAuthOptionsConstructor,
+  IdxStorageManagerConstructor,
+  IdxTransactionManagerConstructor,
 } from '@okta/okta-auth-js/idx';
 import { expectType, expectAssignable, expectError } from 'tsd';
 
-const OptionsConstructor = createIdxOptionsConstructor();
-const StorageManager = createIdxStorageManager();
-const IdxTransactionManager = createIdxTransactionManager();
-const OktaAuth = createOktaAuthIdxLite(StorageManager, OptionsConstructor, IdxTransactionManager);
-const options: OktaAuthOptions = {};
+const OptionsConstructor: OktaAuthOptionsConstructor<OktaAuthIdxOptions> = createIdxOptionsConstructor();
+const StorageManager: IdxStorageManagerConstructor = createIdxStorageManager();
+const TransactionManager: IdxTransactionManagerConstructor = createIdxTransactionManager();
+const OktaAuth = createOktaAuthIdxLite(StorageManager, OptionsConstructor, TransactionManager);
+const options: OktaAuthIdxOptions = {};
 const authClient = new OktaAuth(options);
 
 // includes Http
@@ -43,7 +45,6 @@ expectType<TokenAPI>(authClient.token);
 
 // has IDX
 expectType<OktaAuthIdxOptions>(authClient.options);
-expectType<OktaAuthOptions>(authClient.options); // test alias
 expectType<IdxAPILite>(authClient.idx);
 expectType<IdxStorageManagerInterface>(authClient.storageManager);
 
