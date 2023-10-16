@@ -1,4 +1,3 @@
-import { createOktaAuthCoreLite } from '../../core/factoryLite';
 import { OktaAuthOptionsConstructor } from '../../base/types';
 import { StorageManagerConstructor } from '../../storage/types';
 import { IdxTransactionManagerInterface, OktaAuthIdxInterfaceLite, OktaAuthIdxConstructorLite } from '../types/api';
@@ -7,6 +6,11 @@ import { IdxStorageManagerInterface } from '../types/storage';
 import { OktaAuthIdxOptions } from '../types/options';
 import { TransactionManagerConstructor, OktaAuthOAuthInterfaceLite } from '../../oidc/types';
 import { mixinIdxLite } from '../mixinLite';
+import { createOktaAuthBase } from '../../base/factory';
+import { mixinStorage } from '../../storage/mixin';
+import { mixinHttp } from '../../http/mixin';
+import { mixinSession } from '../../session/mixin';
+import { mixinOAuthLite } from '../../oidc/mixin/lite';
 
 export function createOktaAuthIdxLite<
   M extends IdxTransactionMeta = IdxTransactionMeta,
@@ -23,11 +27,11 @@ export function createOktaAuthIdxLite<
   OktaAuthOAuthInterfaceLite<M, S, O, TM>
 >
 {
-  const Core = createOktaAuthCoreLite<M, S, O, TM>(
-    StorageManagerConstructor,
-    OptionsConstructor,
-    TransactionManagerConstructor
-  );
-  const WithIdx = mixinIdxLite(Core);
+  const Base = createOktaAuthBase(OptionsConstructor);
+  const WithStorage = mixinStorage<S, O>(Base, StorageManagerConstructor);
+  const WithHttp = mixinHttp<S, O>(WithStorage);
+  const WithSession = mixinSession<S, O>(WithHttp);
+  const WithOAuth = mixinOAuthLite<M, S, O, TM>(WithSession, TransactionManagerConstructor);
+  const WithIdx = mixinIdxLite(WithOAuth);
   return WithIdx;
 }
