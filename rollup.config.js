@@ -72,7 +72,7 @@ function createPackageJson(dirName) {
     generateBundle() {
       // Add an extra package.json underneath ESM to indicate module type
       // This helps tools like Jest identify this code as ESM
-      if (!existsSync(dirName)){
+      if (!existsSync(dirName)) {
         mkdirSync(dirName, { recursive: true });
       }
       writeFileSync(`${dirName}/package.json`, JSON.stringify({
