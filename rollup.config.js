@@ -72,7 +72,7 @@ function createPackageJson(dirName) {
     generateBundle() {
       // Add an extra package.json underneath ESM to indicate module type
       // This helps tools like Jest identify this code as ESM
-      if (!existsSync(dirName)){
+      if (!existsSync(dirName)) {
         mkdirSync(dirName, { recursive: true });
       }
       writeFileSync(`${dirName}/package.json`, JSON.stringify({
@@ -89,7 +89,7 @@ const getPlugins = (env, entryName) => {
   let plugins = [
     replace({
       'SDK_VERSION': JSON.stringify(pkg.version),
-      'global.': 'window.',
+      ...(env === 'browser' && { 'global.': 'window.' }),
       preventAssignment: true
     }),
     (env === 'browser' && alias({
@@ -120,7 +120,7 @@ const getPlugins = (env, entryName) => {
         }
       }
     }),
-    multiInput({ 
+    multiInput({
       relative: 'lib/',
     }),
     createPackageJson(outputDir)
