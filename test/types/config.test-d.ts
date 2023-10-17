@@ -138,4 +138,3 @@ const authClient = new OktaAuth(config);
 expectType<OktaAuth>(authClient);
 const authClient2 = new OktaAuth(config2);
 expectType<OktaAuth>(authClient2);
-
