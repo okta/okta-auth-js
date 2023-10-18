@@ -18,6 +18,7 @@ export interface IdentifyValues extends RemediationValues {
   username?: string;
   password?: string;
   credentials?: Credentials;
+  rememberMe?: boolean;
 }
 
 export class Identify extends Remediator<IdentifyValues> {
