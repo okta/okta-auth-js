@@ -1,6 +1,6 @@
 import { OktaAuthOptionsConstructor } from '../../base/types';
 import { StorageManagerConstructor } from '../../storage/types';
-import { IdxTransactionManagerInterface, OktaAuthIdxInterfaceBase, OktaAuthIdxConstructor } from '../types/api';
+import { IdxTransactionManagerInterface, OktaAuthBaseIdxInterface, OktaAuthIdxConstructor } from '../types/api';
 import { IdxTransactionMeta } from '../types/meta';
 import { IdxStorageManagerInterface } from '../types/storage';
 import { OktaAuthIdxOptions } from '../types/options';
@@ -23,7 +23,7 @@ export function createOktaAuthBaseIdx<
   TransactionManagerConstructor: TransactionManagerConstructor<TM>
 )
 : OktaAuthIdxConstructor<
-  OktaAuthIdxInterfaceBase<M, S, O, TM> & OktaAuthBaseOAuthInterface<M, S, O, TM>
+  OktaAuthBaseIdxInterface<M, S, O, TM> & OktaAuthBaseOAuthInterface<M, S, O, TM>
 >
 {
   const Base = createOktaAuthBase(OptionsConstructor);
