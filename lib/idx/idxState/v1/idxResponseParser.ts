@@ -113,7 +113,18 @@ export const parseIdxResponse = function parseIdxResponse( authClient: OktaAuthI
   const remediationData = idxResponse.remediation?.value || [];
 
   remediationData.forEach(
-    remediation => expandRelatesTo(idxResponse, remediation)
+    remediation => {
+      // TODO: remove once IDX is fixed - OKTA-659181
+      if (remediation.name === 'launch-authenticator' &&
+        remediation?.relatesTo?.[0] === 'authenticatorChallenge' &&
+        !idxResponse?.authenticatorChallenge
+      ) {
+        delete remediation.relatesTo;
+        return;
+      }
+
+      return expandRelatesTo(idxResponse, remediation);
+    }
   );
 
   const remediations = remediationData.map(remediation => convertRemediationAction( authClient, remediation, toPersist ));
