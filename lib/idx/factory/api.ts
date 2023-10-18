@@ -21,44 +21,32 @@ import {
   parseEmailVerifyCallback
 } from '../emailVerify';
 import { handleInteractionCodeRedirect } from '../handleInteractionCodeRedirect';
-import { makeIdxState } from '../idxState';
 import { interact } from '../interact';
 import { introspect } from '../introspect';
 import { poll } from '../poll';
-import { canProceed, proceed } from '../proceed';
 import { recoverPassword } from '../recoverPassword';
 import { register } from '../register';
-import { startTransaction } from '../startTransaction';
-import {
-  clearTransactionMeta,
-  createTransactionMeta,
-  getSavedTransactionMeta,
-  getTransactionMeta,
-  isTransactionMetaValid,
-  saveTransactionMeta
-} from '../transactionMeta';
 import { FlowIdentifier, IdxAPI, OktaAuthIdxInterface } from '../types';
 import { unlockAccount } from '../unlockAccount';
 import * as allRemediators from '../remediators';
 import { getFlowSpecification } from '../flow/FlowSpecification';
+import { createBaseIdxAPI } from './baseApi';
 
 // Factory
 export function createIdxAPI(sdk: OktaAuthIdxInterface): IdxAPI {
-  const boundStartTransaction = startTransaction.bind(null, sdk);
+  const baseApi = createBaseIdxAPI(sdk);
   const idx = {
+    ...baseApi,
+
     allRemediators,
     getFlowSpecification,
 
     interact: interact.bind(null, sdk),
     introspect: introspect.bind(null, sdk),
-    makeIdxResponse: makeIdxState.bind(null, sdk),
     
     authenticate: authenticate.bind(null, sdk),
     register: register.bind(null, sdk),
-    start: boundStartTransaction,
-    startTransaction: boundStartTransaction, // Use `start` instead. `startTransaction` will be removed in 7.0
     poll: poll.bind(null, sdk),
-    proceed: proceed.bind(null, sdk),
     cancel: cancel.bind(null, sdk),
     recoverPassword: recoverPassword.bind(null, sdk),
 
@@ -74,20 +62,13 @@ export function createIdxAPI(sdk: OktaAuthIdxInterface): IdxAPI {
     isEmailVerifyCallback,
     parseEmailVerifyCallback,
     isEmailVerifyCallbackError,
-    
-    getSavedTransactionMeta: getSavedTransactionMeta.bind(null, sdk),
-    createTransactionMeta: createTransactionMeta.bind(null, sdk),
-    getTransactionMeta: getTransactionMeta.bind(null, sdk),
-    saveTransactionMeta: saveTransactionMeta.bind(null, sdk),
-    clearTransactionMeta: clearTransactionMeta.bind(null, sdk),
-    isTransactionMetaValid,
+
     setFlow: (flow: FlowIdentifier) => {
       sdk.options.flow = flow;
     },
     getFlow: (): FlowIdentifier | undefined => {
       return sdk.options.flow;
     },
-    canProceed: canProceed.bind(null, sdk),
     unlockAccount: unlockAccount.bind(null, sdk),
   };
   return idx;

@@ -22,10 +22,10 @@ import {
   isTransactionMetaValid,
   saveTransactionMeta
 } from '../transactionMeta';
-import { FlowIdentifier, IdxAPILite, OktaAuthIdxInterface, FlowSpecification } from '../types';
+import { FlowIdentifier, BaseIdxAPI, OktaAuthIdxInterface, FlowSpecification } from '../types';
 
 // Factory
-export function createIdxAPILite(sdk: OktaAuthIdxInterface): IdxAPILite {
+export function createBaseIdxAPI(sdk: OktaAuthIdxInterface): BaseIdxAPI {
   function getFlowSpecification(_oktaAuth: OktaAuthIdxInterface, _flow: FlowIdentifier = 'default') {
     return {
       remediators: {}
@@ -50,7 +50,6 @@ export function createIdxAPILite(sdk: OktaAuthIdxInterface): IdxAPILite {
     saveTransactionMeta: saveTransactionMeta.bind(null, sdk),
     clearTransactionMeta: clearTransactionMeta.bind(null, sdk),
     isTransactionMetaValid,
-
   };
   return idx;
 }

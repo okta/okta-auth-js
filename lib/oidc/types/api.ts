@@ -120,7 +120,7 @@ export interface OriginalUriApi {
   removeOriginalUri(state?: string): void;
 }
 
-export interface OktaAuthOAuthInterfaceLite
+export interface OktaAuthBaseOAuthInterface
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
   S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
@@ -129,7 +129,7 @@ export interface OktaAuthOAuthInterfaceLite
 > 
   extends OktaAuthSessionInterface<S, O>
 {
-  token: TokenAPI;
+  token: BaseTokenAPI;
   transactionManager: TM;
 
   isPKCE(): boolean;
@@ -143,8 +143,9 @@ export interface OktaAuthOAuthInterface
   O extends OktaAuthOAuthOptions = OktaAuthOAuthOptions,
   TM extends TransactionManagerInterface = TransactionManagerInterface
 > 
-  extends OriginalUriApi, OktaAuthOAuthInterfaceLite<M, S, O, TM>
+  extends OriginalUriApi, OktaAuthBaseOAuthInterface<M, S, O, TM>
 {
+  token: TokenAPI;
   tokenManager: TokenManagerInterface;
   pkce: PkceAPI;
   endpoints: Endpoints;

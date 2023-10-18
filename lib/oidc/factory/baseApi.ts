@@ -15,17 +15,17 @@ import { decodeToken } from '../decodeToken';
 import { exchangeCodeForTokens } from '../exchangeCodeForTokens';
 import {
   OktaAuthOAuthInterface,
-  TokenAPI,
+  BaseTokenAPI,
 } from '../types';
 import { prepareTokenParams } from '../util';
 
 // Factory
-export function createTokenAPILite(sdk: OktaAuthOAuthInterface): TokenAPI {
-  const token: TokenAPI = {
+export function createBaseTokenAPI(sdk: OktaAuthOAuthInterface): BaseTokenAPI {
+  const token: BaseTokenAPI = {
     prepareTokenParams: prepareTokenParams.bind(null, sdk),
     exchangeCodeForTokens: exchangeCodeForTokens.bind(null, sdk),
     decode: decodeToken,
-  } as TokenAPI;
+  };
 
   return token;
 }

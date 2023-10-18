@@ -1,40 +1,40 @@
 import { OktaAuthConstructor } from '../base/types';
-import { OktaAuthOAuthInterfaceLite } from '../oidc/types';
+import { OktaAuthBaseOAuthInterface } from '../oidc/types';
 import {
   IdxTransactionManagerInterface, 
   OktaAuthIdxInterface, 
-  OktaAuthIdxConstructorLite, 
+  OktaAuthIdxConstructor, 
   OktaAuthIdxOptions,
-  IdxAPILite,
+  BaseIdxAPI,
   WebauthnAPI,
-  OktaAuthIdxInterfaceLite
+  OktaAuthIdxInterfaceBase
 } from './types';
 import { IdxTransactionMeta } from './types/meta';
 import { IdxStorageManagerInterface } from './types/storage';
-import { createIdxAPILite } from '../idx/factory/apiLite';
+import { createBaseIdxAPI } from '../idx/factory/baseApi';
 import * as webauthn from './webauthn';
 
-export function mixinIdxLite
+export function mixinBaseIdx
 <
   M extends IdxTransactionMeta = IdxTransactionMeta,
   S extends IdxStorageManagerInterface<M> = IdxStorageManagerInterface<M>,
   O extends OktaAuthIdxOptions = OktaAuthIdxOptions,
   TM extends IdxTransactionManagerInterface = IdxTransactionManagerInterface,
-  TBase extends OktaAuthConstructor<OktaAuthOAuthInterfaceLite<M, S, O, TM>>
-    = OktaAuthConstructor<OktaAuthOAuthInterfaceLite<M, S, O, TM>>
+  TBase extends OktaAuthConstructor<OktaAuthBaseOAuthInterface<M, S, O, TM>>
+    = OktaAuthConstructor<OktaAuthBaseOAuthInterface<M, S, O, TM>>
 >
 (
   Base: TBase
-): TBase & OktaAuthIdxConstructorLite<OktaAuthIdxInterfaceLite<M, S, O, TM>>
+): TBase & OktaAuthIdxConstructor<OktaAuthIdxInterfaceBase<M, S, O, TM>>
 {
-  return class OktaAuthIdx extends Base implements OktaAuthIdxInterfaceLite<M, S, O, TM>
+  return class OktaAuthIdx extends Base implements OktaAuthIdxInterfaceBase<M, S, O, TM>
   {
-    idx: IdxAPILite;
+    idx: BaseIdxAPI;
     static webauthn: WebauthnAPI = webauthn;
     
     constructor(...args: any[]) {
       super(...args);
-      this.idx = createIdxAPILite(this as unknown as OktaAuthIdxInterface<M, S, O, TM>);
+      this.idx = createBaseIdxAPI(this as unknown as OktaAuthIdxInterface<M, S, O, TM>);
     }
   };
 }

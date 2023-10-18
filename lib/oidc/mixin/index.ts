@@ -10,7 +10,6 @@ import {
   CustomUserClaims,
   IDToken,
   IsAuthenticatedOptions,
-  OAuthResponseType,
   OAuthStorageManagerInterface,
   OAuthTransactionMeta,
   OktaAuthOAuthInterface,
@@ -30,10 +29,11 @@ import {
 import PKCE from '../util/pkce';
 import { createEndpoints, createTokenAPI } from '../factory/api';
 import { TokenManager } from '../TokenManager';
-import { getOAuthUrls, isLoginRedirect } from '../util';
-
+import { getOAuthUrls } from '../util';
 import { OktaAuthSessionInterface } from '../../session/types';
 import { provideOriginalUri } from './node';
+import { mixinBaseOAuth } from './base';
+
 export function mixinOAuth
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
@@ -49,13 +49,15 @@ export function mixinOAuth
 ): TBase & OktaAuthConstructor<OktaAuthOAuthInterface<M, S, O, TM>>
 {
   const WithOriginalUri = provideOriginalUri(Base);
-  return class OktaAuthOAuth extends WithOriginalUri
+  const WithBaseOAuth = mixinBaseOAuth<M, S, O, TM, typeof WithOriginalUri>(
+    WithOriginalUri, TransactionManagerConstructor
+  );
+  return class OktaAuthOAuth extends WithBaseOAuth
   implements OktaAuthOAuthInterface<M, S, O, TM>
   {
     static crypto: CryptoAPI = crypto;
     token: TokenAPI;
     tokenManager: TokenManager;
-    transactionManager: TM;
     pkce: PkceAPI;
     endpoints: Endpoints;
 
@@ -64,10 +66,6 @@ export function mixinOAuth
     
     constructor(...args: any[]) {
       super(...args);
-
-      this.transactionManager = new TransactionManagerConstructor(Object.assign({
-        storageManager: this.storageManager,
-      }, this.options.transactionManager));
   
       this.pkce = {
         DEFAULT_CODE_CHALLENGE_METHOD: PKCE.DEFAULT_CODE_CHALLENGE_METHOD,
@@ -188,28 +186,6 @@ export function mixinOAuth
       if (responseType !== 'none') {
         this.tokenManager.setTokens(tokens);
       }
-    }
-  
-    isLoginRedirect(): boolean {
-      return isLoginRedirect(this);
-    }
-
-    isPKCE(): boolean {
-      return !!this.options.pkce;
-    }
-  
-    hasResponseType(responseType: OAuthResponseType): boolean {
-      let hasResponseType = false;
-      if (Array.isArray(this.options.responseType) && this.options.responseType.length) {
-        hasResponseType = this.options.responseType.indexOf(responseType) >= 0;
-      } else {
-        hasResponseType = this.options.responseType === responseType;
-      }
-      return hasResponseType;
-    }
-  
-    isAuthorizationCodeFlow(): boolean {
-      return this.hasResponseType('code');
     }
 
     // Escape hatch method to make arbitrary OKTA API call

@@ -13,7 +13,7 @@
 import { APIError } from '../../errors/types';
 import {
   OktaAuthOAuthInterface,
-  OktaAuthOAuthInterfaceLite,
+  OktaAuthBaseOAuthInterface,
   Tokens,
   TransactionManagerConstructor,
   TransactionManagerInterface
@@ -180,7 +180,7 @@ export interface EmailVerifyCallbackResponse {
   otp: string;
 }
 
-export interface IdxAPILite {
+export interface BaseIdxAPI {
   allRemediators: Record<string, RemediatorConstructor>,
   // eslint-disable-next-line no-use-before-define
   getFlowSpecification: GetFlowSpecification,
@@ -205,7 +205,7 @@ export interface IdxAPILite {
   isTransactionMetaValid: (meta: unknown) => boolean;
 }
 
-export interface IdxAPI extends IdxAPILite {
+export interface IdxAPI extends BaseIdxAPI {
   // lowest level api
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
   introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;
@@ -264,31 +264,21 @@ export interface OktaAuthIdxInterface
   idx: IdxAPI;
 }
 
-export interface OktaAuthIdxInterfaceLite
+export interface OktaAuthIdxInterfaceBase
 <
   M extends IdxTransactionMeta = IdxTransactionMeta,
   S extends IdxStorageManagerInterface<M> = IdxStorageManagerInterface<M>,
   O extends OktaAuthIdxOptions = OktaAuthIdxOptions,
   TM extends IdxTransactionManagerInterface = IdxTransactionManagerInterface
 >
-  extends OktaAuthOAuthInterfaceLite<M, S, O, TM>
+  extends OktaAuthBaseOAuthInterface<M, S, O, TM>
 {
-  idx: IdxAPILite;
+  idx: BaseIdxAPI;
 }
 
 export interface OktaAuthIdxConstructor
 <
-  I extends OktaAuthIdxInterface = OktaAuthIdxInterface
->
- extends OktaAuthConstructor<I>
-{
-  new(...args: any[]): I;
-  webauthn: WebauthnAPI;
-}
-
-export interface OktaAuthIdxConstructorLite
-<
-  I extends OktaAuthIdxInterfaceLite = OktaAuthIdxInterfaceLite
+  I extends OktaAuthIdxInterfaceBase = OktaAuthIdxInterface
 >
  extends OktaAuthConstructor<I>
 {

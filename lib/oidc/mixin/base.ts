@@ -4,18 +4,18 @@ import {
   OAuthResponseType,
   OAuthStorageManagerInterface,
   OAuthTransactionMeta,
-  OktaAuthOAuthInterfaceLite,
+  OktaAuthBaseOAuthInterface,
   OktaAuthOAuthOptions,
   PKCETransactionMeta,
-  TokenAPI,
+  BaseTokenAPI,
   TransactionManagerInterface,
   TransactionManagerConstructor,
 } from '../types';
-import { createTokenAPILite } from '../factory/apiLite';
+import { createBaseTokenAPI } from '../factory/baseApi';
 import { isLoginRedirect } from '../util';
 
 import { OktaAuthSessionInterface } from '../../session/types';
-export function mixinOAuthLite
+export function mixinBaseOAuth
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
   S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
@@ -27,11 +27,11 @@ export function mixinOAuthLite
 (
   Base: TBase,
   TransactionManagerConstructor: TransactionManagerConstructor<TM>,
-): TBase & OktaAuthConstructor<OktaAuthOAuthInterfaceLite<M, S, O, TM>>
+): TBase & OktaAuthConstructor<OktaAuthBaseOAuthInterface<M, S, O, TM>>
 {
-  return class OktaAuthOAuth extends Base implements OktaAuthOAuthInterfaceLite<M, S, O, TM>
+  return class OktaAuthOAuth extends Base implements OktaAuthBaseOAuthInterface<M, S, O, TM>
   {
-    token: TokenAPI;
+    token: BaseTokenAPI;
     transactionManager: TM;
     
     constructor(...args: any[]) {
@@ -41,7 +41,7 @@ export function mixinOAuthLite
         storageManager: this.storageManager,
       }, this.options.transactionManager));
   
-      this.token = createTokenAPILite(this as any);
+      this.token = createBaseTokenAPI(this as any);
     }
 
   
@@ -66,7 +66,6 @@ export function mixinOAuthLite
     isAuthorizationCodeFlow(): boolean {
       return this.hasResponseType('code');
     }
-    
 
   };
 
