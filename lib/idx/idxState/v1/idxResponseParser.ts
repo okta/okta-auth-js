@@ -17,7 +17,6 @@ import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
 import { generateRemediationFunctions } from './remediationParser';
 import generateIdxAction from './generateIdxAction';
 import { jsonpath } from '../../../util/jsonpath';
-import { AuthSdkError } from '../../../errors';
 
 const SKIP_FIELDS = Object.fromEntries([
   'remediation', // remediations are put into proceed/neededToProceed
@@ -80,8 +79,6 @@ const expandRelatesTo = (idxResponse, value) => {
         if (result) {
           value[k] = result;
           return;
-        } else {
-          throw new AuthSdkError(`Cannot resolve relatesTo: ${query}`);
         }
       }
     }

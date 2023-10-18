@@ -33,7 +33,7 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
     let option: IdxOption | undefined;
     for (let authenticator of authenticators) {
       option = options
-        .find(({ relatesTo }) => relatesTo.key && relatesTo.key === authenticator.key);
+        .find(({ relatesTo }) => relatesTo.key === authenticator.key);
       if (option) {
         break;
       }
