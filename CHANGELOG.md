@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.4.3
+
+### Bug Fix
+
+- [#1466](https://github.com/okta/okta-auth-js/pull/1466) Fix: Issues with `launch-authenticator` rememdiation on safari
+
 ## 7.4.2
 
 ### Bug Fix
