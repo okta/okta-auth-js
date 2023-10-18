@@ -318,7 +318,7 @@ Then(
 
 When(
   'she verifies her sms',
-  { timeout: 30*1000 }, 
+  { timeout: 40*1000 }, 
   async function (this: ActionContext) {
     await OktaLogin.receiveCodeViaSms();
     const code = await this.a18nClient.getSMSCode(this.credentials.profileId);

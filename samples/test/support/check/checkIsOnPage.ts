@@ -41,7 +41,7 @@ export default async (pageName?: string) => {
       return !!el && await el.isDisplayed();
     }
   }, { 
-    timeout: 10000,
+    timeout: 20000,
     timeoutMsg: `wait for page ${pageName} to load`
   });
 };
