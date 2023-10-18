@@ -1,0 +1,135 @@
+{
+  "version": "1.0.0",
+  "stateHandle": "stateHandle",
+  "expiresAt": "2023-10-18T18:18:41.000Z",
+  "intent": "LOGIN",
+  "remediation": {
+    "type": "array",
+    "value": [
+      {
+        "rel": [
+          "create-form"
+        ],
+        "name": "identify",
+        "href": "http://localhost:3000.com/idp/idx/identify",
+        "method": "POST",
+        "produces": "application/ion+json; okta-version=1.0.0",
+        "value": [
+          {
+            "name": "identifier",
+            "label": "Username",
+            "required": true
+          },
+          {
+            "name": "rememberMe",
+            "type": "boolean",
+            "label": "Remember this device"
+          },
+          {
+            "name": "stateHandle",
+            "required": true,
+            "value": "stateHande",
+            "visible": false,
+            "mutable": false
+          }
+        ],
+        "accepts": "application/json; okta-version=1.0.0"
+      },
+      {
+        "rel": [
+          "create-form"
+        ],
+        "name": "launch-authenticator",
+        "relatesTo": [
+          "authenticatorChallenge"
+        ],
+        "href": "http://localhost:3000.com/idp/idx/authenticators/okta-verify/launch",
+        "method": "POST",
+        "produces": "application/ion+json; okta-version=1.0.0",
+        "value": [
+          {
+            "name": "rememberMe",
+            "type": "boolean",
+            "label": "Remember this device"
+          },
+          {
+            "name": "stateHandle",
+            "required": true,
+            "value": "stateHande",
+            "visible": false,
+            "mutable": false
+          }
+        ],
+        "accepts": "application/json; okta-version=1.0.0"
+      },
+      {
+        "rel": [
+          "create-form"
+        ],
+        "name": "select-enroll-profile",
+        "href": "http://localhost:3000.com/idp/idx/enroll",
+        "method": "POST",
+        "produces": "application/ion+json; okta-version=1.0.0",
+        "value": [
+          {
+            "name": "stateHandle",
+            "required": true,
+            "value": "stateHande",
+            "visible": false,
+            "mutable": false
+          }
+        ],
+        "accepts": "application/json; okta-version=1.0.0"
+      }
+    ]
+  },
+  "cancel": {
+    "rel": [
+      "create-form"
+    ],
+    "name": "cancel",
+    "href": "http://localhost:3000.com/idp/idx/cancel",
+    "method": "POST",
+    "produces": "application/ion+json; okta-version=1.0.0",
+    "value": [
+      {
+        "name": "stateHandle",
+        "required": true,
+        "value": "stateHande",
+        "visible": false,
+        "mutable": false
+      }
+    ],
+    "accepts": "application/json; okta-version=1.0.0"
+  },
+  "app": {
+    "type": "object",
+    "value": {
+      "name": "okta_enduser",
+      "label": "Okta Dashboard",
+      "id": "srhgsefasef"
+    }
+  },
+  "authentication": {
+    "type": "object",
+    "value": {
+      "protocol": "OAUTH2.0",
+      "issuer": {
+        "name": "Mock",
+        "uri": "http://localhost:3000.com"
+      },
+      "request": {
+        "max_age": -1,
+        "scope": "openid profile email",
+        "display": "page",
+        "response_type": "code",
+        "redirect_uri": "http://localhost:3000.com/enduser/callback",
+        "state": "stateValue",
+        "code_challenge_method": "S256",
+        "nonce": "nonceValue",
+        "code_challenge": "code_challenge",
+        "response_mode": "query"
+      }
+    }
+  }
+}
