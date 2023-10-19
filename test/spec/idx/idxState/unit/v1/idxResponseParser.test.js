@@ -21,6 +21,10 @@ const mockComplexContextIdxResponse = require('../../mocks/poll-for-password');
 const mockTerminalIdxResponse = require('../../mocks/terminal-return-email');
 const mockMessageIdxResponse = require('../../mocks/unknown-user');
 const mockSuccessIdxResponse = require('../../mocks/success');
+// TODO: OKTA-659181
+const mockSafariRelatesToResponse = require('../../mocks/safari-relatesTo-response');
+const mockResponseWithFix = require('../../mocks/safari-relatesTo-fixed-response');
+
 const mockIdxResponseWithBadRelationship = () => {
   const mock = require('../../mocks/authenticator-verification-password');
   mock.remediation.value[1].value[0].options[0].relatesTo = '$.authenticatorEnrollments.value[999]';
@@ -172,6 +176,28 @@ describe('idxResponseParser', () => {
     it('throws error if relatesTo can\'t be resolved', () => {
       const fn = () => parseIdxResponse( {}, mockIdxResponseWithBadRelationship() );
       expect(fn).toThrowError('Cannot resolve relatesTo: $.authenticatorEnrollments.value[999]');
+    });
+
+    // TODO: OKTA-659181
+    describe('OKTA-659175', () => {
+      it('removes `relatesTo` when reference is invalid', () => {
+        const { remediations } = parseIdxResponse({}, mockSafariRelatesToResponse, {});
+        expect(remediations[1].name).toEqual('launch-authenticator');
+        expect(remediations[1].relatesTo).toBeUndefined();
+      });
+
+      it('resolves `relatesTo` when reference is valid', () => {
+        const { remediations } = parseIdxResponse({}, mockResponseWithFix, {});
+        expect(remediations[1].name).toEqual('launch-authenticator');
+        expect(remediations[1].relatesTo).toEqual({
+          'type': 'object',
+          'value': {
+            'challengeMethod': 'CUSTOM_URI',
+            'href': 'http://localhost:3000/foobar',
+            'downloadHref': 'http://localhost:3000/foobar'
+          }
+        });
+      });
     });
   });
 });
