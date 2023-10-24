@@ -54,7 +54,7 @@ if (CI) {
 // driver version must match installed chrome version
 // https://chromedriver.storage.googleapis.com/index.html
 
-const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '106.0.5249.61';
+const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '118.0.5993.96';
 const drivers = USE_FIREFOX ? {
   // Use latest geckodriver
   // https://github.com/mozilla/geckodriver/releases

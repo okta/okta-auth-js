@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { mergeFiles } = require('junit-report-merger');
 
-const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '106.0.5249.61';
+const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '118.0.5993.96';
 const USE_FIREFOX = !!process.env.USE_FIREFOX;
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
