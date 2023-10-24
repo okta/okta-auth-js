@@ -17,6 +17,7 @@ class SelectAuthenticatorMethod extends PageWithTitle {
   title = 'Select authenticator method';
 
   get pageTitle() {return '#page-title-header';}
+  // get pageTitle() {return '#select-authenticator-page-title-header';}
 
   get options() { return '#authenticator-method-options';  }
   get submit() { return '#verify-form button[type=submit]';}

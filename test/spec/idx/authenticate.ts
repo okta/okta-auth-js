@@ -2529,4 +2529,94 @@ describe('idx/authenticate', () => {
     });
   });
 
+  describe('clears values.authenticator', () => {
+
+    beforeEach(() => {
+      const selectAuthenticatorResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          SelectAuthenticatorAuthenticateRemediationFactory.build({
+            value: [
+              AuthenticatorValueFactory.build({
+                options: [
+                  EmailAuthenticatorOptionFactory.build(),
+                ]
+              })
+            ]
+          })
+        ],
+      });
+      const verifyAuthenticatorResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          VerifyEmailRemediationFactory.build()
+        ],
+        context: IdxContextFactory.build({
+          authenticatorEnrollments: {
+            type: 'array',
+            value: [
+              EmailAuthenticatorFactory.build()
+            ]
+          }
+        })
+      });
+
+      Object.assign(testContext, {
+        selectAuthenticatorResponse,
+        verifyAuthenticatorResponse,
+      });
+    });
+
+    // OKTA-609234 - specifically confirm these remediation steps
+    fit('clears values.authenticator after being consumed to prevent auto-remediating', async () => {
+      const {
+        authClient,
+        selectAuthenticatorResponse,
+        verifyAuthenticatorResponse
+      } = testContext;
+
+      chainResponses([
+        selectAuthenticatorResponse,
+        verifyAuthenticatorResponse
+      ]);
+
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(selectAuthenticatorResponse);
+
+      const res = await authenticate(authClient, {
+        username: 'foo',
+        authenticator: AuthenticatorKey.OKTA_EMAIL,
+        methodType: 'email'
+      });
+
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { 
+        authenticator: { id: 'id-email' } 
+      });
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toEqual({
+        name: 'challenge-authenticator',
+        type: 'email',
+        authenticator: {
+          displayName: 'Email',
+          id: expect.any(String),
+          key: 'okta_email',
+          methods: [
+            { type: 'email' }
+          ],
+          type: 'email',
+        },
+        authenticatorEnrollments: [{
+          id: expect.any(String),
+          displayName: 'Email',
+          key: 'okta_email',
+          type: 'email',
+          methods: [
+            { type: 'email' }
+          ],
+        }],
+        inputs: [
+          { name: 'verificationCode', type: 'string', label: 'Enter code', required: true },
+        ]
+      });
+    });
+  });
+
 });

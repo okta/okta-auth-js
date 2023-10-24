@@ -53,18 +53,25 @@ test_suites:
       criteria: MERGE
       queue_name: small
 
-    - name: sample-express-embedded-auth-with-sdk-SPEC
+    # - name: sample-express-embedded-auth-with-sdk-SPEC
+    #   script_path: ../okta-auth-js/scripts/samples
+    #   sort_order: '6'
+    #   timeout: '30'
+    #   script_name: e2e-express-embedded-auth-with-sdk-spec
+    #   criteria: MERGE
+    #   queue_name: small
+    # - name: sample-express-embedded-auth-with-sdk-FEATURES
+    #   script_path: ../okta-auth-js/scripts/samples
+    #   sort_order: '6'
+    #   timeout: '30'
+    #   script_name: e2e-express-embedded-auth-with-sdk-features
+    #   criteria: MERGE
+    #   queue_name: small
+    - name: sample-express-embedded-auth-with-sdk
       script_path: ../okta-auth-js/scripts/samples
       sort_order: '6'
       timeout: '30'
-      script_name: e2e-express-embedded-auth-with-sdk-spec
-      criteria: MERGE
-      queue_name: small
-    - name: sample-express-embedded-auth-with-sdk-FEATURES
-      script_path: ../okta-auth-js/scripts/samples
-      sort_order: '6'
-      timeout: '30'
-      script_name: e2e-express-embedded-auth-with-sdk-features
+      script_name: e2e-express-embedded-auth-with-sdk
       criteria: MERGE
       queue_name: small
     - name: sample-express-web-no-oidc

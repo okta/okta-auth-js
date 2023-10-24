@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
-source $DIR/setup.sh
+source $DIR/setup.sh 16.20.2
 
 # setup for e2e tests
 create_log_group "E2E Env Setup"

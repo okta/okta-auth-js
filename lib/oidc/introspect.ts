@@ -44,7 +44,8 @@ export async function oidcIntrospect (sdk, kind: TokenKind, token?: Token) {
   else {
     issuer = (token as any)?.claims?.iss;
   }
-  issuer ??= sdk.options.issuer;
+  // issuer ??= sdk.options.issuer;
+  issuer = issuer || sdk.options.issuer;
 
   if (!clientId) {
     throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to introspect a token');

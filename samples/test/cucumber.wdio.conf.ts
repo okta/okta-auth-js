@@ -107,9 +107,10 @@ const cucumberOpts: WebdriverIO.CucumberOpts = {
   // <string> (expression) only execute the features or scenarios with
   // tags matching the expression, see
   // https://docs.cucumber.io/tag-expressions/
-  tagExpression: 'not @Pending',
+  // tagExpression: 'not @Pending',
+  tags: 'not @Pending',
   // <boolean> add cucumber tags to feature or scenario name
-  tagsInTitle: false,
+  // tagsInTitle: false,
   // <number> timeout for step definitions
   timeout: defaultTimeoutInterval,
 };
@@ -157,7 +158,7 @@ export const config: WebdriverIO.Config = {
     // and 30 processes will get spawned. The property handles how many capabilities
     // from the same test should run tests.
     //
-    maxInstances: 2,
+    maxInstances: 1,
     //
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
@@ -224,16 +225,16 @@ export const config: WebdriverIO.Config = {
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: [
-      ['selenium-standalone', {
-        installArgs: {
-          drivers
-        },
-        args: {
-          drivers
-        }
-      }]
-    ],
+    // services: [
+    //   ['selenium-standalone', {
+    //     installArgs: {
+    //       drivers
+    //     },
+    //     args: {
+    //       drivers
+    //     }
+    //   }]
+    // ],
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
     // see also: https://webdriver.io/docs/frameworks.html
@@ -370,13 +371,13 @@ export const config: WebdriverIO.Config = {
      * @param {<Object>} results object containing test results
      */
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    onComplete: async function(exitCode, config, capabilities, results) {
-      const outputDir = path.join(__dirname, '../../build2/reports/e2e');
-      fs.mkdirSync(outputDir, { recursive: true });
-      const reportsDir = path.resolve(__dirname, 'reports');
-      await mergeFiles(path.resolve(outputDir, 'junit-results.xml'), ['./reports/*.xml']);
-      fs.rmdirSync(reportsDir, { recursive: true });
-    },
+    // onComplete: async function(exitCode, config, capabilities, results) {
+    //   const outputDir = path.join(__dirname, '../../build2/reports/e2e');
+    //   fs.mkdirSync(outputDir, { recursive: true });
+    //   const reportsDir = path.resolve(__dirname, 'reports');
+    //   await mergeFiles(path.resolve(outputDir, 'junit-results.xml'), ['./reports/*.xml']);
+    //   fs.rmdirSync(reportsDir, { recursive: true });
+    // },
     /**
     * Gets executed when a refresh happens.
     * @param {String} oldSessionId session ID of the old session
