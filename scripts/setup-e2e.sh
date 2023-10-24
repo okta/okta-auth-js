@@ -1,14 +1,15 @@
 #!/bin/bash
 
 DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
-source $DIR/setup.sh 16.20.2
+source $DIR/setup.sh
 
 # setup for e2e tests
 create_log_group "E2E Env Setup"
 if [ -n "${TEST_SUITE_ID}" ]; then
 # if running on bacon
   setup_service java 1.8.222
-  setup_service google-chrome-stable 106.0.5249.61-1
+  # setup_service google-chrome-stable 106.0.5249.61-1
+  setup_service google-chrome-stable 118.0.5993.96-1
 
   export CI=true
 else
