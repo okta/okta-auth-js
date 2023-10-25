@@ -11,6 +11,9 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # setup_service google-chrome-stable 106.0.5249.61-1
   # setup_service google-chrome-stable 118.0.5993.96-1
   npx @puppeteer/browsers install chrome@stable
+  which google-chrome
+  which chrome
+  echo $(npx @puppeteer/browsers computeExecutablePath)
 
   export CI=true
 else
