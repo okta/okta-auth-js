@@ -9,7 +9,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
 # if running on bacon
   setup_service java 1.8.222
   # setup_service google-chrome-stable 106.0.5249.61-1
-  # setup_service google-chrome-stable 118.0.5993.96-1
+  setup_service google-chrome-stable 118.0.5993.70-1
   CHROME_INSTALL=$(npx @puppeteer/browsers install chrome@stable)
   echo $CHROME_PATH
   export CHROME_BINARY=$(echo $CHROME_INSTALL | awk '{print $2}')
