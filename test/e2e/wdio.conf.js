@@ -25,7 +25,7 @@ const browserOptions = {
 
 if (CI) {
   if (process.env.CHROME_BINARY) {
-    chromeOptions.binary = process.env.CHROME_BINARY
+    browserOptions.binary = process.env.CHROME_BINARY;
   }
   browserOptions.args = browserOptions.args.concat([
       '--headless',

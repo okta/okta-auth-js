@@ -38,7 +38,7 @@ const maxInstances = process.env.MAX_INSTANCES ? +process.env.MAX_INSTANCES : 1;
 
 if (CI) {
     if (process.env.CHROME_BINARY) {
-      chromeOptions.binary = process.env.CHROME_BINARY
+      chromeOptions.binary = process.env.CHROME_BINARY;
     }
     chromeOptions.args = chromeOptions.args.concat([
         '--headless',
@@ -362,13 +362,13 @@ export const config: WebdriverIO.Config = {
      * @param {<Object>} results object containing test results
      */
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    // onComplete: async function(exitCode, config, capabilities, results) {
-    //   const outputDir = path.join(__dirname, '../../build2/reports/e2e');
-    //   fs.mkdirSync(outputDir, { recursive: true });
-    //   const reportsDir = path.resolve(__dirname, 'reports');
-    //   await mergeFiles(path.resolve(outputDir, 'junit-results.xml'), ['./reports/*.xml']);
-    //   fs.rmdirSync(reportsDir, { recursive: true });
-    // },
+    onComplete: async function(exitCode, config, capabilities, results) {
+      const outputDir = path.join(__dirname, '../../build2/reports/e2e');
+      fs.mkdirSync(outputDir, { recursive: true });
+      const reportsDir = path.resolve(__dirname, 'reports');
+      await mergeFiles(path.resolve(outputDir, 'junit-results.xml'), ['./reports/*.xml']);
+      fs.rmdirSync(reportsDir, { recursive: true });
+    },
     /**
     * Gets executed when a refresh happens.
     * @param {String} oldSessionId session ID of the old session

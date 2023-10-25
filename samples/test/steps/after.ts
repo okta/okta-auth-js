@@ -12,16 +12,10 @@
 
 /* eslint-disable complexity */
 
-import { After, AfterStep, Status } from '@cucumber/cucumber';
+import { After } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
 import deleteSelfEnrolledUser from '../support/management-api/deleteSelfEnrolledUser';
 
-// TODO: REMOVE THIS
-// AfterStep(async ({ result }) => {
-//   if (result.status === Status.FAILED) {
-//     await browser.debug();
-//   }
-// });
 
 // Comment out this after hook to persist test context
 // Extend the hook timeout to fight against org rate limit

@@ -15,6 +15,8 @@ export default async function(config: OktaClientConfig, options: Options) {
     return policy;
   } catch (err) {
     console.warn('Unable to create policy-to-app mapping.', policyId, appId);
+    // TODO: REMOVE THIS
+    console.log(err);
     throw err;
   }
 }

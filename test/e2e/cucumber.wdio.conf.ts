@@ -1,3 +1,4 @@
+// eslint-disable-next-line node/no-missing-import
 import type { Options } from '@wdio/types';
 import { WebDriverLogTypes } from '@wdio/types/build/Options';
 
@@ -22,7 +23,7 @@ const firefoxOptions = {
 
 if (CI) {
   if (process.env.CHROME_BINARY) {
-    chromeOptions.binary = process.env.CHROME_BINARY
+    chromeOptions.binary = process.env.CHROME_BINARY;
   }
   chromeOptions.args = chromeOptions.args.concat([
       '--headless',
