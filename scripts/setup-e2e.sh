@@ -9,7 +9,8 @@ if [ -n "${TEST_SUITE_ID}" ]; then
 # if running on bacon
   setup_service java 1.8.222
   # setup_service google-chrome-stable 106.0.5249.61-1
-  setup_service google-chrome-stable 118.0.5993.96-1
+  # setup_service google-chrome-stable 118.0.5993.96-1
+  npx @puppeteer/browsers install chrome@stable
 
   export CI=true
 else
