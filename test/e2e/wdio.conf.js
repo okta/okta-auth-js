@@ -24,24 +24,20 @@ const browserOptions = {
 };
 
 if (CI) {
-    browserOptions.args = browserOptions.args.concat([
-        '--headless',
-        '--disable-gpu',
-        '--window-size=1600x1200',
-        '--no-sandbox',
-        '--whitelisted-ips',
-        '--disable-extensions',
-        '--verbose',
-        '--disable-dev-shm-usage'
-    ]);
+  if (process.env.CHROME_BINARY) {
+    chromeOptions.binary = process.env.CHROME_BINARY
+  }
+  browserOptions.args = browserOptions.args.concat([
+      '--headless',
+      '--disable-gpu',
+      '--window-size=1600x1200',
+      '--no-sandbox',
+      '--whitelisted-ips',
+      '--disable-extensions',
+      '--verbose',
+      '--disable-dev-shm-usage'
+  ]);
 }
-
-// driver version must match installed chrome version
-// https://chromedriver.storage.googleapis.com/index.html
-const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '118.0.5993.96';
-const drivers = {
-  chrome: { version: CHROMEDRIVER_VERSION }
-};
 
 exports.config = {
     jasmineOpts: {
@@ -162,14 +158,6 @@ exports.config = {
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
     services: [
-      ['selenium-standalone', {
-        installArgs: {
-          drivers
-        },
-        args: {
-          drivers
-        }
-      }]
     ],
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber

@@ -8,15 +8,19 @@ create_log_group "E2E Env Setup"
 if [ -n "${TEST_SUITE_ID}" ]; then
 # if running on bacon
   setup_service java 1.8.222
-  # setup_service google-chrome-stable 106.0.5249.61-1
+
+  # this chrome install is not used, however it will install linux deps chrome needs (via apt-get)
   setup_service google-chrome-stable 118.0.5993.70-1
+  # uses new chrome for testing installation utility (https://developer.chrome.com/blog/chrome-for-testing/)
+  # output format: chrome@118.0.5993.70 /path/to/chrome/binary
   CHROME_INSTALL=$(npx @puppeteer/browsers install chrome@stable)
-  echo $CHROME_PATH
-  export CHROME_BINARY=$(echo $CHROME_INSTALL | awk '{print $2}')
-  echo $CHROME_BINARY
-  echo $(bash -c $CHROME_BINARY --help)
+  echo $CHROME_INSTALL
+  # extract installed version
   export CHROMEDRIVER_VERSION=$(echo $CHROME_INSTALL | awk '{print $1}' | cut -d'@' -f 2)
   echo $CHROMEDRIVER_VERSION
+  # extract binary path
+  export CHROME_BINARY=$(echo $CHROME_INSTALL | awk '{print $2}')
+  echo $CHROME_BINARY
 
   export CI=true
 else

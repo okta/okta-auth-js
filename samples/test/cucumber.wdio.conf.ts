@@ -41,30 +41,18 @@ if (CI) {
       chromeOptions.binary = process.env.CHROME_BINARY
     }
     chromeOptions.args = chromeOptions.args.concat([
-        'headless',
-        'disable-gpu',
-        'window-size=1600x1200',
-        'no-sandbox',
-        'whitelisted-ips',
-        'disable-extensions',
-        'verbose'
+        '--headless',
+        '--disable-gpu',
+        '--window-size=1600x1200',
+        '--no-sandbox',
+        '--whitelisted-ips',
+        '--disable-extensions',
+        '--verbose'
     ]);
     firefoxOptions.args = firefoxOptions.args.concat([
         '-headless'
     ]);
 }
-
-// driver version must match installed chrome version
-// https://chromedriver.storage.googleapis.com/index.html
-
-const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '118.0.5993.70';
-const drivers = USE_FIREFOX ? {
-  // Use latest geckodriver
-  // https://github.com/mozilla/geckodriver/releases
-  firefox: true,
-} : {
-  chrome: { version: CHROMEDRIVER_VERSION },
-};
 
  // If you are using Cucumber you need to specify the location of your step definitions.
 const cucumberOpts: WebdriverIO.CucumberOpts = {
