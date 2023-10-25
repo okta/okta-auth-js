@@ -41,13 +41,13 @@ if (CI) {
       chromeOptions.binary = process.env.CHROME_BINARY
     }
     chromeOptions.args = chromeOptions.args.concat([
-        '--headless',
-        '--disable-gpu',
-        '--window-size=1600x1200',
-        '--no-sandbox',
-        '--whitelisted-ips',
-        '--disable-extensions',
-        '--verbose'
+        'headless',
+        'disable-gpu',
+        'window-size=1600x1200',
+        'no-sandbox',
+        'whitelisted-ips',
+        'disable-extensions',
+        'verbose'
     ]);
     firefoxOptions.args = firefoxOptions.args.concat([
         '-headless'

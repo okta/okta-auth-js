@@ -14,6 +14,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   echo $CHROME_PATH
   export CHROME_BINARY=$(echo $CHROME_INSTALL | awk '{print $2}')
   echo $CHROME_BINARY
+  echo $(bash -c $CHROME_BINARY --help)
   export CHROMEDRIVER_VERSION=$(echo $CHROME_INSTALL | awk '{print $1}' | cut -d'@' -f 2)
   echo $CHROMEDRIVER_VERSION
 
