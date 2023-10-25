@@ -37,6 +37,9 @@ const firefoxOptions = {
 const maxInstances = process.env.MAX_INSTANCES ? +process.env.MAX_INSTANCES : 1;
 
 if (CI) {
+    if (process.env.CHROME_BINARY) {
+      chromeOptions.binary = process.env.CHROME_BINARY
+    }
     chromeOptions.args = chromeOptions.args.concat([
         '--headless',
         '--disable-gpu',
