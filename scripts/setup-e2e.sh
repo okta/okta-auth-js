@@ -10,10 +10,12 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   setup_service java 1.8.222
   # setup_service google-chrome-stable 106.0.5249.61-1
   # setup_service google-chrome-stable 118.0.5993.96-1
-  CHROME_PATH=$(npx @puppeteer/browsers install chrome@stable)
+  CHROME_INSTALL=$(npx @puppeteer/browsers install chrome@stable)
   echo $CHROME_PATH
-  export CHROME_BINARY=$(echo $CHROME_PATH | awk '{print $2}')
+  export CHROME_BINARY=$(echo $CHROME_INSTALL | awk '{print $2}')
   echo $CHROME_BINARY
+  export CHROMEDRIVER_VERSION=$(echo $CHROME_INSTALL | awk '{print $1}' | cut -d'@' -f 2)
+  echo $CHROMEDRIVER_VERSION
 
   export CI=true
 else
