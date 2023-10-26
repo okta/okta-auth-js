@@ -224,7 +224,6 @@ export const config: Options.Testrunner = {
         backtrace: false,
         // <string[]> ("extension:module") require files with the given EXTENSION after requiring MODULE (repeatable)
         requireModule: [
-          'tsconfig-paths/register',
         ],
         // <boolean> invoke formatters without executing steps
         dryRun: false,
