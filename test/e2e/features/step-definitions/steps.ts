@@ -1,9 +1,9 @@
 import { Given, When, Then } from '@wdio/cucumber-framework';
-import ActionContext from 'support/context';
+import ActionContext from '../../../../samples/test/support/context';
 import TestApp from '../../pageobjects/TestApp';
 import OktaLogin from '../../pageobjects/OktaLogin';
 import { openPKCE } from '../../util/appUtils';
-import listFactors from 'management-api/listFactors';
+import listFactors from '../../../../samples/test/support/management-api/listFactors';
 
 const ORG_OIE_ENABLED = process.env.ORG_OIE_ENABLED;
 

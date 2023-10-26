@@ -52,8 +52,7 @@ setup_e2e () {
 run_e2e () {
   create_log_group "E2E Test Run"
   if [ -n "${RUN_CUCUMBER}" ]; then
-    # https://github.com/webdriverio/webdriverio/issues/10857
-    if ! NODE_OPTIONS=' -r tsconfig-paths/register' yarn test:e2e:cucumber; then
+    if ! yarn test:e2e:cucumber; then
       echo "Cucumber tests failed! Exiting..."
       exit ${TEST_FAILURE}
     fi
