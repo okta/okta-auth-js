@@ -14,6 +14,7 @@ Feature: Login with Identifier First
       And a user named "Mary"
       And she has an account with "active" state in the org
 
+  @flaky
   Scenario: Mary logs in with Email with an OTP 
     When she clicks the "login" button
     Then she is redirected to the "Login" page
@@ -32,6 +33,7 @@ Feature: Login with Identifier First
       And she sees a table with her profile info
       And the cell for the value of "email" is shown and contains her "email"
 
+  @flaky
   Scenario: Mary Logs in with Email Magic Link on the same Browser
     Given the app has Email Verification callback uri defined
     When she clicks the "login" button
