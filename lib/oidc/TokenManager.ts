@@ -425,8 +425,9 @@ export class TokenManager implements TokenManagerInterface {
       if (!token) {
         throw new AuthSdkError('The tokenManager has no token for the key: ' + key);
       }
-    } catch (e) {
-      return Promise.reject(e);
+    } catch (err) {
+      this.emitError(err);
+      return Promise.reject(err);
     }
   
     // Remove existing autoRenew timeout

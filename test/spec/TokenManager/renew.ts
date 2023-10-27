@@ -137,6 +137,7 @@ describe('TokenManager renew', () => {
   });
 
   describe('error handling', () => {
+    const mockTokenKey = 'idToken';
     beforeEach(() => {
       jest.spyOn(testContext.sdkMock.token, 'renewTokens').mockImplementation(() => Promise.reject(testContext.error));
     });
@@ -144,29 +145,29 @@ describe('TokenManager renew', () => {
     it('on OAuthError, should remove token and emit error', async () => {
       testContext.error = new OAuthError('does not matter', 'also not important');
       try {
-        await testContext.instance.renew('idToken');
+        await testContext.instance.renew(mockTokenKey);
       } catch (e) {
         expect(e).toMatchObject({
           name: 'OAuthError'
         });
       }
-      expect(testContext.instance.remove).toHaveBeenCalledWith('idToken');
+      expect(testContext.instance.remove).toHaveBeenCalledWith(mockTokenKey);
       expect(testContext.instance.emitError).toHaveBeenCalledWith(testContext.error);
-      expect(testContext.error.tokenKey).toBe('idToken');
+      expect(testContext.error.tokenKey).toBe(mockTokenKey);
     });
 
     it('on AuthSdkError, should remove token and emit error', async () => {
       testContext.error = new AuthSdkError('does not matter');
       try {
-        await testContext.instance.renew('idToken');
+        await testContext.instance.renew(mockTokenKey);
       } catch (e) {
         expect(e).toMatchObject({
           name: 'AuthSdkError'
         });
       }
-      expect(testContext.instance.remove).toHaveBeenCalledWith('idToken');
+      expect(testContext.instance.remove).toHaveBeenCalledWith(mockTokenKey);
       expect(testContext.instance.emitError).toHaveBeenCalledWith(testContext.error);
-      expect(testContext.error.tokenKey).toBe('idToken');
+      expect(testContext.error.tokenKey).toBe(mockTokenKey);
     });
 
     it('on refresh token error, should remove token and emit error', async () => {
@@ -181,15 +182,15 @@ describe('TokenManager renew', () => {
         headers: {}
       });
       try {
-        await testContext.instance.renew('idToken');
+        await testContext.instance.renew(mockTokenKey);
       } catch (e) {
         expect(e).toMatchObject({
           name: 'AuthApiError'
         });
       }
-      expect(testContext.instance.remove).toHaveBeenCalledWith('idToken');
+      expect(testContext.instance.remove).toHaveBeenCalledWith(mockTokenKey);
       expect(testContext.instance.emitError).toHaveBeenCalledWith(testContext.error);
-      expect(testContext.error.tokenKey).toBe('idToken');
+      expect(testContext.error.tokenKey).toBe(mockTokenKey);
     });
 
     it('on other error, should remove token and emit error', async () => {
@@ -201,15 +202,31 @@ describe('TokenManager renew', () => {
         headers: {}
       });
       try {
-        await testContext.instance.renew('idToken');
+        await testContext.instance.renew(mockTokenKey);
       } catch (e) {
         expect(e).toMatchObject({
           name: 'AuthApiError'
         });
       }
-      expect(testContext.instance.remove).toHaveBeenCalledWith('idToken');
+      expect(testContext.instance.remove).toHaveBeenCalledWith(mockTokenKey);
       expect(testContext.instance.emitError).toHaveBeenCalledWith(testContext.error);
-      expect(testContext.error.tokenKey).toBe('idToken');
+      expect(testContext.error.tokenKey).toBe(mockTokenKey);
+    });
+
+    it('on undefined token from getSync error, should reject Promise with error and emit it', async () => {
+      jest.spyOn(testContext.instance, 'getSync').mockResolvedValue(undefined);
+      const errorMessage = 'The tokenManager has no token for the key: ' + mockTokenKey;
+      testContext.error = new AuthSdkError(errorMessage);
+      try {
+        await testContext.instance.renew(mockTokenKey);
+      } catch (e) {
+        expect(e).toMatchObject({
+          name: 'AuthSdkError',
+          errorSummary: errorMessage,
+        });
+      }
+      expect(testContext.instance.emitError).toHaveBeenCalledWith(testContext.error);
+      expect(testContext.instance.renew(mockTokenKey)).rejects.toEqual(testContext.error);
     });
 
   });
