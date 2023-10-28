@@ -70,7 +70,7 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
       // const isCurrentAuthenticator = isAuthenticatorCurrent(context?.currentAuthenticator);                          // false
       // const isCurrentAuthenticatorEnrollment = isAuthenticatorCurrent(context?.currentAuthenticatorEnrollment);      // true
       // return !isCurrentAuthenticator && !isCurrentAuthenticatorEnrollment;                                           // false
-    
+
       return true;
     }
     
@@ -112,8 +112,8 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
       .filter(authenticator => {
         return compareAuthenticators(authenticator, this.selectedAuthenticator) !== true;
       });
-    return { ...this.values, authenticators, authenticator: undefined };
-    // return { ...this.values, authenticators };
+    // return { ...this.values, authenticators, authenticator: undefined };
+    return { ...this.values, authenticators };
   }
 
 }
