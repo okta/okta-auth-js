@@ -67,6 +67,7 @@ import {
   IdxAuthenticatorFactory,
   SelectEnrollmentChannelRemediationFactory,
   EnrollmentChannelDataSmsRemediationFactory,
+  ReEnrollPasswordAuthenticatorRemediationFactory,
 } from '@okta/test.support/idx';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
@@ -612,6 +613,148 @@ describe('idx/authenticate', () => {
 
     });
 
+  });
+
+
+  describe('authentication with optional password change', () => {
+    beforeEach(() => {
+      const { successResponse } = testContext;
+      const identifyResponse = IdentifyResponseFactory.build();
+      const selectAuthenticatorResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          SelectAuthenticatorAuthenticateRemediationFactory.build({
+            value: [
+              AuthenticatorValueFactory.build({
+                options: [
+                  PasswordAuthenticatorOptionFactory.build(),
+                ]
+              })
+            ]
+          })
+        ]
+      });
+      const verifyPasswordResponse = VerifyPasswordResponseFactory.build();
+      const changePasswordResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          ReEnrollPasswordAuthenticatorRemediationFactory.build({
+            name: 'reenroll-authenticator-warning'
+          }),
+          SkipRemediationFactory.build()
+        ]
+      });
+      chainResponses([
+        identifyResponse,
+        selectAuthenticatorResponse,
+        verifyPasswordResponse,
+        changePasswordResponse,
+        successResponse,
+      ]);
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValueOnce(identifyResponse)
+        .mockResolvedValueOnce(changePasswordResponse);
+      jest.spyOn(identifyResponse, 'proceed');
+      jest.spyOn(selectAuthenticatorResponse, 'proceed');
+      jest.spyOn(verifyPasswordResponse, 'proceed');
+      jest.spyOn(changePasswordResponse, 'proceed');
+      Object.assign(testContext, {
+        identifyResponse,
+        selectAuthenticatorResponse,
+        verifyPasswordResponse,
+        changePasswordResponse,
+      });
+    });
+
+    it('can authenticate with current password and then change password to new one', async () => {
+      const { 
+        authClient,
+        identifyResponse,
+        selectAuthenticatorResponse,
+        verifyPasswordResponse,
+        changePasswordResponse,
+        tokenResponse
+      } = testContext;
+      // authenticate
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
+      let res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
+      expect(res).toMatchObject({
+        status: IdxStatus.PENDING,
+        neededToProceed: [{
+          name: 'reenroll-authenticator-warning'
+        }, {
+          name: 'skip'
+        }]
+      });
+      expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'fakeuser' });
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', {
+        authenticator: { id: 'id-password' }
+      });
+      expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'fakepass' } });
+      expect(res.nextStep).toMatchObject({
+        name: 'reenroll-authenticator-warning',
+        type: 'password',
+        authenticator: {
+          key: 'okta_password',
+        },
+        inputs: [{
+          name: 'newPassword',
+          label: 'New password',
+          secret: true,
+        }],
+      });
+      // proceed
+      res = await proceed(authClient, { newPassword: 'newpass' });
+      expect(changePasswordResponse.proceed).toHaveBeenCalledWith('reenroll-authenticator-warning', {
+        credentials: { passcode: 'newpass' }
+      });
+      expect(res).toMatchObject({
+        status: IdxStatus.SUCCESS,
+        tokens: tokenResponse.tokens,
+      });
+    });
+
+    it('can authenticate with current password and skip optional password change', async () => {
+      const { 
+        authClient,
+        identifyResponse,
+        selectAuthenticatorResponse,
+        verifyPasswordResponse,
+        tokenResponse
+      } = testContext;
+      // authenticate
+      jest.spyOn(mocked.introspect, 'introspect').mockResolvedValue(identifyResponse);
+      let res = await authenticate(authClient, { username: 'fakeuser', password: 'fakepass' });
+      expect(res).toMatchObject({
+        status: IdxStatus.PENDING,
+        neededToProceed: [{
+          name: 'reenroll-authenticator-warning'
+        }, {
+          name: 'skip'
+        }]
+      });
+      expect(identifyResponse.proceed).toHaveBeenCalledWith('identify', { identifier: 'fakeuser' });
+      expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', {
+        authenticator: { id: 'id-password' }
+      });
+      expect(verifyPasswordResponse.proceed).toHaveBeenCalledWith('challenge-authenticator', { credentials: { passcode: 'fakepass' } });
+      expect(res.nextStep).toMatchObject({
+        name: 'reenroll-authenticator-warning',
+        type: 'password',
+        authenticator: {
+          key: 'okta_password',
+        },
+        inputs: [{
+          name: 'newPassword',
+          label: 'New password',
+          secret: true,
+        }],
+      });
+      // proceed
+      res = await proceed(authClient, { skip: true });
+      expect(res).toMatchObject({
+        status: IdxStatus.SUCCESS,
+        tokens: tokenResponse.tokens,
+      });
+    });
   });
 
   describe('mfa authentication', () => {

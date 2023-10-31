@@ -18,7 +18,8 @@ import {
   SelectAuthenticatorAuthenticate,
   ChallengeAuthenticator,
   ChallengePoll,
-  AuthenticatorVerificationData
+  AuthenticatorVerificationData,
+  ReEnrollAuthenticatorWarning
 } from '../remediators';
 
 export const AccountUnlockFlow: RemediationFlow = {
@@ -31,4 +32,5 @@ export const AccountUnlockFlow: RemediationFlow = {
   'challenge-authenticator': ChallengeAuthenticator,
   'challenge-poll': ChallengePoll,
   'authenticator-verification-data': AuthenticatorVerificationData,
+  'reenroll-authenticator-warning': ReEnrollAuthenticatorWarning,
 };
