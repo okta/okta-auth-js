@@ -5,6 +5,7 @@
 ### Bug Fix
 
  - [#1462](https://github.com/okta/okta-auth-js/pull/1462) Fixes ESM build for Node.js
+ - [#1472](https://github.com/okta/okta-auth-js/pull/1472) Added missing remediator `ReEnrollAuthenticatorWarning`
 
 ### Other
 
