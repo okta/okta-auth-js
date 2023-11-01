@@ -19,6 +19,7 @@ import {
   AuthenticatorVerificationData,
   ResetAuthenticator,
   ReEnrollAuthenticator,
+  ReEnrollAuthenticatorWarning,
   SelectAuthenticatorEnroll,
   AuthenticatorEnrollmentData,
   EnrollPoll
@@ -34,5 +35,6 @@ export const PasswordRecoveryFlow: RemediationFlow = {
   'authenticator-enrollment-data': AuthenticatorEnrollmentData,
   'reset-authenticator': ResetAuthenticator,
   'reenroll-authenticator': ReEnrollAuthenticator,
+  'reenroll-authenticator-warning': ReEnrollAuthenticatorWarning,
   'enroll-poll': EnrollPoll,
 };

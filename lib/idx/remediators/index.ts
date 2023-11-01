@@ -22,6 +22,7 @@ export * from './ResetAuthenticator';
 export * from './EnrollProfile';
 export * from './Identify';
 export * from './ReEnrollAuthenticator';
+export * from './ReEnrollAuthenticatorWarning';
 export * from './RedirectIdp';
 export * from './SelectAuthenticatorAuthenticate';
 export * from './SelectAuthenticatorEnroll';
