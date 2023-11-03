@@ -35,9 +35,8 @@ export default class PasswordTransaction extends BaseTransaction {
           accessToken, 
           methodName: 'enroll',
           links: _links,
-          transactionClassName: 'PasswordTransaction'
-        });
-        return await fn(payload) as PasswordTransaction;
+        }, PasswordTransaction);
+        return await fn(payload);
       };
     }
     else {
@@ -47,9 +46,8 @@ export default class PasswordTransaction extends BaseTransaction {
           accessToken, 
           methodName: 'get',
           links: _links,
-          transactionClassName: 'PasswordTransaction'
-        });
-        return await fn() as PasswordTransaction;
+        }, PasswordTransaction);
+        return await fn();
       };
 
       this.update = async (payload) => {
@@ -58,9 +56,8 @@ export default class PasswordTransaction extends BaseTransaction {
           accessToken, 
           methodName: 'put', 
           links: _links,
-          transactionClassName: 'PasswordTransaction'
-        });
-        return await fn(payload) as PasswordTransaction;
+        }, PasswordTransaction);
+        return await fn(payload);
       };
   
       this.delete = async () => {
@@ -70,7 +67,7 @@ export default class PasswordTransaction extends BaseTransaction {
           methodName: 'delete', 
           links: _links 
         });
-        return await fn() as BaseTransaction;
+        return await fn();
       };
     }
   }

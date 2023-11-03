@@ -1,10 +1,10 @@
 import { sendRequest } from './request';
-import { 
-  IAPIFunction, 
+import { IAPIFunction } from './types';
+import {
   BaseTransaction, 
   EmailTransaction, 
   EmailChallengeTransaction 
-} from './types';
+} from './transactions';
 
 /**
  * @scope: okta.myAccount.email.read
@@ -13,12 +13,11 @@ export const getEmails: IAPIFunction<EmailTransaction[]> = async (
   oktaAuth,
   options?
 ) => {
-  const transaction = await sendRequest(oktaAuth, {
+  const transaction = await sendRequest<EmailTransaction, 'plural'>(oktaAuth, {
     url: '/idp/myaccount/emails',
     method: 'GET',
-    accessToken: options?.accessToken,
-    transactionClassName: 'EmailTransaction'
-  }) as EmailTransaction[];
+    accessToken: options?.accessToken
+  }, EmailTransaction);
   return transaction;
 };
 
@@ -34,8 +33,7 @@ export const getEmail: IAPIFunction<EmailTransaction> = async (
     url: `/idp/myaccount/emails/${id}`,
     method: 'GET',
     accessToken,
-    transactionClassName: 'EmailTransaction'
-  }) as EmailTransaction;
+  }, EmailTransaction);
   return transaction;
 };
 
@@ -52,8 +50,7 @@ export const addEmail: IAPIFunction<EmailTransaction> = async (
     method: 'POST',
     payload,
     accessToken,
-    transactionClassName: 'EmailTransaction'
-  }) as EmailTransaction;
+  }, EmailTransaction);
   return transaction;
 };
 
@@ -69,7 +66,7 @@ export const deleteEmail: IAPIFunction<BaseTransaction> = async (
     url: `/idp/myaccount/emails/${id}`,
     method: 'DELETE',
     accessToken
-  }) as BaseTransaction;
+  });
   return transaction;
 };
 
@@ -85,8 +82,7 @@ export const sendEmailChallenge: IAPIFunction<EmailChallengeTransaction> = async
     url: `/idp/myaccount/emails/${id}/challenge`,
     method: 'POST',
     accessToken,
-    transactionClassName: 'EmailChallengeTransaction'
-  }) as EmailChallengeTransaction;
+  }, EmailChallengeTransaction);
   return transaction;
 };
 
@@ -102,8 +98,7 @@ export const getEmailChallenge: IAPIFunction<EmailChallengeTransaction> = async 
     url: `/idp/myaccount/emails/${emailId}/challenge/${challengeId}`,
     method: 'POST',
     accessToken,
-    transactionClassName: 'EmailChallengeTransaction'
-  }) as EmailChallengeTransaction;
+  }, EmailChallengeTransaction);
   return transaction;
 };
 
@@ -120,6 +115,6 @@ export const verifyEmailChallenge: IAPIFunction<BaseTransaction> = async (
     method: 'POST',
     payload,
     accessToken
-  }) as BaseTransaction;
+  });
   return transaction;
 };

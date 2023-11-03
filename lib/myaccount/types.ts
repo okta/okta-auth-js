@@ -6,7 +6,7 @@ import {
   PKCETransactionMeta
 } from '../oidc/types';
 
-export { 
+export type { 
   EmailTransaction, 
   EmailStatusTransaction,
   EmailChallengeTransaction,

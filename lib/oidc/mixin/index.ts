@@ -28,7 +28,7 @@ import {
   Endpoints,
 } from '../types';
 import PKCE from '../util/pkce';
-import { createEndpoints, createTokenAPI } from '../factory';
+import { createEndpoints, createTokenAPI } from '../factory/api';
 import { TokenManager } from '../TokenManager';
 import { getOAuthUrls, isLoginRedirect } from '../util';
 

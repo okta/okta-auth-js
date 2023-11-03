@@ -143,8 +143,7 @@ describe('generateRequestFnFromLinks function', () => {
         accessToken: 'fake-token',
         methodName: 'get',
         links: mockLinks,
-        transactionClassName: 'EmailTransaction'
-      });
+      }, EmailTransaction);
       await getFn();
       expect(mocked.http.httpRequest).toHaveBeenCalledWith(auth, {
         url: 'http://my-okta-domain/idp/myaccount/emails/00T196qTp3LIMZQ0L0g3',
@@ -195,8 +194,7 @@ describe('generateRequestFnFromLinks function', () => {
         accessToken: 'fake-token',
         methodName: 'challenge',
         links: mockLinks,
-        transactionClassName: 'EmailChallengeTransaction'
-      });
+      }, EmailChallengeTransaction);
       await challengeFn();
       expect(mocked.http.httpRequest).toHaveBeenCalledWith(auth, {
         method: 'POST',

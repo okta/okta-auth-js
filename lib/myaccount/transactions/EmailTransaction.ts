@@ -1,4 +1,5 @@
-import { EmailChallengeTransaction, EmailStatusTransaction } from '.';
+import EmailChallengeTransaction from './EmailChallengeTransaction';
+import EmailStatusTransaction from './EmailStatusTransaction';
 import { EmailProfile, EmailRole, Status, VerificationPayload } from '../types';
 import BaseTransaction from './Base';
 import { generateRequestFnFromLinks } from '../request';
@@ -34,9 +35,8 @@ export default class EmailTransaction extends BaseTransaction {
         accessToken, 
         methodName: 'get', 
         links: _links,
-        transactionClassName: 'EmailTransaction'
-      });
-      return await fn() as EmailTransaction;
+      }, EmailTransaction);
+      return await fn();
     };
     this.delete = async () => {
       const fn = generateRequestFnFromLinks({ 
@@ -45,7 +45,7 @@ export default class EmailTransaction extends BaseTransaction {
         methodName: 'delete', 
         links: _links 
       });
-      return await fn() as BaseTransaction;
+      return await fn();
     };
     this.challenge = async () => {
       const fn = generateRequestFnFromLinks({ 
@@ -53,9 +53,8 @@ export default class EmailTransaction extends BaseTransaction {
         accessToken, 
         methodName: 'challenge', 
         links: _links,
-        transactionClassName: 'EmailChallengeTransaction'
-      });
-      return await fn() as EmailChallengeTransaction;
+      }, EmailChallengeTransaction);
+      return await fn();
     };
     if (_links.poll) {
       this.poll = async () => {
@@ -64,9 +63,8 @@ export default class EmailTransaction extends BaseTransaction {
           accessToken, 
           methodName: 'poll', 
           links: _links,
-          transactionClassName: 'EmailStatusTransaction'
-        });
-        return await fn() as EmailStatusTransaction;
+        }, EmailStatusTransaction);
+        return await fn();
       };
     }
     if (_links.verify) {
@@ -77,7 +75,7 @@ export default class EmailTransaction extends BaseTransaction {
           methodName: 'verify', 
           links: _links,
         });
-        return await fn(payload) as BaseTransaction;
+        return await fn(payload);
       };
     }
   }

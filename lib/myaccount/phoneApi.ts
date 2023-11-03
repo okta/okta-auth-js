@@ -1,9 +1,9 @@
 import { sendRequest } from './request';
-import { 
-  IAPIFunction,
+import { IAPIFunction } from './types';
+import {
   BaseTransaction, 
   PhoneTransaction
-} from './types';
+} from './transactions';
 
 /**
  * @scope: okta.myAccount.phone.read
@@ -12,12 +12,11 @@ export const getPhones: IAPIFunction<PhoneTransaction[]> = async (
   oktaAuth,
   options?
 ) => {
-  const transaction = await sendRequest(oktaAuth, {
+  const transaction = await sendRequest<PhoneTransaction, 'plural'>(oktaAuth, {
     url: '/idp/myaccount/phones',
     method: 'GET',
     accessToken: options?.accessToken,
-    transactionClassName: 'PhoneTransaction'
-  }) as PhoneTransaction[];
+  }, PhoneTransaction);
   return transaction;
 };
 
@@ -33,8 +32,7 @@ export const getPhone: IAPIFunction<PhoneTransaction> = async (
     url: `/idp/myaccount/phones/${id}`,
     method: 'GET',
     accessToken,
-    transactionClassName: 'PhoneTransaction'
-  }) as PhoneTransaction;
+  }, PhoneTransaction);
   return transaction;
 };
 
@@ -51,8 +49,7 @@ export const addPhone: IAPIFunction<PhoneTransaction> = async (
     method: 'POST',
     payload,
     accessToken,
-    transactionClassName: 'PhoneTransaction'
-  }) as PhoneTransaction;
+  }, PhoneTransaction);
   return transaction;
 };
 
@@ -68,7 +65,7 @@ export const deletePhone: IAPIFunction<BaseTransaction> = async (
     url: `/idp/myaccount/phones/${id}`,
     method: 'DELETE',
     accessToken,
-  }) as BaseTransaction;
+  });
   return transaction;
 };
 
@@ -85,7 +82,7 @@ export const sendPhoneChallenge: IAPIFunction<BaseTransaction> = async (
     method: 'POST',
     payload,
     accessToken
-  }) as BaseTransaction;
+  });
   return transaction;
 };
 
@@ -102,6 +99,6 @@ export const verifyPhoneChallenge: IAPIFunction<BaseTransaction> = async (
     method: 'POST',
     payload,
     accessToken
-  }) as BaseTransaction;
+  });
   return transaction;
 };

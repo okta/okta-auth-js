@@ -1,9 +1,9 @@
 import { sendRequest } from './request';
-import { 
-  IAPIFunction,
+import { IAPIFunction } from './types';
+import {
   BaseTransaction, 
   PasswordTransaction
-} from './types';
+} from './transactions';
 
 /**
  * @scope: okta.myAccount.password.read
@@ -16,8 +16,7 @@ export const getPassword: IAPIFunction<PasswordTransaction> = async (
     url: `/idp/myaccount/password`,
     method: 'GET',
     accessToken: options?.accessToken,
-    transactionClassName: 'PasswordTransaction'
-  }) as PasswordTransaction;
+  }, PasswordTransaction);
   return transaction;
 };
 
@@ -34,8 +33,7 @@ export const enrollPassword: IAPIFunction<PasswordTransaction> = async (
     method: 'POST',
     payload,
     accessToken,
-    transactionClassName: 'PasswordTransaction'
-  }) as PasswordTransaction;
+  }, PasswordTransaction);
   return transaction;
 };
 
@@ -52,8 +50,7 @@ export const updatePassword: IAPIFunction<PasswordTransaction> = async (
     method: 'PUT',
     payload,
     accessToken,
-    transactionClassName: 'PasswordTransaction'
-  }) as PasswordTransaction;
+  }, PasswordTransaction);
   return transaction;
 };
 
@@ -68,6 +65,6 @@ export const deletePassword: IAPIFunction<BaseTransaction> = async (
     url: `/idp/myaccount/password`,
     method: 'DELETE',
     accessToken: options?.accessToken,
-  }) as BaseTransaction;
+  });
   return transaction;
 };

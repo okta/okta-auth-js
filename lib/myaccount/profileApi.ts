@@ -1,9 +1,9 @@
 import { sendRequest } from './request';
-import { 
-  IAPIFunction,
+import { IAPIFunction } from './types';
+import {
   ProfileTransaction,
   ProfileSchemaTransaction
-} from './types';
+} from './transactions';
 
 /**
  * @scope: okta.myAccount.profile.read
@@ -13,8 +13,7 @@ export const getProfile: IAPIFunction<ProfileTransaction> = async (oktaAuth, opt
     url: '/idp/myaccount/profile',
     method: 'GET',
     accessToken: options?.accessToken,
-    transactionClassName: 'ProfileTransaction'
-  }) as ProfileTransaction;
+  }, ProfileTransaction);
   return transaction;
 };
 
@@ -31,8 +30,7 @@ export const updateProfile: IAPIFunction<ProfileTransaction> = async (
     method: 'PUT',
     payload,
     accessToken,
-    transactionClassName: 'ProfileTransaction'
-  }) as ProfileTransaction;
+  }, ProfileTransaction);
   return transaction;
 };
 
@@ -47,7 +45,6 @@ export const getProfileSchema: IAPIFunction<ProfileSchemaTransaction> = async (
     url: '/idp/myaccount/profile/schema',
     method: 'GET',
     accessToken: options?.accessToken,
-    transactionClassName: 'ProfileSchemaTransaction'
-  }) as ProfileSchemaTransaction;
+  }, ProfileSchemaTransaction);
   return transaction;
 };

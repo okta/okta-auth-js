@@ -35,9 +35,8 @@ export default class EmailChallengeTransaction extends BaseTransaction {
         accessToken, 
         methodName: 'poll', 
         links: _links,
-        transactionClassName: 'EmailStatusTransaction'
-      });
-      return await fn() as EmailStatusTransaction;
+      }, EmailStatusTransaction);
+      return await fn();
     };
     this.verify = async (payload) => {
       const fn = generateRequestFnFromLinks({ 
@@ -45,8 +44,8 @@ export default class EmailChallengeTransaction extends BaseTransaction {
         accessToken, 
         methodName: 'verify', 
         links: _links,
-      });
-      return await fn(payload) as EmailChallengeTransaction;
+      }, EmailChallengeTransaction);
+      return await fn(payload);
     };
   }
 }

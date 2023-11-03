@@ -30,9 +30,8 @@ export default class PhoneTransaction extends BaseTransaction {
         accessToken, 
         methodName: 'get', 
         links: _links,
-        transactionClassName: 'PhoneTransaction'
-      });
-      return await fn() as PhoneTransaction;
+      }, PhoneTransaction);
+      return await fn();
     };
     this.delete = async () => {
       const fn = generateRequestFnFromLinks({ 
@@ -41,7 +40,7 @@ export default class PhoneTransaction extends BaseTransaction {
         methodName: 'delete', 
         links: _links 
       });
-      return await fn() as BaseTransaction;
+      return await fn();
     };
     this.challenge = async (payload) => {
       const fn = generateRequestFnFromLinks({ 
@@ -50,7 +49,7 @@ export default class PhoneTransaction extends BaseTransaction {
         methodName: 'challenge', 
         links: _links 
       });
-      return await fn(payload) as BaseTransaction;
+      return await fn(payload);
     };
     if (_links.verify) {
       this.verify = async (payload) => {
@@ -60,7 +59,7 @@ export default class PhoneTransaction extends BaseTransaction {
           methodName: 'verify', 
           links: _links 
         });
-        return await fn(payload) as BaseTransaction;
+        return await fn(payload);
       } ;
     }
   }

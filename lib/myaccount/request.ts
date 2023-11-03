@@ -1,42 +1,29 @@
 import { 
-  BaseTransaction,
-  EmailTransaction,
-  EmailStatusTransaction,
-  EmailChallengeTransaction,
-  ProfileTransaction,
-  ProfileSchemaTransaction,
-  PhoneTransaction,
-  PasswordTransaction
-} from './transactions';
+  default as BaseTransaction,
+  TransactionType,
+  TransactionLinks
+} from './transactions/Base';
 import { httpRequest } from '../http';
 import { AuthSdkError } from '../errors';
 import { MyAccountRequestOptions as RequestOptions } from './types';
 import { OktaAuthOAuthInterface } from '../oidc/types';
 
-export type TransactionLink = {
-  href: string;
-  hints?: {
-    allow?: string[];
-  };
-}
-
-type TransactionLinks = {
-  self: TransactionLink;
-  [property: string]: TransactionLink;
-}
-
 type SendRequestOptions = RequestOptions & {
   url: string;
   method: string;
-  transactionClassName?: string;
 }
 
 /* eslint-disable complexity */
-export async function sendRequest<T extends BaseTransaction> (
+export async function sendRequest<
+  T extends BaseTransaction = BaseTransaction,
+  N extends 'plural' | 'single' = 'single',
+  NT = N extends 'plural' ? T[] : T
+> (
   oktaAuth: OktaAuthOAuthInterface, 
-  options: SendRequestOptions
-): Promise<T | T[]> {
-  const { 
+  options: SendRequestOptions,
+  TransactionClass: TransactionType<T> = BaseTransaction as TransactionType<T>,
+): Promise<NT> {
+  const {
     accessToken: accessTokenObj
   } = oktaAuth.tokenManager.getTokensSync();
   
@@ -57,28 +44,19 @@ export async function sendRequest<T extends BaseTransaction> (
     ...(payload && { args: payload })
   });
 
-  const map = {
-    EmailTransaction,
-    EmailStatusTransaction,
-    EmailChallengeTransaction,
-    ProfileTransaction,
-    ProfileSchemaTransaction,
-    PhoneTransaction,
-    PasswordTransaction
-  };
-  const TransactionClass = map[options.transactionClassName!] || BaseTransaction;
-
+  let ret: T | T[];
   if (Array.isArray(res)) {
-    return res.map(item => new TransactionClass(oktaAuth, { 
+    ret = res.map(item => new TransactionClass(oktaAuth, { 
       res: item, 
       accessToken
     }));
+  } else {
+    ret = new TransactionClass(oktaAuth, { 
+      res, 
+      accessToken
+    });
   }
-
-  return new TransactionClass(oktaAuth, { 
-    res, 
-    accessToken
-  });
+  return ret as NT;
 }
 /* eslint-enable complexity */
 
@@ -87,28 +65,28 @@ export type GenerateRequestFnFromLinksOptions = {
   accessToken: string;
   methodName: string;
   links: TransactionLinks;
-  transactionClassName?: string;
 }
 
-type IRequestFnFromLinks = <T extends BaseTransaction>(payload?) => Promise<T | T[]>;
+type IRequestFnFromLinks<T extends BaseTransaction> = (payload?) => Promise<T>;
 
-export function generateRequestFnFromLinks ({
-  oktaAuth, 
-  accessToken,
-  methodName,
-  links,
-  transactionClassName
-}: GenerateRequestFnFromLinksOptions): IRequestFnFromLinks {
+export function generateRequestFnFromLinks<T extends BaseTransaction>(
+  {
+    oktaAuth, 
+    accessToken,
+    methodName,
+    links,
+  }: GenerateRequestFnFromLinksOptions,
+  TransactionClass: TransactionType<T> = BaseTransaction as TransactionType<T>,
+): IRequestFnFromLinks<T> {
   for (const method of ['GET', 'POST', 'PUT', 'DELETE']) {
     if (method.toLowerCase() === methodName) {
       const link = links.self;
-      return (async (payload?) => sendRequest(oktaAuth, {
+      return (async (payload?) => sendRequest<T, 'single'>(oktaAuth, {
         accessToken,
         url: link.href,
         method,
         payload,
-        transactionClassName
-      }));
+      }, TransactionClass));
     }
   }
   
@@ -117,11 +95,10 @@ export function generateRequestFnFromLinks ({
     throw new AuthSdkError(`No link is found with methodName: ${methodName}`);
   }
 
-  return (async (payload?) => sendRequest(oktaAuth, {
+  return (async (payload?) => sendRequest<T, 'single'>(oktaAuth, {
     accessToken,
     url: link.href,
     method: link.hints!.allow![0],
     payload,
-    transactionClassName
-  }));
+  }, TransactionClass));
 }
