@@ -6,6 +6,7 @@
 
  - [#1462](https://github.com/okta/okta-auth-js/pull/1462) Fixes ESM build for Node.js
  - [#1472](https://github.com/okta/okta-auth-js/pull/1472) Added missing remediator `ReEnrollAuthenticatorWarning`
+ - [#1473](https://github.com/okta/okta-auth-js/pull/1473) Resolves circular dependencies issue for ESM build
 
 ### Other
 
