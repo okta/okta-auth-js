@@ -1,5 +1,16 @@
 import { OktaAuthHttpInterface } from '../../http/types';
-import { TransactionLink } from '../request';
+
+export type TransactionLink = {
+  href: string;
+  hints?: {
+    allow?: string[];
+  };
+}
+
+export type TransactionLinks = {
+  self: TransactionLink;
+  [property: string]: TransactionLink;
+}
 
 type TransactionOptions = {
   // TODO: move res type to http module
@@ -10,6 +21,7 @@ type TransactionOptions = {
   };
   accessToken: string;
 };
+
 export default class BaseTransaction {
   // Deprecated
   headers?: Record<string, string>;
@@ -31,4 +43,9 @@ export default class BaseTransaction {
       this[key] = rest[key];
     });
   }
+}
+
+export interface TransactionType<T extends BaseTransaction = BaseTransaction> extends Function {
+  new (oktaAuth: OktaAuthHttpInterface, options: TransactionOptions): T;
+  prototype: T;
 }
