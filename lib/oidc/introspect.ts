@@ -44,7 +44,6 @@ export async function oidcIntrospect (sdk, kind: TokenKind, token?: Token) {
   else {
     issuer = (token as any)?.claims?.iss;
   }
-  // issuer ??= sdk.options.issuer;
   issuer = issuer || sdk.options.issuer;
 
   if (!clientId) {

@@ -12,10 +12,17 @@
 
 /* eslint-disable complexity */
 
+// import { After, AfterStep, Status } from '@cucumber/cucumber';
 import { After } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
 import deleteSelfEnrolledUser from '../support/management-api/deleteSelfEnrolledUser';
 
+// NOTE: can be used to debug cucumber tests, just uncomment
+// AfterStep(async ({ result }) => {
+//   if (result.status === Status.FAILED) {
+//     await browser.debug();
+//   }
+// });
 
 // Comment out this after hook to persist test context
 // Extend the hook timeout to fight against org rate limit

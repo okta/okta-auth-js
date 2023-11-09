@@ -60,18 +60,19 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
     const matchedOption = this.findMatchedOption(authenticators, options!);
     if (matchedOption) {
 
-      // const isAuthenticatorCurrent = (auth) => {
-      //   return auth && !auth.value?.resend
-      //     && auth.value.id === matchedOption.relatesTo?.id;
-      // };
+      // fix for OKTA-612939 (below) seems to have caused a bug when trying to re-select authenticators
+      // with multiple methodTypes. If `options.step` is passed, this remediation is explicitly being
+      // invoked, therefore do not guard against auto-remediating the selected authenticator (OKTA-646147)
+      if (this.options.step) {
+        return true;
+      }
 
-      // // Don't select current authenticator (OKTA-612939)
-      // // Follow up: OKTA-646147 - original fix caused different issue
-      // const isCurrentAuthenticator = isAuthenticatorCurrent(context?.currentAuthenticator);                          // false
-      // const isCurrentAuthenticatorEnrollment = isAuthenticatorCurrent(context?.currentAuthenticatorEnrollment);      // true
-      // return !isCurrentAuthenticator && !isCurrentAuthenticatorEnrollment;                                           // false
-
-      return true;
+      // Don't select current authenticator (OKTA-612939)
+      const isCurrentAuthenticator = context?.currentAuthenticator
+        && context?.currentAuthenticator.value.id === matchedOption.relatesTo?.id;
+      const isCurrentAuthenticatorEnrollment = context?.currentAuthenticatorEnrollment
+        && context?.currentAuthenticatorEnrollment.value.id === matchedOption.relatesTo?.id;
+      return !isCurrentAuthenticator && !isCurrentAuthenticatorEnrollment;
     }
     
     return false;
@@ -112,7 +113,6 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
       .filter(authenticator => {
         return compareAuthenticators(authenticator, this.selectedAuthenticator) !== true;
       });
-    // return { ...this.values, authenticators, authenticator: undefined };
     return { ...this.values, authenticators };
   }
 

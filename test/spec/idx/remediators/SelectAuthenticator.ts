@@ -19,7 +19,7 @@ describe('remediators/Base/SelectAuthenticator', () => {
           AuthenticatorValueFactory.build({
             options: [
               PhoneAuthenticatorOptionFactory.params({
-                // prevent resolving of authenticator by `relatesTo` in purpose
+                // prevent resolving of authenticator by `relatesTo` on purpose
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 _authenticator: 'cant_be_resolved' as any
               }).build(),
@@ -39,7 +39,7 @@ describe('remediators/Base/SelectAuthenticator', () => {
 
 describe('remediators/SelectAuthenticatorEnroll', () => {
   describe('canRemediate', () => {
-    xit('retuns false if matched authenticator is already the current one', () => {
+    it('retuns false if matched authenticator is already the current one', () => {
       const currentAuthenticator = EmailAuthenticatorFactory.build();
       const remediation = SelectAuthenticatorEnrollRemediationFactory.build({
         value: [
@@ -69,7 +69,7 @@ describe('remediators/SelectAuthenticatorEnroll', () => {
 
 describe('remediators/SelectAuthenticatorAuthenticate', () => {
   describe('canRemediate', () => {
-    xit('retuns false if matched authenticator is already the current one', () => {
+    it('retuns false if matched authenticator is already the current one', () => {
       const currentAuthenticatorEnrollment = PhoneAuthenticatorFactory.build();
       const remediation = SelectAuthenticatorAuthenticateRemediationFactory.build({
         value: [
@@ -95,14 +95,15 @@ describe('remediators/SelectAuthenticatorAuthenticate', () => {
       expect(r.canRemediate()).toBe(true);
     });
 
-    it('returns true if matched authenticator has a resend form', () => {
-      const phoneAuthenticator = PhoneAuthenticatorFactory.build();
+    // Fix for OKTA-646147
+    it('retuns true if `options.step` is explicitly passed', () => {
+      const currentAuthenticatorEnrollment = PhoneAuthenticatorFactory.build();
       const remediation = SelectAuthenticatorAuthenticateRemediationFactory.build({
         value: [
           AuthenticatorValueFactory.build({
             options: [
               PhoneAuthenticatorOptionFactory.params({
-                _authenticator: phoneAuthenticator,
+                _authenticator: currentAuthenticatorEnrollment,
               }).build(),
             ]
           }),
@@ -110,21 +111,13 @@ describe('remediators/SelectAuthenticatorAuthenticate', () => {
       });
       const context = IdxContextFactory.build({
         currentAuthenticatorEnrollment: {
-          value: {
-            ...phoneAuthenticator,
-            resend: ResendAuthenticatorFactory.build(),
-          }
-        },
-        authenticatorEnrollments: {
-          value: [phoneAuthenticator]
-        },
-        currentAuthenticator: {}
+          value: currentAuthenticatorEnrollment
+        }
       });
-
       const authenticators = [
-        phoneAuthenticator,
+        currentAuthenticatorEnrollment,
       ];
-      const r = new SelectAuthenticatorAuthenticate(remediation, { authenticators });
+      const r = new SelectAuthenticatorAuthenticate(remediation, { authenticators }, { step: 'select-authenticator-authenticate'});
       expect(r.canRemediate(context)).toBe(true);
       expect(r.canRemediate()).toBe(true);
     });
