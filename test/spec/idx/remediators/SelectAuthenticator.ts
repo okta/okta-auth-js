@@ -7,8 +7,7 @@ import {
   EmailAuthenticatorOptionFactory,
   IdxContextFactory,
   PhoneAuthenticatorFactory,
-  EmailAuthenticatorFactory,
-  ResendAuthenticatorFactory
+  EmailAuthenticatorFactory
 } from '@okta/test.support/idx';
 
 describe('remediators/Base/SelectAuthenticator', () => {
