@@ -14,6 +14,7 @@
 import { RemediationFlow } from './RemediationFlow';
 import { 
   Identify,
+  DeviceIdentificationChallenge,
   SelectAuthenticatorAuthenticate,
   ChallengeAuthenticator,
   ReEnrollAuthenticator,
@@ -31,6 +32,7 @@ import {
 } from '../remediators';
 
 export const AuthenticationFlow: RemediationFlow = {
+  'device-identification-challenge': DeviceIdentificationChallenge,
   'identify': Identify,
   'select-authenticator-authenticate': SelectAuthenticatorAuthenticate,
   'select-authenticator-enroll': SelectAuthenticatorEnroll,

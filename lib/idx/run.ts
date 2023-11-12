@@ -15,6 +15,7 @@
 /* eslint-disable max-statements, complexity, max-depth */
 import { interact } from './interact';
 import { introspect } from './introspect';
+import { getDeviceChallenge } from './getDeviceChallenge';
 import { remediate } from './remediate';
 import { getFlowSpecification } from './flow';
 import * as remediators from './remediators';
@@ -32,6 +33,8 @@ import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta'
 import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from './util';
 import { Tokens } from '../oidc/types';
 import { APIError } from '../errors/types';
+import { DeviceIdentificationChallenge } from './remediators';
+import { makeIdxState } from './idxState';
 declare interface RunData {
   options: RunOptions;
   values: remediators.RemediationValues;
@@ -152,6 +155,38 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
     idxResponse = await introspect(authClient, { withCredentials, version, interactionHandle });
   }
   return { ...data, idxResponse, meta };
+}
+
+// const delay = ms => new Promise(res => setTimeout(res, ms));
+
+async function collectChromeDeviceSignals(authClient, data: RunData): Promise<any> {
+  const { options } = data;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let idxResponse;
+  const {
+    withCredentials,
+    version
+  } = options;
+
+  const remediations = data.idxResponse?.rawIdxState.remediation?.value;
+  remediations?.forEach(async remediation => { // TODO: only if 1st remediation is device-challenge-poll
+    if (remediation['name'] == 'device-challenge-poll') {
+      const challengeMethod = data.idxResponse?.rawIdxState['authenticatorChallenge']?.value.challengeMethod;
+      if (challengeMethod == 'CHROME_DTC') {
+        const href = data.idxResponse?.rawIdxState['authenticatorChallenge']?.value.href;
+        await getDeviceChallenge(authClient, href, { withCredentials, version });
+      }
+    }
+  });
+
+  // TODO: add a wait here for 2 seconds so that signals are collected, check if view is gone and continue to next 
+
+  // remove the 1st remediations, regardless if we collect device signals successfully or not.
+  // backend will have log, syslog and Splunk monitor set up.
+  // This is not needed when backend has correct logic to add DeviceIdentificationChallenge
+  // data.idxResponse?.rawIdxState.remediation?.value?.shift();
+  // data.idxResponse?.neededToProceed.shift();
+  // return data;
 }
 
 async function getDataFromRemediate(authClient, data: RunData): Promise<RunData> {
@@ -308,6 +343,10 @@ export async function run(
 
   data = initializeData(authClient, data);
   data = await getDataFromIntrospect(authClient, data);
+
+  // collect device signals if elibigle
+  await collectChromeDeviceSignals(authClient, data);
+
   data = await getDataFromRemediate(authClient, data);
   data = await finalizeData(authClient, data);
 

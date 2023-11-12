@@ -39,6 +39,19 @@ export function loadFrame(src) {
   return document.body.appendChild(iframe);
 }
 
+export function loadInvisibleFrame(src, id) {
+  var iframe = document.createElement('iframe');
+  iframe.src = src;
+  iframe.id = id;
+  // invisible and not take up any space
+  iframe.height = '0';
+  iframe.width = '0';
+  iframe.style.position = 'absolute';
+  iframe.style.border = '0';
+
+  return document.body.appendChild(iframe);
+}
+
 export function loadPopup(src, options) {
   var title = options.popupTitle || 'External Identity Provider User Authentication';
   var appearance = 'toolbar=no, scrollbars=yes, resizable=yes, ' +

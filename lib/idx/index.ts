@@ -21,6 +21,7 @@ export {
 } from './emailVerify';
 export { interact } from './interact';
 export { introspect } from './introspect';
+export { getDeviceChallenge } from './getDeviceChallenge';
 export { poll } from './poll';
 export { proceed, canProceed } from './proceed';
 export { register } from './register';

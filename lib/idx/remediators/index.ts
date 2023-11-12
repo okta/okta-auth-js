@@ -21,6 +21,7 @@ export * from './ChallengePoll';
 export * from './ResetAuthenticator';
 export * from './EnrollProfile';
 export * from './Identify';
+export * from './DeviceIdentificationChallenge';
 export * from './ReEnrollAuthenticator';
 export * from './ReEnrollAuthenticatorWarning';
 export * from './RedirectIdp';
