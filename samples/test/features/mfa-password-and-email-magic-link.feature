@@ -16,7 +16,7 @@ Feature: Multi-Factor Authentication with Password and Email Magic Link
       And she has inserted her password
       And her password is correct
     When she submits the form
-    Then she is redirected to the "Verify Email" page       # fails here
+    Then she is redirected to the "Verify Email" page
     When she selects "Email" from the list of methods
       And she submits the form
       And she clicks the Email magic link

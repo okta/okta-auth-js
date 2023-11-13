@@ -14,7 +14,6 @@ Feature: Multi-Factor Authentication with Password and Email
     When she fills in her username
       And she fills in her correct password
       And she submits the form
-    # fails here
     Then she is redirected to the "Verify Email" page
     When she selects "Email" from the list of methods
       And she submits the form
@@ -31,7 +30,6 @@ Feature: Multi-Factor Authentication with Password and Email
       And she has inserted her password
       And her password is correct
     When she submits the form
-    # fails here
     Then she is redirected to the "Verify Email" page
     When she selects "Email" from the list of methods
       And she submits the form
