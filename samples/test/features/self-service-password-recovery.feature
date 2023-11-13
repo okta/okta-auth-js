@@ -7,7 +7,7 @@ Background:
     And a user named "Mary"
     And she has an account with "active" state in the org
 
-  @flaky
+  @quarantined
   Scenario: Mary resets her password
     When she clicks the "login" button
     Then she is redirected to the "Login" page

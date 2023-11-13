@@ -7,7 +7,7 @@ Feature: Multi-Factor Authentication with Password and Email
       And a user named "Mary"
       And she has an account with "active" state in the org
 
-  @flaky
+  @quarantined
   Scenario: Mary enters a wrong verification code
     When she clicks the "login" button
     Then she is redirected to the "Login" page
@@ -22,7 +22,7 @@ Feature: Multi-Factor Authentication with Password and Email
       And she submits the form
     Then the sample shows an error message "Invalid code. Try again." on the Sample App
 
-  @flaky
+  @quarantined
   Scenario: 2FA Login with Email
     When she clicks the "login" button
     Then she is redirected to the "Login" page

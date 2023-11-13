@@ -8,7 +8,7 @@ Feature: Multi-Factor Authentication with Password and Email Magic Link
       And a user named "Mary"
       And she has an account with "active" state in the org
 
-  @flaky
+  @quarantined
   Scenario: 2FA Login with Email Magic Link on the same browser
     When she clicks the "login" button
     Then she is redirected to the "Login" page
