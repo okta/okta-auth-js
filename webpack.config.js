@@ -16,7 +16,7 @@ var entries = {
   'default': './lib/exports/default.ts',
   'core': './lib/exports/core.ts',
   'authn': './lib/exports/authn.ts',
-  'idx-lite': './lib/exports/idx-lite.ts',
+  'idx-minimal': './lib/exports/idx-minimal.ts',
   'idx': './lib/exports/idx.ts',
   'myaccount': './lib/exports/myaccount.ts'
 };
