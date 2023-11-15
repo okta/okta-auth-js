@@ -1,5 +1,5 @@
 import { warn, split2 } from '../util';
-import { RemediationValues, Remediator, RemediatorConstructor } from './remediators/Base/Remediator';
+import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
 import { GenericRemediator } from './remediators/GenericRemediator';
 import { OktaAuthIdxInterface, IdxFeature, NextStep, RemediateOptions, RemediationResponse, RunOptions } from './types';
 import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse } from './types/idx-js';

@@ -11,6 +11,6 @@
  */
 
 
-import type { RemediatorConstructor } from '../remediators/Base/Remediator';
+import { RemediatorConstructor } from '../remediators';
 
 export type RemediationFlow = Record<string, RemediatorConstructor>;
