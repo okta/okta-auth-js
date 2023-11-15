@@ -15,7 +15,7 @@ import { createBaseTokenAPI } from '../factory/baseApi';
 import { isLoginRedirect, hasResponseType } from '../util';
 
 import { OktaAuthSessionInterface } from '../../session/types';
-export function mixinBaseOAuth
+export function mixinMinimalOAuth
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
   S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,

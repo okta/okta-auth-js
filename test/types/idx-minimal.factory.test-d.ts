@@ -16,10 +16,10 @@ import {
   HttpAPI,
   OktaAuthIdxOptions,
   IdxStorageManagerInterface,
-  BaseIdxAPI,
+  MinimalIdxAPI,
   BaseTokenAPI,
   WebauthnAPI,
-  createOktaAuthBaseIdx,
+  createMinimalOktaAuthIdx,
   createIdxOptionsConstructor,
   createIdxStorageManager,
   createIdxTransactionManager,
@@ -32,7 +32,7 @@ import { expectType, expectAssignable, expectError } from 'tsd';
 const OptionsConstructor: OktaAuthOptionsConstructor<OktaAuthIdxOptions> = createIdxOptionsConstructor();
 const StorageManager: IdxStorageManagerConstructor = createIdxStorageManager();
 const TransactionManager: IdxTransactionManagerConstructor = createIdxTransactionManager();
-const OktaAuth = createOktaAuthBaseIdx(StorageManager, OptionsConstructor, TransactionManager);
+const OktaAuth = createMinimalOktaAuthIdx(StorageManager, OptionsConstructor, TransactionManager);
 const options: OktaAuthIdxOptions = {};
 const authClient = new OktaAuth(options);
 
@@ -45,7 +45,7 @@ expectType<BaseTokenAPI>(authClient.token);
 
 // has IDX
 expectType<OktaAuthIdxOptions>(authClient.options);
-expectType<BaseIdxAPI>(authClient.idx);
+expectType<MinimalIdxAPI>(authClient.idx);
 expectType<IdxStorageManagerInterface>(authClient.storageManager);
 
 // has partial IDX API

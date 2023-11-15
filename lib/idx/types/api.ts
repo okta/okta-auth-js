@@ -177,7 +177,7 @@ export interface EmailVerifyCallbackResponse {
   otp: string;
 }
 
-export interface BaseIdxAPI {
+export interface MinimalIdxAPI {
   // lowest level api
   makeIdxResponse: (rawIdxResponse: RawIdxResponse, toPersist: IdxToPersist, requestDidSucceed: boolean) => IdxResponse;
 
@@ -280,7 +280,7 @@ export interface OktaAuthBaseIdxInterface
 >
   extends OktaAuthBaseOAuthInterface<M, S, O, TM>
 {
-  idx: BaseIdxAPI;
+  idx: MinimalIdxAPI;
 }
 
 export interface OktaAuthIdxConstructor
