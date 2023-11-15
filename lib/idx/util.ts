@@ -1,8 +1,40 @@
 import { warn, split2 } from '../util';
 import { RemediationValues, Remediator, RemediatorConstructor } from './remediators';
 import { GenericRemediator } from './remediators/GenericRemediator';
-import { OktaAuthIdxInterface, IdxFeature, NextStep, RemediateOptions, RemediationResponse, RunOptions } from './types';
+import {
+  OktaAuthIdxInterface,
+  IdxFeature,
+  NextStep,
+  RemediateOptions,
+  RemediationResponse,
+  RunOptions,
+  GetFlowSpecification,
+  FlowIdentifier,
+  FlowSpecification
+} from './types';
 import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse } from './types/idx-js';
+
+const ctx: {
+  remediators: Record<string, RemediatorConstructor>,
+  getFlowSpecification: GetFlowSpecification,
+} = {
+  // default values to be used by minimal IDX API
+  remediators: {},
+  getFlowSpecification: function(_oktaAuth: OktaAuthIdxInterface, _flow: FlowIdentifier = 'default') {
+    return {
+      remediators: {}
+    } as FlowSpecification;
+  }
+};
+
+// should be set in createIdxAPI() factory
+export function setRemediatorsCtx(newCtx: Partial<typeof ctx>) {
+  Object.assign(ctx, newCtx);
+}
+
+export function getFlowSpecification(oktaAuth: OktaAuthIdxInterface, flow: FlowIdentifier = 'default') {
+  return ctx.getFlowSpecification(oktaAuth, flow);
+}
 
 export function isTerminalResponse(idxResponse: IdxResponse) {
   const { neededToProceed, interactionCode } = idxResponse;
@@ -114,7 +146,7 @@ export function getAvailableSteps(
 ): NextStep[] {
   const res: NextStep[] = [];
 
-  const remediatorMap: Record<string, RemediatorConstructor> = Object.values(authClient.idx.allRemediators)
+  const remediatorMap: Record<string, RemediatorConstructor> = Object.values(ctx.remediators)
     .reduce((map, remediatorClass) => {
       // Only add concrete subclasses to the map
       if (remediatorClass.remediationName) {

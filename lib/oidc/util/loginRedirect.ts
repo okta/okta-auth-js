@@ -54,10 +54,6 @@ export function hasResponseType(responseType: OAuthResponseType, options: OktaAu
   return hasResponseType;
 }
 
-export function isAuthorizationCodeFlow(options: OktaAuthOAuthOptions): boolean {
-  return hasResponseType('code', options);
-}
-
 export function getHashOrSearch(options: OktaAuthOAuthOptions) {
   var codeFlow = isCodeFlow(options);
   var useQuery = codeFlow && options.responseMode !== 'fragment';

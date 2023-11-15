@@ -1,6 +1,7 @@
 
 import { OktaAuthConstructor } from '../../base/types';
 import {
+  OAuthResponseType,
   OAuthStorageManagerInterface,
   OAuthTransactionMeta,
   OktaAuthBaseOAuthInterface,
@@ -11,7 +12,7 @@ import {
   TransactionManagerConstructor,
 } from '../types';
 import { createBaseTokenAPI } from '../factory/baseApi';
-import { isLoginRedirect, isAuthorizationCodeFlow } from '../util';
+import { isLoginRedirect, hasResponseType } from '../util';
 
 import { OktaAuthSessionInterface } from '../../session/types';
 export function mixinBaseOAuth
@@ -51,8 +52,12 @@ export function mixinBaseOAuth
       return !!this.options.pkce;
     }
 
+    hasResponseType(responseType: OAuthResponseType): boolean {
+      return hasResponseType(responseType, this.options);
+    }
+
     isAuthorizationCodeFlow(): boolean {
-      return isAuthorizationCodeFlow(this.options);
+      return this.hasResponseType('code');
     }
 
   };

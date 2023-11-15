@@ -14,8 +14,6 @@
 import { recoverPassword } from '../../../lib/idx/recoverPassword';
 import { IdxStatus } from '../../../lib/idx/types';
 import { IdxActions } from '../../../lib/idx/types/idx-js';
-import { getFlowSpecification } from '../../../lib/idx/flow';
-import * as allRemediators from '../../../lib/idx/remediators';
 
 import {
   IdxResponseFactory,
@@ -39,11 +37,16 @@ import {
   PasswordAuthenticatorOptionFactory,
   VerifyPasswordRemediationFactory
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 
 const mocked = {
   interact: require('../../../lib/idx/interact'),
   introspect: require('../../../lib/idx/introspect')
 };
+
+beforeAll(() => {
+  util.setRemediatorsCtx();
+});
 
 describe('idx/recoverPassword', () => {
  let testContext;
@@ -77,8 +80,6 @@ describe('idx/recoverPassword', () => {
       },
       idx: {
         setFlow: () => {},
-        getFlowSpecification,
-        allRemediators,
       },
       token: {
         exchangeCodeForTokens: jest.fn().mockReturnValue({

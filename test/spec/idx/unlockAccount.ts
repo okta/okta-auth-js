@@ -14,8 +14,6 @@
 import { unlockAccount } from '../../../lib/idx/unlockAccount';
 import { IdxStatus, AuthenticatorKey } from '../../../lib/idx/types';
 import { AuthSdkError } from '../../../lib/errors';
-import { getFlowSpecification } from '../../../lib/idx/flow';
-import * as allRemediators from '../../../lib/idx/remediators';
 
 import {
   chainResponses,
@@ -39,6 +37,7 @@ import {
   EmailAuthenticatorFactory,
   OktaVerifyPushChallengePollRemediationFactory
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 
 const mocked = {
   interact: require('../../../lib/idx/interact'),
@@ -47,6 +46,10 @@ const mocked = {
   transactionMeta: require('../../../lib/idx/transactionMeta'),
   flowSpec: require('../../../lib/idx/flow/FlowSpecification'),
 };
+
+beforeAll(() => {
+  util.setRemediatorsCtx();
+});
 
 const SuccessfulTerminalState = {
   status: IdxStatus.TERMINAL,
@@ -104,8 +107,6 @@ describe('/idx/unlockAccout', () => {
       },
       idx: {
         setFlow: () => {},
-        getFlowSpecification,
-        allRemediators,
       }
     };
 

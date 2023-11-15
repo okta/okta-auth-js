@@ -21,33 +21,26 @@ import {
   PasscodeValueFactory,
   IdxErrorPasscodeInvalidFactory
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 import { IdxFeature, IdxResponse, OktaAuthIdxInterface } from '../../../lib/idx/types';
 import { Remediator, GenericRemediator } from '../../../lib/idx/remediators';
-import { getFlowSpecification } from '../../../lib/idx/flow';
-import * as allRemediators from '../../../lib/idx/remediators';
 
 jest.mock('../../../lib/idx/remediators/GenericRemediator');
+
+beforeAll(() => {
+  util.setRemediatorsCtx();
+});
 
 describe('idx/util', () => {
   describe('getAvailableSteps', () => {
     it('returns an empty array if there are no remediations', () => {
-      const authClient = {
-        idx: {
-          getFlowSpecification,
-          allRemediators,
-        }
-      } as unknown as OktaAuthIdxInterface;
+      const authClient = {} as OktaAuthIdxInterface;
       const idxResponse = IdxResponseFactory.build();
       const res = getAvailableSteps(authClient, idxResponse);
       expect(res.length).toBe(0);
     });
     it('returns next step for identify remediation', () => {
-      const authClient = {
-        idx: {
-          getFlowSpecification,
-          allRemediators,
-        }
-      } as unknown as OktaAuthIdxInterface;
+      const authClient = {} as OktaAuthIdxInterface;
       const idxResponse = IdxResponseFactory.build({
         neededToProceed: [
           IdentifyRemediationFactory.build()
@@ -424,12 +417,7 @@ describe('idx/util', () => {
       const remediator: Remediator = {
         getNextStep: jest.fn().mockReturnValue(nextStep)
       } as unknown as Remediator;
-      const authClient = {
-        idx: {
-          getFlowSpecification,
-          allRemediators,
-        }
-      } as unknown as OktaAuthIdxInterface;
+      const authClient = {} as OktaAuthIdxInterface;
       const context = {
          foo: 'bar'
       };
@@ -488,12 +476,7 @@ describe('idx/util', () => {
   describe('handleFailedResponse', () => {
     let testContext;
     beforeEach(() => {
-      const authClient = {
-        idx: {
-          getFlowSpecification,
-          allRemediators,
-        }
-      } as unknown as OktaAuthIdxInterface;
+      const authClient = {} as OktaAuthIdxInterface;
       const idxResponse = {
         neededToProceed: [],
         actions: {},

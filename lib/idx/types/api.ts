@@ -55,9 +55,6 @@ import type {
   WebauthnEnrollValues,
   WebauthnVerificationValues
 } from '../authenticator';
-import type {
-  RemediatorConstructor
-} from '../remediators/Base/Remediator';
 import { OktaAuthConstructor } from '../../base/types';
 
 export enum IdxStatus {
@@ -181,10 +178,6 @@ export interface EmailVerifyCallbackResponse {
 }
 
 export interface BaseIdxAPI {
-  allRemediators: Record<string, RemediatorConstructor>,
-  // eslint-disable-next-line no-use-before-define
-  getFlowSpecification: GetFlowSpecification,
-
   // lowest level api
   makeIdxResponse: (rawIdxResponse: RawIdxResponse, toPersist: IdxToPersist, requestDidSucceed: boolean) => IdxResponse;
 
@@ -206,10 +199,6 @@ export interface BaseIdxAPI {
 }
 
 export interface IdxAPI {
-  allRemediators: Record<string, RemediatorConstructor>,
-  // eslint-disable-next-line no-use-before-define
-  getFlowSpecification: GetFlowSpecification,
-
   // lowest level api
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
   introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;

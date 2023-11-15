@@ -14,8 +14,6 @@ import { authenticate } from '../../../lib/idx/authenticate';
 import { proceed } from '../../../lib/idx/proceed';
 import { IdxStatus, AuthenticatorKey } from '../../../lib/idx/types';
 import { IdxActions } from './../../../lib/idx/types/idx-js';
-import { getFlowSpecification } from '../../../lib/idx/flow';
-import * as allRemediators from '../../../lib/idx/remediators';
 
 import {
   chainResponses,
@@ -71,12 +69,17 @@ import {
   EnrollmentChannelDataSmsRemediationFactory,
   ReEnrollPasswordAuthenticatorRemediationFactory,
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
 const mocked = {
   interact: require('../../../lib/idx/interact'),
   introspect: require('../../../lib/idx/introspect'),
 };
+
+beforeAll(() => {
+  util.setRemediatorsCtx();
+});
 
 describe('idx/authenticate', () => {
   let testContext;
@@ -125,8 +128,6 @@ describe('idx/authenticate', () => {
       },
       idx: {
         setFlow: () => {},
-        getFlowSpecification,
-        allRemediators,
       }
     };
     jest.spyOn(mocked.interact, 'interact').mockResolvedValue({

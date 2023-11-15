@@ -28,7 +28,13 @@ import {
 } from './types';
 import { IdxMessage, IdxResponse } from './types/idx-js';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
-import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from './util';
+import {
+  getAvailableSteps,
+  getEnabledFeatures,
+  getMessagesFromResponse,
+  isTerminalResponse,
+  getFlowSpecification
+} from './util';
 import { Tokens } from '../oidc/types';
 import { APIError } from '../errors/types';
 declare interface RunData {
@@ -88,7 +94,7 @@ function initializeData(authClient, data: RunData): RunData {
   flow = flow || authClient.idx.getFlow?.() || 'default';
   if (flow) {
     authClient.idx.setFlow?.(flow);
-    const flowSpec = authClient.idx.getFlowSpecification(authClient, flow);
+    const flowSpec = getFlowSpecification(authClient, flow);
     // Favor option values over flow spec
     withCredentials = (typeof withCredentials !== 'undefined') ? withCredentials : flowSpec.withCredentials;
     remediators = remediators || flowSpec.remediators;

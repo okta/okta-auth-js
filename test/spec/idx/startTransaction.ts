@@ -13,8 +13,6 @@
 
 import { startTransaction } from '../../../lib/idx/startTransaction';
 import { IdxFeature, IdxStatus } from '../../../lib/idx/types';
-import { getFlowSpecification } from '../../../lib/idx/flow';
-import * as allRemediators from '../../../lib/idx/remediators';
 
 import { 
   IdxResponseFactory,
@@ -24,6 +22,7 @@ import {
   RawIdxResponseFactory,
   IdxAuthenticatorFactory,
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 
 const mocked = {
   interact: require('../../../lib/idx/interact'),
@@ -31,6 +30,10 @@ const mocked = {
   remediate: require('../../../lib/idx/remediate'),
   transactionMeta: require('../../../lib/idx/transactionMeta')
 };
+
+beforeAll(() => {
+  util.setRemediatorsCtx();
+});
 
 describe('idx/startTransaction', () => {
   let testContext;
@@ -67,8 +70,6 @@ describe('idx/startTransaction', () => {
       idx: {
         getFlow: () => {},
         setFlow: () => {},
-        getFlowSpecification,
-        allRemediators,
       },
       token: {
         exchangeCodeForTokens: () => {}

@@ -19,9 +19,20 @@ import { OktaAuth } from '@okta/okta-auth-js';
 
 import browserStorage from '../../lib/browser/browserStorage';
 import { ServiceManager } from '../../lib/core/ServiceManager';
+import { getFlowSpecification } from '../../lib/idx/flow';
+import * as remediators from '../../lib/idx/remediators';
+import { setRemediatorsCtx } from '../../lib/idx/util';
 const cookies = browserStorage.storage;
 
 var util = {};
+
+util.setRemediatorsCtx = function(newCtx = {}) {
+  setRemediatorsCtx({
+    remediators,
+    getFlowSpecification,
+    ...newCtx,
+  });
+};
 
 util.getConsole = function getConsole() {
   return (typeof window === 'undefined') ? global.console : window.console;

@@ -22,21 +22,12 @@ import {
   isTransactionMetaValid,
   saveTransactionMeta
 } from '../transactionMeta';
-import { FlowIdentifier, BaseIdxAPI, OktaAuthBaseIdxInterface, FlowSpecification } from '../types';
+import { BaseIdxAPI, OktaAuthBaseIdxInterface } from '../types';
 
 // Factory
 export function createBaseIdxAPI(sdk: OktaAuthBaseIdxInterface): BaseIdxAPI {
-  function getFlowSpecification(_oktaAuth: OktaAuthBaseIdxInterface, _flow: FlowIdentifier = 'default') {
-    return {
-      remediators: {}
-    } as FlowSpecification;
-  }
-  const allRemediators = {};
   const boundStartTransaction = startTransaction.bind(null, sdk);
   const idx = {
-    allRemediators,
-    getFlowSpecification,
-
     makeIdxResponse: makeIdxState.bind(null, sdk),
 
     start: boundStartTransaction,

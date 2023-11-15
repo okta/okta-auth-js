@@ -16,8 +16,6 @@ import { register } from '../../../lib/idx/register';
 import { proceed } from '../../../lib/idx/proceed';
 import { IdxStatus, AuthenticatorKey } from '../../../lib/idx/types';
 import { AuthSdkError } from '../../../lib/errors';
-import { getFlowSpecification } from '../../../lib/idx/flow';
-import * as allRemediators from '../../../lib/idx/remediators';
 
 import {
   IdxResponseFactory,
@@ -61,6 +59,7 @@ import {
   SelectIdentifyRemediationFactory,
   EnrollProfileWithPasswordRemediationFactory
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 
 jest.mock('../../../lib/idx/transactionMeta', () => {
   return {
@@ -83,6 +82,10 @@ const mocked = {
   startTransaction: require('../../../lib/idx/startTransaction'),
   transactionMeta: require('../../../lib/idx/transactionMeta')
 };
+
+beforeAll(() => {
+  util.setRemediatorsCtx();
+});
 
 describe('idx/register', () => {
  let testContext;
@@ -127,8 +130,6 @@ describe('idx/register', () => {
       },
       idx: {
         setFlow: () => {},
-        getFlowSpecification,
-        allRemediators,
       }
     };
     jest.spyOn(mocked.interact, 'interact').mockResolvedValue({ 
