@@ -14,6 +14,8 @@
 import { run } from '../../../lib/idx/run';
 import { AuthenticationOptions, IdxStatus } from '../../../lib/idx/types';
 import { IdxResponseFactory, IdentifyRemediationFactory } from '@okta/test.support/idx';
+import { getFlowSpecification } from '../../../lib/idx/flow';
+import * as allRemediators from '../../../lib/idx/remediators';
 
 jest.mock('../../../lib/idx/transactionMeta', () => {
   return {
@@ -81,7 +83,9 @@ describe('idx/run', () => {
       options: {},
       idx: {
         setFlow: () => {},
-        getFlow: () => {}
+        getFlow: () => {},
+        getFlowSpecification,
+        allRemediators,
       }
     };
 
@@ -154,7 +158,8 @@ describe('idx/run', () => {
 
     it('retrieves flow specification based on flow option', async () => {
       const { authClient } = testContext;
-      jest.spyOn(mocked.FlowSpecification, 'getFlowSpecification');
+      const spy = jest.spyOn(mocked.FlowSpecification, 'getFlowSpecification');
+      authClient.idx.getFlowSpecification = spy;
       await run(authClient, { flow: 'signup' });
       expect(mocked.FlowSpecification.getFlowSpecification).toHaveBeenCalledWith(authClient, 'signup');
     });

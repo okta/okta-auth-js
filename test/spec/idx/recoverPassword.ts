@@ -14,6 +14,8 @@
 import { recoverPassword } from '../../../lib/idx/recoverPassword';
 import { IdxStatus } from '../../../lib/idx/types';
 import { IdxActions } from '../../../lib/idx/types/idx-js';
+import { getFlowSpecification } from '../../../lib/idx/flow';
+import * as allRemediators from '../../../lib/idx/remediators';
 
 import {
   IdxResponseFactory,
@@ -74,7 +76,9 @@ describe('idx/recoverPassword', () => {
         saveIdxResponse: () => {},
       },
       idx: {
-        setFlow: () => {}
+        setFlow: () => {},
+        getFlowSpecification,
+        allRemediators,
       },
       token: {
         exchangeCodeForTokens: jest.fn().mockReturnValue({

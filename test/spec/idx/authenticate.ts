@@ -14,6 +14,8 @@ import { authenticate } from '../../../lib/idx/authenticate';
 import { proceed } from '../../../lib/idx/proceed';
 import { IdxStatus, AuthenticatorKey } from '../../../lib/idx/types';
 import { IdxActions } from './../../../lib/idx/types/idx-js';
+import { getFlowSpecification } from '../../../lib/idx/flow';
+import * as allRemediators from '../../../lib/idx/remediators';
 
 import {
   chainResponses,
@@ -122,7 +124,9 @@ describe('idx/authenticate', () => {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
       },
       idx: {
-        setFlow: () => {}
+        setFlow: () => {},
+        getFlowSpecification,
+        allRemediators,
       }
     };
     jest.spyOn(mocked.interact, 'interact').mockResolvedValue({

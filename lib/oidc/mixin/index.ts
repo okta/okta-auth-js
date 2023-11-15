@@ -30,7 +30,7 @@ import {
 import PKCE from '../util/pkce';
 import { createEndpoints, createTokenAPI } from '../factory/api';
 import { TokenManager } from '../TokenManager';
-import { getOAuthUrls, isLoginRedirect } from '../util';
+import { getOAuthUrls, isLoginRedirect, isAuthorizationCodeFlow } from '../util';
 
 import { OktaAuthSessionInterface } from '../../session/types';
 import { provideOriginalUri } from './node';
@@ -198,18 +198,8 @@ export function mixinOAuth
       return !!this.options.pkce;
     }
   
-    hasResponseType(responseType: OAuthResponseType): boolean {
-      let hasResponseType = false;
-      if (Array.isArray(this.options.responseType) && this.options.responseType.length) {
-        hasResponseType = this.options.responseType.indexOf(responseType) >= 0;
-      } else {
-        hasResponseType = this.options.responseType === responseType;
-      }
-      return hasResponseType;
-    }
-  
     isAuthorizationCodeFlow(): boolean {
-      return this.hasResponseType('code');
+      return isAuthorizationCodeFlow(this.options);
     }
 
     // Escape hatch method to make arbitrary OKTA API call

@@ -1,0 +1,60 @@
+
+import { OktaAuthConstructor } from '../../base/types';
+import {
+  OAuthStorageManagerInterface,
+  OAuthTransactionMeta,
+  OktaAuthBaseOAuthInterface,
+  OktaAuthOAuthOptions,
+  PKCETransactionMeta,
+  BaseTokenAPI,
+  TransactionManagerInterface,
+  TransactionManagerConstructor,
+} from '../types';
+import { createBaseTokenAPI } from '../factory/baseApi';
+import { isLoginRedirect, isAuthorizationCodeFlow } from '../util';
+
+import { OktaAuthSessionInterface } from '../../session/types';
+export function mixinBaseOAuth
+<
+  M extends OAuthTransactionMeta = PKCETransactionMeta,
+  S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
+  O extends OktaAuthOAuthOptions = OktaAuthOAuthOptions,
+  TM extends TransactionManagerInterface = TransactionManagerInterface,
+  TBase extends OktaAuthConstructor<OktaAuthSessionInterface<S, O>>
+    = OktaAuthConstructor<OktaAuthSessionInterface<S, O>>
+>
+(
+  Base: TBase,
+  TransactionManagerConstructor: TransactionManagerConstructor<TM>,
+): TBase & OktaAuthConstructor<OktaAuthBaseOAuthInterface<M, S, O, TM>>
+{
+  return class OktaAuthOAuth extends Base implements OktaAuthBaseOAuthInterface<M, S, O, TM>
+  {
+    token: BaseTokenAPI;
+    transactionManager: TM;
+    
+    constructor(...args: any[]) {
+      super(...args);
+
+      this.transactionManager = new TransactionManagerConstructor(Object.assign({
+        storageManager: this.storageManager,
+      }, this.options.transactionManager));
+  
+      this.token = createBaseTokenAPI(this as any);
+    }
+
+    isLoginRedirect(): boolean {
+      return isLoginRedirect(this as any);
+    }
+
+    isPKCE(): boolean {
+      return !!this.options.pkce;
+    }
+
+    isAuthorizationCodeFlow(): boolean {
+      return isAuthorizationCodeFlow(this.options);
+    }
+
+  };
+
+}

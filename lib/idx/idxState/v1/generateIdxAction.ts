@@ -12,12 +12,12 @@
 
 /* eslint-disable max-len, complexity */
 import { httpRequest } from '../../../http';
-import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
+import { OktaAuthBaseIdxInterface } from '../../types';    // auth-js/types
 import { IdxActionFunction, IdxActionParams, IdxResponse, IdxToPersist } from '../../types/idx-js';
 import { divideActionParamsByMutability } from './actionParser';
 import AuthApiError from '../../../errors/AuthApiError';
 
-const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdxInterface, { 
+const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthBaseIdxInterface, { 
   actionDefinition, 
   defaultParamsForAction = {}, 
   immutableParamsForAction = {}, 
@@ -86,7 +86,7 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdx
 //   };
 // };
 
-const generateIdxAction = function generateIdxAction( authClient: OktaAuthIdxInterface, actionDefinition, toPersist ): IdxActionFunction {
+const generateIdxAction = function generateIdxAction( authClient: OktaAuthBaseIdxInterface, actionDefinition, toPersist ): IdxActionFunction {
   // TODO: leaving this here to see where the polling is EXPECTED to drop into the code, but removing any accidental trigger of incomplete code
   // const generator =  actionDefinition.refresh ? generatePollingFetch : generateDirectFetch;
   const generator = generateDirectFetch;

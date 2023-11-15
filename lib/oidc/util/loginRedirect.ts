@@ -12,7 +12,7 @@
  */
 /* global window */
 /* eslint-disable complexity, max-statements */
-import { OktaAuthOAuthOptions, OktaAuthOAuthInterface } from '../types';
+import { OktaAuthOAuthOptions, OktaAuthOAuthInterface, OAuthResponseType } from '../types';
 
 export function hasTokensInHash(hash: string): boolean {
   return /((id|access)_token=)/i.test(hash);
@@ -42,6 +42,20 @@ export function isRedirectUri(uri: string, sdk: OktaAuthOAuthInterface): boolean
 
 export function isCodeFlow(options: OktaAuthOAuthOptions) {
   return options.pkce || options.responseType === 'code' || options.responseMode === 'query';
+}
+
+export function hasResponseType(responseType: OAuthResponseType, options: OktaAuthOAuthOptions): boolean {
+  let hasResponseType = false;
+  if (Array.isArray(options.responseType) && options.responseType.length) {
+    hasResponseType = options.responseType.indexOf(responseType) >= 0;
+  } else {
+    hasResponseType = options.responseType === responseType;
+  }
+  return hasResponseType;
+}
+
+export function isAuthorizationCodeFlow(options: OktaAuthOAuthOptions): boolean {
+  return hasResponseType('code', options);
 }
 
 export function getHashOrSearch(options: OktaAuthOAuthOptions) {

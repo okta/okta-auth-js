@@ -120,7 +120,7 @@ describe('browserStorage', () => {
       const fn = function() {
         browserStorage.getCookieStorage();
       };
-      expect(fn).toThrowError('Cannot read property \'secure\' of undefined');
+      expect(fn).toThrowError(/Cannot read property 'secure' of undefined|Cannot read properties of undefined \(reading 'secure'\)/);
     });
 
     it('requires a "secure" option', () => {

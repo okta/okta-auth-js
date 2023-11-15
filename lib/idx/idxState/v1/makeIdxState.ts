@@ -10,12 +10,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { IdxResponse, IdxToPersist } from '../../types/idx-js';
-import { OktaAuthIdxInterface, RawIdxResponse } from '../../types';    // auth-js/types
+import { IdxResponse, IdxToPersist, IdxActionParams } from '../../types/idx-js';
+import { OktaAuthBaseIdxInterface, RawIdxResponse } from '../../types';    // auth-js/types
 import { parseIdxResponse } from './idxResponseParser';
 
 export function makeIdxState( 
-  authClient: OktaAuthIdxInterface,
+  authClient: OktaAuthBaseIdxInterface,
   idxResponse: RawIdxResponse,
   toPersist: IdxToPersist,
   requestDidSucceed: boolean
@@ -41,7 +41,7 @@ export function makeIdxState(
       return Promise.reject(`Current remediation cannot make form submit action: [${remediationChoice}]`);
     }
 
-    return remediationChoiceObject.action(paramsFromUser);
+    return remediationChoiceObject.action!(paramsFromUser as IdxActionParams);
   };
 
   const findCode = item => item.name === 'interaction_code';

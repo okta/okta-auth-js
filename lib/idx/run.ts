@@ -16,10 +16,9 @@
 import { interact } from './interact';
 import { introspect } from './introspect';
 import { remediate } from './remediate';
-import { getFlowSpecification } from './flow';
-import * as remediators from './remediators';
+import { RemediationValues } from './remediators/Base/Remediator';
 import { 
-  OktaAuthIdxInterface,
+  OktaAuthBaseIdxInterface,
   IdxStatus,
   IdxTransaction,
   IdxFeature,
@@ -34,7 +33,7 @@ import { Tokens } from '../oidc/types';
 import { APIError } from '../errors/types';
 declare interface RunData {
   options: RunOptions;
-  values: remediators.RemediationValues;
+  values: RemediationValues;
   status?: IdxStatus;
   tokens?: Tokens;
   nextStep?: NextStep;
@@ -86,10 +85,10 @@ function initializeData(authClient, data: RunData): RunData {
   const status = IdxStatus.PENDING;
 
   // certain options can be set by the flow specification
-  flow = flow || authClient.idx.getFlow() || 'default';
+  flow = flow || authClient.idx.getFlow?.() || 'default';
   if (flow) {
-    authClient.idx.setFlow(flow);
-    const flowSpec = getFlowSpecification(authClient, flow);
+    authClient.idx.setFlow?.(flow);
+    const flowSpec = authClient.idx.getFlowSpecification(authClient, flow);
     // Favor option values over flow spec
     withCredentials = (typeof withCredentials !== 'undefined') ? withCredentials : flowSpec.withCredentials;
     remediators = remediators || flowSpec.remediators;
@@ -298,7 +297,7 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
 }
 
 export async function run(
-  authClient: OktaAuthIdxInterface, 
+  authClient: OktaAuthBaseIdxInterface, 
   options: RunOptions = {},
 ): Promise<IdxTransaction> {
   let data: RunData = {

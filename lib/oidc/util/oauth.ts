@@ -13,7 +13,7 @@
 /* eslint-disable complexity, max-statements */
 import { genRandomString, removeTrailingSlash } from '../../util';
 import AuthSdkError from '../../errors/AuthSdkError';
-import { OktaAuthOAuthInterface, CustomUrls } from '../types';
+import { OktaAuthBaseOAuthInterface, CustomUrls } from '../types';
 
 export function generateState() {
   return genRandomString(64);
@@ -23,24 +23,24 @@ export function generateNonce() {
   return genRandomString(64);
 }
 
-function getIssuer(sdk: OktaAuthOAuthInterface, options: CustomUrls = {}) {
+function getIssuer(sdk: OktaAuthBaseOAuthInterface, options: CustomUrls = {}) {
   const issuer = removeTrailingSlash(options.issuer) || sdk.options.issuer;
   return issuer;
 }
 
-export function getOAuthBaseUrl(sdk: OktaAuthOAuthInterface, options: CustomUrls = {}) {
+export function getOAuthBaseUrl(sdk: OktaAuthBaseOAuthInterface, options: CustomUrls = {}) {
   const issuer = getIssuer(sdk, options);
   const baseUrl = issuer.indexOf('/oauth2') > 0 ? issuer : issuer + '/oauth2';
   return baseUrl;
 }
 
-export function getOAuthDomain(sdk: OktaAuthOAuthInterface, options: CustomUrls = {}) {
+export function getOAuthDomain(sdk: OktaAuthBaseOAuthInterface, options: CustomUrls = {}) {
   const issuer = getIssuer(sdk, options);
   const domain = issuer.split('/oauth2')[0];
   return domain;
 }
 
-export function getOAuthUrls(sdk: OktaAuthOAuthInterface, options?: CustomUrls): CustomUrls {
+export function getOAuthUrls(sdk: OktaAuthBaseOAuthInterface, options?: CustomUrls): CustomUrls {
   if (arguments.length > 2) {
     throw new AuthSdkError('As of version 3.0, "getOAuthUrls" takes only a single set of options');
   }

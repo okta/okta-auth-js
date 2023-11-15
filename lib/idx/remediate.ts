@@ -13,7 +13,7 @@
 
 /* eslint-disable max-statements, max-depth, complexity */
 import { AuthSdkError } from '../errors';
-import { RemediationValues } from './remediators';
+import { RemediationValues } from './remediators/Base/Remediator';
 import { OktaAuthIdxInterface, RemediateOptions, RemediationResponse } from './types';
 import { 
   IdxResponse,

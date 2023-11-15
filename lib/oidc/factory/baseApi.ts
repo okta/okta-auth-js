@@ -6,11 +6,26 @@
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and limitations under the License.
+ *
  */
 
+import { decodeToken } from '../decodeToken';
+import { exchangeCodeForTokens } from '../exchangeCodeForTokens';
+import {
+  OktaAuthOAuthInterface,
+  BaseTokenAPI,
+} from '../types';
+import { prepareTokenParams } from '../util';
 
-import type { RemediatorConstructor } from '../remediators/Base/Remediator';
+// Factory
+export function createBaseTokenAPI(sdk: OktaAuthOAuthInterface): BaseTokenAPI {
+  const token: BaseTokenAPI = {
+    prepareTokenParams: prepareTokenParams.bind(null, sdk),
+    exchangeCodeForTokens: exchangeCodeForTokens.bind(null, sdk),
+    decode: decodeToken,
+  };
 
-export type RemediationFlow = Record<string, RemediatorConstructor>;
+  return token;
+}

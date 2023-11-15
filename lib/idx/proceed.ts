@@ -12,7 +12,7 @@
 
 
 import { 
-  OktaAuthIdxInterface,
+  OktaAuthBaseIdxInterface,
   IdxTransaction,
   ProceedOptions,
 } from './types';
@@ -20,13 +20,13 @@ import { run } from './run';
 import { getSavedTransactionMeta } from './transactionMeta';
 import { AuthSdkError } from '../errors';
 
-export function canProceed(authClient: OktaAuthIdxInterface, options: ProceedOptions = {}): boolean {
+export function canProceed(authClient: OktaAuthBaseIdxInterface, options: ProceedOptions = {}): boolean {
   const meta = getSavedTransactionMeta(authClient, options);
   return !!(meta || options.stateHandle);
 }
 
 export async function proceed(
-  authClient: OktaAuthIdxInterface,
+  authClient: OktaAuthBaseIdxInterface,
   options: ProceedOptions = {}
 ): Promise<IdxTransaction> {
 

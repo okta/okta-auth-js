@@ -13,11 +13,13 @@
 import { APIError } from '../../errors/types';
 import {
   OktaAuthOAuthInterface,
+  OktaAuthBaseOAuthInterface,
   Tokens,
   TransactionManagerConstructor,
   TransactionManagerInterface
 } from '../../oidc/types';
 import { FlowIdentifier } from './FlowIdentifier';
+import { FlowSpecification } from './FlowSpecification';
 import {
   IdxActions,
   IdxAuthenticator,
@@ -45,7 +47,7 @@ import {
   ProceedOptions,
   RegistrationOptions,
   StartOptions,
-  IdxTransactionMetaOptions
+  IdxTransactionMetaOptions,
 } from './options';
 import { IdxTransactionMeta } from './meta';
 import { IdxStorageManagerInterface, SavedIdxResponse } from './storage';
@@ -53,6 +55,9 @@ import type {
   WebauthnEnrollValues,
   WebauthnVerificationValues
 } from '../authenticator';
+import type {
+  RemediatorConstructor
+} from '../remediators/Base/Remediator';
 import { OktaAuthConstructor } from '../../base/types';
 
 export enum IdxStatus {
@@ -175,7 +180,36 @@ export interface EmailVerifyCallbackResponse {
   otp: string;
 }
 
+export interface BaseIdxAPI {
+  allRemediators: Record<string, RemediatorConstructor>,
+  // eslint-disable-next-line no-use-before-define
+  getFlowSpecification: GetFlowSpecification,
+
+  // lowest level api
+  makeIdxResponse: (rawIdxResponse: RawIdxResponse, toPersist: IdxToPersist, requestDidSucceed: boolean) => IdxResponse;
+
+  // flow control
+  start: (options?: StartOptions) => Promise<IdxTransaction>;
+  canProceed(options?: ProceedOptions): boolean;
+  proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
+
+  // call `start` instead of `startTransaction`. `startTransaction` will be removed in next major version (7.0)
+  startTransaction: (options?: StartOptions) => Promise<IdxTransaction>;
+
+  // transaction meta
+  getSavedTransactionMeta: (options?: IdxTransactionMetaOptions) => IdxTransactionMeta | undefined;
+  createTransactionMeta: (options?: IdxTransactionMetaOptions) => Promise<IdxTransactionMeta>;
+  getTransactionMeta: (options?: IdxTransactionMetaOptions) => Promise<IdxTransactionMeta>;
+  saveTransactionMeta: (meta: unknown) => void;
+  clearTransactionMeta: () => void;
+  isTransactionMetaValid: (meta: unknown) => boolean;
+}
+
 export interface IdxAPI {
+  allRemediators: Record<string, RemediatorConstructor>,
+  // eslint-disable-next-line no-use-before-define
+  getFlowSpecification: GetFlowSpecification,
+
   // lowest level api
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
   introspect: (options?: IntrospectOptions) => Promise<IdxResponse>;
@@ -248,9 +282,21 @@ export interface OktaAuthIdxInterface
   idx: IdxAPI;
 }
 
+export interface OktaAuthBaseIdxInterface
+<
+  M extends IdxTransactionMeta = IdxTransactionMeta,
+  S extends IdxStorageManagerInterface<M> = IdxStorageManagerInterface<M>,
+  O extends OktaAuthIdxOptions = OktaAuthIdxOptions,
+  TM extends IdxTransactionManagerInterface = IdxTransactionManagerInterface
+>
+  extends OktaAuthBaseOAuthInterface<M, S, O, TM>
+{
+  idx: BaseIdxAPI;
+}
+
 export interface OktaAuthIdxConstructor
 <
-  I extends OktaAuthIdxInterface = OktaAuthIdxInterface
+  I extends OktaAuthBaseIdxInterface = OktaAuthIdxInterface
 >
  extends OktaAuthConstructor<I>
 {
@@ -258,3 +304,7 @@ export interface OktaAuthIdxConstructor
   webauthn: WebauthnAPI;
 }
 
+export type GetFlowSpecification = (
+  oktaAuth: OktaAuthIdxInterface,
+  flow: FlowIdentifier
+) => FlowSpecification;

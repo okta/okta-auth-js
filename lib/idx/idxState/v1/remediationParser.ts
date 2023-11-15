@@ -10,20 +10,16 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
+import { OktaAuthBaseIdxInterface, IdxRemediation } from '../../types';    // auth-js/types
 import generateIdxAction from './generateIdxAction';
 
 export const generateRemediationFunctions = function generateRemediationFunctions(
-  authClient: OktaAuthIdxInterface,
-  remediationValue,
+  authClient: OktaAuthBaseIdxInterface,
+  remediationValue: IdxRemediation[],
   toPersist = {}
 ) {
-  return Object.fromEntries( remediationValue.map( remediation => {
-    return [
-      remediation.name,
-      generateIdxAction(authClient, remediation, toPersist),
-    ];
-  }) );
+  return remediationValue.reduce((obj, remediation) => ({
+    ...obj,
+    [remediation.name]: generateIdxAction(authClient, remediation, toPersist)
+  }), {});
 };
