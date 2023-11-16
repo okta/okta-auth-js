@@ -17,7 +17,6 @@ var entries = {
   'okta-auth-js.min': './lib/exports/cdn/default.ts',
   'okta-auth-js.core.min': './lib/exports/cdn/core.ts',
   'okta-auth-js.authn.min': './lib/exports/cdn/authn.ts',
-  'okta-auth-js.idx-minimal.min': './lib/exports/cdn/idx-minimal.ts',
   'okta-auth-js.idx.min': './lib/exports/cdn/idx.ts',
   'okta-auth-js.myaccount.min': './lib/exports/cdn/myaccount.ts'
 };
