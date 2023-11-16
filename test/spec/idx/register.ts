@@ -129,7 +129,7 @@ describe('idx/register', () => {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
       },
       idx: {
-        setFlow: () => {},
+        setFlow: () => {}
       }
     };
     jest.spyOn(mocked.interact, 'interact').mockResolvedValue({ 

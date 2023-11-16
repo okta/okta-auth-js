@@ -79,7 +79,7 @@ describe('idx/recoverPassword', () => {
         saveIdxResponse: () => {},
       },
       idx: {
-        setFlow: () => {},
+        setFlow: () => {}
       },
       token: {
         exchangeCodeForTokens: jest.fn().mockReturnValue({

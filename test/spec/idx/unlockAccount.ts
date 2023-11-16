@@ -106,7 +106,7 @@ describe('/idx/unlockAccout', () => {
         exchangeCodeForTokens: () => Promise.resolve(tokenResponse)
       },
       idx: {
-        setFlow: () => {},
+        setFlow: () => {}
       }
     };
 

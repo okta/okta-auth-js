@@ -69,7 +69,7 @@ describe('idx/startTransaction', () => {
       },
       idx: {
         getFlow: () => {},
-        setFlow: () => {},
+        setFlow: () => {}
       },
       token: {
         exchangeCodeForTokens: () => {}

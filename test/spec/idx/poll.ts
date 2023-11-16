@@ -77,7 +77,7 @@ describe('idx/poll', () => {
       },
       idx: {
         getFlow: () => {},
-        setFlow: () => {},
+        setFlow: () => {}
       }
     };
 

@@ -57,10 +57,10 @@ expectError<undefined>(authClient.authn);
 // has Webauthn
 expectType<WebauthnAPI>(OktaAuth.webauthn);
 
-// has partial core API
+// has no core API
 expectError<undefined>(authClient.start);
 
-// has partial OAuth2 API
+// has partial OAuth API
 expectError<undefined>(authClient.pkce);
 expectType<() => boolean>(authClient.isPKCE);
 

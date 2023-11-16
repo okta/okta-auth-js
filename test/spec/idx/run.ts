@@ -86,7 +86,7 @@ describe('idx/run', () => {
       options: {},
       idx: {
         setFlow: () => {},
-        getFlow: () => {},
+        getFlow: () => {}
       }
     };
 
