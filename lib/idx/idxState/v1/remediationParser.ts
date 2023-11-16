@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { OktaAuthBaseIdxInterface, IdxRemediation } from '../../types';    // auth-js/types
+import { MinimalOktaAuthIdxInterface, IdxRemediation } from '../../types';    // auth-js/types
 import generateIdxAction from './generateIdxAction';
 
 export const generateRemediationFunctions = function generateRemediationFunctions(
-  authClient: OktaAuthBaseIdxInterface,
+  authClient: MinimalOktaAuthIdxInterface,
   remediationValue: IdxRemediation[],
   toPersist = {}
 ) {

@@ -18,7 +18,7 @@ import { introspect } from './introspect';
 import { remediate } from './remediate';
 import { RemediationValues } from './remediators/Base/Remediator';
 import { 
-  OktaAuthBaseIdxInterface,
+  MinimalOktaAuthIdxInterface,
   IdxStatus,
   IdxTransaction,
   IdxFeature,
@@ -303,7 +303,7 @@ async function finalizeData(authClient, data: RunData): Promise<RunData> {
 }
 
 export async function run(
-  authClient: OktaAuthBaseIdxInterface, 
+  authClient: MinimalOktaAuthIdxInterface, 
   options: RunOptions = {},
 ): Promise<IdxTransaction> {
   let data: RunData = {

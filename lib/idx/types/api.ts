@@ -271,7 +271,7 @@ export interface OktaAuthIdxInterface
   idx: IdxAPI;
 }
 
-export interface OktaAuthBaseIdxInterface
+export interface MinimalOktaAuthIdxInterface
 <
   M extends IdxTransactionMeta = IdxTransactionMeta,
   S extends IdxStorageManagerInterface<M> = IdxStorageManagerInterface<M>,
@@ -285,7 +285,7 @@ export interface OktaAuthBaseIdxInterface
 
 export interface OktaAuthIdxConstructor
 <
-  I extends OktaAuthBaseIdxInterface = OktaAuthIdxInterface
+  I extends MinimalOktaAuthIdxInterface = OktaAuthIdxInterface
 >
  extends OktaAuthConstructor<I>
 {

@@ -12,7 +12,7 @@
 
 /* eslint-disable max-len */
 
-import { OktaAuthBaseIdxInterface, IdxResponse, IdxRemediation, IdxContext } from '../../types';    // auth-js/types
+import { MinimalOktaAuthIdxInterface, IdxResponse, IdxRemediation, IdxContext } from '../../types';    // auth-js/types
 import { IdxActions } from '../../types/idx-js';
 import { generateRemediationFunctions } from './remediationParser';
 import generateIdxAction from './generateIdxAction';
@@ -24,7 +24,7 @@ const SKIP_FIELDS = {
   'context': true, // the API response of 'context' isn't externally useful.  We ignore it and put all non-action (contextual) info into idxState.context
 };
 
-export const parseNonRemediations = function parseNonRemediations( authClient: OktaAuthBaseIdxInterface, idxResponse: IdxResponse, toPersist = {} ) {
+export const parseNonRemediations = function parseNonRemediations( authClient: MinimalOktaAuthIdxInterface, idxResponse: IdxResponse, toPersist = {} ) {
   const actions = {};
   const context = {} as IdxContext;
 
@@ -93,7 +93,7 @@ const expandRelatesTo = (idxResponse, value) => {
   });
 };
 
-const convertRemediationAction = (authClient: OktaAuthBaseIdxInterface, remediation, toPersist) => {
+const convertRemediationAction = (authClient: MinimalOktaAuthIdxInterface, remediation, toPersist) => {
   // Only remediation that has `rel` field (indicator for form submission) can have http action
   if (remediation.rel) {
     const remediationActions = generateRemediationFunctions( authClient, [remediation], toPersist );
@@ -107,7 +107,7 @@ const convertRemediationAction = (authClient: OktaAuthBaseIdxInterface, remediat
   return remediation;
 };
 
-export const parseIdxResponse = function parseIdxResponse( authClient: OktaAuthBaseIdxInterface, idxResponse, toPersist = {} ): {
+export const parseIdxResponse = function parseIdxResponse( authClient: MinimalOktaAuthIdxInterface, idxResponse, toPersist = {} ): {
   remediations: IdxRemediation[];
   context: IdxContext;
   actions: IdxActions;

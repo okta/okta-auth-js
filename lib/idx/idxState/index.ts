@@ -1,4 +1,4 @@
-import { OktaAuthBaseIdxInterface } from '../types';    // auth-js/types
+import { MinimalOktaAuthIdxInterface } from '../types';    // auth-js/types
 import { IdxResponse, IdxToPersist, RawIdxResponse } from '../types/idx-js';      // idx/types
 import { IDX_API_VERSION } from '../../constants';
 import v1 from './v1/parsers';
@@ -30,7 +30,7 @@ export function validateVersionConfig(version) {
 }
 
 export function makeIdxState ( 
-  authClient: OktaAuthBaseIdxInterface,
+  authClient: MinimalOktaAuthIdxInterface,
   rawIdxResponse: RawIdxResponse,
   toPersist: IdxToPersist,
   requestDidSucceed: boolean,
