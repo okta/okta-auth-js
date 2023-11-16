@@ -75,7 +75,7 @@ function initializeValues(options: RunOptions) {
   return values;
 }
 
-function initializeData(authClient, data: RunData): RunData {
+function initializeData(authClient: OktaAuthIdxInterface, data: RunData): RunData {
   let { options } = data;
   options = {
     ...authClient.options.idx,
@@ -114,7 +114,7 @@ function initializeData(authClient, data: RunData): RunData {
   };
 }
 
-async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData> {
+async function getDataFromIntrospect(authClient: OktaAuthIdxInterface, data: RunData): Promise<RunData> {
   const { options } = data;
   const {
     stateHandle,
@@ -159,7 +159,7 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
   return { ...data, idxResponse, meta };
 }
 
-async function getDataFromRemediate(authClient, data: RunData): Promise<RunData> {
+async function getDataFromRemediate(authClient: OktaAuthIdxInterface, data: RunData): Promise<RunData> {
   let {
     idxResponse,
     options,
@@ -207,7 +207,7 @@ async function getDataFromRemediate(authClient, data: RunData): Promise<RunData>
   return { ...data, idxResponse, nextStep, canceled };
 }
 
-async function getTokens(authClient, data: RunData): Promise<Tokens> {
+async function getTokens(authClient: OktaAuthIdxInterface, data: RunData): Promise<Tokens> {
   let { meta, idxResponse } = data;
   const { interactionCode } = idxResponse as IdxResponse;
   const {
@@ -229,7 +229,7 @@ async function getTokens(authClient, data: RunData): Promise<Tokens> {
   return tokenResponse.tokens;
 }
 
-async function finalizeData(authClient, data: RunData): Promise<RunData> {
+async function finalizeData(authClient: OktaAuthIdxInterface, data: RunData): Promise<RunData> {
   let {
     options,
     idxResponse,
