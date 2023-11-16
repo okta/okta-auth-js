@@ -1,9 +1,8 @@
 import { OktaAuthConstructor } from '../base/types';
 import { OktaAuthBaseOAuthInterface } from '../oidc/types';
 import {
-  IdxTransactionManagerInterface, 
-  OktaAuthIdxInterface, 
-  OktaAuthIdxConstructor, 
+  IdxTransactionManagerInterface,
+  OktaAuthIdxConstructor,
   OktaAuthIdxOptions,
   MinimalIdxAPI,
   WebauthnAPI,
@@ -34,7 +33,7 @@ export function mixinMinimalIdx
     
     constructor(...args: any[]) {
       super(...args);
-      this.idx = createMinimalIdxAPI(this as unknown as OktaAuthIdxInterface<M, S, O, TM>);
+      this.idx = createMinimalIdxAPI(this);
     }
   };
 }
