@@ -22,10 +22,11 @@ import {
   isTransactionMetaValid,
   saveTransactionMeta
 } from '../transactionMeta';
-import { MinimalIdxAPI, MinimalOktaAuthIdxInterface } from '../types';
+import { MinimalIdxAPI, MinimalOktaAuthIdxInterface, OktaAuthIdxInterface } from '../types';
 
 // Factory
-export function createMinimalIdxAPI(sdk: MinimalOktaAuthIdxInterface): MinimalIdxAPI {
+export function createMinimalIdxAPI(minimalSdk: MinimalOktaAuthIdxInterface): MinimalIdxAPI {
+  const sdk = minimalSdk as OktaAuthIdxInterface;
   const boundStartTransaction = startTransaction.bind(null, sdk);
   const idx = {
     makeIdxResponse: makeIdxState.bind(null, sdk),
