@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import { createOAuthOptionsConstructor } from '../oidc/options';
+import { createOAuthOptionsConstructor } from '../oidc';
 import { AuthState, OktaAuthCoreInterface, OktaAuthCoreOptions, ServiceManagerOptions } from './types';
 
 

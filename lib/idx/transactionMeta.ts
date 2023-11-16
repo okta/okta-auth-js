@@ -13,8 +13,7 @@
 
 import { MinimalOktaAuthIdxInterface, IdxTransactionMeta, IdxTransactionMetaOptions } from './types';
 import { removeNils, warn } from '../util';
-import { createOAuthMeta } from '../oidc/util';
-import { PKCETransactionMeta } from '../oidc/types';
+import { createOAuthMeta, PKCETransactionMeta } from '../oidc';
 
 // Calculate new values
 export async function createTransactionMeta(

@@ -47,7 +47,7 @@ import {
   ProceedOptions,
   RegistrationOptions,
   StartOptions,
-  IdxTransactionMetaOptions,
+  IdxTransactionMetaOptions
 } from './options';
 import { IdxTransactionMeta } from './meta';
 import { IdxStorageManagerInterface, SavedIdxResponse } from './storage';

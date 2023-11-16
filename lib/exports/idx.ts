@@ -1,6 +1,6 @@
 import {
   OktaAuthOptionsConstructor,
-} from '../base/types';
+} from '../base';
 
 import {
   IdxStorageManagerConstructor,
