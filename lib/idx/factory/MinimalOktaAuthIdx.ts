@@ -5,7 +5,7 @@ import { IdxTransactionMeta } from '../types/meta';
 import { IdxStorageManagerInterface } from '../types/storage';
 import { OktaAuthIdxOptions } from '../types/options';
 import { TransactionManagerConstructor, OktaAuthBaseOAuthInterface } from '../../oidc/types';
-import { mixinMinimalIdx } from '../mixinBase';
+import { mixinMinimalIdx } from '../mixinMinimal';
 import { createOktaAuthBase } from '../../base/factory';
 import { mixinStorage } from '../../storage/mixin';
 import { mixinHttp } from '../../http/mixin';
@@ -31,6 +31,7 @@ export function createMinimalOktaAuthIdx<
   const WithHttp = mixinHttp<S, O>(WithStorage);
   const WithSession = mixinSession<S, O>(WithHttp);
   const WithOAuth = mixinMinimalOAuth<M, S, O, TM>(WithSession, TransactionManagerConstructor);
+  // do not mixin core
   const WithIdx = mixinMinimalIdx(WithOAuth);
   return WithIdx;
 }
