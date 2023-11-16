@@ -4,7 +4,7 @@ import {
   OAuthResponseType,
   OAuthStorageManagerInterface,
   OAuthTransactionMeta,
-  OktaAuthBaseOAuthInterface,
+  MinimalOktaOAuthInterface,
   OktaAuthOAuthOptions,
   PKCETransactionMeta,
   BaseTokenAPI,
@@ -27,9 +27,9 @@ export function mixinMinimalOAuth
 (
   Base: TBase,
   TransactionManagerConstructor: TransactionManagerConstructor<TM>,
-): TBase & OktaAuthConstructor<OktaAuthBaseOAuthInterface<M, S, O, TM>>
+): TBase & OktaAuthConstructor<MinimalOktaOAuthInterface<M, S, O, TM>>
 {
-  return class OktaAuthOAuth extends Base implements OktaAuthBaseOAuthInterface<M, S, O, TM>
+  return class OktaAuthOAuth extends Base implements MinimalOktaOAuthInterface<M, S, O, TM>
   {
     token: BaseTokenAPI;
     transactionManager: TM;

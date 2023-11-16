@@ -8,11 +8,15 @@ import {
   RemediateOptions,
   RemediationResponse,
   RunOptions,
-  GetFlowSpecification,
   FlowIdentifier,
   FlowSpecification
 } from './types';
 import { IdxMessage, IdxRemediation, IdxRemediationValue, IdxResponse } from './types/idx-js';
+
+type GetFlowSpecification = (
+  oktaAuth: OktaAuthIdxInterface,
+  flow: FlowIdentifier
+) => FlowSpecification;
 
 const ctx: {
   remediators: Record<string, RemediatorConstructor>,

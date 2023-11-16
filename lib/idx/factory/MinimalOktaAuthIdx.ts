@@ -4,7 +4,7 @@ import { IdxTransactionManagerInterface, MinimalOktaAuthIdxInterface, OktaAuthId
 import { IdxTransactionMeta } from '../types/meta';
 import { IdxStorageManagerInterface } from '../types/storage';
 import { OktaAuthIdxOptions } from '../types/options';
-import { TransactionManagerConstructor, OktaAuthBaseOAuthInterface } from '../../oidc/types';
+import { TransactionManagerConstructor, MinimalOktaOAuthInterface } from '../../oidc/types';
 import { mixinMinimalIdx } from '../mixinMinimal';
 import { createOktaAuthBase } from '../../base/factory';
 import { mixinStorage } from '../../storage/mixin';
@@ -23,7 +23,7 @@ export function createMinimalOktaAuthIdx<
   TransactionManagerConstructor: TransactionManagerConstructor<TM>
 )
 : OktaAuthIdxConstructor<
-  MinimalOktaAuthIdxInterface<M, S, O, TM> & OktaAuthBaseOAuthInterface<M, S, O, TM>
+  MinimalOktaAuthIdxInterface<M, S, O, TM> & MinimalOktaOAuthInterface<M, S, O, TM>
 >
 {
   const Base = createOktaAuthBase(OptionsConstructor);

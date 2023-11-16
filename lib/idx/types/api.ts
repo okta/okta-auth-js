@@ -13,13 +13,12 @@
 import { APIError } from '../../errors/types';
 import {
   OktaAuthOAuthInterface,
-  OktaAuthBaseOAuthInterface,
+  MinimalOktaOAuthInterface,
   Tokens,
   TransactionManagerConstructor,
   TransactionManagerInterface
 } from '../../oidc/types';
 import { FlowIdentifier } from './FlowIdentifier';
-import { FlowSpecification } from './FlowSpecification';
 import {
   IdxActions,
   IdxAuthenticator,
@@ -278,7 +277,7 @@ export interface MinimalOktaAuthIdxInterface
   O extends OktaAuthIdxOptions = OktaAuthIdxOptions,
   TM extends IdxTransactionManagerInterface = IdxTransactionManagerInterface
 >
-  extends OktaAuthBaseOAuthInterface<M, S, O, TM>
+  extends MinimalOktaOAuthInterface<M, S, O, TM>
 {
   idx: MinimalIdxAPI;
 }
@@ -292,8 +291,3 @@ export interface OktaAuthIdxConstructor
   new(...args: any[]): I;
   webauthn: WebauthnAPI;
 }
-
-export type GetFlowSpecification = (
-  oktaAuth: OktaAuthIdxInterface,
-  flow: FlowIdentifier
-) => FlowSpecification;

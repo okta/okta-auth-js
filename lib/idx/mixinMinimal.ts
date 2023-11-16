@@ -1,5 +1,5 @@
 import { OktaAuthConstructor } from '../base/types';
-import { OktaAuthBaseOAuthInterface } from '../oidc/types';
+import { MinimalOktaOAuthInterface } from '../oidc/types';
 import {
   IdxTransactionManagerInterface,
   OktaAuthIdxConstructor,
@@ -19,8 +19,8 @@ export function mixinMinimalIdx
   S extends IdxStorageManagerInterface<M> = IdxStorageManagerInterface<M>,
   O extends OktaAuthIdxOptions = OktaAuthIdxOptions,
   TM extends IdxTransactionManagerInterface = IdxTransactionManagerInterface,
-  TBase extends OktaAuthConstructor<OktaAuthBaseOAuthInterface<M, S, O, TM>>
-    = OktaAuthConstructor<OktaAuthBaseOAuthInterface<M, S, O, TM>>
+  TBase extends OktaAuthConstructor<MinimalOktaOAuthInterface<M, S, O, TM>>
+    = OktaAuthConstructor<MinimalOktaOAuthInterface<M, S, O, TM>>
 >
 (
   Base: TBase

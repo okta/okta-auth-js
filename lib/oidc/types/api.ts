@@ -120,7 +120,7 @@ export interface OriginalUriApi {
   removeOriginalUri(state?: string): void;
 }
 
-export interface OktaAuthBaseOAuthInterface
+export interface MinimalOktaOAuthInterface
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
   S extends OAuthStorageManagerInterface<M> = OAuthStorageManagerInterface<M>,
