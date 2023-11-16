@@ -27,11 +27,11 @@ import { Remediator, GenericRemediator } from '../../../lib/idx/remediators';
 
 jest.mock('../../../lib/idx/remediators/GenericRemediator');
 
-beforeAll(() => {
-  util.setRemediatorsCtx();
-});
-
 describe('idx/util', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
   describe('getAvailableSteps', () => {
     it('returns an empty array if there are no remediations', () => {
       const authClient = {} as OktaAuthIdxInterface;

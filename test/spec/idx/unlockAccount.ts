@@ -47,10 +47,6 @@ const mocked = {
   flowSpec: require('../../../lib/idx/flow/FlowSpecification'),
 };
 
-beforeAll(() => {
-  util.setRemediatorsCtx();
-});
-
 const SuccessfulTerminalState = {
   status: IdxStatus.TERMINAL,
   messages: [
@@ -66,6 +62,10 @@ const SuccessfulTerminalState = {
 };
 
 describe('/idx/unlockAccout', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
   let testContext;
 
   beforeEach(() => {

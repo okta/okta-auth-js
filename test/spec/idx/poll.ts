@@ -32,11 +32,11 @@ const mocked = {
   util: require('../../../lib/util/console')
 };
 
-beforeAll(() => {
-  util.setRemediatorsCtx();
-});
-
 describe('idx/poll', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
   let testContext;
   beforeEach(() => {
     const issuer = 'test-issuer';

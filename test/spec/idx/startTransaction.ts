@@ -31,11 +31,11 @@ const mocked = {
   transactionMeta: require('../../../lib/idx/transactionMeta')
 };
 
-beforeAll(() => {
-  util.setRemediatorsCtx();
-});
-
 describe('idx/startTransaction', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
   let testContext;
 
   beforeEach(() => {

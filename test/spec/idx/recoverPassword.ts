@@ -44,11 +44,11 @@ const mocked = {
   introspect: require('../../../lib/idx/introspect')
 };
 
-beforeAll(() => {
-  util.setRemediatorsCtx();
-});
-
 describe('idx/recoverPassword', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
  let testContext;
   beforeEach(() => {
     const issuer = 'https://test-issuer';

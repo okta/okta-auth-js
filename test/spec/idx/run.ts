@@ -31,11 +31,11 @@ const mocked = {
   FlowSpecification: require('../../../lib/idx/flow/FlowSpecification')
 };
 
-beforeAll(() => {
-  util.setRemediatorsCtx();
-});
-
 describe('idx/run', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
   let testContext;
   beforeEach(() => {
     const transactionMeta = {
