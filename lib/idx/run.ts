@@ -16,8 +16,7 @@
 import { interact } from './interact';
 import { introspect } from './introspect';
 import { remediate } from './remediate';
-import { getFlowSpecification } from './flow';
-import * as remediators from './remediators';
+import { RemediationValues } from './remediators/Base/Remediator';
 import { 
   OktaAuthIdxInterface,
   IdxStatus,
@@ -29,12 +28,18 @@ import {
 } from './types';
 import { IdxMessage, IdxResponse } from './types/idx-js';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
-import { getAvailableSteps, getEnabledFeatures, getMessagesFromResponse, isTerminalResponse } from './util';
+import {
+  getAvailableSteps,
+  getEnabledFeatures,
+  getMessagesFromResponse,
+  isTerminalResponse,
+  getFlowSpecification
+} from './util';
 import { Tokens } from '../oidc/types';
 import { APIError } from '../errors/types';
 declare interface RunData {
   options: RunOptions;
-  values: remediators.RemediationValues;
+  values: RemediationValues;
   status?: IdxStatus;
   tokens?: Tokens;
   nextStep?: NextStep;
@@ -70,7 +75,7 @@ function initializeValues(options: RunOptions) {
   return values;
 }
 
-function initializeData(authClient, data: RunData): RunData {
+function initializeData(authClient: OktaAuthIdxInterface, data: RunData): RunData {
   let { options } = data;
   options = {
     ...authClient.options.idx,
@@ -86,9 +91,9 @@ function initializeData(authClient, data: RunData): RunData {
   const status = IdxStatus.PENDING;
 
   // certain options can be set by the flow specification
-  flow = flow || authClient.idx.getFlow() || 'default';
+  flow = flow || authClient.idx.getFlow?.() || 'default';
   if (flow) {
-    authClient.idx.setFlow(flow);
+    authClient.idx.setFlow?.(flow);
     const flowSpec = getFlowSpecification(authClient, flow);
     // Favor option values over flow spec
     withCredentials = (typeof withCredentials !== 'undefined') ? withCredentials : flowSpec.withCredentials;
@@ -109,7 +114,7 @@ function initializeData(authClient, data: RunData): RunData {
   };
 }
 
-async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData> {
+async function getDataFromIntrospect(authClient: OktaAuthIdxInterface, data: RunData): Promise<RunData> {
   const { options } = data;
   const {
     stateHandle,
@@ -154,7 +159,7 @@ async function getDataFromIntrospect(authClient, data: RunData): Promise<RunData
   return { ...data, idxResponse, meta };
 }
 
-async function getDataFromRemediate(authClient, data: RunData): Promise<RunData> {
+async function getDataFromRemediate(authClient: OktaAuthIdxInterface, data: RunData): Promise<RunData> {
   let {
     idxResponse,
     options,
@@ -202,7 +207,7 @@ async function getDataFromRemediate(authClient, data: RunData): Promise<RunData>
   return { ...data, idxResponse, nextStep, canceled };
 }
 
-async function getTokens(authClient, data: RunData): Promise<Tokens> {
+async function getTokens(authClient: OktaAuthIdxInterface, data: RunData): Promise<Tokens> {
   let { meta, idxResponse } = data;
   const { interactionCode } = idxResponse as IdxResponse;
   const {
@@ -224,7 +229,7 @@ async function getTokens(authClient, data: RunData): Promise<Tokens> {
   return tokenResponse.tokens;
 }
 
-async function finalizeData(authClient, data: RunData): Promise<RunData> {
+async function finalizeData(authClient: OktaAuthIdxInterface, data: RunData): Promise<RunData> {
   let {
     options,
     idxResponse,

@@ -37,6 +37,7 @@ import {
   EmailAuthenticatorFactory,
   OktaVerifyPushChallengePollRemediationFactory
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 
 const mocked = {
   interact: require('../../../lib/idx/interact'),
@@ -61,6 +62,10 @@ const SuccessfulTerminalState = {
 };
 
 describe('/idx/unlockAccout', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
   let testContext;
 
   beforeEach(() => {

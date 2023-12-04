@@ -6,30 +6,26 @@
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * 
+ *
  * See the License for the specific language governing permissions and limitations under the License.
+ *
  */
 
+import { decodeToken } from '../decodeToken';
+import { exchangeCodeForTokens } from '../exchangeCodeForTokens';
+import {
+  OktaAuthOAuthInterface,
+  BaseTokenAPI,
+} from '../types';
+import { prepareTokenParams } from '../util';
 
-export * from './api';
-export * from './options';
-export type {
-  IdxMessage,
-  IdxMessages,
-  ChallengeData,
-  ActivationData,
-  IdxResponse,
-  IdxContext,
-  RawIdxResponse,
-  IdxRemediation,
-  IdxAuthenticator,
-  IdxActionParams,
-  IdxContextUIDisplay,
+// Factory
+export function createBaseTokenAPI(sdk: OktaAuthOAuthInterface): BaseTokenAPI {
+  const token: BaseTokenAPI = {
+    prepareTokenParams: prepareTokenParams.bind(null, sdk),
+    exchangeCodeForTokens: exchangeCodeForTokens.bind(null, sdk),
+    decode: decodeToken,
+  };
 
-} from './idx-js';
-export * from './meta';
-export type { FlowIdentifier } from './FlowIdentifier';
-export type { FlowSpecification } from './FlowSpecification';
-export type { WebauthnEnrollValues } from '../authenticator/WebauthnEnrollment';
-export type { WebauthnVerificationValues } from '../authenticator/WebauthnVerification';
-export * from './storage';
+  return token;
+}

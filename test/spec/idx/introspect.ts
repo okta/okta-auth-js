@@ -28,8 +28,10 @@ jest.mock('../../../lib/idx/idxState', () => {
   return jest.requireActual('../../../lib/idx/idxState');
 });
 
-jest.mock('../../../lib/oidc', () => {
+jest.mock('../../../lib/oidc/util/oauth', () => {
+  const actual = jest.requireActual('../../../lib/oidc/util/oauth');
   return {
+    ...actual,
     getOAuthDomain: () => {}
   };
 });
@@ -37,7 +39,7 @@ jest.mock('../../../lib/oidc', () => {
 const mocked = {
   idxState: require('../../../lib/idx/idxState'),
   http: require('../../../lib/http'),
-  oidc: require('../../../lib/oidc')
+  oidc: require('../../../lib/oidc/util/oauth')
 };
 
 describe('idx/introspect', () => {

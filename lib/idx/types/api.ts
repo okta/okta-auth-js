@@ -13,6 +13,7 @@
 import { APIError } from '../../errors/types';
 import {
   OktaAuthOAuthInterface,
+  MinimalOktaOAuthInterface,
   Tokens,
   TransactionManagerConstructor,
   TransactionManagerInterface
@@ -175,6 +176,27 @@ export interface EmailVerifyCallbackResponse {
   otp: string;
 }
 
+export interface MinimalIdxAPI {
+  // lowest level api
+  makeIdxResponse: (rawIdxResponse: RawIdxResponse, toPersist: IdxToPersist, requestDidSucceed: boolean) => IdxResponse;
+
+  // flow control
+  start: (options?: StartOptions) => Promise<IdxTransaction>;
+  canProceed(options?: ProceedOptions): boolean;
+  proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
+
+  // call `start` instead of `startTransaction`. `startTransaction` will be removed in next major version (7.0)
+  startTransaction: (options?: StartOptions) => Promise<IdxTransaction>;
+
+  // transaction meta
+  getSavedTransactionMeta: (options?: IdxTransactionMetaOptions) => IdxTransactionMeta | undefined;
+  createTransactionMeta: (options?: IdxTransactionMetaOptions) => Promise<IdxTransactionMeta>;
+  getTransactionMeta: (options?: IdxTransactionMetaOptions) => Promise<IdxTransactionMeta>;
+  saveTransactionMeta: (meta: unknown) => void;
+  clearTransactionMeta: () => void;
+  isTransactionMetaValid: (meta: unknown) => boolean;
+}
+
 export interface IdxAPI {
   // lowest level api
   interact: (options?: InteractOptions) => Promise<InteractResponse>;
@@ -248,13 +270,24 @@ export interface OktaAuthIdxInterface
   idx: IdxAPI;
 }
 
+export interface MinimalOktaAuthIdxInterface
+<
+  M extends IdxTransactionMeta = IdxTransactionMeta,
+  S extends IdxStorageManagerInterface<M> = IdxStorageManagerInterface<M>,
+  O extends OktaAuthIdxOptions = OktaAuthIdxOptions,
+  TM extends IdxTransactionManagerInterface = IdxTransactionManagerInterface
+>
+  extends MinimalOktaOAuthInterface<M, S, O, TM>
+{
+  idx: MinimalIdxAPI;
+}
+
 export interface OktaAuthIdxConstructor
 <
-  I extends OktaAuthIdxInterface = OktaAuthIdxInterface
+  I extends MinimalOktaAuthIdxInterface = OktaAuthIdxInterface
 >
  extends OktaAuthConstructor<I>
 {
   new(...args: any[]): I;
   webauthn: WebauthnAPI;
 }
-

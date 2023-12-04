@@ -59,6 +59,7 @@ import {
   SelectIdentifyRemediationFactory,
   EnrollProfileWithPasswordRemediationFactory
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 
 jest.mock('../../../lib/idx/transactionMeta', () => {
   return {
@@ -83,6 +84,10 @@ const mocked = {
 };
 
 describe('idx/register', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
  let testContext;
   beforeEach(() => {
     const issuer = 'test-issuer';

@@ -11,22 +11,22 @@
  */
 
 /* eslint-disable max-len */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
+
+import { OktaAuthIdxInterface, IdxResponse, IdxRemediation, IdxContext } from '../../types';    // auth-js/types
+import { IdxActions } from '../../types/idx-js';
 import { generateRemediationFunctions } from './remediationParser';
 import generateIdxAction from './generateIdxAction';
 import { jsonpath } from '../../../util/jsonpath';
 import { AuthSdkError } from '../../../errors';
 
-const SKIP_FIELDS = Object.fromEntries([
-  'remediation', // remediations are put into proceed/neededToProceed
-  'context', // the API response of 'context' isn't externally useful.  We ignore it and put all non-action (contextual) info into idxState.context
-].map( (field) => [ field, !!'skip this field' ] ));
+const SKIP_FIELDS = {
+  'remediation': true, // remediations are put into proceed/neededToProceed
+  'context': true, // the API response of 'context' isn't externally useful.  We ignore it and put all non-action (contextual) info into idxState.context
+};
 
-export const parseNonRemediations = function parseNonRemediations( authClient: OktaAuthIdxInterface, idxResponse, toPersist = {} ) {
+export const parseNonRemediations = function parseNonRemediations( authClient: OktaAuthIdxInterface, idxResponse: IdxResponse, toPersist = {} ) {
   const actions = {};
-  const context = {};
+  const context = {} as IdxContext;
 
   Object.keys(idxResponse)
     .filter( field => !SKIP_FIELDS[field])
@@ -56,10 +56,12 @@ export const parseNonRemediations = function parseNonRemediations( authClient: O
 
       // We are an object field containing an object value
       context[field].value = {};
-      Object.entries(fieldValue)
+      Object.entries<IdxRemediation>(fieldValue)
         .forEach( ([subField, value]) => {
           if (value.rel) { // is [field].value[subField] an action?
             // add any "action" value subfields to actions
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             actions[`${field}-${subField.name || subField}`] = generateIdxAction(authClient, value, toPersist);
           } else {
             // add non-action value subfields to context

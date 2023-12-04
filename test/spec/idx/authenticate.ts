@@ -69,6 +69,7 @@ import {
   EnrollmentChannelDataSmsRemediationFactory,
   ReEnrollPasswordAuthenticatorRemediationFactory,
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 import { IdxMessagesFactory } from '@okta/test.support/idx/factories/messages';
 
 const mocked = {
@@ -77,6 +78,10 @@ const mocked = {
 };
 
 describe('idx/authenticate', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
   let testContext;
   beforeEach(() => {
     const interactionCode = 'test-interactionCode';

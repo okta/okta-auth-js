@@ -39,9 +39,16 @@ import {
 } from '../transactionMeta';
 import { FlowIdentifier, IdxAPI, OktaAuthIdxInterface } from '../types';
 import { unlockAccount } from '../unlockAccount';
+import * as remediators from '../remediators';
+import { getFlowSpecification } from '../flow/FlowSpecification';
+import { setRemediatorsCtx } from '../util';
 
 // Factory
 export function createIdxAPI(sdk: OktaAuthIdxInterface): IdxAPI {
+  setRemediatorsCtx({
+    remediators,
+    getFlowSpecification,
+  });
   const boundStartTransaction = startTransaction.bind(null, sdk);
   const idx = {
     interact: interact.bind(null, sdk),

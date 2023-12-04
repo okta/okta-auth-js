@@ -22,6 +22,7 @@ import {
   RawIdxResponseFactory,
   IdxAuthenticatorFactory,
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 
 const mocked = {
   interact: require('../../../lib/idx/interact'),
@@ -31,6 +32,10 @@ const mocked = {
 };
 
 describe('idx/startTransaction', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
   let testContext;
 
   beforeEach(() => {

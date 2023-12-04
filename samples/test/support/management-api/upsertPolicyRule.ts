@@ -1,6 +1,7 @@
 import { randomStr } from '../../util';
 import getOktaClient, { OktaClientConfig } from './util/getOktaClient';
 import merge from 'deepmerge';
+import { Client } from '@okta/okta-sdk-nodejs';
 
 type Options = {
   policyId: string;
@@ -233,6 +234,33 @@ const getPasswordPolicyActions = (description: string) => {
   } as any)[description];
 };
 
+async function addCustomAttributeToDefaultUserType(oktaClient: Client) {
+  await oktaClient.updateUserProfile('default', {
+    definitions: {
+      custom: {
+        id: '#custom',
+        type: 'object',
+        properties: {
+          customAttribute: {
+            title: 'Custom Attribute',
+            description: 'Custom Attribute',
+            type: 'string',
+            required: false,
+            minLength: 1,
+            maxLength: 20,
+            permissions: [
+              {
+                principal: 'SELF',
+                action: 'READ_WRITE'
+              }
+            ]
+          }
+        }
+      }
+    }
+  });
+}
+
 /* eslint-disable complexity */
 export default async function (config: OktaClientConfig, {
   policyId,
@@ -269,6 +297,21 @@ export default async function (config: OktaClientConfig, {
   let res;
   const { value: existingRule } = await oktaClient.listPolicyRules(policyId).next();
   if (existingRule) {
+    if (policyType === 'PROFILE_ENROLLMENT') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const existingAttributes: { name: string }[] = (existingRule.actions as any).profileEnrollment?.profileAttributes;
+      // Exclude existing attributes (like 'email') to prevent API error
+      const profileAttributes: { name: string }[] = actions.actions.profileEnrollment.profileAttributes
+        .filter((attr: { name: string }) => {
+          return !existingAttributes.find((existingAttr) => (existingAttr.name === attr.name));
+        });
+      const customAttribute = profileAttributes.find((existingAttr) => (existingAttr.name === 'customAttribute'));
+      if (customAttribute) {
+        // Need to add custom attribute to default user schema
+        await addCustomAttributeToDefaultUserType(oktaClient);
+      }
+      actions.actions.profileEnrollment.profileAttributes = profileAttributes;
+    }
     res = await oktaClient.updatePolicyRule(policyId, existingRule.id, merge(existingRule, actions));
   } else {
     res = await oktaClient.createPolicyRule(policyId, {

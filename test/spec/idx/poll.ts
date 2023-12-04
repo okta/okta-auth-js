@@ -19,6 +19,7 @@ import {
   IdxResponseFactory,
   RawIdxResponseFactory
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 import { poll } from '../../../lib/idx';
 import { proceed } from '../../../lib/idx/proceed';
 import { IdxStatus } from '../../../lib/idx/types';
@@ -32,6 +33,10 @@ const mocked = {
 };
 
 describe('idx/poll', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
   let testContext;
   beforeEach(() => {
     const issuer = 'test-issuer';

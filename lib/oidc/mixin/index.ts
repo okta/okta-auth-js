@@ -30,7 +30,7 @@ import {
 import PKCE from '../util/pkce';
 import { createEndpoints, createTokenAPI } from '../factory/api';
 import { TokenManager } from '../TokenManager';
-import { getOAuthUrls, isLoginRedirect } from '../util';
+import { getOAuthUrls, isLoginRedirect, hasResponseType } from '../util';
 
 import { OktaAuthSessionInterface } from '../../session/types';
 import { provideOriginalUri } from './node';
@@ -197,15 +197,9 @@ export function mixinOAuth
     isPKCE(): boolean {
       return !!this.options.pkce;
     }
-  
+
     hasResponseType(responseType: OAuthResponseType): boolean {
-      let hasResponseType = false;
-      if (Array.isArray(this.options.responseType) && this.options.responseType.length) {
-        hasResponseType = this.options.responseType.indexOf(responseType) >= 0;
-      } else {
-        hasResponseType = this.options.responseType === responseType;
-      }
-      return hasResponseType;
+      return hasResponseType(responseType, this.options);
     }
   
     isAuthorizationCodeFlow(): boolean {

@@ -37,6 +37,7 @@ import {
   PasswordAuthenticatorOptionFactory,
   VerifyPasswordRemediationFactory
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 
 const mocked = {
   interact: require('../../../lib/idx/interact'),
@@ -44,6 +45,10 @@ const mocked = {
 };
 
 describe('idx/recoverPassword', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
  let testContext;
   beforeEach(() => {
     const issuer = 'https://test-issuer';

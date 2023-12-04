@@ -21,12 +21,17 @@ import {
   PasscodeValueFactory,
   IdxErrorPasscodeInvalidFactory
 } from '@okta/test.support/idx';
+import util from '@okta/test.support/util';
 import { IdxFeature, IdxResponse, OktaAuthIdxInterface } from '../../../lib/idx/types';
 import { Remediator, GenericRemediator } from '../../../lib/idx/remediators';
 
 jest.mock('../../../lib/idx/remediators/GenericRemediator');
 
 describe('idx/util', () => {
+  beforeAll(() => {
+    util.setRemediatorsCtx();
+  });
+
   describe('getAvailableSteps', () => {
     it('returns an empty array if there are no remediations', () => {
       const authClient = {} as OktaAuthIdxInterface;
