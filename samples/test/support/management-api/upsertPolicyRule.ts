@@ -269,6 +269,17 @@ export default async function (config: OktaClientConfig, {
   let res;
   const { value: existingRule } = await oktaClient.listPolicyRules(policyId).next();
   if (existingRule) {
+    if (policyType === 'PROFILE_ENROLLMENT') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const existingAttributes: { name: string }[] = (existingRule.actions as any).profileEnrollment?.profileAttributes;
+      // Exclude existing attributes to prevent API error
+      console.log(9999, existingAttributes)
+      const profileAttributes = actions.actions.profileEnrollment.profileAttributes
+        .filter((attr: { name: string }) => {
+          return !existingAttributes.find((existingAttr: { name: string }) => (existingAttr.name === attr.name));
+        });
+      actions.actions.profileEnrollment.profileAttributes = profileAttributes;
+    }
     res = await oktaClient.updatePolicyRule(policyId, existingRule.id, merge(existingRule, actions));
   } else {
     res = await oktaClient.createPolicyRule(policyId, {
