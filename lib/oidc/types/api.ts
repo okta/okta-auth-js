@@ -134,6 +134,7 @@ export interface MinimalOktaOAuthInterface
 
   isPKCE(): boolean;
   isLoginRedirect(): boolean;
+  isAuthorizationCodeFlow(): boolean;
 }
 
 export interface OktaAuthOAuthInterface
@@ -160,6 +161,7 @@ export interface OktaAuthOAuthInterface
   isAuthenticated(options?: IsAuthenticatedOptions): Promise<boolean>;
   signOut(opts?: SignoutOptions): Promise<boolean>;
   isLoginRedirect(): boolean;
+  isAuthorizationCodeFlow(): boolean;
   storeTokensFromRedirect(): Promise<void>;
   getUser<T extends CustomUserClaims = CustomUserClaims>(): Promise<UserClaims<T>>;
   signInWithRedirect(opts?: SigninWithRedirectOptions): Promise<void>;
