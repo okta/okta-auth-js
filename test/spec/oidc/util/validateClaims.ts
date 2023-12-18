@@ -78,10 +78,33 @@ describe('validateClaims', function () {
     'does not match [' + validationOptions.issuer + ']'); 
   });
 
-  it('validates audience', function() {
+  it('validates audience when not an array', function() {
     var claims = {
       iss: validationOptions.issuer,
       aud: 'nobody'
+    } as unknown as UserClaims;
+    var fn = function () {
+      validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).toThrowError('The audience [' + claims.aud + '] ' +
+      'does not match [' + validationOptions.clientId + ']'); 
+  });
+
+  it('validates audience without error when at least one matches', function() {
+    var claims = {
+      iss: validationOptions.issuer,
+      aud: ['nobody', validationOptions.clientId]
+    } as unknown as UserClaims;
+    var fn = function () {
+      validateClaims(sdk, claims, validationOptions);
+    };
+    expect(fn).not.toThrowError(); 
+  });
+
+  it('validates audience when an array', function() {
+    var claims = {
+      iss: validationOptions.issuer,
+      aud: ['nobody']
     } as unknown as UserClaims;
     var fn = function () {
       validateClaims(sdk, claims, validationOptions);
