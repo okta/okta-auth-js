@@ -1,4 +1,8 @@
-import { SelectAuthenticatorAuthenticate, SelectAuthenticatorEnroll } from '../../../../lib/idx/remediators';
+import {
+  SelectAuthenticatorAuthenticate,
+  SelectAuthenticatorEnroll,
+  SelectAuthenticatorUnlockAccount
+} from '../../../../lib/idx/remediators';
 import {
   SelectAuthenticatorEnrollRemediationFactory,
   SelectAuthenticatorAuthenticateRemediationFactory,
@@ -7,7 +11,10 @@ import {
   EmailAuthenticatorOptionFactory,
   IdxContextFactory,
   PhoneAuthenticatorFactory,
-  EmailAuthenticatorFactory
+  EmailAuthenticatorFactory,
+  SelectAuthenticatorUnlockAccountRemediationFactory,
+  SecurityQuestionAuthenticatorOptionFactory,
+  IdxValueFactory,
 } from '@okta/test.support/idx';
 
 describe('remediators/Base/SelectAuthenticator', () => {
@@ -119,6 +126,38 @@ describe('remediators/SelectAuthenticatorAuthenticate', () => {
       const r = new SelectAuthenticatorAuthenticate(remediation, { authenticators }, { step: 'select-authenticator-authenticate'});
       expect(r.canRemediate(context)).toBe(true);
       expect(r.canRemediate()).toBe(true);
+    });
+  });
+});
+
+describe('remediators/SelectAuthenticatorUnlockAccount', () => {
+  describe('mapAuthenticator', () => {
+    // TODO: return methodType 1
+
+    // TODO: return methodType 2
+
+    // TODO: return methodType 3
+
+    // TODO: return no methodType
+    fit('should not return a methodType value', () => {
+      const phoneAuthenticatorValue = AuthenticatorValueFactory.build({
+        options: [
+          PhoneAuthenticatorOptionFactory.build(),
+        ]
+      });
+      
+      const remediation = SelectAuthenticatorUnlockAccountRemediationFactory.build({
+        value: [
+          phoneAuthenticatorValue
+        ]
+      });
+
+      console.log(phoneAuthenticatorValue);
+      console.log('##########')
+      console.log(remediation);
+
+      const r = new SelectAuthenticatorUnlockAccount(remediation);
+      expect(r.mapAuthenticator(phoneAuthenticatorValue)).toBe(false);
     });
   });
 });

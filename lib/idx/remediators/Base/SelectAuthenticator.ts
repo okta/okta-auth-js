@@ -89,11 +89,13 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
 
     const { options } = remediationValue;
     const selectedOption = findMatchedOption(authenticators, options);
-    this.selectedAuthenticator = selectedOption.relatesTo; // track the selected authenticator
-    this.selectedOption = selectedOption;
-    return {
-      id: selectedOption?.value.form.value.find(({ name }) => name === 'id').value
-    };
+    if (selectedOption) {
+      this.selectedAuthenticator = selectedOption.relatesTo; // track the selected authenticator
+      this.selectedOption = selectedOption;
+      return {
+        id: selectedOption?.value.form.value.find(({ name }) => name === 'id').value
+      };
+    }
   }
 
   getInputAuthenticator(remediation) {

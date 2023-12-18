@@ -150,8 +150,9 @@ export async function remediate(
     `);
   }
 
-  // Return next step to the caller
-  if (!remediator.canRemediate()) {
+  // always attempt remediation if `opts.step` is provided
+  if (!options.step && !remediator.canRemediate()) {
+    // Return next step to the caller
     const nextStep = getNextStep(authClient, remediator, idxResponse);
     return {
       idxResponse,
