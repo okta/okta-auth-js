@@ -1,5 +1,12 @@
 # Changelog
 
+## 7.5.1
+
+### Bug Fix
+
+ - [#1482](https://github.com/okta/okta-auth-js/pull/1482) fix: idToken claim validation now accepts `aud` array
+    * Resolves [#1481](https://github.com/okta/okta-auth-js/pull/1481)
+
 ## 7.5.0
 
 ### Bug Fix
