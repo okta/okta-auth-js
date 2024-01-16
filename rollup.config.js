@@ -2,13 +2,13 @@ import replace from '@rollup/plugin-replace';
 import alias from '@rollup/plugin-alias';
 import cleanup from 'rollup-plugin-cleanup';
 import typescript from 'rollup-plugin-typescript2';
-import license from 'rollup-plugin-license';
 import multiInput from 'rollup-plugin-multi-input';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import pkg from './package.json';
 
 const path = require('path');
+const fs = require('fs');
 
 let platforms = ['browser', 'node'];
 let entries = {
@@ -84,6 +84,21 @@ function createPackageJson(dirName) {
   };
 }
 
+// adds the Okta license to the main export file with esm/<env>/exports/exports/<main>.js
+function addLicenseToExports(entryName) {
+  return {
+    name: 'add-license-to-exports',
+    generateBundle (options, bundle) {
+      // reads banner (license) text from template
+      const bannerTxt = fs.readFileSync(path.join(__dirname, 'scripts', 'buildtools', 'license-template')).toString();
+      // update input pattern to match output pattern, ex: lib/exports/default.ts --> exports/exports/default.js
+      const entryKey = entries[entryName].replace('lib', 'exports').replace('.ts', '.js');
+      const entryBundle = bundle[entryKey];
+      entryBundle.code = `${bannerTxt}\n${entryBundle.code}`;
+    }
+  }
+}
+
 const getPlugins = (env, entryName) => {
   const outputDir = getOuptutDir(entryName, env);
   let plugins = [
@@ -113,17 +128,11 @@ const getPlugins = (env, entryName) => {
       extensions,
       comments: 'none'
     }),
-    license({
-      banner: {
-        content: {
-          file: path.join(__dirname, 'scripts', 'buildtools', 'license-template'),
-        }
-      }
-    }),
     multiInput({
       relative: 'lib/',
     }),
-    createPackageJson(outputDir)
+    createPackageJson(outputDir),
+    addLicenseToExports(entryName)
   ];
 
   // if ANALZYE env var is passed, output analyzer html
