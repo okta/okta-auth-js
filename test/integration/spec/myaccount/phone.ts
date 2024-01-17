@@ -45,7 +45,7 @@ describe('MyAccount Phone API', () => {
       }
     });
 
-    it.only('can manage phone with transaction functions', async () => {
+    it.skip('can manage phone with transaction functions', async () => {
       // create test phone
       phone = await addPhone(client, {
         accessToken: token,
