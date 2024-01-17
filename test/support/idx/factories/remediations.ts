@@ -42,7 +42,10 @@ import {
   AuthenticatorValueFactory,
   CredentialsValueFactory,
   IdxValueFactory,
-  NewPasswordValueFactory, EmailValueFactory, PhoneNumberValueFactory,
+  NewPasswordValueFactory,
+  EmailValueFactory,
+  PhoneNumberValueFactory,
+  StateHandleValueFactory
 } from './values';
 
 interface MockedIdxRemediation extends IdxRemediation {
@@ -519,5 +522,17 @@ export const SelectAuthenticatorUnlockAccountRemediationFactory = IdxRemediation
   value: [
     UsernameValueFactory.build(),
     AuthenticatorValueFactory.build()
+  ]
+});
+
+export const ResendAuthenticatorFactory = IdxRemediationFactory.params({
+  accepts: 'application/json; okta-version=1.0.0',
+  href: 'http://localhost:3000/idp/idx/challenge/resend',
+  method: 'POST',
+  name: 'resend',
+  produces: 'application/ion+json; okta-version=1.0.0',
+  rel: ['create-form'],
+  value: [
+    StateHandleValueFactory.build()
   ]
 });

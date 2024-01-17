@@ -59,6 +59,14 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
     // Proceed with provided authenticators
     const matchedOption = this.findMatchedOption(authenticators, options!);
     if (matchedOption) {
+
+      // fix for OKTA-612939 (below) seems to have caused a bug when trying to re-select authenticators
+      // with multiple methodTypes. If `options.step` is passed, this remediation is explicitly being
+      // invoked, therefore do not guard against auto-remediating the selected authenticator (OKTA-646147)
+      if (this.options.step) {
+        return true;
+      }
+
       // Don't select current authenticator (OKTA-612939)
       const isCurrentAuthenticator = context?.currentAuthenticator
         && context?.currentAuthenticator.value.id === matchedOption.relatesTo?.id;
@@ -81,11 +89,13 @@ export class SelectAuthenticator<T extends SelectAuthenticatorValues = SelectAut
 
     const { options } = remediationValue;
     const selectedOption = findMatchedOption(authenticators, options);
-    this.selectedAuthenticator = selectedOption.relatesTo; // track the selected authenticator
-    this.selectedOption = selectedOption;
-    return {
-      id: selectedOption?.value.form.value.find(({ name }) => name === 'id').value
-    };
+    if (selectedOption) {
+      this.selectedAuthenticator = selectedOption.relatesTo; // track the selected authenticator
+      this.selectedOption = selectedOption;
+      return {
+        id: selectedOption?.value.form.value.find(({ name }) => name === 'id').value
+      };
+    }
   }
 
   getInputAuthenticator(remediation) {

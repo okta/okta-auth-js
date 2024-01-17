@@ -1,3 +1,4 @@
+// eslint-disable-next-line node/no-missing-import
 import type { Options } from '@wdio/types';
 import { WebDriverLogTypes } from '@wdio/types/build/Options';
 
@@ -5,7 +6,6 @@ const fs = require('fs');
 const path = require('path');
 const { mergeFiles } = require('junit-report-merger');
 
-const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '106.0.5249.61';
 const USE_FIREFOX = !!process.env.USE_FIREFOX;
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
@@ -13,13 +13,7 @@ const LOG = process.env.LOG as WebDriverLogTypes;
 
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel: WebDriverLogTypes = LOG || 'warn';
-const drivers = USE_FIREFOX ? {
-  // Use latest geckodriver
-  // https://github.com/mozilla/geckodriver/releases
-  firefox: true,
-} : {
-  chrome: { version: CHROMEDRIVER_VERSION },
-};
+
 const chromeOptions = {
   args: []
 };
@@ -28,6 +22,9 @@ const firefoxOptions = {
 };
 
 if (CI) {
+  if (process.env.CHROME_BINARY) {
+    chromeOptions.binary = process.env.CHROME_BINARY;
+  }
   chromeOptions.args = chromeOptions.args.concat([
       '--headless',
       '--disable-gpu',
@@ -184,14 +181,6 @@ export const config: Options.Testrunner = {
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
     services: [
-      ['selenium-standalone', {
-        installArgs: {
-          drivers
-        },
-        args: {
-          drivers
-        }
-      }]
     ],    
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
@@ -235,7 +224,6 @@ export const config: Options.Testrunner = {
         backtrace: false,
         // <string[]> ("extension:module") require files with the given EXTENSION after requiring MODULE (repeatable)
         requireModule: [
-          'tsconfig-paths/register',
         ],
         // <boolean> invoke formatters without executing steps
         dryRun: false,

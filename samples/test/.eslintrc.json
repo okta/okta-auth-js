@@ -28,6 +28,11 @@
     "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/no-var-requires": 0,
     "node/no-missing-import": ["error", {
+      "allowModules": ["@cucumber/cucumber"],
+      "tryExtensions": [".js", ".ts"]
+    }],
+    "node/no-extraneous-import": ["error", {
+      "allowModules": ["@cucumber/cucumber"],
       "tryExtensions": [".js", ".ts"]
     }],
     "new-cap": 0,

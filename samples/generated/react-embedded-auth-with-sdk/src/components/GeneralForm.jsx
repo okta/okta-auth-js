@@ -46,6 +46,42 @@ const GeneralForm = () => {
     }
   };
 
+  const handleReselect = async e => {
+    e.preventDefault();
+    let newTransaction = transaction;
+
+    setProcessing(true);
+    try {
+      newTransaction = await oktaAuth.idx.proceed({ step: 'select-authenticator-authenticate' });
+      setTransaction(newTransaction);
+      setInputValues({});
+    }
+    catch (err) {
+      console.log('proceed threw');
+      console.log(err);
+    }
+    finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReselectPhone = async e => {
+    e.preventDefault();
+
+    setProcessing(true);
+    try {
+      const newTransaction = await oktaAuth.idx.proceed({ step: 'select-authenticator-authenticate', authenticator: 'phone_number' });
+      setTransaction(newTransaction);
+      setInputValues({});
+    }
+    catch (err) {
+      console.log(err);
+    }
+    finally {
+      setProcessing(false);
+    }
+  };
+
   const handleSkip = async () => {
     const newTransaction = await oktaAuth.idx.proceed({ skip: true });
     setTransaction(newTransaction);
@@ -119,6 +155,12 @@ const GeneralForm = () => {
           {canSkip && <Button variant="secondary" type="button" onClick={handleSkip}>Skip</Button>}
           <Box paddingTop="s" paddingBottom="s">
             <Button wide type="submit" disabled={processing}>Submit</Button>
+          </Box>
+          <Box paddingTop="s" paddingBottom="s">
+            <Button wide variant="secondary" disabled={processing} onClick={handleReselect}>Re-Select</Button>
+          </Box>
+          <Box paddingTop="s" paddingBottom="s">
+            <Button wide variant="secondary" disabled={processing} onClick={handleReselectPhone}>Re-Select Phone</Button>
           </Box>
           {canRecoverPassword && (
             <Box paddingTop="s" paddingBottom="s">

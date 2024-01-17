@@ -1,5 +1,5 @@
 import { Before } from '@wdio/cucumber-framework';
-import ActionContext from 'support/context';
+import ActionContext from '../../../../samples/test/support/context';
 
 Before('@smstest', function () {
   if (process.env.SKIP_SMS === 'true') {

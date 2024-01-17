@@ -56,6 +56,7 @@ function App() {
       history.replace('/terminal');
       setTransaction(null);
     } else if (status === IdxStatus.FAILURE) {
+      console.log('ERROR STATUS?')
       history.replace('/error');
       setTransaction(null);
     } else if (status === IdxStatus.CANCELED) {

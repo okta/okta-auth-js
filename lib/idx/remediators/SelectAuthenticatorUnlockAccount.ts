@@ -38,11 +38,16 @@ export class SelectAuthenticatorUnlockAccount extends SelectAuthenticator<Select
     const authenticatorMap = super.mapAuthenticator(remediationValue);
     const methodTypeOption = this.selectedOption?.value.form.value.find(({ name }) => name === 'methodType');
 
+    const isSingleValue = () => {
+      if (Array.isArray(methodTypeOption?.options) && methodTypeOption?.options?.length === 1) {
+        return methodTypeOption?.options?.[0]?.value as string;
+      }
+    }
+
     // defaults to 'manually defined' value
     // 2nd: option may have pre-defined value, like stateHandle
     // 3rd: if only a single OV option is available, default to that option
-    const methodTypeValue = this.values.methodType ||
-      methodTypeOption?.value as string || methodTypeOption?.options?.[0]?.value as string;
+    const methodTypeValue = this.values.methodType || methodTypeOption?.value as string || isSingleValue();
 
     if (methodTypeValue) {
       return {

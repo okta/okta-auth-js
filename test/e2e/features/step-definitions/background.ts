@@ -1,15 +1,15 @@
 import { Given } from '@wdio/cucumber-framework';
-import ActionContext from 'support/context';
-import createGroup from 'management-api/createGroup';
-import createApp from 'management-api/createApp';
-import addAppToGroup from 'management-api/addAppToGroup';
-import A18nClient from 'management-api/a18nClient';
-import createPolicy from 'management-api/createPolicy';
-import addAppToPolicy from 'management-api/addAppToPolicy';
-import upsertPolicyRule from 'management-api/upsertPolicyRule';
-import createCredentials from 'management-api/createCredentials';
-import createUser from 'management-api/createUser';
-import enrollFactor from 'management-api/enrollFactor';
+import ActionContext from '../../../../samples/test/support/context';
+import createGroup from '../../../../samples/test/support/management-api/createGroup';
+import createApp from '../../../../samples/test/support/management-api/createApp';
+import addAppToGroup from '../../../../samples/test/support/management-api/addAppToGroup';
+import A18nClient from '../../../../samples/test/support/management-api/a18nClient';
+import createPolicy from '../../../../samples/test/support/management-api/createPolicy';
+import addAppToPolicy from '../../../../samples/test/support/management-api/addAppToPolicy';
+import upsertPolicyRule from '../../../../samples/test/support/management-api/upsertPolicyRule';
+import createCredentials from '../../../../samples/test/support/management-api/createCredentials';
+import createUser from '../../../../samples/test/support/management-api/createUser';
+import enrollFactor from '../../../../samples/test/support/management-api/enrollFactor';
 
 
 // Extend the hook timeout to fight against org rate limit
