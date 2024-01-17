@@ -52,21 +52,6 @@ test_suites:
       script_name: e2e-mfa
       criteria: MERGE
       queue_name: small
-
-    # - name: sample-express-embedded-auth-with-sdk-SPEC
-    #   script_path: ../okta-auth-js/scripts/samples
-    #   sort_order: '6'
-    #   timeout: '30'
-    #   script_name: e2e-express-embedded-auth-with-sdk-spec
-    #   criteria: MERGE
-    #   queue_name: small
-    # - name: sample-express-embedded-auth-with-sdk-FEATURES
-    #   script_path: ../okta-auth-js/scripts/samples
-    #   sort_order: '6'
-    #   timeout: '30'
-    #   script_name: e2e-express-embedded-auth-with-sdk-features
-    #   criteria: MERGE
-    #   queue_name: small
     - name: sample-express-embedded-auth-with-sdk
       script_path: ../okta-auth-js/scripts/samples
       sort_order: '6'
