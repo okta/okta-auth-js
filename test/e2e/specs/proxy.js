@@ -19,6 +19,11 @@ import { getIssuer, getBaseUrl } from '../util/browserUtils';
 describe('E2E through proxy', () => {
   // Proxy tests are disabled on OIE org, pending a fix for OKTA-416683
   if (process.env.ORG_OIE_ENABLED) {
+    // fixes: ERROR @wdio/runner: Error: describe with no children (describe() or it()): E2E through proxy
+    it('passes', () => {
+      expect(true).toBe(true);
+    });
+
     return;
   }
   

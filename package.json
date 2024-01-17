@@ -251,7 +251,8 @@
       "samples/generated/*"
     ],
     "nohoist": [
-      "**/@wdio/**"
+      "**/@wdio/**",
+      "**/@cucumber/**"
     ]
   },
   "tsd": {

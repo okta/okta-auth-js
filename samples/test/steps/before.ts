@@ -14,6 +14,12 @@
 import { Before } from '@cucumber/cucumber';
 import ActionContext from '../support/context';
 
+Before('@flaky', function () {
+  if (process.env.SKIP_SAMPLE_FLAKY === 'true') {
+    return 'skipped';
+  }
+});
+
 Before('@smstest', function () {
   if (process.env.SKIP_SMS === 'true') {
     return 'skipped';
