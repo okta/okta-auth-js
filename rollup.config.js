@@ -96,7 +96,7 @@ function addLicenseToExports(entryName) {
       const entryBundle = bundle[entryKey];
       entryBundle.code = `${bannerTxt}\n${entryBundle.code}`;
     }
-  }
+  };
 }
 
 const getPlugins = (env, entryName) => {
