@@ -45,7 +45,7 @@ describe('MyAccount Phone API', () => {
       }
     });
 
-    it.skip('can manage phone with transaction functions', async () => {
+    it.only('can manage phone with transaction functions', async () => {
       // create test phone
       phone = await addPhone(client, {
         accessToken: token,
@@ -68,6 +68,8 @@ describe('MyAccount Phone API', () => {
       });
 
       // get phone
+      // TODO: quarantine follow up - OKTA-686334
+      //   "lastMethod": "sms", was removed from snapshot
       const transaction = await phone.get();
       expect(transaction).toMatchSnapshot({
         headers: expect.any(Object),
