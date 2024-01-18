@@ -24,7 +24,7 @@ import {
 } from '@okta/okta-auth-js/idx';
 import { expectType, expectAssignable, expectError } from 'tsd';
 
-const options: OktaAuthOptions = {};
+const options: OktaAuthOptions = {issuer: 'https://{yourOktaDomain}/oauth2/default'};
 const authClient = new OktaAuth(options);
 
 // includes Http

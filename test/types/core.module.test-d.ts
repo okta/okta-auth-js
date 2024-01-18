@@ -22,7 +22,7 @@ import {
 } from '@okta/okta-auth-js/core';
 import { expectType, expectAssignable } from 'tsd';
 
-const options: OktaAuthOptions = {};
+const options: OktaAuthOptions = {issuer: 'https://{yourOktaDomain}/oauth2/default'};
 const authClient = new OktaAuth(options);
 
 expectAssignable<OktaAuthHttpInterface>(authClient);

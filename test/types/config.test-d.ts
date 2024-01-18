@@ -117,6 +117,7 @@ const config2: OktaAuthOptions = {
 };
 
 const configServerSide: OktaAuthOptions = {
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
   clientSecret: 'GHtf9iJdr60A9IYrR0jwGHtf9iJdr60A9IYrR0jw',
   setLocation: function (_: string) {},
 };
@@ -124,6 +125,7 @@ const configServerSide: OktaAuthOptions = {
 expectAssignable<OktaAuthOptions>(configServerSide);
 
 const servicesConfig: OktaAuthOptions = {
+  issuer: 'https://{yourOktaDomain}/oauth2/default',
   services: {
     autoRenew: true,
     autoRemove: false,

@@ -25,7 +25,7 @@ import {
 
 import { expectType, expectAssignable, expectError } from 'tsd';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 expectAssignable<OktaAuthTxInterface>(authClient);
 expectAssignable<OktaAuthHttpInterface>(authClient);
 expectAssignable<OktaAuthCoreInterface>(authClient);

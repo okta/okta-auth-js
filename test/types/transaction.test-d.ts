@@ -14,7 +14,7 @@
 import { AuthnTransaction, OktaAuth, IdxStatus } from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 
 (async () => {
   const tx = await authClient.tx.introspect();

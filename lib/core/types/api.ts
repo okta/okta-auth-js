@@ -14,6 +14,7 @@ import { AuthState, AuthStateManagerInterface } from './AuthState';
 // options passed to AuthJS constructor
 export interface OktaAuthCoreOptions extends OktaAuthOAuthOptions
 {
+  issuer: string;
   services?: ServiceManagerOptions;
   // eslint-disable-next-line no-use-before-define
   transformAuthState?: (oktaAuth: OktaAuthCoreInterface, authState: AuthState) => Promise<AuthState>;
