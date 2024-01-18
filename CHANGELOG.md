@@ -4,6 +4,7 @@
 
 ### Bug Fix
 
+ - [#1488](https://github.com/okta/okta-auth-js/pull/1488) fix: type `OktaAuthOptions`` now requires `issuer`
  - [#1482](https://github.com/okta/okta-auth-js/pull/1482) fix: idToken claim validation now accepts `aud` array
     * Resolves [#1481](https://github.com/okta/okta-auth-js/pull/1481)
 
