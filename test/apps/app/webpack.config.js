@@ -16,6 +16,7 @@ require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 const path = require('path');
 const webpack = require('webpack');
 const PORT = process.env.PORT || 8080;
+const PROXY_PORT = process.env.PROXY_PORT || 8082;
 
 const babelOptions = {
   presets: [
@@ -54,6 +55,7 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'public'),
     port: PORT,
+    proxyPort: PROXY_PORT,
   },
   devtool: 'source-map',
   module: {

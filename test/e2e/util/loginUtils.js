@@ -64,6 +64,11 @@ export async function loginRedirect(flow, responseMode) {
   return handleCallback(flow, responseMode);
 }
 
+export async function loginRedirectWithSso(flow, responseMode) {
+  await TestApp.loginRedirect();
+  return handleCallback(flow, responseMode);
+}
+
 export async function loginDirect(setCredentials = true) {
   if (setCredentials) {
     await TestApp.username.then(el => el.setValue(USERNAME));

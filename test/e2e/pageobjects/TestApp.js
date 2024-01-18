@@ -19,6 +19,7 @@ class TestApp {
   get rootSelector() { return $('#root'); }
   get readySelector() { return $('#root.rendered.loaded'); }
   get landingSelector() { return $('body.oidc-app.landing'); }
+  get isAuthenticatedText() { return $('#is-authenticated'); }
 
   // Authenticated landing
   get logoutRedirectBtn() { return $('#logout-redirect'); }
@@ -32,7 +33,9 @@ class TestApp {
   get getTokenBtn() { return $('#get-token'); }
   get clearTokensBtn() { return $('#clear-tokens'); }
   get getUserInfoBtn() { return $('#get-userinfo'); }
+  get getSessionInfoBtn() { return $('#get-session'); }
   get userInfo() { return $('#user-info'); }
+  get sessionInfo() { return $('#session-info'); }
   get sessionExpired() { return $('#session-expired'); }
   get testConcurrentGetTokenBtn() { return $('#test-concurrent-get-token'); }
   get loginWithAcrBtn() { return $('#login-acr'); }
@@ -94,6 +97,12 @@ class TestApp {
       await browser.url('/' + qs);
     }
     await browser.waitUntil(async () => this.readySelector.then(el => el.isExisting()), 5000, 'wait for ready selector');
+  }
+
+  async isAuthenticated() {
+    await this.waitForIsAuthenticatedText();
+    const isAuthenticatedText = (await (await this.isAuthenticatedText).getText()).trim();
+    return isAuthenticatedText === 'Authenticated';
   }
 
   async showLoginWidget() {
@@ -169,6 +178,17 @@ class TestApp {
         return true;
       }
     }, 5000, 'wait for get user info btn');
+  }
+
+  async getSessionInfo() {
+    await browser.waitUntil(async () => {
+      const el = await this.getSessionInfoBtn;
+
+      if (el.isDisplayed()) {
+        await browser.execute('arguments[0].click();', el);
+        return true;
+      }
+    }, 5000, 'wait for get session info btn');
   }
 
   async getIdToken() {
@@ -248,6 +268,10 @@ class TestApp {
     await this.pkceOptionOff.then(el=> el.click());
   }
 
+  async waitForIsAuthenticatedText() {
+    return browser.waitUntil(async () => this.isAuthenticatedText.then(el => el.isDisplayed()), 5000, 'wait for is authenticated text');
+  }
+
   async waitForLoginBtn() {
     return browser.waitUntil(async () => this.loginRedirectBtn.then(el => el.isDisplayed()), 5000, 'wait for login button');
   }
@@ -266,6 +290,10 @@ class TestApp {
 
   async waitForUserInfo() {
     return browser.waitUntil(async () => this.userInfo.then(el => el.isDisplayed()), 5000, 'wait for user info');
+  }
+
+  async waitForSessionInfo() {
+    return browser.waitUntil(async () => this.sessionInfo.then(el => el.isDisplayed()), 5000, 'wait for session info');
   }
 
   async waitForSigninWidget() {
@@ -333,6 +361,20 @@ class TestApp {
     await this.waitForUserInfo();
     await this.userInfo.then(el => el.getText()).then(txt => {
       assert(txt.indexOf('email') > 0);
+    });
+  }
+
+  async assertSessionExists() {
+    await this.waitForSessionInfo();
+    await this.sessionInfo.then(el => el.getText()).then(txt => {
+      assert(txt.indexOf('"ACTIVE"') > 0);
+    });
+  }
+
+  async assertSessionNotExists() {
+    await this.waitForSessionInfo();
+    await this.sessionInfo.then(el => el.getText()).then(txt => {
+      assert(txt.indexOf('"INACTIVE"') > 0);
     });
   }
 
