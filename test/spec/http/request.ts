@@ -14,7 +14,8 @@
 declare var USER_AGENT: string; // set in jest config
 
 import { httpRequest } from '../../../lib/http';
-import { 
+import {
+  OAuthError, 
   OktaAuth, 
   DEFAULT_CACHE_DURATION, 
   AuthApiError, 
@@ -244,6 +245,18 @@ describe('HTTP Requestor', () => {
     function initWithErrorResponse(response) {
       httpRequestClient = jest.fn().mockReturnValue(Promise.reject(response));
     }
+    it('can handle Error objects', () => {
+      const errMessage = 'Failed to execute \'fetch\' on \'Window\': Failed to parse URL from http://localhost:3000:1802/some_endpoint';
+      const response = new TypeError(errMessage);
+      initWithErrorResponse(response);
+      createAuthClient();
+      return httpRequest(sdk, { url })
+        .catch(err => {
+          expect(err).toBeInstanceOf(OAuthError);
+          expect(err.errorCode).toBe('fetch_error');
+          expect(err.errorSummary).toEqual(errMessage);
+        });
+    });
     it('handles string errors', () => {
       const response = { responseText: 'fake error', status: 404 };
       initWithErrorResponse(response);
