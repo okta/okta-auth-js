@@ -14,6 +14,6 @@
 import { OktaAuth, FeaturesAPI } from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 expectType<FeaturesAPI>(authClient.features);
 expectType<boolean>(authClient.features.isPKCESupported());

@@ -27,7 +27,7 @@ import {
 } from '@okta/okta-auth-js';
 import { expectType, expectAssignable, expectError } from 'tsd';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 
 // Tokens
 const idTokenExample = {

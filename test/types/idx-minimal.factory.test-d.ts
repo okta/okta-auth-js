@@ -33,7 +33,7 @@ const OptionsConstructor: OktaAuthOptionsConstructor<OktaAuthIdxOptions> = creat
 const StorageManager: IdxStorageManagerConstructor = createIdxStorageManager();
 const TransactionManager: IdxTransactionManagerConstructor = createIdxTransactionManager();
 const OktaAuth = createMinimalOktaAuthIdx(StorageManager, OptionsConstructor, TransactionManager);
-const options: OktaAuthIdxOptions = {};
+const options: OktaAuthIdxOptions = {issuer: 'https://{yourOktaDomain}/oauth2/default'};
 const authClient = new OktaAuth(options);
 
 // includes Http

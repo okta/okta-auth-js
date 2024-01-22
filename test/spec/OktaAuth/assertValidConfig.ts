@@ -31,6 +31,7 @@ describe('assertValidConfig', () => {
   it('throw an error if no issuer is passed to the constructor', function () {
     var err;
     try {
+      // @ts-expect-error this test is deliberately testing an error is throw if no issuer is passed
       new OktaAuth({}); // eslint-disable-line no-new
     } catch (e) {
       err = e;

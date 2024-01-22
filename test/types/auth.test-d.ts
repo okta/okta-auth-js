@@ -14,7 +14,7 @@
 import { AuthnTransaction, UserClaims, OktaAuth, TokenParams } from '@okta/okta-auth-js';
 import { expectType, expectAssignable } from 'tsd';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 
 const authorizeOptions: TokenParams = {
   sessionToken: '00p8RhRDCh_8NxIin-wtF5M6ofFtRhfKWGBAbd2WmE',
