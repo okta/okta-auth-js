@@ -37,9 +37,7 @@ export function validateClaims(sdk: OktaAuthOAuthInterface, claims: UserClaims, 
       'does not match [' + iss + ']');
   }
 
-  if ((Array.isArray(claims.aud) && claims.aud.indexOf(aud) < 0) ||
-    (!Array.isArray(claims.aud) && claims.aud !== aud))
-  {
+  if (claims.aud !== aud) {
     throw new AuthSdkError('The audience [' + claims.aud + '] ' +
       'does not match [' + aud + ']');
   }
