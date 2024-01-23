@@ -15,7 +15,6 @@ declare var USER_AGENT: string; // set in jest config
 
 import { httpRequest } from '../../../lib/http';
 import {
-  OAuthError, 
   OktaAuth, 
   DEFAULT_CACHE_DURATION, 
   AuthApiError, 
@@ -252,9 +251,9 @@ describe('HTTP Requestor', () => {
       createAuthClient();
       return httpRequest(sdk, { url })
         .catch(err => {
-          expect(err).toBeInstanceOf(OAuthError);
-          expect(err.errorCode).toBe('fetch_error');
+          expect(err).toBeInstanceOf(AuthApiError);
           expect(err.errorSummary).toEqual(errMessage);
+          expect(err.xhr).toEqual(undefined);
         });
     });
     it('handles string errors', () => {

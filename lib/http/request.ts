@@ -56,7 +56,9 @@ const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): A
   if (error instanceof Error) {
     // fetch() can throw exceptions
     // see https://developer.mozilla.org/en-US/docs/Web/API/fetch#exceptions
-    return new OAuthError('fetch_error', error.message);
+    return new AuthApiError({
+      errorSummary: error.message,
+    });
   }
 
   let resp: HttpResponse = error;
