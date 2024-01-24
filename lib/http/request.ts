@@ -52,7 +52,16 @@ const parseInsufficientAuthenticationError = (
     }, {}) as InsufficientAuthenticationError;
 };
 
-const formatError = (sdk: OktaAuthHttpInterface, resp: HttpResponse): AuthApiError | OAuthError => {
+const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): AuthApiError | OAuthError => {
+  if (error instanceof Error) {
+    // fetch() can throw exceptions
+    // see https://developer.mozilla.org/en-US/docs/Web/API/fetch#exceptions
+    return new AuthApiError({
+      errorSummary: error.message,
+    });
+  }
+
+  let resp: HttpResponse = error;
   let err: AuthApiError | OAuthError;
   let serverErr: Record<string, any> = {};
   if (resp.responseText && isString(resp.responseText)) {
