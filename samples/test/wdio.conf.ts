@@ -28,6 +28,9 @@ const chromeOptions = {
 };
 
 if (CI) {
+    if (process.env.CHROME_BINARY) {
+        chromeOptions.binary = process.env.CHROME_BINARY;
+    }
     chromeOptions.args = chromeOptions.args.concat([
         '--headless',
         '--disable-gpu',
@@ -38,13 +41,6 @@ if (CI) {
         '--verbose'
     ]);
 }
-
-// driver version must match installed chrome version
-// https://chromedriver.storage.googleapis.com/index.html
-const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '106.0.5249.61';
-const drivers = {
-  chrome: { version: CHROMEDRIVER_VERSION }
-};
 
 export const config: WebdriverIO.Config = {
     jasmineOpts: {
@@ -159,16 +155,8 @@ export const config: WebdriverIO.Config = {
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: [
-      ['selenium-standalone', {
-        installArgs: {
-          drivers
-        },
-        args: {
-          drivers
-        }
-      }]
-    ],
+    // services: [
+    // ],
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
     // see also: https://webdriver.io/docs/frameworks.html

@@ -1,6 +1,6 @@
 import { After } from '@wdio/cucumber-framework';
-import ActionContext from 'support/context';
-import deleteSelfEnrolledUser from 'management-api/deleteSelfEnrolledUser';
+import ActionContext from '../../../../samples/test/support/context';
+import deleteSelfEnrolledUser from '../../../../samples/test/support/management-api/deleteSelfEnrolledUser';
 
 
 // Comment out this after hook to persist test context

@@ -51,7 +51,7 @@ const BaseOptions: OktaAuthOptionsConstructor<OktaAuthBaseOptions> = createBaseO
 const OktaAuthBase = createOktaAuthBase(BaseOptions);
 
 const baseClient = new OktaAuthBase(baseOptions);
-expectAssignable<OktaAuthOptions>(baseClient.options);
+expectAssignable<OktaAuthBaseOptions>(baseClient.options);
 expectAssignable<FeaturesAPI>(baseClient.features);
 
 expectError(mixinIdx(OktaAuthBase));

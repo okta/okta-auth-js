@@ -14,7 +14,7 @@
 import { OktaAuth, TokenResponse } from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 (async () => {
   expectType<TokenResponse>(await authClient.token.parseFromUrl());
   expectType<TokenResponse>(await authClient.token.parseFromUrl({

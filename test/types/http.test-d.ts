@@ -14,5 +14,5 @@
 import { OktaAuth } from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 expectType<void>(authClient.http.setRequestHeader('Authorization', 'SSWS'));

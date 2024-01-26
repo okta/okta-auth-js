@@ -20,7 +20,7 @@ import {
 } from '@okta/okta-auth-js';
 import { expectType } from 'tsd';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 expectType<IdxTransaction>(await authClient.idx.register());
 expectType<IdxTransaction>(await authClient.idx.recoverPassword());
 expectType<IdxTransaction>(await authClient.idx.unlockAccount());

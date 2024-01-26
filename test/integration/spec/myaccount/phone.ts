@@ -68,6 +68,8 @@ describe('MyAccount Phone API', () => {
       });
 
       // get phone
+      // TODO: quarantine follow up - OKTA-686334
+      //   "lastMethod": "sms", was removed from snapshot
       const transaction = await phone.get();
       expect(transaction).toMatchSnapshot({
         headers: expect.any(Object),
