@@ -36,6 +36,8 @@ You can learn more on the [Okta + JavaScript][lang-landing] page in our document
 
 This library uses semantic versioning and follows Okta's [library version policy](https://developer.okta.com/code/library-versions/).
 
+foo
+
 ## Release Status
 
 :heavy_check_mark: The current stable major version series is: `7.x`
