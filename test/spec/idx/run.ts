@@ -635,6 +635,15 @@ describe('idx/run', () => {
         await run(authClient);
         expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalled();
       });
+      it('does not save the idxResponse when legacy flag is provided', async () => {
+        const { idxResponse, authClient } = testContext;
+        idxResponse.actions = {
+          cancel: () => {}
+        };
+        jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+        await run(authClient, { __INTERNAL_legacyTerminalSaveBehavior__: true });
+        expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
+      });
     });
   });
 

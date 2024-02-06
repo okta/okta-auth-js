@@ -67,7 +67,9 @@ export interface RemediateOptions extends IdxOptions {
   useGenericRemediator?: boolean; // beta
 }
 
-export interface RunOptions extends RemediateOptions, InteractOptions, IntrospectOptions {}
+export interface RunOptions extends RemediateOptions, InteractOptions, IntrospectOptions {
+  __INTERNAL_legacyTerminalSaveBehavior__?: boolean;
+}
 
 export interface AuthenticationOptions extends
   RunOptions, 

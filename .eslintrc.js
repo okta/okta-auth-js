@@ -159,7 +159,7 @@ module.exports = {
     "prefer-const": 0,
     "node/no-unpublished-require": 0,
     "node/no-unpublished-import": 0,
-    camelcase: 2,
+    camelcase: ["error", {allow: ["__INTERNAL_"]}],
     complexity: [2, 7],
     curly: 2,
     "dot-notation": 0,
