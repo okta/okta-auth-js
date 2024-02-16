@@ -7,7 +7,7 @@ setup_e2e
 # overrides
 export ISSUER=https://oie-signin-widget.okta.com/oauth2/default
 
-export TEST_NAME=@okta/test.app
+export TEST_NAME=e2e
 
 # This client has refresh token enabled
 export CLIENT_ID=0oa8lrg7ojTsbJgRQ696

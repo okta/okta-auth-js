@@ -23,10 +23,11 @@ const browserOptions = {
     args: []
 };
 
-if (CI) {
-  if (process.env.CHROME_BINARY) {
+if (process.env.CHROME_BINARY) {
     browserOptions.binary = process.env.CHROME_BINARY;
-  }
+}
+
+if (CI) {
   browserOptions.args = browserOptions.args.concat([
       '--headless',
       '--disable-gpu',

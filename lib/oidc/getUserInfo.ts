@@ -11,10 +11,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  *
  */
-import { isFunction } from '../util';
-import { AuthSdkError, OAuthError } from '../errors';
+import { AuthSdkError, OAuthError, WWWAuthError, AuthApiError } from '../errors';
 import { httpRequest } from '../http';
 import { AccessToken, IDToken, UserClaims, isAccessToken, isIDToken, CustomUserClaims } from './types';
+import { findKeyPair, generateDPoPProof } from './dpop';
 
 export async function getUserInfo<T extends CustomUserClaims = CustomUserClaims>(
   sdk, accessTokenObject: AccessToken,
@@ -36,11 +36,23 @@ export async function getUserInfo<T extends CustomUserClaims = CustomUserClaims>
     return Promise.reject(new AuthSdkError('getUserInfo requires an ID token object'));
   }
 
-  return httpRequest(sdk, {
+  const options: any = {
     url: accessTokenObject.userinfoUrl,
     method: 'GET',
     accessToken: accessTokenObject.accessToken
-  })
+  };
+
+  if (sdk.options.dpop) {
+    const keyPair = await findKeyPair(accessTokenObject.dpopPairId);
+    const proof = await generateDPoPProof({ ...options, keyPair });
+    options.headers = {
+      DPoP: proof,
+      Authorization: `DPoP ${accessTokenObject.accessToken}`
+    };
+    delete options.accessToken;      // unset to prevent overriding Auth header with Bearer Token
+  }
+
+  return httpRequest(sdk, options)
     .then(userInfo => {
       // Only return the userinfo response if subjects match to mitigate token substitution attacks
       if (userInfo.sub === idTokenObject.claims.sub) {
@@ -49,23 +61,25 @@ export async function getUserInfo<T extends CustomUserClaims = CustomUserClaims>
       return Promise.reject(new AuthSdkError('getUserInfo request was rejected due to token mismatch'));
     })
     .catch(function (err) {
-      if (err.xhr && (err.xhr.status === 401 || err.xhr.status === 403)) {
-        var authenticateHeader;
-        if (err.xhr.headers && isFunction(err.xhr.headers.get) && err.xhr.headers.get('WWW-Authenticate')) {
-          authenticateHeader = err.xhr.headers.get('WWW-Authenticate');
-        } else if (isFunction(err.xhr.getResponseHeader)) {
-          authenticateHeader = err.xhr.getResponseHeader('WWW-Authenticate');
+      // throw OAuthError to avoid breaking change (when dpop is not being used)
+      if (err instanceof WWWAuthError && !sdk.options.dpop) {
+        const { error, errorDescription } = err;
+        throw new OAuthError(error, errorDescription);
+      }
+
+      // throw OAuthError to avoid breaking change (when dpop is not being used)
+      if (!sdk.options.dpop) {
+        let e = err;
+        if (err instanceof AuthApiError && err?.meta?.wwwAuthHeader) {
+          e = WWWAuthError.parseHeader(err.meta.wwwAuthHeader as string);
         }
-        if (authenticateHeader) {
-          var errorMatches = authenticateHeader.match(/error="(.*?)"/) || [];
-          var errorDescriptionMatches = authenticateHeader.match(/error_description="(.*?)"/) || [];
-          var error = errorMatches[1];
-          var errorDescription = errorDescriptionMatches[1];
-          if (error && errorDescription) {
-            err = new OAuthError(error, errorDescription);
-          }
+
+        if (e instanceof WWWAuthError) {
+          const { error, errorDescription } = e;
+          throw new OAuthError(error, errorDescription);
         }
       }
+
       throw err;
     });
 }

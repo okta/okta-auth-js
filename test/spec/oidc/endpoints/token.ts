@@ -20,14 +20,18 @@ jest.mock('../../../../lib/http', () => {
 });
 
 const mocked = {
-  http: require('../../../../lib/http')
+  http: require('../../../../lib/http'),
 };
 
 import { OktaAuth, AuthSdkError } from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
-import { postToTokenEndpoint } from '../../../../lib/oidc/endpoints/token';
+import { postToTokenEndpoint, postRefreshToken } from '../../../../lib/oidc/endpoints/token';
 import factory from '@okta/test.support/factory';
+import tokens from '@okta/test.support/tokens';
 import { CustomUrls } from '../../../../lib/oidc/types';
+import { OAuthError } from '../../../../lib/errors';
+import { generateKeyPair } from '../../../../lib/oidc/dpop';
+import { decodeToken } from '../../../../lib/oidc';
 
 describe('token endpoint', function() {
   var ISSUER = 'http://example.okta.com';
@@ -101,54 +105,188 @@ describe('token endpoint', function() {
       };
     });
 
-    it('Does not throw if options are valid', function() {
+    it('Does not throw if options are valid', async () => {
       var httpRequst = jest.spyOn(mocked.http, 'httpRequest').mockImplementation();
       var urls = {
         tokenUrl: 'http://superfake'
       };
-      postToTokenEndpoint(authClient, oauthOptions, urls);
+      await postToTokenEndpoint(authClient, oauthOptions, urls);
       expect(httpRequst).toHaveBeenCalled();
     });
 
-    it('Throws if no clientId', function() {
+    it('Throws if no clientId', async () => {
       oauthOptions.clientId = undefined;
       try {
-        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
+        await postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
       } catch(e) {
         expect(e instanceof AuthSdkError).toBe(true);
         expect((e as Error).message).toBe('A clientId must be specified in the OktaAuth constructor to get a token');
       }
     });
 
-    it('Throws if no redirectUri', function() {
+    it('Throws if no redirectUri', async () => {
       oauthOptions.redirectUri = undefined;
       try {
-        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
+        await postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
       } catch(e) {
         expect(e instanceof AuthSdkError).toBe(true);
         expect((e as Error).message).toBe('The redirectUri passed to /authorize must also be passed to /token');
       }
     });
 
-    it('Throws if no authorizationCode', function() {
+    it('Throws if no authorizationCode', async () => {
       oauthOptions.authorizationCode = undefined;
       try {
-        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
+        await postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
       } catch(e) {
         expect(e instanceof AuthSdkError).toBe(true);
         expect((e as Error).message).toBe('An authorization code (returned from /authorize) must be passed to /token');
       }
     });
 
-    it('Throws if no codeVerifier', function() {
+    it('Throws if no codeVerifier', async () => {
       oauthOptions.codeVerifier = undefined;
       try {
-        postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
+        await postToTokenEndpoint(authClient, oauthOptions, undefined as unknown as CustomUrls);
       } catch(e) {
         expect(e instanceof AuthSdkError).toBe(true);
         expect((e as Error).message).toBe('The "codeVerifier" (generated and saved by your app) must be passed to /token');
       }
     });
 
+  });
+
+  describe('dpop', () => {
+    const ctx: any = {};
+
+    beforeEach(async () => {
+      ctx.client = new OktaAuth({
+        issuer: 'https://auth-js-test.okta.com',
+        dpop: true
+      });
+
+      ctx.options = {
+        dpop: true,
+        clientId: CLIENT_ID,
+        redirectUri: REDIRECT_URI,
+        authorizationCode: authorizationCode,
+        codeVerifier: codeVerifier,
+        dpopKeyPair: await generateKeyPair()
+      };
+
+      ctx.urls = {
+        tokenUrl: 'http://superfake'
+      };
+
+      ctx.refreshToken = tokens.standardRefreshTokenParsed;
+    });
+
+    describe('postToTokenEndpoint', () => {
+      it('throws if no key pair is provided', async () => {
+        const { client, options, urls } = ctx;
+        jest.spyOn(mocked.http, 'httpRequest').mockImplementation();
+        options.dpopKeyPair = undefined;
+        await expect(async () => await postToTokenEndpoint(client, options, urls)).rejects.toThrow();
+      });
+  
+      it('handles dpop nonce error (happpy path)', async () => {
+        const { client, options, urls } = ctx;
+        const httpSpy = jest.spyOn(mocked.http, 'httpRequest')
+          .mockRejectedValueOnce(new OAuthError('use_dpop_nonce',
+            'Authorization server requires nonce in DPoP proof.',
+            { status: 400, responseText: 'Bad Request', headers: { 'dpop-nonce': 'nonceuponatime' }})
+          ).mockImplementation();
+        await postToTokenEndpoint(client, options, urls);
+        expect(httpSpy).toHaveBeenCalledTimes(2);
+        const firstCall = (httpSpy.mock.calls[0][1] as any).headers.DPoP;
+        const secondCall = (httpSpy.mock.calls[1][1] as any).headers.DPoP;
+        expect(firstCall).not.toEqual(secondCall);
+        expect(decodeToken(firstCall)).toMatchObject({
+          header: {
+            alg: 'RS256',
+            typ: 'dpop+jwt',
+            jwk: expect.objectContaining({
+              n: expect.any(String)
+            })
+          },
+          payload: {
+            htm: 'POST',
+            htu: 'http://superfake',
+            iat: expect.any(Number),
+            jti: expect.any(String),
+          }
+        });
+        expect(decodeToken(secondCall)).toMatchObject({
+          header: {
+            alg: 'RS256',
+            typ: 'dpop+jwt',
+            jwk: expect.objectContaining({
+              n: expect.any(String)
+            })
+          },
+          payload: {
+            htm: 'POST',
+            htu: 'http://superfake',
+            iat: expect.any(Number),
+            jti: expect.any(String),
+            nonce: 'nonceuponatime'
+          }
+        });
+      });
+    });
+
+    describe('postRefreshToken', () => {
+      it('throws if no key pair is provided', async () => {
+        const { client, options, refreshToken } = ctx;
+        jest.spyOn(mocked.http, 'httpRequest').mockImplementation();
+        options.dpopKeyPair = undefined;
+        await expect(async () => await postRefreshToken(client, options, refreshToken)).rejects.toThrow();
+      });
+  
+      it('handles dpop nonce error (happpy path)', async () => {
+        const { client, options, refreshToken } = ctx;
+        const httpSpy = jest.spyOn(mocked.http, 'httpRequest')
+          .mockRejectedValueOnce(new OAuthError('use_dpop_nonce',
+            'Authorization server requires nonce in DPoP proof.',
+            { status: 400, responseText: 'Bad Request', headers: { 'dpop-nonce': 'nonceuponatime' }})
+          ).mockImplementation();
+        await postRefreshToken(client, options, refreshToken);
+        expect(httpSpy).toHaveBeenCalledTimes(2);
+        const firstCall = (httpSpy.mock.calls[0][1] as any).headers.DPoP;
+        const secondCall = (httpSpy.mock.calls[1][1] as any).headers.DPoP;
+        expect(firstCall).not.toEqual(secondCall);
+        expect(decodeToken(firstCall)).toMatchObject({
+          header: {
+            alg: 'RS256',
+            typ: 'dpop+jwt',
+            jwk: expect.objectContaining({
+              n: expect.any(String)
+            })
+          },
+          payload: {
+            htm: 'POST',
+            htu: 'https://auth-js-test.okta.com/oauth2/v1/token',
+            iat: expect.any(Number),
+            jti: expect.any(String),
+          }
+        });
+        expect(decodeToken(secondCall)).toMatchObject({
+          header: {
+            alg: 'RS256',
+            typ: 'dpop+jwt',
+            jwk: expect.objectContaining({
+              n: expect.any(String)
+            })
+          },
+          payload: {
+            htm: 'POST',
+            htu: 'https://auth-js-test.okta.com/oauth2/v1/token',
+            iat: expect.any(Number),
+            jti: expect.any(String),
+            nonce: 'nonceuponatime'
+          }
+        });
+      });
+    });
   });
 });

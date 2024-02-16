@@ -399,6 +399,105 @@ Additionally, if using hash routing, we recommend using PKCE and responseMode "q
    2. Add tokens to the  `TokenManager`: [tokenManager.setTokens](#tokenmanagersettokenstokens)
 6. Read saved route and redirect to it: [getOriginalUri](#getoriginaluristate)
 
+### Enabling DPoP
+<sub><sup>*Reference: DPoP (Demonstrating Proof-of-Possession) - [RFC9449](https://datatracker.ietf.org/doc/html/rfc9449)*</sub></sup>
+
+#### Requirements
+* `DPoP` must be enabled in your Okta application ([Guide: Configure DPoP](https://developer.okta.com/docs/guides/dpop/main/))
+* Only supported on web (browser)
+* `https` is required. A [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts) is required for `WebCrypto.subtle`
+* Targeted browsers must support `IndexedDB` ([MDN](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API), [caniuse](https://caniuse.com/indexeddb))
+* :warning: IE11 (and lower) is not supported!
+
+#### Configuration
+```javascript
+const config = {
+  // other configurations
+  pkce: true,     // required
+  dpop: true,
+};
+
+const authClient = new OktaAuth(config);
+```
+
+#### Providing DPoP Proof to Resource Requests
+<sub><sup>*Reference: **The DPoP Authentication Scheme** ([RFC9449](https://datatracker.ietf.org/doc/html/rfc9449#name-the-dpop-authentication-sch))*</sub></sup>
+
+##### DPoP-Protected Resource Request ([link](https://datatracker.ietf.org/doc/html/rfc9449#name-dpop-protected-resource-req))
+```
+GET /protectedresource HTTP/1.1
+Host: resource.example.org
+Authorization: DPoP Kz~8mXK1EalYznwH-LC-1fBAo.4Ljp~zsPE_NeO.gxU
+DPoP: eyJ0eXAiOiJkcG9wK2p3dCIsIm...
+```
+
+##### Fetching DPoP-Protected Resource
+```javascript
+async function dpopAuthenticatedFetch (url, options) {
+  const { method } = options;
+  const dpop = await authClient.getDPoPAuthorizationHeaders({ url, method });
+  // dpop = { Authorization: "DPoP token****", Dpop: "proof****" }
+  const headers = new Headers({...options.headers, ...dpop});
+  return fetch(url, {...options, headers });
+}
+```
+
+#### Handling `use_dpop_nonce`
+<sub><sup>*Reference: **Resource Server-Provided Nonce** ([RFC9449](https://datatracker.ietf.org/doc/html/rfc9449#name-resource-server-provided-no))*</sub></sup>
+
+> Resource servers can also choose to provide a nonce value to be included in DPoP proofs sent to them. They provide the nonce using the DPoP-Nonce header in the same way that authorization servers do...
+
+##### Resource Server Response
+```
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: DPoP error="use_dpop_nonce", \
+   error_description="Resource server requires nonce in DPoP proof"
+DPoP-Nonce: eyJ7S_zG.eyJH0-Z.HX4w-7v
+```
+##### Handling Response
+```javascript
+async function dpopAuthenticatedFetch (url, options) {
+  // ...previous example...
+  const resp = await fetch(url, {...options, headers });
+  // resp = HTTP/1.1 401 Unauthorized...
+
+  if (!resp.ok) {
+    const nonce = authClient.parseUseDPoPNonceError(resp.headers);
+    if (nonce) {
+      const retryDpop = await authClient.getDPoPAuthorizationHeaders({ url, method, nonce });
+      const retryHeaders = new Headers({...options.headers, ...retryDpop});
+      return fetch(url, {...options, headers: retryHeaders });
+    }
+  }
+
+  return resp;
+}
+```
+
+#### Ensure browser can support DPoP (*Recommended*)
+DPoP requires certain browser features. A user using a browser without the required features will unable to complete a request for tokens. It's recommended to verify browser support during application bootstrapping
+
+```javascript
+// App.tsx
+useEffect(() => {
+  if (!authClient.features.isDPoPSupported()) {
+    // user will be unable to request tokens
+    navigate('/unsupported-error-page');
+  }
+}, []);
+```
+
+#### Clear DPoP Storage (*Recommended*)
+DPoP requires the generation of a `CryptoKeyPair` which needs to persist in storage. Methods like `signOut()` or `revokeAccessToken()` will clear the key pair, however users don't always explicitly logout. It's good practice to clear storage before login to flush any orphaned key pairs generated from previously requested tokens
+
+```javascript
+async function login (options) {
+  await authClient.clearDPoPStorage();      // clear possibly orphaned key pairs
+
+  return authClient.signInWithRedirect(options);
+}
+```
+
 ## Configuration reference
 
 Whether you are using this SDK to implement an OIDC flow or for communicating with the [Authentication API](https://developer.okta.com/docs/api/resources/authn), the only required configuration option is `issuer`, which is the URL to an Okta [Authorization Server](https://developer.okta.com/docs/guides/customize-authz-server/overview/)
@@ -469,6 +568,13 @@ A client-provided string that will be passed to the server endpoint and returned
 #### `pkce`
 
 Default value is `true` which enables the [PKCE OAuth Flow](#pkce-oauth-20-flow). To use the [Implicit Flow](#implicit-oauth-20-flow) or [Authorization Code Flow](#authorization-code-flow-for-web-and-native-client-types), set `pkce` to `false`.
+
+#### `dpop`
+
+Default value is `false`. Set to `true` to enable `DPoP` (Demonstrating Proof-of-Possession ([RFC9449](https://datatracker.ietf.org/doc/html/rfc9449)))
+
+See Guide: [Enabling DPoP](#enabling-dpop)
+
 
 #### responseMode
 
@@ -915,6 +1021,9 @@ The amount of time, in seconds, a tab needs to be inactive for the `RenewOnTabAc
 * [tx.resume](#txresume)
 * [tx.exists](#txexists)
 * [transaction.status](#transactionstatus)
+* [getDPoPAuthorizationHeaders](#getdpopauthorizationheaders)
+* [parseUseDPoPNonceError](#parseusedpopnonceerror)
+* [clearDPoPStorage](#cleardpopstorage)
 * [session](#session)
   * [session.setCookieAndRedirect](#sessionsetcookieandredirectsessiontoken-redirecturi)
   * [session.exists](#sessionexists)
@@ -1269,6 +1378,39 @@ See [authn API](docs/authn.md#txexists).
 ### `transaction.status`
 
 See [authn API](docs/authn.md#transactionstatus).
+
+### `getDPoPAuthorizationHeaders(params)`
+
+> :link: web browser only <br>
+> :hourglass: async <br>
+
+Requires [dpop](#dpop) set to `true`. Returns `Authorization` and `Dpop` header values to build a DPoP protected-request.
+
+Params: `url` and (http) `method` are required.
+*  `accessToken` is optional, but will be read from `tokenStorage` if not provided
+*  `nonce` is optional, may be provided via `use_dpop_nonce` pattern from Resource Server ([more info](#handling-use_dpop_nonce))
+
+### `parseUseDPoPNonceError(headers)`
+
+> :link: web browser only <br>
+
+Utility to extract and parse the `WWW-Authenticate` and `DPoP-Nonce` headers from a network response from a DPoP-protected request. Should the response be in the following format, the `nonce` value will be returned. Otherwise returns `null`
+
+```
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: DPoP error="use_dpop_nonce", \
+   error_description="Resource server requires nonce in DPoP proof"
+DPoP-Nonce: eyJ7S_zG.eyJH0-Z.HX4w-7v
+```
+
+### `clearDPoPStorage(clearAll=false)`
+
+> :link: web browser only <br>
+> :hourglass: async <br>
+
+Clears storage location of `CryptoKeyPair`s generated and used by DPoP. Pass `true` to remove all key pairs as it's possible for orphaned key pairs to exist. If `clearAll` is `false`, the key pair bound to the current `accessToken` in tokenStorage will be removed.
+
+It's recommended to call this function during user login. [See Example](#clear-dpop-storage-recommended)
 
 ### `session`
 

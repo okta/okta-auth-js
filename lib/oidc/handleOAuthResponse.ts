@@ -39,6 +39,12 @@ function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
   if (res.state !== oauthParams.state) {
     throw new AuthSdkError('OAuth flow response state doesn\'t match request state');
   }
+
+  // https://datatracker.ietf.org/doc/html/rfc9449#token-response
+  // "A token_type of DPoP MUST be included in the access token response to signal to the client"
+  if (oauthParams.dpop && res.token_type !== 'DPoP') {
+    throw new AuthSdkError('Unable to parse OAuth flow response: DPoP was configured but "token_type" was not DPoP');
+  }
 }
 
 export async function handleOAuthResponse(
@@ -96,6 +102,10 @@ export async function handleOAuthResponse(
       authorizeUrl: urls.authorizeUrl!,
       userinfoUrl: urls.userinfoUrl!
     };
+
+    if (tokenParams.dpopPairId) {
+      tokenDict.accessToken.dpopPairId = tokenParams.dpopPairId;
+    }
   }
 
   if (refreshToken) {
@@ -109,6 +119,10 @@ export async function handleOAuthResponse(
       authorizeUrl: urls.authorizeUrl!,
       issuer: urls.issuer!,
     };
+
+    if (tokenParams.dpopPairId) {
+      tokenDict.refreshToken.dpopPairId = tokenParams.dpopPairId;
+    }
   }
 
   if (idToken) {

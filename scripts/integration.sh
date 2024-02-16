@@ -17,6 +17,7 @@ get_vault_secret_key devex/auth-js-sdk-vars a18n_api_key A18N_API_KEY
 # This client has refresh token enabled and password optional
 export CLIENT_ID=0oa3b5fp4h02UIrjZ697
 
+create_log_group "Integration Test Run"
 if ! yarn test:integration; then
   echo "integration failed! Exiting..."
   exit ${TEST_FAILURE}
@@ -25,3 +26,4 @@ fi
 echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
 echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
 exit ${PUBLISH_TYPE_AND_RESULT_DIR}
+finish_log_group $?

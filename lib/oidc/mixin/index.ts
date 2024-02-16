@@ -2,6 +2,7 @@ import { httpRequest, RequestOptions } from '../../http';
 import { OktaAuthConstructor } from '../../base/types';
 import { 
   PromiseQueue,
+  isFunction
 } from '../../util';
 import { CryptoAPI } from '../../crypto/types';
 import * as crypto from '../../crypto';
@@ -26,11 +27,22 @@ import {
   TransactionManagerConstructor,
   UserClaims,
   Endpoints,
+  DPoPRequest,
+  DPoPHeaders
 } from '../types';
 import PKCE from '../util/pkce';
 import { createEndpoints, createTokenAPI } from '../factory/api';
 import { TokenManager } from '../TokenManager';
 import { getOAuthUrls, isLoginRedirect, hasResponseType } from '../util';
+import { 
+  generateDPoPProof,
+  clearDPoPKeyPair,
+  clearAllDPoPKeyPairs,
+  clearDPoPKeyPairAfterRevoke,
+  findKeyPair,
+  isDPoPNonceError
+} from '../dpop';
+import { AuthSdkError, WWWAuthError } from '../../errors';
 
 import { OktaAuthSessionInterface } from '../../session/types';
 import { provideOriginalUri } from './node';
@@ -234,9 +246,14 @@ export function mixinOAuth
     // Revokes the access token for the application session
     async revokeAccessToken(accessToken?: AccessToken): Promise<unknown> {
       if (!accessToken) {
-        accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
+        const tokens = await this.tokenManager.getTokens();
+        accessToken = tokens.accessToken;
         const accessTokenKey = this.tokenManager.getStorageKeyByType('accessToken');
         this.tokenManager.remove(accessTokenKey);
+
+        if (this.options.dpop) {
+          await clearDPoPKeyPairAfterRevoke('access', tokens);
+        }
       }
       // Access token may have been removed. In this case, we will silently succeed.
       if (!accessToken) {
@@ -248,9 +265,14 @@ export function mixinOAuth
     // Revokes the refresh token for the application session
     async revokeRefreshToken(refreshToken?: RefreshToken): Promise<unknown> {
       if (!refreshToken) {
-        refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
+        const tokens = await this.tokenManager.getTokens();
+        refreshToken = tokens.refreshToken;
         const refreshTokenKey = this.tokenManager.getStorageKeyByType('refreshToken');
         this.tokenManager.remove(refreshTokenKey);
+
+        if (this.options.dpop) {
+          await clearDPoPKeyPairAfterRevoke('refresh', tokens);
+        }
       }
       // Refresh token may have been removed. In this case, we will silently succeed.
       if (!refreshToken) {
@@ -333,6 +355,11 @@ export function mixinOAuth
         await this.revokeAccessToken(accessToken);
       }
 
+      const dpopPairId = accessToken?.dpopPairId ?? refreshToken?.dpopPairId;
+      if (this.options.dpop && dpopPairId) {
+        await clearDPoPKeyPair(dpopPairId);
+      }
+
       const logoutUri = this.getSignOutRedirectUrl({ ...options, postLogoutRedirectUri });
       // No logoutUri? This can happen if the storage was cleared.
       // Fallback to XHR signOut, then simulate a redirect to the post logout uri
@@ -363,6 +390,55 @@ export function mixinOAuth
       }
     }
 
+    async getDPoPAuthorizationHeaders (params: DPoPRequest): Promise<DPoPHeaders> {
+      if (!this.options.dpop) {
+        throw new AuthSdkError('DPoP is not configured for this client instance');
+      }
+
+      let { accessToken } = params;
+      if (!accessToken) {
+        accessToken = (this.tokenManager.getTokensSync()).accessToken;
+      }
+
+      if (!accessToken) {
+        throw new AuthSdkError('AccessToken is required to generate a DPoP Proof');
+      }
+
+      const keyPair = await findKeyPair(accessToken?.dpopPairId);
+      const proof = await generateDPoPProof({...params, keyPair, accessToken: accessToken.accessToken});
+      return {
+        Authorization: `DPoP ${accessToken.accessToken}`,
+        Dpop: proof
+      };
+    }
+
+    async clearDPoPStorage (clearAll=false): Promise<void> {
+      if (clearAll) {
+        return clearAllDPoPKeyPairs();
+      }
+
+      const tokens = await this.tokenManager.getTokens();
+      const keyPair = tokens.accessToken?.dpopPairId || tokens.refreshToken?.dpopPairId;
+
+      if (keyPair) {
+        await clearDPoPKeyPair(keyPair);
+      }
+    }
+
+    parseUseDPoPNonceError (headers: HeadersInit): string | null {
+      const wwwAuth = WWWAuthError.getWWWAuthenticateHeader(headers);
+      const wwwErr = WWWAuthError.parseHeader(wwwAuth ?? '');
+      if (isDPoPNonceError(wwwErr)) {
+        let nonce: string | null = null;
+        if (isFunction((headers as Headers)?.get)) {
+          nonce = (headers as Headers).get('DPoP-Nonce');
+        }
+        nonce = nonce ?? headers['dpop-nonce'] ?? headers['DPoP-Nonce'];
+        return nonce;
+      }
+
+      return null;
+    }
   };
 
 }

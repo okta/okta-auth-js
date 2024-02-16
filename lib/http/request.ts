@@ -22,35 +22,8 @@ import {
   RequestData,
   HttpResponse
 } from './types';
-import { AuthApiError, OAuthError, AuthSdkError, APIError } from '../errors';
+import { AuthApiError, OAuthError, APIError, WWWAuthError } from '../errors';
 
-type InsufficientAuthenticationError = {
-  error: string;
-  // eslint-disable-next-line camelcase
-  error_description: string;
-  // eslint-disable-next-line camelcase
-  max_age: string;
-  // eslint-disable-next-line camelcase
-  acr_values: string;
-};
-
-const parseInsufficientAuthenticationError = (
-  header: string
-): InsufficientAuthenticationError => {
-  if (!header) {
-    throw new AuthSdkError('Missing header string');
-  }
-
-  return header
-    .split(',')
-    .map(part => part.trim())
-    .map(part => part.split('='))
-    .reduce((acc, curr) => {
-      // unwrap quotes from value
-      acc[curr[0]] = curr[1].replace(/^"(.*)"$/, '$1');
-      return acc;
-    }, {}) as InsufficientAuthenticationError;
-};
 
 const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): AuthApiError | OAuthError => {
   if (error instanceof Error) {
@@ -62,7 +35,7 @@ const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): A
   }
 
   let resp: HttpResponse = error;
-  let err: AuthApiError | OAuthError;
+  let err: AuthApiError | OAuthError | WWWAuthError;
   let serverErr: Record<string, any> = {};
   if (resp.responseText && isString(resp.responseText)) {
     try {
@@ -82,30 +55,27 @@ const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): A
     resp = sdk.options.transformErrorXHR(clone(resp));
   }
 
+  // 
+  const wwwAuthHeader = WWWAuthError.getWWWAuthenticateHeader(resp?.headers) ?? '';
+
   if (serverErr.error && serverErr.error_description) {
-    err = new OAuthError(serverErr.error, serverErr.error_description);
+    err = new OAuthError(serverErr.error, serverErr.error_description, resp);
   } else {
-    err = new AuthApiError(serverErr as APIError, resp);
+    err = new AuthApiError(serverErr as APIError, resp, { wwwAuthHeader });
   }
 
-  if (resp?.status === 403 && !!resp?.headers?.['www-authenticate']) {
-    const { 
-      error, 
+  if (wwwAuthHeader && resp?.status >= 400 && resp?.status < 500) {
+    const wwwAuthErr = WWWAuthError.parseHeader(wwwAuthHeader);
+    // check for 403 to avoid breaking change
+    if (resp.status === 403 && wwwAuthErr?.error === 'insufficient_authentication_context') {
       // eslint-disable-next-line camelcase
-      error_description,
-      // eslint-disable-next-line camelcase
-      max_age,
-      // eslint-disable-next-line camelcase
-      acr_values 
-    } = parseInsufficientAuthenticationError(resp?.headers?.['www-authenticate']);
-    if (error === 'insufficient_authentication_context') {
+      const { max_age, acr_values } = wwwAuthErr.parameters;
       err = new AuthApiError(
-        { 
-          errorSummary: error,
-          // eslint-disable-next-line camelcase
-          errorCauses: [{ errorSummary: error_description }]
-        }, 
-        resp, 
+        {
+          errorSummary: wwwAuthErr.error,
+          errorCauses: [{ errorSummary: wwwAuthErr.errorDescription }]
+        },
+        resp,
         {
           // eslint-disable-next-line camelcase
           max_age: +max_age,
@@ -114,6 +84,13 @@ const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): A
         }
       );
     }
+    else if (wwwAuthErr?.scheme === 'DPoP') {
+      err = wwwAuthErr;
+    }
+    // else {
+    //   // WWWAuthError.parseHeader may return null, only overwrite if !null
+    //   err = wwwAuthErr ?? err;
+    // }
   }
 
   return err;

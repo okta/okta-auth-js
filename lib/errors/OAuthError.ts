@@ -12,6 +12,7 @@
  */
 
 import CustomError from './CustomError';
+import type { HttpResponse } from '../http';
 
 export default class OAuthError extends CustomError {
   errorCode: string;
@@ -21,7 +22,9 @@ export default class OAuthError extends CustomError {
   error: string;
   error_description: string;
 
-  constructor(errorCode: string, summary: string) {
+  resp: HttpResponse | null = null;
+
+  constructor(errorCode: string, summary: string, resp?: HttpResponse) {
     super(summary);
 
     this.name = 'OAuthError';
@@ -31,6 +34,12 @@ export default class OAuthError extends CustomError {
     // for widget / idx-js backward compatibility
     this.error = errorCode;
     this.error_description = summary;
+
+    // an OAuth error (should) always result from a network request
+    // therefore include that in error for potential error handling
+    if (resp) {
+      this.resp = resp;
+    }
   }
 }
 

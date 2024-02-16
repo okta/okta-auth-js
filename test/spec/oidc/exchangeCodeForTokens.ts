@@ -15,8 +15,13 @@ const postToTokenEndpoint = jest.fn();
 jest.mock('../../../lib/oidc/endpoints/token', () => { return { postToTokenEndpoint }; });
 const handleOAuthResponse = jest.fn();
 jest.mock('../../../lib/oidc/handleOAuthResponse', () => { return { handleOAuthResponse }; });
+const findKeyPair = jest.fn();
+const createDPoPKeyPair = jest.fn();
+jest.mock('../../../lib/oidc/dpop', () => { return { findKeyPair, createDPoPKeyPair }; });
+
 
 import { exchangeCodeForTokens, getOAuthUrls } from '../../../lib/oidc';
+// import { generateKeyPair } from '../../../lib/oidc/dpop';
 import { OktaAuthOAuthInterface } from '../../../lib/oidc/types';
 
 function mockOktaAuth(): OktaAuthOAuthInterface {
@@ -30,6 +35,14 @@ function mockOktaAuth(): OktaAuthOAuthInterface {
   } as unknown as OktaAuthOAuthInterface;
 }
 
+const testParams = {
+  authorizationCode: 'a',
+  clientId: 'x',
+  codeVerifier: 'y',
+  interactionCode: 'b',
+  redirectUri: 'http://localhost',
+};
+
 describe('exchangeCodeForTokens', () => {
 
   it('passes parameters to `postToTokenEndpoint`', async () => {
@@ -38,21 +51,15 @@ describe('exchangeCodeForTokens', () => {
     const tokenResponse = {}; // response to caller
     (postToTokenEndpoint as jest.Mock).mockResolvedValue(oauthResponse);
     (handleOAuthResponse as jest.Mock).mockResolvedValue(tokenResponse);
-    const authorizationCode = 'a';
-    const clientId = 'x';
-    const codeVerifier = 'y';
-    const interactionCode = 'b';
-    const redirectUri = 'http://localhost';
     const acrValues = 'foo';
-    const getTokenOptions = { authorizationCode, clientId, codeVerifier, interactionCode, redirectUri };
-    const tokenParams = { ...getTokenOptions, acrValues };
+    const tokenParams = { ...testParams, acrValues };
     const urls = getOAuthUrls(sdk);
     await exchangeCodeForTokens(sdk, tokenParams);
-    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, getTokenOptions, urls);
+    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, testParams, urls);
     expect(handleOAuthResponse).toHaveBeenCalledWith(sdk, {
-      clientId,
+      clientId: testParams.clientId,
       ignoreSignature: undefined,
-      redirectUri,
+      redirectUri: testParams.redirectUri,
       responseType: ['token', 'id_token'],
       scopes: ['openid', 'email'],
       acrValues
@@ -65,22 +72,69 @@ describe('exchangeCodeForTokens', () => {
     const tokenResponse = {}; // response to caller
     (postToTokenEndpoint as jest.Mock).mockResolvedValue(oauthResponse);
     (handleOAuthResponse as jest.Mock).mockResolvedValue(tokenResponse);
-    const authorizationCode = 'a';
-    const clientId = 'x';
-    const codeVerifier = 'y';
-    const interactionCode = 'b';
-    const redirectUri = 'http://localhost';
     const scopes = ['email'];
-    const tokenParams = { authorizationCode, clientId, codeVerifier, interactionCode, redirectUri, scopes };
+    const tokenParams = { ...testParams, scopes };
     const urls = getOAuthUrls(sdk);
     await exchangeCodeForTokens(sdk, tokenParams);
-    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, { authorizationCode, clientId, codeVerifier, interactionCode, redirectUri }, urls);
+    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, testParams, urls);
     expect(handleOAuthResponse).toHaveBeenCalledWith(sdk, {
-      clientId,
+      clientId: testParams.clientId,
       ignoreSignature: undefined,
-      redirectUri,
+      redirectUri: testParams.redirectUri,
       responseType: ['token'],
       scopes: ['email']
+    }, oauthResponse, urls);
+  });
+
+  it('should pass dpop key pair during token refresh', async () => {
+    const sdk = mockOktaAuth();
+    const oauthResponse = {}; // response from token endpoint
+    const tokenResponse = {}; // response to caller
+    (postToTokenEndpoint as jest.Mock).mockResolvedValue(oauthResponse);
+    (handleOAuthResponse as jest.Mock).mockResolvedValue(tokenResponse);
+    (findKeyPair as jest.Mock).mockResolvedValue({});
+    const scopes = ['email'];
+    const tokenParams = { ...testParams, scopes, dpop: true, dpopPairId: 'foo' };
+    const urls = getOAuthUrls(sdk);
+    await exchangeCodeForTokens(sdk, tokenParams);
+    expect(findKeyPair).toBeCalledWith('foo');
+    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, {
+      ...testParams, dpop: true, dpopKeyPair: {}
+    }, urls);
+    expect(handleOAuthResponse).toHaveBeenCalledWith(sdk, {
+      clientId: testParams.clientId,
+      ignoreSignature: undefined,
+      redirectUri: testParams.redirectUri,
+      responseType: ['token'],
+      scopes: ['email'],
+      dpop: true,
+      dpopPairId: 'foo',
+    }, oauthResponse, urls);
+  });
+
+  it('should create and pass dpop key pair during initial token request', async () => {
+    const sdk = mockOktaAuth();
+    const oauthResponse = {}; // response from token endpoint
+    const tokenResponse = {}; // response to caller
+    (postToTokenEndpoint as jest.Mock).mockResolvedValue(oauthResponse);
+    (handleOAuthResponse as jest.Mock).mockResolvedValue(tokenResponse);
+    (createDPoPKeyPair as jest.Mock).mockResolvedValue({ keyPair: {}, keyPairId: 'bar'});
+    const scopes = ['email'];
+    const tokenParams = { ...testParams, scopes, dpop: true };
+    const urls = getOAuthUrls(sdk);
+    await exchangeCodeForTokens(sdk, tokenParams);
+    expect(createDPoPKeyPair).toHaveBeenCalledTimes(1);
+    expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, {
+      ...testParams, dpop: true, dpopKeyPair: {}
+    }, urls);
+    expect(handleOAuthResponse).toHaveBeenCalledWith(sdk, {
+      clientId: testParams.clientId,
+      ignoreSignature: undefined,
+      redirectUri: testParams.redirectUri,
+      responseType: ['token'],
+      scopes: ['email'],
+      dpop: true,
+      dpopPairId: 'bar',
     }, oauthResponse, urls);
   });
 });
