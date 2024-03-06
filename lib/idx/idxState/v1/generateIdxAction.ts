@@ -13,7 +13,7 @@
 /* eslint-disable max-len, complexity */
 import { httpRequest } from '../../../http';
 import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
-import { IdxActionFunction, IdxActionParams, IdxResponse, IdxToPersist } from '../../types/idx-js';
+import { IdxActionFunction, IdxActionParams, IdxResponse, IdxToPersist, isRawIdxResponse } from '../../types/idx-js';
 import { divideActionParamsByMutability } from './actionParser';
 import AuthApiError from '../../../errors/AuthApiError';
 
@@ -55,7 +55,8 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdx
       const payload = response.responseJSON || JSON.parse(response.responseText);
       const wwwAuthHeader = response.headers['WWW-Authenticate'] || response.headers['www-authenticate'];
 
-      const idxResponse = authClient.idx.makeIdxResponse({ ...payload }, toPersist, false);
+      // requestDidSucceed should be true when an IDX payload is returned
+      const idxResponse = authClient.idx.makeIdxResponse({ ...payload }, toPersist, isRawIdxResponse(payload));
       if (response.status === 401 && wwwAuthHeader === 'Oktadevicejwt realm="Okta Device"') {
         // Okta server responds 401 status code with WWW-Authenticate header and new remediation
         // so that the iOS/MacOS credential SSO extension (Okta Verify) can intercept

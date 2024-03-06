@@ -248,8 +248,7 @@ async function finalizeData(authClient: OktaAuthIdxInterface, data: RunData): Pr
   let terminal;
 
   if (idxResponse) {
-    // shouldSaveResponse = !!(idxResponse.requestDidSucceed || idxResponse.stepUp);
-    shouldSaveResponse = !!(idxResponse.stepUp || options.stateHandle !== idxResponse.context?.stateHandle);
+    shouldSaveResponse = !!(idxResponse.requestDidSucceed || idxResponse.stepUp);
     enabledFeatures = getEnabledFeatures(idxResponse);
     availableSteps = getAvailableSteps(authClient, idxResponse, options.useGenericRemediator);
     messages = getMessagesFromResponse(idxResponse, options);
