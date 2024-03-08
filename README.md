@@ -96,7 +96,7 @@ require('@okta/okta-auth-js/polyfill');
 The built polyfill bundle is also available on our global CDN. Include the following script in your HTML file to load before any other scripts:
 
 ```html
-<script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.polyfill.js" type="text/javascript"></script>
+<script src="https://global.oktacdn.com/okta-auth-js/7.5.1/okta-auth-js.polyfill.js" type="text/javascript" integrity="sha384-EBFsuVdi4TGp/DwS7b+t+wA8zmWK10omkX05ZjJWQhzWuW31t7FWEGOnHQeIr8+L" crossorigin="anonymous"></script>
 ```
 
 > :warning: The version shown in this sample may be older than the current version. We recommend using the highest version available
@@ -171,7 +171,7 @@ If you are using the JS on a web page from the browser, you can copy the `node_m
 The built library bundle is also available on our global CDN. Include the following script in your HTML file to load before your application script:
 
 ```html
-<script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js" type="text/javascript"></script>
+<script src="https://global.oktacdn.com/okta-auth-js/7.5.1/okta-auth-js.min.js" type="text/javascript" integrity="sha384-6epSwnIDkI5zFNEVNjEYy3A7aSZ+C7ehmEyG8zDJZfP9Bmnxc51TK8du+2me4pjb" crossorigin="anonymous"></script>
 ```
 
 > :warning: The version shown in this sample may be older than the current version. We recommend using the highest version available
