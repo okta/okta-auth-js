@@ -793,4 +793,45 @@ describe('token.getWithoutPrompt', function() {
     });
   });
 
+  it('returns no access_token using sessionToken with authorization server', function() {
+    return oauthUtil.setupFrame({
+      oktaAuthArgs: {
+        pkce: false,
+        issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect'
+      },
+      getWithoutPromptArgs: {
+        responseType: 'token',
+        sessionToken: 'testSessionToken',
+        bypassExchangeCodeForTokens: true
+      },
+      postMessageSrc: {
+        baseUri: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
+        queryParams: {
+          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+          'redirect_uri': 'https://example.com/redirect',
+          'response_type': 'token',
+          'response_mode': 'okta_post_message',
+          'state': oauthUtil.mockedState,
+          'nonce': oauthUtil.mockedNonce,
+          'scope': 'openid email',
+          'prompt': 'none',
+          'sessionToken': 'testSessionToken'
+        }
+      },
+      time: 1449699929,
+      postMessageResp: {
+        'access_token': tokens.authServerAccessToken,
+        'token_type': 'Bearer',
+        'expires_in': 3600,
+        'state': oauthUtil.mockedState
+      },
+      expectedResp: {
+        state: oauthUtil.mockedState,
+        tokens: {
+        },
+      }
+    });
+  });
 });
