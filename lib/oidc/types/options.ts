@@ -55,6 +55,7 @@ export interface TokenParams extends CustomUrls {
   extraParams?: { [propName: string]: string }; // custom authorize query params
   // TODO: remove in the next major version
   popupTitle?: string;
+  bypassExchangeCodeForTokens?: boolean;
 }
 
 export interface TokenManagerOptions {
