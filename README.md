@@ -1435,6 +1435,11 @@ authClient.token.getWithoutPrompt({
 });
 ```
 
+For special PKCE case where the client requesting the "authorization code" and the client owning the "code verifier" are not the same client, passing in `bypassExchangeCodeForTokens` set to true, as an attribute to the tokenParams input object will allow the first client to get the "authorization code" and the second client to exchange the code for tokens.
+
+This is accomplished by not immediately exchanging the "authorization code" for a "token" where it would normally use up the one time code, instead returning back the code to pass along to the other client. e.g: a ChatBot authentication flow, where one client (the main app), and another client (embedded ChatBot) are coordinating the PKCE Code Flow together.
+
+
 #### `token.getWithPopup(options)`
 
 > :link: web browser only <br>
