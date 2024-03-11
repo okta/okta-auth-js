@@ -51,7 +51,7 @@ export async function handleOAuthResponse(
 
   // The result contains an authorization_code and PKCE is enabled 
   // `exchangeCodeForTokens` will call /token then call `handleOauthResponse` recursively with the result
-  if (pkce && (res.code || res.interaction_code)) {
+  if (pkce && (res.code || res.interaction_code) && !tokenParams.bypassExchangeCodeForTokens) {
     return sdk.token.exchangeCodeForTokens(Object.assign({}, tokenParams, {
       authorizationCode: res.code,
       interactionCode: res.interaction_code
