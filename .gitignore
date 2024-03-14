@@ -18,6 +18,3 @@ dist
 .bacon.env
 
 !.gitkeep
-
-artifacts
-unpack
