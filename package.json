@@ -123,7 +123,6 @@
     "build:types": "tsc --emitDeclarationOnly",
     "docs:myaccount": "node typedoc.js",
     "generate:samples": "yarn workspace @okta/samples build && yarn install --ignore-scripts",
-    "generate:sri": "node scripts/generate-sri.js",
     "dev:samples": "yarn workspace @okta/samples dev",
     "prepare": "yarn build",
     "start": "yarn workspace @okta/test.app start --open",
