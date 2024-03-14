@@ -236,6 +236,7 @@ async function finalizeData(authClient: OktaAuthIdxInterface, data: RunData): Pr
     canceled,
     status,
   } = data;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { exchangeCodeForTokens, __INTERNAL_legacyTerminalSaveBehavior__ } = options;
   let shouldSaveResponse = false;
   let shouldClearTransaction = false;
@@ -271,11 +272,13 @@ async function finalizeData(authClient: OktaAuthIdxInterface, data: RunData): Pr
       // save response if there are actions available (ignore messages)
       // shouldSaveResponse = !!hasActions
       // fix: OKTA-654784 - gen2 depends on message merging, which requires responses to *not* save
-      shouldSaveResponse =
-        (__INTERNAL_legacyTerminalSaveBehavior__ && shouldSaveResponse && hasActions) || // leagcy
-        (!__INTERNAL_legacyTerminalSaveBehavior__ && !!hasActions);                      // current
-      // see https://github.com/okta/okta-auth-js/commit/ad8260e917424f277f83f7aca7cb302fe9fac24b
+      // shouldSaveResponse =
+      //   (__INTERNAL_legacyTerminalSaveBehavior__ && shouldSaveResponse && hasActions) || // leagcy
+      //   (!__INTERNAL_legacyTerminalSaveBehavior__ && !!hasActions);                      // current
+      // // see https://github.com/okta/okta-auth-js/commit/ad8260e917424f277f83f7aca7cb302fe9fac24b
       // #diff-d6fb3beea919e91b77a5f23519b255af0d8d4b1e86f3c7776aa77f11c602ccd6L265 for more context
+
+      shouldSaveResponse = (shouldSaveResponse && hasActions);
     }
     // leave shared storage intact so the transaction can be continued in another tab
     clearSharedStorage = false;
