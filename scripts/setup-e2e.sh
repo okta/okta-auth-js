@@ -11,6 +11,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
 
   # this chrome install is not used, however it will install linux deps chrome needs (via apt-get)
   setup_service google-chrome-stable 118.0.5993.70-1
+  export PUPPETEER_DOWNLOAD_BASE_URL="https://storage.googleapis.com/chrome-for-testing-public"
   # uses new chrome for testing installation utility (https://developer.chrome.com/blog/chrome-for-testing/)
   # output format: chrome@118.0.5993.70 /path/to/chrome/binary
   CHROME_INSTALL=$(npx @puppeteer/browsers install chrome@stable)
