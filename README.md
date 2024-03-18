@@ -43,7 +43,7 @@ This library uses semantic versioning and follows Okta's [library version policy
 | Version   | Status                           |
 | -------   | -------------------------------- |
 | `7.x`     | :heavy_check_mark: Stable        |
-| `6.x`     | :warning: Retiring on 2023-09-30 |
+| `6.x`     | :x: Retired
 | `5.x`     | :x: Retired                      |
 | `4.x`     | :x: Retired                      |
 | `3.x`     | :x: Retired                      |
