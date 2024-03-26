@@ -387,7 +387,7 @@ export function mixinOAuth
         await clearDPoPKeyPair(keyPair);
       }
       else if (clearAll) {
-        await clearDPoPKeyPair(keyPair);
+        await clearDPoPKeyPair();
       }
     }
   };
