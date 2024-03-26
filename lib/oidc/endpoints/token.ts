@@ -45,10 +45,6 @@ function validateOptions(options: TokenEndpointParams) {
   if (!options.codeVerifier) {
     throw new AuthSdkError('The "codeVerifier" (generated and saved by your app) must be passed to /token');
   }
-
-  if (options.dpop && !options.dpopKeyPair) {
-    throw new AuthSdkError('DPoP is configured but no key pair was provided');
-  }
 }
 
 function getPostData(sdk, options: TokenParams): string {
@@ -81,7 +77,11 @@ async function makeTokenRequest (sdk, { url, data, nonce, dpopKeyPair }: TokenRe
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  if (sdk.options.dpop && dpopKeyPair) {
+  if (sdk.options.dpop) {
+    if (!dpopKeyPair) {
+      throw new AuthSdkError('DPoP is configured but no key pair was provided');
+    }
+
     const proof = await generateDPoPForTokenRequest({ url, method, nonce, keyPair: dpopKeyPair });
     headers.DPoP = proof;
   }

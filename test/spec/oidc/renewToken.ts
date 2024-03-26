@@ -10,6 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+// TODO: mock findKeyPair rather than load indexeddb?
+import 'fake-indexeddb/auto';
 
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
@@ -162,6 +164,45 @@ describe('token.renew', function() {
     })
     .catch(function(e) {
       util.expectErrorToEqual(e, error);
+    });
+  });
+
+  it('renews access token via authorize with dpop enabled', function () {
+    return oauthUtil.setupFrame({
+      oktaAuthArgs: {
+        pkce: false,
+        dpop: true,
+        issuer: 'https://auth-js-test.okta.com',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect'
+      },
+      tokenRenewArgs: [{
+        ...tokens.standardAccessTokenParsed, dpopPairId: 'foo'
+      }],
+      postMessageSrc: {
+        baseUri: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
+        queryParams: {
+          'client_id': 'NPSfOkH5eZrTy8PMDlvx',
+          'redirect_uri': 'https://example.com/redirect',
+          'response_type': 'token',
+          'response_mode': 'okta_post_message',
+          'state': oauthUtil.mockedState,
+          'nonce': oauthUtil.mockedNonce,
+          'scope': 'openid email',
+          'prompt': 'none'
+        }
+      },
+      time: 1449699929,
+      postMessageResp: {
+        'access_token': tokens.standardAccessToken,
+        'token_type': 'DPoP',
+        'expires_in': 3600,
+        'state': oauthUtil.mockedState
+      },
+      expectedResp: {
+        ...tokens.standardAccessTokenParsed,
+        tokenType: 'DPoP'
+      }
     });
   });
 });

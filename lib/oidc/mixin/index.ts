@@ -31,7 +31,13 @@ import PKCE from '../util/pkce';
 import { createEndpoints, createTokenAPI } from '../factory/api';
 import { TokenManager } from '../TokenManager';
 import { getOAuthUrls, isLoginRedirect, hasResponseType } from '../util';
-import { generateDPoPProof, clearDPoPKeyPair, ResourceDPoPProofParams, clearDPoPKeyPairAfterRevoke, findKeyPair } from '../dpop';
+import { 
+  generateDPoPProof,
+  clearDPoPKeyPair,
+  ResourceDPoPProofParams,
+  clearDPoPKeyPairAfterRevoke,
+  findKeyPair
+} from '../dpop';
 import { AuthSdkError } from '../../errors';
 
 import { OktaAuthSessionInterface } from '../../session/types';

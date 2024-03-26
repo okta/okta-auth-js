@@ -31,11 +31,9 @@ export interface DPoPProofParams {
 
 export type ResourceDPoPProofParams = Omit<DPoPProofParams, 'keyPair' | 'nonce'>;
 type DPoPProofTokenRequestParams = Omit<DPoPProofParams, 'accessToken'>;
-// https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore#instance_methods
-// add additional methods as needed
-type StoreMethod = 'get' | 'put' | 'delete' | 'clear';
 
 const INDEXEDDB_NAME = 'OktaAuthJs';
+const DB_KEY = 'DPoPKeys';
 
 export function isDPoPNonceError(obj: any): obj is OAuthError {
   return (
@@ -75,79 +73,86 @@ export async function generateKeyPair (): Promise<CryptoKeyPair> {
 
 /////////// indexeddb / keystore ///////////
 
+
+// https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore#instance_methods
+// add additional methods as needed
+export type StoreMethod = 'get' | 'add' | 'delete' | 'clear';
+
 // convenience abstraction for exposing IDBObjectStore instance
-function keyStore (onsuccess: (store: IDBObjectStore) => void,  onerror: (error: Error) => void) {
-  const dbKey = 'DPoPKeys';
-  const indexedDB = window.indexedDB;
-  const req = indexedDB.open(INDEXEDDB_NAME, 1);
+function keyStore (): Promise<IDBObjectStore> {
+  return new Promise((resolve, reject) => {
+    try {
+      const indexedDB = window.indexedDB;
+      const req = indexedDB.open(INDEXEDDB_NAME, 1);
 
-  req.onerror = function () {
-    // TODO: throw error
-    onerror(req.error!);
-  };
+      req.onerror = function () {
+        reject(req.error!);
+      };
 
-  req.onupgradeneeded = function () {
-    const db = req.result;
-    db.createObjectStore(dbKey, { keyPath: 'id' });
-  };
+      req.onupgradeneeded = function () {
+        const db = req.result;
+        db.createObjectStore(DB_KEY);
+      };
 
-  req.onsuccess = function () {
-    const db = req.result;
-    const tx = db.transaction(dbKey, 'readwrite');
+      req.onsuccess = function () {
+        const db = req.result;
+        const tx = db.transaction(DB_KEY, 'readwrite');
 
-    tx.onerror = function () {
-      // TODO: throw error
-      onerror(tx.error!);
-    };
+        tx.onerror = function () {
+          reject(tx.error!);
+        };
 
-    const store = tx.objectStore(dbKey);
+        const store = tx.objectStore(DB_KEY);
 
-    onsuccess(store);
+        resolve(store);
 
-    tx.oncomplete = function () {
-      db.close();
-    };
-  };
+        tx.oncomplete = function () {
+          db.close();
+        };
+      };
+    }
+    catch (err) {
+      reject(err);
+    }
+  });
 }
 
 // convenience abstraction for wrapping IDBObjectStore methods in promises
-function invokeStoreMethod (method: StoreMethod, ...args: any[]): Promise<IDBRequest> {
+async function invokeStoreMethod (method: StoreMethod, ...args: any[]): Promise<IDBRequest> {
+  const store = await keyStore();
   return new Promise((resolve, reject) => {
-    keyStore(function (store) {
-      // https://github.com/microsoft/TypeScript/issues/49700
-      // https://github.com/microsoft/TypeScript/issues/49802
-      // @ts-expect-error ts(2556)
-      const req = store[method](...args);
-      req.onsuccess = function () {
-        resolve(req);
-      };
-      req.onerror = function () {
-        reject(req.error);
-      };
-    }, reject);
+    // https://github.com/microsoft/TypeScript/issues/49700
+    // https://github.com/microsoft/TypeScript/issues/49802
+    // @ts-expect-error ts(2556)
+    const req = store[method](...args);
+    req.onsuccess = function () {
+      resolve(req);
+    };
+    req.onerror = function () {
+      reject(req.error);
+    };
   });
 }
 
 async function storeKeyPair (pairId: string, keyPair: CryptoKeyPair) {
-  await invokeStoreMethod('put', {id: pairId, keyPair});
+  await invokeStoreMethod('add', keyPair, pairId);
   return keyPair;
 }
-
-/////////// exported key pair methods ///////////
 
 // attempts to find keyPair stored at given key, otherwise throws
 export async function findKeyPair (pairId?: string): Promise<CryptoKeyPair> {
   if (pairId) {
     const req = await invokeStoreMethod('get', pairId);
-    if (req.result?.keyPair) {
-      return req.result?.keyPair;
+    if (req.result) {
+      return req.result;
     }
   }
 
   // defaults to throwing unless keyPair is found
-  throw new AuthSdkError(`Unable to locate dpop key pair required for refresh (${pairId})`);
+  throw new AuthSdkError(`Unable to locate dpop key pair required for refresh${pairId ? ` (${pairId})` : ''}`);
 }
 
+// deletes a specifc KP, or the entire db if no id is passed
 export async function clearDPoPKeyPair (pairId?: string): Promise<void> {
   if (pairId) {
     await invokeStoreMethod('delete', pairId);
@@ -157,7 +162,16 @@ export async function clearDPoPKeyPair (pairId?: string): Promise<void> {
   }
 }
 
+// generates a crypto (non-extractable) private key pair and writes it to indexeddb, returns key (id)
+export async function createDPoPKeyPair (): Promise<{keyPair: CryptoKeyPair, keyPairId: string}> {
+  const keyPairId = cryptoRandomValue(4);
+  const keyPair = await generateKeyPair();
+  await storeKeyPair(keyPairId, keyPair);
+  return { keyPair, keyPairId };
+}
+
 // will clear PK from storage if certain token conditions are met
+/* eslint max-len: [2, 132], complexity: [2, 12] */
 export async function clearDPoPKeyPairAfterRevoke (revokedToken: 'access' | 'refresh', tokens: Tokens): Promise<void> {
   let shouldClear = false;
 
@@ -179,15 +193,7 @@ export async function clearDPoPKeyPairAfterRevoke (revokedToken: 'access' | 'ref
   }
 }
 
-// generates a crypto (non-extractable) private key pair and writes it to indexeddb, returns key (id)
-export async function createDPoPKeyPair (): Promise<{keyPair: CryptoKeyPair, keyPairId: string}> {
-  const keyPairId = cryptoRandomValue(4);
-  const keyPair = await generateKeyPair();
-  await storeKeyPair(keyPairId, keyPair);
-  return { keyPair, keyPairId };
-}
-
-/////////// exported proof generation methods ///////////
+/////////// proof generation methods ///////////
 
 export async function generateDPoPProof ({ keyPair, url, method, nonce, accessToken }: DPoPProofParams): Promise<string> {
   const { kty, crv, e, n, x, y } = await webcrypto.subtle.exportKey('jwk', keyPair.publicKey);
@@ -218,7 +224,7 @@ export async function generateDPoPProof ({ keyPair, url, method, nonce, accessTo
   return writeJwt(header, claims, keyPair.privateKey);
 }
 
-/* eslint max-len: [2, 125] */
+/* eslint max-len: [2, 132] */
 export async function generateDPoPForTokenRequest ({ keyPair, url, method, nonce }: DPoPProofTokenRequestParams): Promise<string> {
   const params: DPoPProofParams = { keyPair, url, method };
   if (nonce) {

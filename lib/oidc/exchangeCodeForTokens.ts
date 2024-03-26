@@ -72,13 +72,13 @@ export async function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenPa
       if (dpopPairId) {
         const keyPair = await findKeyPair(dpopPairId);
         getTokenOptions.dpopKeyPair = keyPair;
-        handleResponseOptions. dpop = dpop;
+        handleResponseOptions.dpop = dpop;
         handleResponseOptions.dpopPairId = dpopPairId;
       }
       else {
         const { keyPair, keyPairId } = await createDPoPKeyPair();
         getTokenOptions.dpopKeyPair = keyPair;
-        handleResponseOptions. dpop = dpop;
+        handleResponseOptions.dpop = dpop;
         handleResponseOptions.dpopPairId = keyPairId;
       }
     }
