@@ -25,14 +25,14 @@ const config = [
     ]
   },
   {
-    name: 'mfa-e2e',
+    name: 'e2e-mfa',
     app: '@okta/test.app.react-mfa-v1',
     spec: [
       'mfa.js'
     ]
   },
   {
-    name: 'dpop-e2e',
+    name: 'e2e-dpop',
     app: '@okta/test.app',
     spec: [
       'dpop.js'
