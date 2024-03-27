@@ -40,13 +40,15 @@ export async function renewTokens(sdk, options?: RenewTokensParams): Promise<Tok
   }
   const userinfoUrl = accessToken.userinfoUrl || sdk.options.userinfoUrl;
   const issuer = idToken.issuer || sdk.options.issuer;
+  const dpopPairId = accessToken?.dpopPairId;
 
   // Get tokens using the SSO cookie
   options = Object.assign({
     scopes,
     authorizeUrl,
     userinfoUrl,
-    issuer
+    issuer,
+    dpopPairId
   }, options);
 
   if (sdk.options.pkce) {

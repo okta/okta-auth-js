@@ -15,11 +15,12 @@
 import { CustomUrls, OAuthResponse, OAuthResponseType, OktaAuthOAuthInterface, TokenParams, TokenResponse } from './types';
 import { getOAuthUrls, getDefaultTokenParams } from './util';
 import { clone } from '../util';
-import { postToTokenEndpoint } from './endpoints/token';
+import { postToTokenEndpoint, TokenEndpointParams } from './endpoints/token';
 import { handleOAuthResponse } from './handleOAuthResponse';
+import { createDPoPKeyPair, findKeyPair } from './dpop';
 
 // codeVerifier is required. May pass either an authorizationCode or interactionCode
-export function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenParams: TokenParams, urls?: CustomUrls): Promise<TokenResponse> {
+export async function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenParams: TokenParams, urls?: CustomUrls): Promise<TokenResponse> {
   urls = urls || getOAuthUrls(sdk, tokenParams);
   // build params using defaults + options
   tokenParams = Object.assign({}, getDefaultTokenParams(sdk), clone(tokenParams));
@@ -33,44 +34,63 @@ export function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenParams: 
     scopes,
     ignoreSignature,
     state,
-    acrValues
+    acrValues,
+    dpop,
+    dpopPairId,
   } = tokenParams;
 
-  var getTokenOptions = {
+  // postToTokenEndpoint() params
+  const getTokenOptions: TokenEndpointParams = {
     clientId,
     redirectUri,
     authorizationCode,
     interactionCode,
     codeVerifier,
+    dpop,
   };
 
-  return postToTokenEndpoint(sdk, getTokenOptions, urls)
-    .then((response: OAuthResponse) => {
+  // `handleOAuthResponse` hanadles responses from both `/authorize` and `/token` endpoints
+  // Here we modify the response from `/token` so that it more closely matches a response from `/authorize`
+  // `responseType` is used to validate that the expected tokens were returned
+  const responseType: OAuthResponseType[] = ['token']; // an accessToken will always be returned
+  if (scopes!.indexOf('openid') !== -1) {
+    responseType.push('id_token'); // an idToken will be returned if "openid" is in the scopes
+  }
+  // handleOAuthResponse() params
+  const handleResponseOptions: TokenParams = {
+    clientId,
+    redirectUri,
+    scopes,
+    responseType,
+    ignoreSignature,
+    acrValues,
+  };
 
-      // `handleOAuthResponse` hanadles responses from both `/authorize` and `/token` endpoints
-      // Here we modify the response from `/token` so that it more closely matches a response from `/authorize`
-      // `responseType` is used to validate that the expected tokens were returned
-      const responseType: OAuthResponseType[] = ['token']; // an accessToken will always be returned
-      if (scopes!.indexOf('openid') !== -1) {
-        responseType.push('id_token'); // an idToken will be returned if "openid" is in the scopes
+  try {
+    if (dpop) {
+      // token refresh, KP should already exist
+      if (dpopPairId) {
+        const keyPair = await findKeyPair(dpopPairId);
+        getTokenOptions.dpopKeyPair = keyPair;
+        handleResponseOptions.dpop = dpop;
+        handleResponseOptions.dpopPairId = dpopPairId;
       }
-      const handleResponseOptions: TokenParams = {
-        clientId,
-        redirectUri,
-        scopes,
-        responseType,
-        ignoreSignature,
-        acrValues
-      };
-      return handleOAuthResponse(sdk, handleResponseOptions, response, urls!)
-        .then((response: TokenResponse) => {
-          // For compatibility, "code" is returned in the TokenResponse. OKTA-326091
-          response.code = authorizationCode;
-          response.state = state!;
-          return response;
-        });
-    })
-    .finally(() => {
-      sdk.transactionManager.clear();
-    });
+      else {
+        const { keyPair, keyPairId } = await createDPoPKeyPair();
+        getTokenOptions.dpopKeyPair = keyPair;
+        handleResponseOptions.dpop = dpop;
+        handleResponseOptions.dpopPairId = keyPairId;
+      }
+    }
+
+    const oauthResponse: OAuthResponse = await postToTokenEndpoint(sdk, getTokenOptions, urls);
+
+    const tokenResponse: TokenResponse = await handleOAuthResponse(sdk, handleResponseOptions, oauthResponse, urls!);
+    tokenResponse.code = authorizationCode;
+    tokenResponse.state = state!;
+    return tokenResponse;
+  }
+  finally {
+    sdk.transactionManager.clear();
+  }
 }

@@ -55,6 +55,8 @@ export interface TokenParams extends CustomUrls {
   extraParams?: { [propName: string]: string }; // custom authorize query params
   // TODO: remove in the next major version
   popupTitle?: string;
+  dpop?: boolean;
+  dpopPairId?: string;
 }
 
 export interface TokenManagerOptions {
@@ -105,6 +107,7 @@ export interface OktaAuthOAuthOptions extends
   postLogoutRedirectUri?: string;
   maxClockSkew?: number;
   restoreOriginalUri?: (oktaAuth: OktaAuthOAuthInterface, originalUri?: string) => Promise<void>;
+  dpop?: boolean;
 
   transactionManager?: TransactionManagerOptions;
 

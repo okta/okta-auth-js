@@ -39,9 +39,10 @@ describe('token.renewTokens', function() {
       getWihoutPromptResponse,
       renewWithRefreshResponse
     };
-    jest.spyOn(mocked.getWithoutPrompt, 'getWithoutPrompt').mockImplementation(() => {
+    const withoutPromptSpy = jest.spyOn(mocked.getWithoutPrompt, 'getWithoutPrompt').mockImplementation(() => {
       return Promise.resolve(testContext.getWihoutPromptResponse);
     });
+    testContext.withoutPromptSpy = withoutPromptSpy;
     jest.spyOn(mocked.renewTokensWithRefresh, 'renewTokensWithRefresh').mockImplementation(() => {
       return Promise.resolve(testContext.renewWithRefreshResponse);
     });
@@ -272,6 +273,23 @@ describe('token.renewTokens', function() {
         await renewTokens(sdk, { issuer: 'custom' });
         const options = mocked.getWithoutPrompt.getWithoutPrompt.mock.calls[0][1];
         expect(options.issuer).toBe('custom');
+      });
+    });
+
+    it('dpop', async () => {
+      const { sdk, accessToken, idToken, getWihoutPromptResponse, withoutPromptSpy } = testContext;
+      accessToken.dpopPairId = 'foo';
+      const tokens = { fake: true };
+      getWihoutPromptResponse.tokens = tokens;
+      const res = await renewTokens(sdk, {});
+      expect(res).toBe(tokens);
+      expect(withoutPromptSpy).toHaveBeenCalledWith(sdk, {
+        authorizeUrl: accessToken.authorizeUrl,
+        dpopPairId: accessToken.dpopPairId,
+        issuer: idToken.issuer,
+        responseType: ['token', 'id_token'],
+        scopes: accessToken.scopes,
+        userinfoUrl: accessToken.userinfoUrl
       });
     });
 

@@ -47,6 +47,7 @@ export function getDefaultConfig(): Config {
     responseType: ['token', 'id_token'],
     scopes: ['openid', 'email', 'offline_access'],
     pkce: true,
+    dpop: true,
     forceRedirect: false,
     siwVersion: DEFAULT_SIW_VERSION,
     siwAuthClient: false,
@@ -88,6 +89,7 @@ export function getConfigFromUrl(): Config {
   const syncStorage = url.searchParams.get('syncStorage') !== 'false'; // on by default
   const acrValues = url.searchParams.get('acrValues') || undefined;
   const enrollAmrValues = (url.searchParams.get('enrollAmrValues') || '').split(',');
+  const dpop = url.searchParams.get('dpop') === 'true'; // off by default
   let crossTabsCount = parseInt(url.searchParams.get('crossTabsCount'));
   if (isNaN(crossTabsCount)) {
     crossTabsCount = DEFAULT_CROSS_TABS_COUNT;
@@ -99,6 +101,7 @@ export function getConfigFromUrl(): Config {
     redirectUri,
     useInteractionCodeFlow,
     pkce,
+    dpop,
     defaultScopes,
     scopes,
     acrValues,

@@ -31,6 +31,14 @@ import PKCE from '../util/pkce';
 import { createEndpoints, createTokenAPI } from '../factory/api';
 import { TokenManager } from '../TokenManager';
 import { getOAuthUrls, isLoginRedirect, hasResponseType } from '../util';
+import { 
+  generateDPoPProof,
+  clearDPoPKeyPair,
+  ResourceDPoPProofParams,
+  clearDPoPKeyPairAfterRevoke,
+  findKeyPair
+} from '../dpop';
+import { AuthSdkError } from '../../errors';
 
 import { OktaAuthSessionInterface } from '../../session/types';
 import { provideOriginalUri } from './node';
@@ -218,9 +226,14 @@ export function mixinOAuth
     // Revokes the access token for the application session
     async revokeAccessToken(accessToken?: AccessToken): Promise<unknown> {
       if (!accessToken) {
-        accessToken = (await this.tokenManager.getTokens()).accessToken as AccessToken;
+        const tokens = await this.tokenManager.getTokens();
+        accessToken = tokens.accessToken as AccessToken;
         const accessTokenKey = this.tokenManager.getStorageKeyByType('accessToken');
         this.tokenManager.remove(accessTokenKey);
+
+        if (this.options.dpop) {
+          await clearDPoPKeyPairAfterRevoke('access', tokens);
+        }
       }
       // Access token may have been removed. In this case, we will silently succeed.
       if (!accessToken) {
@@ -232,9 +245,14 @@ export function mixinOAuth
     // Revokes the refresh token for the application session
     async revokeRefreshToken(refreshToken?: RefreshToken): Promise<unknown> {
       if (!refreshToken) {
-        refreshToken = (await this.tokenManager.getTokens()).refreshToken as RefreshToken;
+        const tokens = await this.tokenManager.getTokens();
+        refreshToken = tokens.refreshToken as RefreshToken;
         const refreshTokenKey = this.tokenManager.getStorageKeyByType('refreshToken');
         this.tokenManager.remove(refreshTokenKey);
+
+        if (this.options.dpop) {
+          await clearDPoPKeyPairAfterRevoke('refresh', tokens);
+        }
       }
       // Refresh token may have been removed. In this case, we will silently succeed.
       if (!refreshToken) {
@@ -347,6 +365,31 @@ export function mixinOAuth
       }
     }
 
+    async generateDPoPProof (params: ResourceDPoPProofParams): Promise<string> {
+      if (!params?.accessToken) {
+        const { accessToken } = this.tokenManager.getTokensSync();
+        if (!accessToken) {
+          throw new AuthSdkError('AccessToken is required to generate a DPoP Proof');
+        }
+        params.accessToken = accessToken;
+      }
+
+      const keyPair = await findKeyPair(params.accessToken?.dpopPairId);
+
+      return generateDPoPProof({...params, keyPair});
+    }
+
+    async clearDPoPKeyPair (clearAll=false): Promise<void> {
+      const tokens = await this.tokenManager.getTokens();
+      const keyPair = tokens.accessToken?.dpopPairId || tokens.refreshToken?.dpopPairId;
+
+      if (keyPair) {
+        await clearDPoPKeyPair(keyPair);
+      }
+      else if (clearAll) {
+        await clearDPoPKeyPair();
+      }
+    }
   };
 
 }

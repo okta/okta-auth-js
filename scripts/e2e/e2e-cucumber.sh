@@ -4,7 +4,7 @@ source $(dirname "${BASH_SOURCE[0]}")/../setup-e2e.sh
 
 setup_sample_tests
 
-export TEST_NAME=@okta/test.app
+export TEST_NAME=e2e
 
 export ORG_OIE_ENABLED=true
 

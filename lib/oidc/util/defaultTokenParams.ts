@@ -28,7 +28,8 @@ export function getDefaultTokenParams(sdk: OktaAuthOAuthInterface): TokenParams 
     acrValues,
     maxAge,
     state,
-    ignoreSignature
+    ignoreSignature,
+    dpop
   } = sdk.options;
   const defaultRedirectUri = isBrowser() ? window.location.href : undefined;
   return removeNils({
@@ -42,6 +43,7 @@ export function getDefaultTokenParams(sdk: OktaAuthOAuthInterface): TokenParams 
     scopes: scopes || ['openid', 'email'],
     acrValues,
     maxAge,
-    ignoreSignature
+    ignoreSignature,
+    dpop,
   });
 }

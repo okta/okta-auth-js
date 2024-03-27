@@ -10,13 +10,15 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+const findKeyPair = jest.fn();
+jest.mock('../../../lib/oidc/dpop', () => { return { findKeyPair }; });
 
 import { OktaAuth, TokenResponse } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import * as tokenEndpoint from '../../../lib/oidc/endpoints/token';
 import * as renewTokensWithRefreshTokenModule from '../../../lib/oidc/renewTokensWithRefresh';
 import * as getWithoutPromptModule from '../../../lib/oidc/getWithoutPrompt';
-import { OAuthError } from '../../../lib/errors';
+import { AuthSdkError, OAuthError } from '../../../lib/errors';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import util from '@okta/test.support/util';
 
@@ -142,6 +144,55 @@ describe('renewTokensWithRefresh', function () {
     expect(authInstance.tokenManager.add).not.toHaveBeenCalled();
     refreshToken = await authInstance.tokenManager.get('refreshToken2');
     expect(refreshToken).toEqual(tokens.standardRefreshToken2Parsed);
+  });
+
+  it('should throw renewing token without a dpop keyPairId', async () => {
+    const { authInstance, renewTokenSpy } = testContext;
+    authInstance.options.dpop = true;
+    authInstance.tokenManager.add('accessToken', tokens.standardAccessTokenParsed);
+    authInstance.tokenManager.add('refreshToken', tokens.standardRefreshTokenParsed);
+
+    const t = async () => await authInstance.token.renewTokens();
+    await expect(t).rejects.toThrowError();
+
+    const renewTokenArguments = renewTokenSpy.mock.calls[0];
+    expect(renewTokenSpy).toHaveBeenCalled();
+    expect(renewTokenArguments[2]).toMatchObject(tokens.standardRefreshTokenParsed);
+  });
+
+  it('should throw renewing token when dpop key pair cannot be found', async () => {
+    const { authInstance, renewTokenSpy, postRefreshTokenResponse } = testContext;
+    findKeyPair.mockRejectedValue(new AuthSdkError('Unable to locate dpop key pair required for refresh (foo)'));
+    authInstance.options.dpop = true;
+    postRefreshTokenResponse.token_type = 'DPoP';
+    const accessToken = {...tokens.standardAccessTokenParsed, dpopPairId: 'foo'};
+    const refreshToken = {...tokens.standardRefreshTokenParsed, dpopPairId: 'foo'};
+    authInstance.tokenManager.add('accessToken', accessToken);
+    authInstance.tokenManager.add('refreshToken', refreshToken);
+
+    const t = async () => await authInstance.token.renewTokens();
+    await expect(t).rejects.toThrowError();
+
+    const renewTokenArguments = renewTokenSpy.mock.calls[0];
+    expect(renewTokenSpy).toHaveBeenCalled();
+    expect(renewTokenArguments[2]).toMatchObject(tokens.standardRefreshTokenParsed);
+  });
+
+  it('should renew tokens when dpop is enabled and keyPair is available', async () => {
+    const { authInstance, renewTokenSpy, postRefreshTokenResponse } = testContext;
+    findKeyPair.mockResolvedValue({});
+    authInstance.options.dpop = true;
+    postRefreshTokenResponse.token_type = 'DPoP';
+    const accessToken = {...tokens.standardAccessTokenParsed, dpopPairId: 'foo'};
+    const refreshToken = {...tokens.standardRefreshTokenParsed, dpopPairId: 'foo'};
+    authInstance.tokenManager.add('accessToken', accessToken);
+    authInstance.tokenManager.add('refreshToken', refreshToken);
+
+    await authInstance.token.renewTokens();
+
+    const renewTokenArguments = renewTokenSpy.mock.calls[0];
+    expect(renewTokenSpy).toHaveBeenCalled();
+    expect(renewTokenArguments[2]).toMatchObject(tokens.standardRefreshTokenParsed);
   });
 
   describe('error handling', () => {

@@ -15,7 +15,8 @@ import { getOAuthUrls } from './util/oauth';
 import { isSameRefreshToken } from './util/refreshToken';
 import { OktaAuthOAuthInterface, TokenParams, RefreshToken, Tokens } from './types';
 import { handleOAuthResponse } from './handleOAuthResponse';
-import { postRefreshToken } from './endpoints/token';
+import { TokenEndpointParams, postRefreshToken } from './endpoints/token';
+import { findKeyPair } from './dpop';
 import { isRefreshTokenInvalidError } from './util/errors';
 
 export async function renewTokensWithRefresh(
@@ -23,16 +24,23 @@ export async function renewTokensWithRefresh(
   tokenParams: TokenParams,
   refreshTokenObject: RefreshToken
 ): Promise<Tokens> {
-  const { clientId } = sdk.options;
+  const { clientId, dpop } = sdk.options;
   if (!clientId) {
     throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to renew tokens');
   }
 
   try {
-    const renewTokenParams: TokenParams = Object.assign({}, tokenParams, {
-      clientId,
-    });
-    const tokenResponse = await postRefreshToken(sdk, renewTokenParams, refreshTokenObject);
+    const renewTokenParams: TokenParams = Object.assign({}, tokenParams, { clientId });
+    const endpointParams: TokenEndpointParams = {...renewTokenParams};
+
+    if (dpop) {
+      const keyPair = await findKeyPair(refreshTokenObject?.dpopPairId);    // will throw if KP cannot be found
+      endpointParams.dpopKeyPair = keyPair;
+      renewTokenParams.dpop = dpop;
+      renewTokenParams.dpopPairId = refreshTokenObject.dpopPairId;
+    }
+
+    const tokenResponse = await postRefreshToken(sdk, endpointParams, refreshTokenObject);
     const urls = getOAuthUrls(sdk, tokenParams);
     const { tokens } = await handleOAuthResponse(sdk, renewTokenParams, tokenResponse, urls);
 

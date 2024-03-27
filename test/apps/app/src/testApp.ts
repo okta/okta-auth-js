@@ -189,6 +189,7 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     startService: testApp.startService.bind(testApp),
     stopService: testApp.stopService.bind(testApp),
     enrollAuthenticator: testApp.enrollAuthenticator.bind(testApp),
+    generateDPoPProof: testApp.generateDPoPProof.bind(testApp)
   };
   Object.keys(boundFunctions).forEach(functionName => {
     (window as any)[functionName] = makeClickHandler((boundFunctions as any)[functionName]);
@@ -738,6 +739,16 @@ class TestApp {
       });
   }
 
+  async generateDPoPProof(): Promise<string> {
+    // passes dummy values for url and method
+    const proof = await this.oktaAuth.generateDPoPProof({
+      url: 'http://localhost:8080',
+      method: 'POST'
+    });
+    alert(proof);
+    return proof;
+  }
+
   async logoutRedirect(options = {}): Promise<void> {
     this.oktaAuth.signOut(options)
       .catch(e => {
@@ -968,6 +979,9 @@ class TestApp {
                 </li>
                 <li class="pure-menu-item">
                   <a id="cross-tab-token-renew" onclick="simulateCrossTabTokenRenew(event)" class="pure-menu-link">Simulate cross-tab token renew</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="dpop-proof" onclick="generateDPoPProof(event)" class="pure-menu-link">Generate DPoP Proof</a>
                 </li>
                 <li class="pure-menu-item">
                   <a id="enroll-authenticator" href="/" onclick="enrollAuthenticator(event)" class="pure-menu-link">Enroll Authenticator</a>

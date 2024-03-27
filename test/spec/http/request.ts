@@ -344,5 +344,7 @@ describe('HTTP Requestor', () => {
           expect(err.meta.acr_values).toEqual('urn:okta:loa:2fa:any:ifpossible');
         });
     });
+
+    // TODO: OAuthError includes response object
   });
 });

@@ -60,7 +60,8 @@ describe('base token API', function() {
           'codeChallengeMethod': 'S256',
           'codeVerifier': expect.any(String),
           'codeChallenge': expect.any(String),
-          'ignoreSignature': false
+          'ignoreSignature': false,
+          'dpop': false,
         });
       });
     });
@@ -84,7 +85,8 @@ describe('base token API', function() {
           'scopes': [
             'openid',
             'email'
-          ]
+          ],
+          'dpop': false,
         });
       });
     });

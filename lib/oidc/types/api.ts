@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import type { DPoPProofParams } from '../dpop';
 import { JWTObject } from './JWT';
 import { OAuthTransactionMeta, PKCETransactionMeta } from './meta';
 import { CustomUrls, OktaAuthOAuthOptions, SigninWithRedirectOptions, TokenParams, RenewTokensParams } from './options';
@@ -168,4 +169,7 @@ export interface OktaAuthOAuthInterface
   
   revokeAccessToken(accessToken?: AccessToken): Promise<unknown>;
   revokeRefreshToken(refreshToken?: RefreshToken): Promise<unknown>;
+
+  generateDPoPProof(params: DPoPProofParams): Promise<string>;
+  clearDPoPKeyPair(): Promise<void>;
 }

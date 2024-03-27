@@ -33,7 +33,7 @@ import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import SdkClock from '../../../lib/clock';
 import { TokenManager } from '../../../lib/oidc/TokenManager';
-  
+
 describe('TokenManager (browser)', function() {
   let client;
 
@@ -52,6 +52,7 @@ describe('TokenManager (browser)', function() {
     return new OktaAuth({
       cookies: options.cookies,
       pkce: false,
+      dpop: options.dpop ?? false,
       issuer: 'https://auth-js-test.okta.com',
       clientId: 'NPSfOkH5eZrTy8PMDlvx',
       redirectUri: 'https://example.com/redirect',

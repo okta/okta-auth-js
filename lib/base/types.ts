@@ -27,6 +27,7 @@ export interface FeaturesAPI {
   isTokenVerifySupported(): boolean;
   isPKCESupported(): boolean;
   isIE11OrLess(): boolean;
+  isDPoPSupported(): boolean;
 }
 
 

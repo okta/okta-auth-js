@@ -83,6 +83,11 @@ const Form = `
   <input id="f_pkce-off" name="pkce" type="radio" value="false"/>OFF
   </div>
   <div class="pure-control-group">
+  <label for="dpop">DPoP</label>
+  <input id="f_dpop-on" name="dpop" type="radio" value="true"/>ON
+  <input id="f_dpop-off" name="dpop" type="radio" value="false"/>OFF
+  </div>
+  <div class="pure-control-group">
   <label for="storage">Storage</label>
   <select id="f_storage" name="storage">
     <option value="" selected>Auto</option>
@@ -172,6 +177,12 @@ export function updateForm(origConfig: Config): void {
     (document.getElementById('f_pkce-on') as HTMLInputElement).checked = true;
   } else {
     (document.getElementById('f_pkce-off') as HTMLInputElement).checked = true;
+  }
+
+  if (config.dpop) {
+    (document.getElementById('f_dpop-on') as HTMLInputElement).checked = true;
+  } else {
+    (document.getElementById('f_dpop-off') as HTMLInputElement).checked = true;
   }
 
   if (config.secure) {

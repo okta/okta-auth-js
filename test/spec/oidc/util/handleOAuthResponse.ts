@@ -59,8 +59,8 @@ describe('handleOAuthResponse', () => {
         expect(res.tokens.refreshToken!.refreshToken).toBe('foo');
       });
       it('returns all tokens from the response', async () => {
-        const tokenParams: TokenParams = { responseType: ['token', 'id_token', 'refresh_token'] };
-        const oauthRes = { id_token: 'foo', access_token: 'blar', refresh_token: 'bloo' };
+        const tokenParams: TokenParams = { responseType: ['token', 'id_token', 'refresh_token'], dpop: true };
+        const oauthRes = { id_token: 'foo', access_token: 'blar', refresh_token: 'bloo', token_type: 'DPoP' };
         const res = await handleOAuthResponse(sdk, tokenParams, oauthRes, undefined as unknown as CustomUrls);
         expect(res.tokens).toBeTruthy();
         expect(res.tokens.accessToken).toBeTruthy();
@@ -80,10 +80,6 @@ describe('handleOAuthResponse', () => {
       });
 
       describe('errors', () => {
-        beforeEach(() => {
-          sdk = mockOktaAuth();
-        });
-      
         it('does not throw if response contains only "error" without "error_description"', async () => {
           let errorThrown = false;
           try {
@@ -171,6 +167,18 @@ describe('handleOAuthResponse', () => {
             expect(err.name).toBe('AuthSdkError');
             expect(err.errorCode).toBe('INTERNAL');
             expect(err.errorSummary).toBe(`Unable to parse OAuth flow response: response type "token" was requested but "access_token" was not returned.`);
+          }
+          expect(errorThrown).toBe(true);
+        });
+        it('throws if dpop=true and token_type is not DPoP', async () => {
+          let errorThrown = false;
+          try {
+            await handleOAuthResponse(sdk, { responseType: ['token', 'id_token'], dpop: true }, { }, undefined as unknown as CustomUrls);
+          } catch (err: any) {
+            errorThrown = true;
+            expect(err.name).toBe('AuthSdkError');
+            expect(err.errorCode).toBe('INTERNAL');
+            expect(err.errorSummary).toBe(`Unable to parse OAuth flow response: DPoP was configured but "token_type" was not DPoP`);
           }
           expect(errorThrown).toBe(true);
         });

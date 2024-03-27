@@ -83,7 +83,7 @@ const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): A
   }
 
   if (serverErr.error && serverErr.error_description) {
-    err = new OAuthError(serverErr.error, serverErr.error_description);
+    err = new OAuthError(serverErr.error, serverErr.error_description, resp);
   } else {
     err = new AuthApiError(serverErr as APIError, resp);
   }

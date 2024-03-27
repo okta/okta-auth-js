@@ -24,12 +24,14 @@ export interface AccessToken extends AbstractToken {
   claims: UserClaims;
   tokenType: string;
   userinfoUrl: string;
+  dpopPairId?: string;
 }
 
 export interface RefreshToken extends AbstractToken {
   refreshToken: string;
   tokenUrl: string;
   issuer: string;
+  dpopPairId?: string;
 }
 
 export interface IDToken extends AbstractToken {

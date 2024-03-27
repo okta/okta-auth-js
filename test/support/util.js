@@ -34,6 +34,10 @@ util.setRemediatorsCtx = function(newCtx = {}) {
   });
 };
 
+util.sleep = (ms=2000) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 util.getConsole = function getConsole() {
   return (typeof window === 'undefined') ? global.console : window.console;
 };
