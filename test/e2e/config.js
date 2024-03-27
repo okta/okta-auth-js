@@ -1,6 +1,7 @@
 const config = [
   {
-    name: '@okta/test.app',
+    name: 'e2e',
+    app: '@okta/test.app',
     spec: [
       'authRequired.js',
       'concurrent.js',
@@ -24,10 +25,18 @@ const config = [
     ]
   },
   {
-    name: '@okta/test.app.react-mfa-v1',
+    name: 'mfa-e2e',
+    app: '@okta/test.app.react-mfa-v1',
     spec: [
       'mfa.js'
     ]
+  },
+  {
+    name: 'dpop-e2e',
+    app: '@okta/test.app',
+    spec: [
+      'dpop.js'
+    ],
   },
 ];
 

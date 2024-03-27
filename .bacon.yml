@@ -52,6 +52,13 @@ test_suites:
       script_name: e2e-mfa
       criteria: MERGE
       queue_name: small
+    - name: e2e-dpop
+      script_path: ../okta-auth-js/scripts/e2e
+      sort_order: '5'
+      timeout: '10'
+      script_name: e2e-dpop
+      criteria: MERGE
+      queue_name: small
     - name: sample-express-embedded-auth-with-sdk
       script_path: ../okta-auth-js/scripts/samples
       sort_order: '6'
