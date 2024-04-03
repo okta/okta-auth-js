@@ -4,6 +4,7 @@ export interface OktaPasswordInputValues {
   password?: string;
   passcode?: string;
   credentials?: Credentials;
+  // for ResetAuthenticator
   revokeSessions?: boolean;
 }
 
@@ -24,11 +25,23 @@ export class OktaPassword extends Authenticator<OktaPasswordInputValues> {
   }
 
   getInputs(idxRemediationValue) {
-    return [{
+    const inputs = [{
       ...idxRemediationValue.form?.value[0],
       name: 'password',
       type: 'string',
       required: idxRemediationValue.required,
     }];
+    const revokeSessions = idxRemediationValue.form?.value.find(
+      input => input.name === 'revokeSessions'
+    );
+    if (revokeSessions) {
+      inputs.push({
+        name: 'revokeSessions',
+        type: 'boolean',
+        label: 'Sign me out of all other devices',
+        required: false,
+      });
+    }
+    return inputs;
   }
 }
