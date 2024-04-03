@@ -2,7 +2,8 @@ import { IdxAuthenticator, IdxRemediationValue } from '../types/idx-js';
 
 
 export interface Credentials {
-  [key: string]: string | undefined;
+  // except strings there can be additional options like revokeSessions
+  [key: string]: string | boolean | number | undefined;
 }
 
 export abstract class Authenticator<Values> {

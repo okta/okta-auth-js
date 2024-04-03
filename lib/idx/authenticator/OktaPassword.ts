@@ -4,6 +4,7 @@ export interface OktaPasswordInputValues {
   password?: string;
   passcode?: string;
   credentials?: Credentials;
+  revokeSessions?: boolean;
 }
 
 export class OktaPassword extends Authenticator<OktaPasswordInputValues> {
@@ -12,19 +13,22 @@ export class OktaPassword extends Authenticator<OktaPasswordInputValues> {
   }
 
   mapCredentials(values: OktaPasswordInputValues): Credentials | undefined {
-    const { credentials, password, passcode } = values;
+    const { credentials, password, passcode, revokeSessions } = values;
     if (!credentials && !password && !passcode) {
       return;
     }
-    return credentials || { passcode: passcode || password };
+    return credentials || {
+      passcode: passcode || password,
+      revokeSessions,
+    };
   }
 
   getInputs(idxRemediationValue) {
-    return {
+    return [{
       ...idxRemediationValue.form?.value[0],
       name: 'password',
       type: 'string',
-      required: idxRemediationValue.required
-    };
+      required: idxRemediationValue.required,
+    }];
   }
 }
