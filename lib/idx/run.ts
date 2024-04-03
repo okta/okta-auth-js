@@ -26,7 +26,7 @@ import {
   RunOptions,
   IdxTransactionMeta,
 } from './types';
-import { IdxMessage, IdxResponse } from './types/idx-js';
+import { IdxMessage, IdxResponse, isRawIdxResponse } from './types/idx-js';
 import { getSavedTransactionMeta, saveTransactionMeta } from './transactionMeta';
 import {
   getAvailableSteps,
@@ -248,7 +248,7 @@ async function finalizeData(authClient: OktaAuthIdxInterface, data: RunData): Pr
   let terminal;
 
   if (idxResponse) {
-    shouldSaveResponse = !!(idxResponse.requestDidSucceed || idxResponse.stepUp);
+    shouldSaveResponse = !!(isRawIdxResponse(idxResponse.rawIdxState) || idxResponse.stepUp);
     enabledFeatures = getEnabledFeatures(idxResponse);
     availableSteps = getAvailableSteps(authClient, idxResponse, options.useGenericRemediator);
     messages = getMessagesFromResponse(idxResponse, options);
@@ -269,7 +269,7 @@ async function finalizeData(authClient: OktaAuthIdxInterface, data: RunData): Pr
       shouldClearTransaction = true;
     } else {
       // save response if there are actions available (ignore messages)
-      shouldSaveResponse = !!hasActions;
+      shouldSaveResponse = shouldSaveResponse && hasActions;
     }
     // leave shared storage intact so the transaction can be continued in another tab
     clearSharedStorage = false;

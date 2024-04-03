@@ -378,7 +378,7 @@ describe('idx/run', () => {
         idxResponse.requestDidSucceed = false;
         jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
         await run(authClient);
-        expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
+        expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalled();
       });
   
       // an error response does not clear the transaction. options may be valid on previous response
