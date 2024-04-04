@@ -29,7 +29,7 @@ Feature: Direct Auth Basic Login with Password Factor
       When she fills in an incorrect "username" with value "Mory"
         And she fills in her "password"
         And she submits the form
-      Then she should see a message on the Login form "Authentication failed"
+      Then she should see a message on the Login form "There is no account with the Username Mory."
 
     Scenario: Mary doesn't know her password
       Given she has an account with "active" state in the org
