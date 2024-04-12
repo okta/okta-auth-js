@@ -14,3 +14,4 @@
 export * from './AutoRenewService';
 export * from './SyncStorageService';
 export * from './LeaderElectionService';
+export * from './InactiveTabService';

@@ -23,12 +23,17 @@ import {
   OktaAuthCoreInterface,
   OktaAuthCoreOptions
 } from '../types';
-import { AutoRenewService, SyncStorageService, LeaderElectionService } from '../../services';
+import { AutoRenewService,
+  SyncStorageService,
+  LeaderElectionService,
+  InactiveTabService
+} from '../../services';
 import { removeNils } from '../../util';
 
 const AUTO_RENEW = 'autoRenew';
 const SYNC_STORAGE = 'syncStorage';
 const LEADER_ELECTION = 'leaderElection';
+const RENEW_ON_TAB_ACTIVATION = 'renewOnTabActivation';
 
 export class ServiceManager
 <
@@ -43,12 +48,13 @@ implements ServiceManagerInterface
   private services: Map<string, ServiceInterface>;
   private started: boolean;
 
-  private static knownServices = [AUTO_RENEW, SYNC_STORAGE, LEADER_ELECTION];
+  private static knownServices = [AUTO_RENEW, SYNC_STORAGE, LEADER_ELECTION, RENEW_ON_TAB_ACTIVATION];
 
-  private static defaultOptions = {
+  private static defaultOptions: ServiceManagerOptions = {
     autoRenew: true,
     autoRemove: true,
-    syncStorage: true
+    syncStorage: true,
+    renewOnTabActivation: true
   };
 
   constructor(sdk: OktaAuthCoreInterface<M, S, O>, options: ServiceManagerOptions = {}) {
@@ -150,6 +156,9 @@ implements ServiceManagerInterface
         break;
       case SYNC_STORAGE:
         service = new SyncStorageService(tokenManager, {...this.options});
+        break;
+      case RENEW_ON_TAB_ACTIVATION:
+        service = new InactiveTabService(tokenManager, {...this.options});
         break;
       default:
         throw new Error(`Unknown service ${name}`);

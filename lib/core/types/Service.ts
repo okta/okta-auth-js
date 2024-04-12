@@ -31,5 +31,12 @@ export interface LeaderElectionServiceOptions {
   broadcastChannelName?: string;
 }
 
-export type ServiceManagerOptions = AutoRenewServiceOptions &
-  SyncStorageServiceOptions & LeaderElectionServiceOptions;
+export interface InactiveTabServiceOptions {
+  renewOnTabActivation?: boolean;
+}
+
+export type ServiceManagerOptions =
+  AutoRenewServiceOptions &
+  SyncStorageServiceOptions &
+  LeaderElectionServiceOptions &
+  InactiveTabServiceOptions;
