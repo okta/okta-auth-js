@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.6.0
+- TODO
+
 ## 7.5.1
 
 ### Bug Fix
