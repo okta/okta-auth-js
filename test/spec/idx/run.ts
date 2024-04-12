@@ -640,6 +640,14 @@ describe('idx/run', () => {
         await run(authClient);
         expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
       });
+      it('does not save the idxResponse when it is not a rawIdxResponse', async () => {
+        const { authClient, idxResponse } = testContext;
+        idxResponse.requestDidSucceed = false;
+        idxResponse.rawIdxState.version = null;
+        jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+        await run(authClient);
+        expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
+      });
       it('saves the idxResponse when has actions', async () => {
         const { idxResponse, authClient } = testContext;
         idxResponse.actions = {
