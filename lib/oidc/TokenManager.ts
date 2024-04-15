@@ -420,18 +420,22 @@ export class TokenManager implements TokenManagerInterface {
       return this.state.renewPromise;
     }
 
-    const token = this.getSync(key);
-    let shouldRenew = token !== undefined;
-    // explicitly check if key='accessToken' because token keys are not guaranteed (long story, features dragons)
-    if (!token && key === 'accessToken') {
-      // attempt token renewal if refresh token is present (improves consistency of autoRenew)
-      const refreshKey = this.getStorageKeyByType('refreshToken');
-      const refreshToken = this.getSync(refreshKey);
-      shouldRenew = refreshToken !== undefined;
-    }
+    try {
+      var token = this.getSync(key);
+      let shouldRenew = token !== undefined;
+      // explicitly check if key='accessToken' because token keys are not guaranteed (long story, features dragons)
+      if (!token && key === 'accessToken') {
+        // attempt token renewal if refresh token is present (improves consistency of autoRenew)
+        const refreshKey = this.getStorageKeyByType('refreshToken');
+        const refreshToken = this.getSync(refreshKey);
+        shouldRenew = refreshToken !== undefined;
+      }
 
-    if (!shouldRenew) {
-      const err = new AuthSdkError('The tokenManager has no token for the key: ' + key);
+      if (!shouldRenew) {
+        throw new AuthSdkError('The tokenManager has no token for the key: ' + key);
+      }
+    }
+    catch (err) {
       this.emitError(err);
       return Promise.reject(err);
     }
@@ -446,7 +450,7 @@ export class TokenManager implements TokenManagerInterface {
         this.setTokens(tokens);
 
         // return accessToken in case where access token doesn't exist
-        // but refresh token does exists
+        // but refresh token exists
         if (!token && key === 'accessToken') {
           const accessToken = tokens['accessToken'];
           this.emitRenewed(key, accessToken, null);

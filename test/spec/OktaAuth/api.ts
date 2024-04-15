@@ -454,7 +454,7 @@ describe('OktaAuth (api)', function() {
       expect(renewSpy).toHaveBeenCalled();
     });
 
-    it('returns renewed access token when no stored access token exists', async () => {
+    it('returns renewed access token when only refresh token exists', async () => {
       const refreshToken = {...tokens.standardRefreshTokenParsed};
       const renewedToken = {...tokens.standardAccessTokenParsed, expiresAt: now + 300};
       const renewSpy = jest.spyOn(auth.token, 'renewTokens').mockResolvedValue({ accessToken: renewedToken });

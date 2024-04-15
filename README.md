@@ -36,10 +36,11 @@ You can learn more on the [Okta + JavaScript][lang-landing] page in our document
 
 This library uses semantic versioning and follows Okta's [library version policy](https://developer.okta.com/code/library-versions/).
 
-> :warning: :warning: :warning: :warning: :warning:<br>
-> :warning: Review [Future of autoRenew](./docs/autoRenew-notice.md)<br>
-> :warning: Review [End of Third-Party Cookies](https://developer.okta.com/blog/2024/02/29/third-party-cookies)<br>
-> :warning: :warning: :warning: :warning: :warning:<br>
+> :warning: :warning: :warning: :warning: :warning: :warning: :warning: :warning: :warning:<br>
+#### :warning: Bulletin Board :warning:
+* Review [Future of autoRenew](./docs/autoRenew-notice.md) <br>
+* Review [End of Third-Party Cookies](https://developer.okta.com/blog/2024/02/29/third-party-cookies) <br>
+> :warning: :warning: :warning: :warning: :warning: :warning: :warning: :warning::warning:<br>
 
 ## Release Status
 
@@ -48,7 +49,7 @@ This library uses semantic versioning and follows Okta's [library version policy
 | Version   | Status                           |
 | -------   | -------------------------------- |
 | `7.x`     | :heavy_check_mark: Stable        |
-| `6.x`     | :x: Retired  |
+| `6.x`     | :x: Retired                      |
 | `5.x`     | :x: Retired                      |
 | `4.x`     | :x: Retired                      |
 | `3.x`     | :x: Retired                      |
@@ -1162,8 +1163,7 @@ Returns the access token string retrieved from [authState](#authstatemanager) if
 
 ### `getOrRenewAccessToken()`
 
-Reads the `accessToken` from storage and will attempt a token renewal if expired.
-Returns the access token string or `null` if the doesn't exist or a renewal cannot be completed
+Returns the access token string if it exists. Returns `null` if the access token doesn't exist or a renewal cannot be completed
 
 ### `storeTokensFromRedirect()`
 
