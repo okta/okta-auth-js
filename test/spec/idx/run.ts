@@ -372,27 +372,13 @@ describe('idx/run', () => {
         idxResponse.requestDidSucceed = false;
       });
   
-      // Do not save the response if it is not a rawIdxResponse. Use previous saved IDX resposne to continue
-      it('does not save the idxResponse when it is not a rawIdxResponse', async () =>{
+      // Do not save the failed response. Use previous saved IDX resposne to continue
+      it('does not save the idxResponse', async () =>{
         const { authClient, idxResponse } = testContext;
         idxResponse.requestDidSucceed = false;
         jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
         await run(authClient);
-        expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalled();
-      });
-
-      // Will save the idxResponse if it is a rawIdxResponse, even if the response failed
-      it('saves idxResponse', async () => {
-        const { authClient, idxResponse, transactionMeta } = testContext;
-        idxResponse.requestDidSucceed = false;
-        jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
-        await run(authClient);
-        expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalledWith({
-          rawIdxResponse: idxResponse.rawIdxState,
-          requestDidSucceed: false,
-          stateHandle: idxResponse.context.stateHandle,
-          interactionHandle: transactionMeta.interactionHandle
-        });
+        expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
       });
   
       // an error response does not clear the transaction. options may be valid on previous response
@@ -636,14 +622,6 @@ describe('idx/run', () => {
       // a terminal error response is not saved. previous idxResponse may be used to cancel/skip
       it('does not save the idxResponse', async () =>{
         const { authClient } = testContext;
-        jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
-        await run(authClient);
-        expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
-      });
-      it('does not save the idxResponse when it is not a rawIdxResponse', async () => {
-        const { authClient, idxResponse } = testContext;
-        idxResponse.requestDidSucceed = false;
-        idxResponse.rawIdxState.version = null;
         jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
         await run(authClient);
         expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
