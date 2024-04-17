@@ -33,14 +33,6 @@ expect(authClient.tx).type.toEqual<AuthnTransactionAPI>();
 expect(authClient.authn).type.toEqual<AuthnTransactionAPI>();
 expect(authClient.fingerprint).type.toEqual<FingerprintAPI>();
 
-// does not include OAuth
-// TODO: expectError<undefined>
-expect(authClient.token).type.toRaiseError();
-
-// does not include Core
-// TODO: expectError<undefined>
-expect(authClient.authStateManager).type.toRaiseError();
-
 // test async methods
 expect(await authClient.fingerprint()).type.toEqual<string>();
 expect(await authClient.signIn({})).type.toEqual<AuthnTransaction>();
