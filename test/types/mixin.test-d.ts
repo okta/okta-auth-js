@@ -44,17 +44,17 @@ import {
   TransactionManagerInterface
 } from '@okta/okta-auth-js';
 
-import { expectType, expectAssignable, expectError } from 'tsd';
+import { expect } from 'tstyche';
 
 const baseOptions: OktaAuthBaseOptions = { devMode: true };
 const BaseOptions: OktaAuthOptionsConstructor<OktaAuthBaseOptions> = createBaseOptionsConstructor();
 const OktaAuthBase = createOktaAuthBase(BaseOptions);
 
 const baseClient = new OktaAuthBase(baseOptions);
-expectAssignable<OktaAuthBaseOptions>(baseClient.options);
-expectAssignable<FeaturesAPI>(baseClient.features);
+expect<OktaAuthBaseOptions>().type.toBeAssignable(baseClient.options);
+expect<FeaturesAPI>().type.toBeAssignable(baseClient.features);
 
-expectError(mixinIdx(OktaAuthBase));
+expect(mixinIdx(OktaAuthBase)).type.toRaiseError();
 
 const oauthOptions: OktaAuthOAuthOptions = { ...baseOptions };
 const OAuthOptions: OktaAuthOauthOptionsConstructor = createOAuthOptionsConstructor();
@@ -64,25 +64,25 @@ const OktaAuthOAuth = createOktaAuthOAuth(OAuthStorageManager, OAuthOptions, Tra
 const oauthClient = new OktaAuthOAuth();
 
 // includes Http
-expectAssignable<OktaAuthHttpInterface>(oauthClient);
-expectType<HttpAPI>(oauthClient.http);
+expect<OktaAuthHttpInterface>().type.toBeAssignable(oauthClient);
+expect(oauthClient.http).type.toEqual<HttpAPI>();
 
 // includes OAuth
-expectType<OktaAuthOAuthOptions>(oauthClient.options);
-expectType<TokenAPI>(oauthClient.token);
-expectType<TransactionManagerInterface>(oauthClient.transactionManager);
+expect(oauthClient.options).type.toEqual<OktaAuthOAuthOptions>();
+expect(oauthClient.token).type.toEqual<TokenAPI>();
+expect(oauthClient.transactionManager).type.toEqual<TransactionManagerInterface>();
 
 // does not include Authn
-expectError<undefined>(oauthClient.authn);
+expect(oauthClient.authn).type.toRaiseError();
 
 // does not include Idx
-expectError<undefined>(oauthClient.idx);
+expect(oauthClient.idx).type.toRaiseError();
 
 // does not include MyAccount
-expectError<undefined>(oauthClient.myaccount);
+expect(oauthClient.myaccount).type.toRaiseError();
 
 // cannot mixin IDX (mismatching storage)
-expectError(mixinIdx(OktaAuthOAuth));
+expect(mixinIdx(OktaAuthOAuth)).type.toRaiseError();
 
 // Create a base class that CAN mixin IDX
 const IdxOptions: OktaAuthIdxOptionsConstructor = createIdxOptionsConstructor();
@@ -96,15 +96,15 @@ let idxClient = new OktaAuthWithIdx();
 
 
 // has IDX
-expectType<OktaAuthIdxOptions>(idxClient.options);
-expectType<IdxAPI>(idxClient.idx);
-expectType<IdxStorageManagerInterface>(idxClient.storageManager);
+expect(idxClient.options).type.toEqual<OktaAuthIdxOptions>();
+expect(idxClient.idx).type.toEqual<IdxAPI>();
+expect(idxClient.storageManager).type.toEqual<IdxStorageManagerInterface>();
 
 // still includes OAuth
-expectType<TokenAPI>(idxClient.token);
+expect(idxClient.token).type.toEqual<TokenAPI>();
 
 // still does not include Authn
-expectError<undefined>(idxClient.authn);
+expect(idxClient.authn).type.toRaiseError();
 
 
 // Add MyAccount
@@ -112,14 +112,14 @@ const OktaAuthWithIdxAndMyAccount = mixinMyAccount(OktaAuthWithIdx);
 let comboClient = new OktaAuthWithIdxAndMyAccount();
 
 // has IDX
-expectAssignable<OktaAuthIdxOptions>(comboClient.options);
-expectType<IdxAPI>(comboClient.idx);
+expect(comboClient.options).type.toBeAssignable<OktaAuthIdxOptions>();
+expect(comboClient.idx).type.toEqual<IdxAPI>();
 
 // has MyAccount
-expectAssignable<OktaAuthMyAccountInterface>(comboClient);
+expect<OktaAuthMyAccountInterface>().type.toBeAssignable(comboClient);
 
 // still includes OAuth
-expectType<TokenAPI>(comboClient.token);
+expect(comboClient.token).type.toEqual<TokenAPI>();
 
 // still does not include Authn
-expectError<undefined>(comboClient.authn);
+expect(comboClient.authn).type.toRaiseError();

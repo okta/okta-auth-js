@@ -27,7 +27,7 @@ import {
   IdxStorageManagerConstructor,
   IdxTransactionManagerConstructor,
 } from '@okta/okta-auth-js/idx';
-import { expectType, expectAssignable, expectError } from 'tsd';
+import { expect } from 'tstyche';
 
 const OptionsConstructor: OktaAuthOptionsConstructor<OktaAuthIdxOptions> = createIdxOptionsConstructor();
 const StorageManager: IdxStorageManagerConstructor = createIdxStorageManager();
@@ -37,30 +37,30 @@ const options: OktaAuthIdxOptions = {issuer: 'https://{yourOktaDomain}/oauth2/de
 const authClient = new OktaAuth(options);
 
 // includes Http
-expectAssignable<OktaAuthHttpInterface>(authClient);
-expectType<HttpAPI>(authClient.http);
+expect<OktaAuthHttpInterface>().type.toBeAssignable(authClient);
+expect(authClient.http).type.toEqual<HttpAPI>();
 
 // includes base OAuth
-expectType<BaseTokenAPI>(authClient.token);
+expect(authClient.token).type.toEqual<BaseTokenAPI>();
 
 // has IDX
-expectType<OktaAuthIdxOptions>(authClient.options);
-expectType<MinimalIdxAPI>(authClient.idx);
-expectType<IdxStorageManagerInterface>(authClient.storageManager);
+expect(authClient.options).type.toEqual<OktaAuthIdxOptions>();
+expect(authClient.idx).type.toEqual<MinimalIdxAPI>();
+expect(authClient.storageManager).type.toEqual<IdxStorageManagerInterface>();
 
 // has partial IDX API
-expectError<undefined>(authClient.idx.cancel);
+expect(authClient.idx.cancel).type.toRaiseError();
 
 // does not include Authn
-expectError<undefined>(authClient.authn);
+expect(authClient.authn).type.toRaiseError();
 
 // has Webauthn
-expectType<WebauthnAPI>(OktaAuth.webauthn);
+expect(OktaAuth.webauthn).type.toEqual<WebauthnAPI>();
 
 // has no core API
-expectError<undefined>(authClient.start);
+expect(authClient.start).type.toRaiseError();
 
 // has partial OAuth API
-expectError<undefined>(authClient.pkce);
-expectType<() => boolean>(authClient.isPKCE);
+expect(authClient.pkce).type.toRaiseError();
+expect(authClient.isPKCE).type.toEqual<() => boolean>();
 

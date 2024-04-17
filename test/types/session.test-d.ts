@@ -12,21 +12,19 @@
  *
  */
 import { SessionObject, OktaAuth } from '@okta/okta-auth-js';
-import { expectType } from 'tsd';
+import { expect } from 'tstyche';
 
 const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 
-(async () => {
-  // Session API
-  expectType<void>(authClient.session.setCookieAndRedirect('SESSION_TOKEN', 'https://some.com/redirect'));
-  expectType<boolean>(await authClient.session.exists());
-  const session = await authClient.session.get();
-  expectType<SessionObject>(session);
-  expectType<object>(await authClient.session.close());
-  expectType<object>(await authClient.session.refresh());
+// Session API
+expect(authClient.session.setCookieAndRedirect('SESSION_TOKEN', 'https://some.com/redirect')).type.toEqual<void>();
+expect(await authClient.session.exists()).type.toEqual<boolean>();
+const session = await authClient.session.get();
+expect(session).type.toEqual<SessionObject>();
+expect(await authClient.session.close()).type.toEqual<object>();
+expect(await authClient.session.refresh()).type.toEqual<object>();
 
-  // Session
-  expectType<string>(session.status);
-  expectType<object>(await session.user!());
-  expectType<object>(await session.refresh!());
-})();
+// Session
+expect(session.status).type.toEqual<string>();
+expect(await session.user!()).type.toEqual<object>();
+expect(await session.refresh!()).type.toEqual<object>();

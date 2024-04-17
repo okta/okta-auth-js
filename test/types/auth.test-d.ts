@@ -12,7 +12,7 @@
  *
  */
 import { AuthnTransaction, UserClaims, OktaAuth, TokenParams } from '@okta/okta-auth-js';
-import { expectType, expectAssignable } from 'tsd';
+import { expect } from 'tstyche';
 
 const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 
@@ -51,7 +51,7 @@ const authorizeOptions2: TokenParams = {
 
 (async () => {
   // signIn
-  expectType<AuthnTransaction>(await authClient.signInWithCredentials({
+  expect(await authClient.signInWithCredentials({
     username: 'some-username',
     password: 'some-password',
     sendFingerprint: true,
@@ -59,83 +59,83 @@ const authorizeOptions2: TokenParams = {
       deviceToken: 'device-1'
     },
     stateToken: 'fake-state-token'
-  }));
-  expectType<void>(await authClient.signInWithRedirect());
-  expectType<void>(await authClient.signInWithRedirect({
+  })).type.toEqual<AuthnTransaction>();
+  expect(await authClient.signInWithRedirect()).type.toEqual<void>();
+  expect(await authClient.signInWithRedirect({
     originalUri: `${window.location.href}`,
     ...authorizeOptions
-  }));
-  expectType<void>(await authClient.signInWithRedirect({
+  })).type.toEqual<void>();
+  expect(await authClient.signInWithRedirect({
     originalUri: `${window.location.href}`,
     ...authorizeOptions2
-  }));
+  })).type.toEqual<void>();
 
   // forgotPassword
-  expectType<AuthnTransaction>(await authClient.forgotPassword({
+  expect(await authClient.forgotPassword({
     username: 'dade.murphy@example.com',
     factorType: 'SMS',
     relayState: 'd3de23'
-  }));
+  })).type.toEqual<AuthnTransaction>();
 
   // unlockAccount
-  expectType<AuthnTransaction>(await authClient.unlockAccount({
+  expect(await authClient.unlockAccount({
     username: 'dade.murphy@example.com',
     factorType: 'SMS',
     relayState: 'd3de23'
-  }));
+  })).type.toEqual<AuthnTransaction>();
 
   // verifyRecoveryToken
-  expectType<AuthnTransaction>(await authClient.verifyRecoveryToken({
+  expect(await authClient.verifyRecoveryToken({
     recoveryToken: '00xdqXOE5qDZX8-PBR1bYv8AESqIFinDy3yul01tyh'
-  }));
+  })).type.toEqual<AuthnTransaction>();
 
   // Fingerprint
-  expectType<string>(await authClient.fingerprint({
+  expect(await authClient.fingerprint({
     timeout: 10
-  }));
-  expectAssignable<object>(await authClient.webfinger({
+  })).type.toEqual<string>();
+  expect(await authClient.webfinger({
     resource: 'acct:john.joe@example.com',
     rel: 'okta:idp'
-  }));
+  })).type.toBeAssignable<object>();
 
   // originalUri
-  expectType<void>(authClient.setOriginalUri(`${window.location.href}`));
-  expectType<string>(authClient.getOriginalUri()!);
-  expectType<void>(authClient.removeOriginalUri());
+  expect(authClient.setOriginalUri(`${window.location.href}`)).type.toEqual<void>();
+  expect(authClient.getOriginalUri()!).type.toEqual<string>();
+  expect(authClient.removeOriginalUri()).type.toEqual<void>();
 
   // Tokens
-  expectType<string>(authClient.getIdToken()!);
-  expectType<string>(authClient.getAccessToken()!);
+  expect(authClient.getIdToken()!).type.toEqual<string>();
+  expect(authClient.getAccessToken()!).type.toEqual<string>();
 
   // User
-  expectType<boolean>(await authClient.isAuthenticated());
-  expectType<UserClaims>(await authClient.getUser());
+  expect(await authClient.isAuthenticated()).type.toEqual<boolean>();
+  expect(await authClient.getUser()).type.toEqual<UserClaims>();
   const user = { sub: 'sub', groups: ['fake group'] };
-  expectAssignable<UserClaims<{
+  expect(user).type.toBeAssignable<UserClaims<{
     groups: string[];
-  }>>(user);
+  }>>();
 
   // Redirect
-  expectType<boolean>(authClient.isLoginRedirect());
-  expectType<void>(await authClient.handleLoginRedirect());
+  expect(authClient.isLoginRedirect()).type.toEqual<boolean>();
+  expect(await authClient.handleLoginRedirect()).type.toEqual<void>();
   const tokens = await authClient.tokenManager.getTokens();
-  expectType<void>(await authClient.handleLoginRedirect(tokens));
-  expectType<void>(await authClient.handleLoginRedirect(tokens, `${window.location.href}`));
-  expectType<void>(await authClient.storeTokensFromRedirect());
-  expectType<void>(await authClient.handleRedirect());
-  expectType<void>(await authClient.handleRedirect(`${window.location.href}`));
+  expect(await authClient.handleLoginRedirect(tokens)).type.toEqual<void>();
+  expect(await authClient.handleLoginRedirect(tokens, `${window.location.href}`)).type.toEqual<void>();
+  expect(await authClient.storeTokensFromRedirect()).type.toEqual<void>();
+  expect(await authClient.handleRedirect()).type.toEqual<void>();
+  expect(await authClient.handleRedirect(`${window.location.href}`)).type.toEqual<void>();
 
   // signOut
-  expectType<boolean>(await authClient.signOut());
-  expectType<boolean>(await authClient.signOut({
+  expect(await authClient.signOut()).type.toEqual<boolean>();
+  expect(await authClient.signOut({
     postLogoutRedirectUri: `${window.location.origin}/logout/callback`,
     state: '1234',
     idToken: tokens.idToken,
     revokeAccessToken: false,
     revokeRefreshToken: false,
     accessToken: tokens.accessToken,
-  }));
-  expectAssignable<boolean>(await authClient.closeSession());
-  expectType<unknown>(await authClient.revokeAccessToken(tokens.accessToken));
-  expectType<unknown>(await authClient.revokeRefreshToken(tokens.refreshToken));
+  })).type.toEqual<boolean>();
+  expect(await authClient.closeSession()).type.toBeAssignable<boolean>();
+  expect(await authClient.revokeAccessToken(tokens.accessToken)).type.toEqual<unknown>();
+  expect(await authClient.revokeRefreshToken(tokens.refreshToken)).type.toEqual<unknown>();
 })();

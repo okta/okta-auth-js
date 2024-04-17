@@ -22,26 +22,26 @@ import {
   TokenAPI,
   WebauthnAPI
 } from '@okta/okta-auth-js/idx';
-import { expectType, expectAssignable, expectError } from 'tsd';
+import { expect } from 'tstyche';
 
 const options: OktaAuthOptions = {issuer: 'https://{yourOktaDomain}/oauth2/default'};
 const authClient = new OktaAuth(options);
 
 // includes Http
-expectAssignable<OktaAuthHttpInterface>(authClient);
-expectType<HttpAPI>(authClient.http);
+expect<OktaAuthHttpInterface>().type.toBeAssignable(authClient);
+expect(authClient.http).type.toEqual<HttpAPI>();
 
 // includes OAuth
-expectType<TokenAPI>(authClient.token);
+expect(authClient.token).type.toEqual<TokenAPI>();
 
 // has IDX
-expectType<OktaAuthIdxOptions>(authClient.options);
-expectType<OktaAuthOptions>(authClient.options); // test alias
-expectType<IdxAPI>(authClient.idx);
-expectType<IdxStorageManagerInterface>(authClient.storageManager);
+expect(authClient.options).type.toEqual<OktaAuthIdxOptions>();
+expect(authClient.options).type.toEqual<OktaAuthOptions>(); // test alias
+expect(authClient.idx).type.toEqual<IdxAPI>();
+expect(authClient.storageManager).type.toEqual<IdxStorageManagerInterface>();
 
 // does not include Authn
-expectError<undefined>(authClient.authn);
+expect(authClient.authn).type.toRaiseError();
 
 // has Webauthn
-expectType<WebauthnAPI>(OktaAuth.webauthn);
+expect(OktaAuth.webauthn).type.toEqual<WebauthnAPI>();

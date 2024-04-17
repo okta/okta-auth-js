@@ -39,15 +39,14 @@ import {
   AuthStateManagerInterface,
   WebauthnAPI
 } from '@okta/okta-auth-js';
-
-import { expectType, expectAssignable, expectError } from 'tsd';
+import { expect } from 'tstyche';
 
 const baseOptions: OktaAuthBaseOptions = { devMode: true };
 const BaseOptions: OktaAuthOptionsConstructor<OktaAuthBaseOptions> = createBaseOptionsConstructor();
 const OktaAuthBase = createOktaAuthBase(BaseOptions);
 
 // Cannot mixin on a Base interface
-expectError(mixinIdx(OktaAuthBase));
+expect(mixinIdx(OktaAuthBase)).type.toRaiseError();
 
 const oauthOptions: OktaAuthOAuthOptions = { ...baseOptions };
 const OAuthOptions: OktaAuthOauthOptionsConstructor = createOAuthOptionsConstructor();
@@ -56,7 +55,7 @@ const TransactionManager: TransactionManagerConstructor = createTransactionManag
 const OktaAuthOAuth = createOktaAuthOAuth(OAuthStorageManager, OAuthOptions, TransactionManager);
 
 // cannot mixin (mismatching storage)
-expectError(mixinIdx(OktaAuthOAuth));
+expect(mixinIdx(OktaAuthOAuth)).type.toRaiseError();
 
 // OAuth base with IDX storage
 const IdxOptions: OktaAuthIdxOptionsConstructor = createIdxOptionsConstructor();
@@ -69,18 +68,18 @@ const OktaAuthWithIdx = mixinIdx(OAuthBaseWithIdxStorage);
 const idxClient = new OktaAuthWithIdx();
 
 // has Webauthn
-expectType<WebauthnAPI>(OktaAuthWithIdx.webauthn);
+expect(OktaAuthWithIdx.webauthn).type.toEqual<WebauthnAPI>();
 
 // has IDX
-expectType<OktaAuthIdxOptions>(idxClient.options);
-expectType<IdxAPI>(idxClient.idx);
-expectType<IdxStorageManagerInterface>(idxClient.storageManager);
+expect(idxClient.options).type.toEqual<OktaAuthIdxOptions>();
+expect(idxClient.idx).type.toEqual<IdxAPI>();
+expect(idxClient.storageManager).type.toEqual<IdxStorageManagerInterface>();
 
 // still includes OAuth
-expectType<TokenAPI>(idxClient.token);
+expect(idxClient.token).type.toEqual<TokenAPI>();
 
 // does not include Core
-expectError<undefined>(idxClient.authStateManager);
+expect(idxClient.authStateManager).type.toRaiseError();
 
 // Create a Core base class
 const OAuthBaseWithCore = createOktaAuthCore(IdxStorageManager, IdxOptions, IdxTransactionManager);
@@ -88,12 +87,12 @@ const OktaAuthCoreWithIdx = mixinIdx(OAuthBaseWithCore);
 const coreClient = new OktaAuthCoreWithIdx();
 
 // has IDX
-expectType<OktaAuthIdxOptions>(coreClient.options);
-expectType<IdxAPI>(coreClient.idx);
-expectType<IdxStorageManagerInterface>(coreClient.storageManager);
+expect(coreClient.options).type.toEqual<OktaAuthIdxOptions>();
+expect(coreClient.idx).type.toEqual<IdxAPI>();
+expect(coreClient.storageManager).type.toEqual<IdxStorageManagerInterface>();
 
 // still includes OAuth
-expectType<TokenAPI>(coreClient.token);
+expect(coreClient.token).type.toEqual<TokenAPI>();
 
 // also includes Core
-expectAssignable<AuthStateManagerInterface>(coreClient.authStateManager);
+expect(coreClient.authStateManager).type.toBeAssignable<AuthStateManagerInterface>();

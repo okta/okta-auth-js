@@ -38,15 +38,14 @@ import {
   AuthnTransaction
 } from '@okta/okta-auth-js';
 
-import { expectType, expectAssignable, expectNotAssignable, expectError } from 'tsd';
-
+import { expect } from 'tstyche';
 
 const baseOptions: OktaAuthBaseOptions = { devMode: true };
 const BaseOptions: OktaAuthOptionsConstructor<OktaAuthBaseOptions> = createBaseOptionsConstructor();
 const OktaAuthBase = createOktaAuthBase(BaseOptions);
 
 // Cannot mixin on a Base interface
-expectError(mixinAuthn(OktaAuthBase));
+expect(mixinAuthn(OktaAuthBase)).type.toRaiseError();
 
 const httpOptions: OktaAuthHttpOptions = { ...baseOptions };
 const HttpOptions: OktaAuthOptionsConstructor<OktaAuthHttpOptions> = createHttpOptionsConstructor();
@@ -57,27 +56,25 @@ const OktaAuthWithAuthn = mixinAuthn(OktaAuthWithHttp);
 const authnClient = new OktaAuthWithAuthn(httpOptions);
 
 // includes authn
-expectAssignable<OktaAuthTxInterface>(authnClient);
-expectType<AuthnTransactionAPI>(authnClient.tx);
-expectType<AuthnTransactionAPI>(authnClient.authn);
-expectType<FingerprintAPI>(authnClient.fingerprint);
+expect<OktaAuthTxInterface>().type.toBeAssignable(authnClient);
+expect(authnClient.tx).type.toEqual<AuthnTransactionAPI>();
+expect(authnClient.authn).type.toEqual<AuthnTransactionAPI>();
+expect(authnClient.fingerprint).type.toEqual<FingerprintAPI>();
 
 // does not include OAuth
-expectError<undefined>(authnClient.token);
+expect(authnClient.token).type.toRaiseError();
 
 // does not include Core
-expectError<undefined>(authnClient.authStateManager);
+expect(authnClient.authStateManager).type.toRaiseError();
 
 // test async methods
-(async () => {
-  expectType<string>(await authnClient.fingerprint());
-  expectType<AuthnTransaction>(await authnClient.signIn({}));
-  expectError(authnClient.signInWithCredentials({})); // must provide credentials
-  expectType<AuthnTransaction>(await authnClient.signInWithCredentials({ username: 'foo', password: 'blah' }));
-  expectType<AuthnTransaction>(await authnClient.forgotPassword({}));
-  expectType<AuthnTransaction>(await authnClient.unlockAccount({ username: 'foo', factorType: 'SMS' }));
-  expectType<AuthnTransaction>(await authnClient.verifyRecoveryToken({ recoveryToken: 'foo' }));
-})();
+expect(await authnClient.fingerprint()).type.toEqual<string>();
+expect(await authnClient.signIn({})).type.toEqual<AuthnTransaction>();
+expect(authnClient.signInWithCredentials({})).type.toRaiseError(); // must provide credentials
+expect(await authnClient.signInWithCredentials({ username: 'foo', password: 'blah' })).type.toEqual<AuthnTransaction>();
+expect(await authnClient.forgotPassword({})).type.toEqual<AuthnTransaction>();
+expect(await authnClient.unlockAccount({ username: 'foo', factorType: 'SMS' })).type.toEqual<AuthnTransaction>();
+expect(await authnClient.verifyRecoveryToken({ recoveryToken: 'foo' })).type.toEqual<AuthnTransaction>();
 
 // Create an OAuth base class
 const oauthOptions: OktaAuthOAuthOptions = { ...baseOptions };
@@ -90,10 +87,10 @@ const OktaAuthOAuthWithAuthn = mixinAuthn(OktaAuthOAuth);
 const oauthClient = new OktaAuthOAuthWithAuthn(httpOptions);
 
 // includes OAuth
-expectType<TokenAPI>(oauthClient.token);
+expect(oauthClient.token).type.toEqual<TokenAPI>();
 
 // includes authn
-expectAssignable<OktaAuthTxInterface>(oauthClient);
-expectType<AuthnTransactionAPI>(oauthClient.tx);
-expectType<AuthnTransactionAPI>(oauthClient.authn);
-expectType<FingerprintAPI>(oauthClient.fingerprint);
+expect<OktaAuthTxInterface>().type.toBeAssignable(oauthClient);
+expect(oauthClient.tx).type.toEqual<AuthnTransactionAPI>();
+expect(oauthClient.authn).type.toEqual<AuthnTransactionAPI>();
+expect(oauthClient.fingerprint).type.toEqual<FingerprintAPI>();
