@@ -355,6 +355,32 @@ describe('TokenManager', function() {
       });
       return p1;
     });
+
+    it('performs renew when no access token exists but refresh token is present', async () => {
+      expect.assertions(4);
+
+      const accessTokenKey = 'accessToken';
+      const renewedAccessToken = tokens.standardAccessTokenParsed;
+
+      const refreshTokenkey = 'test-refreshToken';
+      const refreshToken = tokens.standardRefreshTokenParsed;
+      client.tokenManager.add(refreshTokenkey, refreshToken);
+
+      jest.spyOn(client.token, 'renewTokens').mockResolvedValue({ accessToken: renewedAccessToken, refreshToken });
+      const addedCallback = jest.fn();
+      const renewedCallback = jest.fn();
+      const removedCallback = jest.fn();
+      client.tokenManager.on('added', addedCallback);
+      client.tokenManager.on('renewed', renewedCallback);
+      client.tokenManager.on('removed', removedCallback);
+
+      await client.tokenManager.renew(accessTokenKey);
+
+      expect(renewedCallback).toHaveBeenNthCalledWith(1, refreshTokenkey, refreshToken, refreshToken);
+      expect(renewedCallback).toHaveBeenNthCalledWith(2, accessTokenKey, renewedAccessToken, null);
+      expect(addedCallback).toHaveBeenNthCalledWith(1, accessTokenKey, renewedAccessToken);
+      expect(removedCallback).toHaveBeenNthCalledWith(1, refreshTokenkey, refreshToken);
+    });
   });
 
   describe('autoRenew', function() {

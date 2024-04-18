@@ -157,6 +157,7 @@ export interface OktaAuthOAuthInterface
   getIdToken(): string | undefined;
   getAccessToken(): string | undefined;
   getRefreshToken(): string | undefined;
+  getOrRenewAccessToken(): Promise<string | null>;
 
   isAuthenticated(options?: IsAuthenticatedOptions): Promise<boolean>;
   signOut(opts?: SignoutOptions): Promise<boolean>;

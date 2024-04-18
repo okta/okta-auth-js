@@ -179,6 +179,22 @@ export function mixinOAuth
       const { refreshToken } = this.tokenManager.getTokensSync();
       return refreshToken ? refreshToken.refreshToken : undefined;
     }
+
+    async getOrRenewAccessToken(): Promise<string | null> {
+      const { accessToken } = this.tokenManager.getTokensSync();
+      if (accessToken && !this.tokenManager.hasExpired(accessToken)) {
+        return accessToken.accessToken;
+      }
+      try {
+        const key = this.tokenManager.getStorageKeyByType('accessToken');
+        const token = await this.tokenManager.renew(key ?? 'accessToken');
+        return (token as AccessToken)?.accessToken ?? null;
+      }
+      catch (err) {
+        this.emitter.emit('error', err);
+        return null;
+      }
+    }
   
     /**
      * Store parsed tokens from redirect url

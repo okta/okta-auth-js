@@ -427,6 +427,60 @@ describe('OktaAuth (api)', function() {
     });
   });
 
+  describe('getOrRenewAccessToken', () => {
+    beforeEach(() => {
+      auth = new OktaAuth({ issuer, pkce: true, services: {
+        autoRenew: false,
+        syncStorage: false
+      }});
+      auth.tokenManager.clear();
+    });
+
+    const now = Math.floor(Date.now() / 1000);
+    it('returns valid access token from storage', async () => {
+      const accessToken = {...tokens.standardAccessTokenParsed, expiresAt: now + 300};
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({ accessToken });
+      const retVal = await auth.getOrRenewAccessToken();
+      expect(retVal).toBe(accessToken.accessToken);
+    });
+
+    it('returns renewed access token when stored token is expired', async () => {
+      const currentToken = {...tokens.standardAccessTokenParsed};
+      const renewedToken = {...tokens.standardAccessTokenParsed, expiresAt: now + 300};
+      const renewSpy = jest.spyOn(auth.token, 'renewTokens').mockResolvedValue({ accessToken: renewedToken });
+      auth.tokenManager.add('accessToken', currentToken);
+      const retVal = await auth.getOrRenewAccessToken();
+      expect(retVal).toBe(renewedToken.accessToken);
+      expect(renewSpy).toHaveBeenCalled();
+    });
+
+    it('returns renewed access token when only refresh token exists', async () => {
+      const refreshToken = {...tokens.standardRefreshTokenParsed};
+      const renewedToken = {...tokens.standardAccessTokenParsed, expiresAt: now + 300};
+      const renewSpy = jest.spyOn(auth.token, 'renewTokens').mockResolvedValue({ accessToken: renewedToken });
+      auth.tokenManager.add('refreshToken', refreshToken);
+      const retVal = await auth.getOrRenewAccessToken();
+      expect(retVal).toBe(renewedToken.accessToken);
+      expect(renewSpy).toHaveBeenCalled();
+    });
+
+    it('returns `null` when no token exists and unable to refresh', async () => {
+      const currentToken = {...tokens.standardAccessTokenParsed};
+      const renewSpy = jest.spyOn(auth.token, 'renewTokens').mockRejectedValue(new Error('Bad Request'));
+      auth.tokenManager.add('accessToken', currentToken);
+      const retVal = await auth.getOrRenewAccessToken();
+      expect(retVal).toBe(null);
+      expect(renewSpy).toHaveBeenCalled();
+    });
+
+    it('returns `null` when no token exists (unauthenticated)', async () => {
+      const renewSpy = jest.spyOn(auth.token, 'renewTokens').mockRejectedValue(new Error('Bad Request'));
+      const retVal = await auth.getOrRenewAccessToken();
+      expect(retVal).toBe(null);
+      expect(renewSpy).not.toHaveBeenCalled();
+    });
+  });
+
   describe('isPKCE', () => {
     it('is true by default', () => {
       auth = new OktaAuth({ issuer });

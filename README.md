@@ -36,6 +36,12 @@ You can learn more on the [Okta + JavaScript][lang-landing] page in our document
 
 This library uses semantic versioning and follows Okta's [library version policy](https://developer.okta.com/code/library-versions/).
 
+> :warning: :warning: :warning: :warning: :warning: :warning: :warning: :warning: :warning:<br>
+#### :warning: Bulletin Board :warning:
+* Review [Future of autoRenew](./docs/autoRenew-notice.md) <br>
+* Review [End of Third-Party Cookies](https://developer.okta.com/blog/2024/02/29/third-party-cookies) <br>
+> :warning: :warning: :warning: :warning: :warning: :warning: :warning: :warning::warning:<br>
+
 ## Release Status
 
 :heavy_check_mark: The current stable major version series is: `7.x`
@@ -43,7 +49,7 @@ This library uses semantic versioning and follows Okta's [library version policy
 | Version   | Status                           |
 | -------   | -------------------------------- |
 | `7.x`     | :heavy_check_mark: Stable        |
-| `6.x`     | :warning: Retiring on 2023-09-30 |
+| `6.x`     | :x: Retired                      |
 | `5.x`     | :x: Retired                      |
 | `4.x`     | :x: Retired                      |
 | `3.x`     | :x: Retired                      |
@@ -342,7 +348,7 @@ Most applications will handle an OAuth callback using a special route/page, sepa
       **It’s important that no other app logic runs until the async parseFromUrl / token manager logic is complete**
 3. After this, continue normal app logic
 
-```
+```javascript
 
 async function main() {
   // create OktaAuth instance
@@ -886,6 +892,7 @@ This is accomplished by selecting a single tab to handle the network requests to
 * [getUser](#getuser)
 * [getIdToken](#getidtoken)
 * [getAccessToken](#getaccesstoken)
+* [getOrRenewAccessToken](#getorrenewaccesstoken)
 * [storeTokensFromRedirect](#storetokensfromredirect)
 * [setOriginalUri](#setoriginaluriuri)
 * [getOriginalUri](#getoriginaluristate)
@@ -1153,6 +1160,10 @@ Returns the id token string retrieved from [authState](#authstatemanager) if it 
 ### `getAccessToken()`
 
 Returns the access token string retrieved from [authState](#authstatemanager) if it exists.
+
+### `getOrRenewAccessToken()`
+
+Returns the access token string if it exists. Returns `null` if the access token doesn't exist or a renewal cannot be completed
 
 ### `storeTokensFromRedirect()`
 

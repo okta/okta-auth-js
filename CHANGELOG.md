@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.6.0
+
+### Features
+- [#1507](https://github.com/okta/okta-auth-js/pull/1507) add: new method `getOrRenewAccessToken`
+
 ## 7.5.1
 
 ### Bug Fix
