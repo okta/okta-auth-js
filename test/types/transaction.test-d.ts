@@ -12,59 +12,59 @@
  *
  */
 import { AuthnTransaction, OktaAuth, IdxStatus } from '@okta/okta-auth-js';
-import { expectType } from 'tsd';
+import { expect } from 'tstyche';
 
 const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 
 (async () => {
   const tx = await authClient.tx.introspect();
-  expectType<AuthnTransaction>(tx);
+  expect(tx).type.toEqual<AuthnTransaction>();
 
-  expectType<boolean>(await authClient.tx.exists());
-  expectType<object>(await authClient.tx.status());
-  expectType<string | IdxStatus>(tx.status);
+  expect(await authClient.tx.exists()).type.toEqual<boolean>();
+  expect(await authClient.tx.status()).type.toEqual<object>();
+  expect(tx.status).type.toEqual<string | IdxStatus>();
 
   // Manage transaction
-  expectType<AuthnTransaction>(await authClient.tx.resume());
-  expectType<AuthnTransaction>(await tx.verify!({
+  expect(await authClient.tx.resume()).type.toEqual<AuthnTransaction>();
+  expect(await tx.verify!({
     passCode: '123456',
     autoPush: true
-  }));
-  expectType<AuthnTransaction>(await tx.activate!({
+  })).type.toEqual<AuthnTransaction>();
+  expect(await tx.activate!({
     passCode: '123456'
-  }));
-  expectType<AuthnTransaction>(await tx.cancel!());
-  expectType<AuthnTransaction>(await tx.poll!({
+  })).type.toEqual<AuthnTransaction>();
+  expect(await tx.cancel!()).type.toEqual<AuthnTransaction>();
+  expect(await tx.poll!({
     autoPush: true
-  }));
-  expectType<AuthnTransaction>(await tx.prev!());
-  expectType<AuthnTransaction>(await tx.skip!());
-  expectType<AuthnTransaction>(await tx.changePassword!({
+  })).type.toEqual<AuthnTransaction>();
+  expect(await tx.prev!()).type.toEqual<AuthnTransaction>();
+  expect(await tx.skip!()).type.toEqual<AuthnTransaction>();
+  expect(await tx.changePassword!({
     oldPassword: '0ldP4ssw0rd',
     newPassword: 'N3wP4ssw0rd'
-  }));
-  expectType<AuthnTransaction>(await tx.resetPassword!({
+  })).type.toEqual<AuthnTransaction>();
+  expect(await tx.resetPassword!({
     newPassword: 'N3wP4ssw0rd'
-  }));
-  expectType<AuthnTransaction>(await tx.unlock!({
+  })).type.toEqual<AuthnTransaction>();
+  expect(await tx.unlock!({
     username: 'dade.murphy@example.com',
     factorType: 'EMAIL',
     relayState: 'd3de23'
-  }));
-  expectType<AuthnTransaction>(await tx.answer!({
+  })).type.toEqual<AuthnTransaction>();
+  expect(await tx.answer!({
     answer: 'My favorite recovery question answer'
-  }));
-  expectType<AuthnTransaction>(await tx.recovery!({
+  })).type.toEqual<AuthnTransaction>();
+  expect(await tx.recovery!({
     recoveryToken: '00xdqXOE5qDZX8-PBR1bYv8AESqIFinDy3yul01tyh'
-  }));
-  expectType<AuthnTransaction>(await tx.resend!());
+  })).type.toEqual<AuthnTransaction>();
+  expect(await tx.resend!()).type.toEqual<AuthnTransaction>();
 
   // Questions
   const questionFactor = tx.factors!.find(function(factor) {
     return factor.provider === 'OKTA' && factor.factorType === 'question';
   })!;
   const questions = await questionFactor.questions() as Array<object>;
-  expectType<Array<object>>(questions);
+  expect(questions).type.toEqual<Array<object>>();
   questionFactor.enroll({
     passCode: 'cccccceukngdfgkukfctkcvfidnetljjiknckkcjulji',
     nextPassCode: '678195',

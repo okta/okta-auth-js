@@ -14,7 +14,7 @@ if ! yarn test:unit; then
 fi
 
 if ! yarn test:types; then
-  echo "tsd test failed! Exiting..."
+  echo "tstyche test failed! Exiting..."
   exit ${TEST_FAILURE}
 fi
 

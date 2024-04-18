@@ -1,4 +1,3 @@
-import { expectAssignable } from 'tsd';
 /*!
  * Copyright (c) 2015-present, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
@@ -16,7 +15,7 @@ import {
   OktaAuthOptions,
   toRelativeUrl
 } from '@okta/okta-auth-js';
-import { expectType } from 'tsd';
+import { expect } from 'tstyche';
 
 // Custom storage provider
 const myMemoryStore: Record<string, string> = {};
@@ -121,8 +120,7 @@ const configServerSide: OktaAuthOptions = {
   clientSecret: 'GHtf9iJdr60A9IYrR0jwGHtf9iJdr60A9IYrR0jw',
   setLocation: function (_: string) {},
 };
-
-expectAssignable<OktaAuthOptions>(configServerSide);
+expect<OktaAuthOptions>().type.toBeAssignable(configServerSide);
 
 const servicesConfig: OktaAuthOptions = {
   issuer: 'https://{yourOktaDomain}/oauth2/default',
@@ -133,10 +131,10 @@ const servicesConfig: OktaAuthOptions = {
     syncChannelName: 'tincanphone'
   }
 };
-expectAssignable<OktaAuthOptions>(servicesConfig);
+expect<OktaAuthOptions>().type.toBeAssignable(servicesConfig);
 
 // OktaAuth
 const authClient = new OktaAuth(config);
-expectType<OktaAuth>(authClient);
+expect(authClient).type.toEqual<OktaAuth>();
 const authClient2 = new OktaAuth(config2);
-expectType<OktaAuth>(authClient2);
+expect(authClient2).type.toEqual<OktaAuth>();

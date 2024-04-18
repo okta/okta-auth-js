@@ -20,23 +20,21 @@ import {
   OktaAuthCoreOptions,
   CoreStorageManagerInterface
 } from '@okta/okta-auth-js/core';
-import { expectType, expectAssignable } from 'tsd';
+import { expect } from 'tstyche';
 
 const options: OktaAuthOptions = {issuer: 'https://{yourOktaDomain}/oauth2/default'};
 const authClient = new OktaAuth(options);
 
-expectAssignable<OktaAuthHttpInterface>(authClient);
+expect<OktaAuthHttpInterface>().type.toBeAssignable(authClient);
 
-expectType<OktaAuthCoreOptions>(authClient.options);
-expectType<OktaAuthOptions>(authClient.options); // test alias
-expectType<HttpAPI>(authClient.http);
-expectType<CoreStorageManagerInterface>(authClient.storageManager);
-expectType<OktaUserAgent>(authClient._oktaUserAgent);
+expect(authClient.options).type.toEqual<OktaAuthCoreOptions>();
+expect(authClient.options).type.toEqual<OktaAuthOptions>(); // test alias
+expect(authClient.http).type.toEqual<HttpAPI>();
+expect(authClient.storageManager).type.toEqual<CoreStorageManagerInterface>();
+expect(authClient._oktaUserAgent).type.toEqual<OktaUserAgent>();
 
-expectType<string>(authClient.getIssuerOrigin());
-expectType<void>(authClient.setHeaders({ foo: 'bar' }));
+expect(authClient.getIssuerOrigin()).type.toEqual<string>();
+expect(authClient.setHeaders({ foo: 'bar' })).type.toEqual<void>();
 
 // test async methods
-(async () => {
-  expectType<object>(await authClient.webfinger({}));
-})();
+expect(await authClient.webfinger({})).type.toEqual<object>();
