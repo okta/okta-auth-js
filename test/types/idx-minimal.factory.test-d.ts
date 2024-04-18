@@ -49,18 +49,17 @@ expect(authClient.idx).type.toEqual<MinimalIdxAPI>();
 expect(authClient.storageManager).type.toEqual<IdxStorageManagerInterface>();
 
 // has partial IDX API
-expect(authClient.idx.cancel).type.toRaiseError();
+expect(authClient.idx).type.not.toHaveProperty('cancel');
 
 // does not include Authn
-expect(authClient.authn).type.toRaiseError();
+expect(authClient).type.not.toHaveProperty('authn');
 
 // has Webauthn
 expect(OktaAuth.webauthn).type.toEqual<WebauthnAPI>();
 
 // has no core API
-expect(authClient.start).type.toRaiseError();
+expect(authClient).type.not.toHaveProperty('start');
 
 // has partial OAuth API
-expect(authClient.pkce).type.toRaiseError();
+expect(authClient).type.not.toHaveProperty('pkce');
 expect(authClient.isPKCE).type.toEqual<() => boolean>();
-

@@ -62,10 +62,10 @@ expect(authnClient.authn).type.toEqual<AuthnTransactionAPI>();
 expect(authnClient.fingerprint).type.toEqual<FingerprintAPI>();
 
 // does not include OAuth
-expect(authnClient.token).type.toRaiseError();
+expect(authnClient).type.not.toHaveProperty('token');
 
 // does not include Core
-expect(authnClient.authStateManager).type.toRaiseError();
+expect(authnClient).type.not.toHaveProperty('authStateManager');
 
 // test async methods
 expect(await authnClient.fingerprint()).type.toEqual<string>();

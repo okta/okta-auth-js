@@ -20,7 +20,9 @@ import {
   AuthnTransaction,
   OktaAuthCoreInterface,
   OktaAuthHttpInterface,
-  FingerprintAPI
+  FingerprintAPI,
+  TokenAPI,
+  AuthStateManagerInterface
 } from '@okta/okta-auth-js/authn';
 import { expect } from 'tstyche';
 
@@ -32,6 +34,9 @@ expect<OktaAuthCoreInterface>().type.toBeAssignable(authClient);
 expect(authClient.tx).type.toEqual<AuthnTransactionAPI>();
 expect(authClient.authn).type.toEqual<AuthnTransactionAPI>();
 expect(authClient.fingerprint).type.toEqual<FingerprintAPI>();
+
+expect(authClient.token).type.toEqual<TokenAPI>();
+expect(authClient.authStateManager).type.toEqual<AuthStateManagerInterface>();
 
 // test async methods
 expect(await authClient.fingerprint()).type.toEqual<string>();

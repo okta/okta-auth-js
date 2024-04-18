@@ -41,7 +41,7 @@ expect(authClient.idx).type.toEqual<IdxAPI>();
 expect(authClient.storageManager).type.toEqual<IdxStorageManagerInterface>();
 
 // does not include Authn
-expect(authClient.authn).type.toRaiseError();
+expect(authClient).type.not.toHaveProperty('authn');
 
 // has Webauthn
 expect(OktaAuth.webauthn).type.toEqual<WebauthnAPI>();

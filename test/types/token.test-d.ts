@@ -97,26 +97,17 @@ const enrollAuthenticatorOptons2: EnrollAuthenticatorOptions = {
   acrValues: DEFAULT_ACR_VALUES,
   responseType: 'none'
 };
-expect(await authClient.endpoints.authorize.enrollAuthenticator(enrollAuthenticatorOptons)).type.toEqual<void>();
-expect(await authClient.endpoints.authorize.enrollAuthenticator(enrollAuthenticatorOptons2)).type.toEqual<void>();
-expect(async () => {
-  // missing acrValues
-  
-  await authClient.endpoints.authorize.enrollAuthenticator({
+expect(authClient.endpoints.authorize.enrollAuthenticator(enrollAuthenticatorOptons)).type.toEqual<void>();
+expect(authClient.endpoints.authorize.enrollAuthenticator(enrollAuthenticatorOptons2)).type.toEqual<void>();
+expect(authClient.endpoints.authorize.enrollAuthenticator({
     enrollAmrValues: ['email', 'kba'],
-  });
-}).type.toRaiseError();
-expect(async () => {
-  // missing enrollAmrValues
-  
-  await authClient.endpoints.authorize.enrollAuthenticator({
+  })
+).type.toRaiseError();
+expect(authClient.endpoints.authorize.enrollAuthenticator({
     acrValues: DEFAULT_ACR_VALUES
-  });
-}).type.toRaiseError();
-expect(async () => {
-  
-  await authClient.endpoints.authorize.enrollAuthenticator();
-}).type.toRaiseError();
+  })
+).type.toRaiseError();
+expect(authClient.endpoints.authorize.enrollAuthenticator()).type.toRaiseError();
 
 const customUrls = {
   issuer: 'https://{yourOktaDomain}/oauth2/{authorizationServerId}',
@@ -177,7 +168,4 @@ type MyCustomClaims = {
 const customUserClaims = await authClient.getUser<MyCustomClaims>();
 expect(customUserClaims).type.toEqual<UserClaims<MyCustomClaims>>();
 
-expect(() => {
-  
-  type InvalidCustomClaims = UserClaims<{ func: () => boolean }>;
-}).type.toRaiseError();
+expect<UserClaims<{ func: () => boolean }>>().type.toRaiseError();

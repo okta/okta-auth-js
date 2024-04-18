@@ -73,13 +73,13 @@ expect(oauthClient.token).type.toEqual<TokenAPI>();
 expect(oauthClient.transactionManager).type.toEqual<TransactionManagerInterface>();
 
 // does not include Authn
-expect(oauthClient.authn).type.toRaiseError();
+expect(oauthClient).type.not.toHaveProperty('authn');
 
 // does not include Idx
-expect(oauthClient.idx).type.toRaiseError();
+expect(oauthClient).type.not.toHaveProperty('idx');
 
 // does not include MyAccount
-expect(oauthClient.myaccount).type.toRaiseError();
+expect(oauthClient).type.not.toHaveProperty('myaccount');
 
 // cannot mixin IDX (mismatching storage)
 expect(mixinIdx(OktaAuthOAuth)).type.toRaiseError();
@@ -104,7 +104,7 @@ expect(idxClient.storageManager).type.toEqual<IdxStorageManagerInterface>();
 expect(idxClient.token).type.toEqual<TokenAPI>();
 
 // still does not include Authn
-expect(idxClient.authn).type.toRaiseError();
+expect(idxClient).type.not.toHaveProperty('authn');
 
 
 // Add MyAccount
@@ -122,4 +122,4 @@ expect<OktaAuthMyAccountInterface>().type.toBeAssignable(comboClient);
 expect(comboClient.token).type.toEqual<TokenAPI>();
 
 // still does not include Authn
-expect(comboClient.authn).type.toRaiseError();
+expect(comboClient).type.not.toHaveProperty('authn');

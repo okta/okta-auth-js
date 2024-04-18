@@ -79,7 +79,7 @@ expect(idxClient.storageManager).type.toEqual<IdxStorageManagerInterface>();
 expect(idxClient.token).type.toEqual<TokenAPI>();
 
 // does not include Core
-expect(idxClient.authStateManager).type.toRaiseError();
+expect(idxClient).type.not.toHaveProperty('authStateManager');
 
 // Create a Core base class
 const OAuthBaseWithCore = createOktaAuthCore(IdxStorageManager, IdxOptions, IdxTransactionManager);
