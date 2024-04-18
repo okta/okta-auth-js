@@ -187,8 +187,8 @@ export function mixinOAuth
       }
       try {
         const key = this.tokenManager.getStorageKeyByType('accessToken');
-        const token = await this.tokenManager.renew(key ?? 'accessToken') as AccessToken;
-        return token.accessToken;
+        const token = await this.tokenManager.renew(key ?? 'accessToken');
+        return (token as AccessToken)?.accessToken ?? null;
       }
       catch (err) {
         this.emitter.emit('error', err);
