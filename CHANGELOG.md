@@ -5,6 +5,7 @@
 ### Features
 - [#1507](https://github.com/okta/okta-auth-js/pull/1507) add: new method `getOrRenewAccessToken`
 - [#1505](https://github.com/okta/okta-auth-js/pull/1505) add: support of `revokeSessions` param for `OktaPassword` authenticator (can be used in `reset-authenticator` remediation)
+- [#1512](https://github.com/okta/okta-auth-js/pull/1512) add: new service `RenewOnTabActivation`
 
 ## 7.5.1
 

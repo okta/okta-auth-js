@@ -26,7 +26,7 @@ import {
 import { AutoRenewService,
   SyncStorageService,
   LeaderElectionService,
-  InactiveTabService
+  RenewOnTabActivationService
 } from '../../services';
 import { removeNils } from '../../util';
 
@@ -158,7 +158,7 @@ implements ServiceManagerInterface
         service = new SyncStorageService(tokenManager, {...this.options});
         break;
       case RENEW_ON_TAB_ACTIVATION:
-        service = new InactiveTabService(tokenManager, {...this.options});
+        service = new RenewOnTabActivationService(tokenManager, {...this.options});
         break;
       default:
         throw new Error(`Unknown service ${name}`);

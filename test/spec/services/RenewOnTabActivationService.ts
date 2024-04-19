@@ -2,7 +2,7 @@ import { OktaAuth } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import * as features from '../../../lib/features';
 import { TokenManager } from '../../../lib/oidc/TokenManager';
-import { InactiveTabService } from '../../../lib/services/InactiveTabService';
+import { RenewOnTabActivationService } from '../../../lib/services/RenewOnTabActivationService';
 
 function createAuth(options) {
   options = options || {};
@@ -18,9 +18,9 @@ function createAuth(options) {
 }
 
 
-describe('InactiveTabService', () => {
+describe('RenewOnTabActivationService', () => {
   let client: OktaAuth;
-  let service: InactiveTabService;
+  let service: RenewOnTabActivationService;
 
   async function setup(options = {}, start = true) {
     client = createAuth(options);
@@ -32,7 +32,7 @@ describe('InactiveTabService', () => {
     tokenManager.off('added');
     tokenManager.off('removed');
 
-    service = new InactiveTabService(tokenManager, (client.serviceManager as any).options);
+    service = new RenewOnTabActivationService(tokenManager, (client.serviceManager as any).options);
 
     if (start) {
       client.tokenManager.start();
@@ -106,7 +106,7 @@ describe('InactiveTabService', () => {
     it('should not renew if visibility toggle occurs within 30mins', async () => {
       jest.spyOn(document, 'hidden', 'get')
         .mockReturnValueOnce(true)
-        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(false);
       await setup();
       service.onPageVisbilityChange();
       service.onPageVisbilityChange();
@@ -116,7 +116,7 @@ describe('InactiveTabService', () => {
     it('should renew tokens if none exist', async () => {
       jest.spyOn(document, 'hidden', 'get')
         .mockReturnValueOnce(true)
-        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(false);
       await setup();
       jest.spyOn(client.tokenManager, 'getTokensSync').mockReturnValue({});
       service.onPageVisbilityChange();
@@ -131,7 +131,7 @@ describe('InactiveTabService', () => {
       const refreshToken = tokens.standardRefreshTokenParsed;
       jest.spyOn(document, 'hidden', 'get')
         .mockReturnValueOnce(true)
-        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(false);
       await setup();
       jest.spyOn(client.tokenManager, 'getTokensSync').mockReturnValue({ accessToken, idToken, refreshToken });
       jest.spyOn(client.tokenManager, 'hasExpired').mockReturnValue(false);
@@ -147,7 +147,7 @@ describe('InactiveTabService', () => {
       const refreshToken = tokens.standardRefreshTokenParsed;
       jest.spyOn(document, 'hidden', 'get')
         .mockReturnValueOnce(true)
-        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(false);
       await setup();
       jest.spyOn(client.tokenManager, 'getTokensSync').mockReturnValue({ accessToken, idToken, refreshToken });
       service.onPageVisbilityChange();

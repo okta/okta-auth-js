@@ -4,11 +4,11 @@ import { isBrowser } from '../features';
 
 const getNow = () => Math.floor(Date.now() / 1000);
 
-export class InactiveTabService implements ServiceInterface {
+export class RenewOnTabActivationService implements ServiceInterface {
   private tokenManager: TokenManagerInterface;
   private started = false;
   private options: ServiceManagerOptions;
-  private lastHidden: number = -1;
+  private lastHidden = -1;
   onPageVisbilityChange: () => void;
 
   constructor(tokenManager: TokenManagerInterface, options: ServiceManagerOptions = {}) {
@@ -19,6 +19,7 @@ export class InactiveTabService implements ServiceInterface {
   }
 
   // do not use directly, use `onPageVisbilityChange` (with binded this context)
+  /* eslint complexity: [0, 10] */
   private _onPageVisbilityChange () {
     if (document.hidden) {
       this.lastHidden = getNow();
@@ -47,7 +48,7 @@ export class InactiveTabService implements ServiceInterface {
   }
 
   async stop () {
-    if (!!document) {
+    if (document) {
       document.removeEventListener('visibilitychange', this.onPageVisbilityChange);
       this.started = false;
     }
