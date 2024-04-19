@@ -2,7 +2,7 @@ import { IdxAuthenticator, IdxRemediationValue } from '../types/idx-js';
 
 
 export interface Credentials {
-  [key: string]: string | undefined;
+  [key: string]: string | boolean | number | undefined;
 }
 
 export abstract class Authenticator<Values> {
