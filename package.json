@@ -252,8 +252,5 @@
       "**/@wdio/**",
       "**/@cucumber/**"
     ]
-  },
-  "tsd": {
-    "directory": "test/types"
   }
 }
