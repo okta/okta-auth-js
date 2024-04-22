@@ -75,7 +75,7 @@ describe('idx/introspect', () => {
     expect(authClient.transactionManager.loadIdxResponse).toHaveBeenCalled();
     expect(mocked.http.httpRequest).not.toHaveBeenCalled();
     expect(res.rawIdxState).toEqual(rawIdxResponse);
-    expect(res.requestDidSucceed).toBe(false);
+    expect(res.requestDidSucceed).toBe(true);
   });
 
   it('calls idx.introspect when idx states not in storage', async () => {
