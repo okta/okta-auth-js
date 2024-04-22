@@ -69,7 +69,7 @@ describe('idx/introspect', () => {
     const rawIdxResponse = RawIdxResponseFactory.build();
     authClient.transactionManager.loadIdxResponse = jest.fn().mockReturnValue({
       rawIdxResponse,
-      requestDidSucceed: false
+      requestDidSucceed: true
     });
     const res = await introspect(authClient, introspectOptions);
     expect(authClient.transactionManager.loadIdxResponse).toHaveBeenCalled();
