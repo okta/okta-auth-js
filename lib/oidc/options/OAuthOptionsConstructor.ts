@@ -47,6 +47,11 @@ function assertValidConfig(args) {
     throw new AuthSdkError('Issuer must be a valid URL. ' + 
       'Required usage: new OktaAuth({issuer: "https://{yourOktaDomain}.com/oauth2/{authServerId}"})');
   }
+
+  if (issuer.indexOf('-admin.okta') !== -1) {
+    throw new AuthSdkError('Issuer URL passed to constructor contains "-admin" in subdomain. ' +
+      'Required usage: new OktaAuth({issuer: "https://{yourOktaDomain}.com})');
+  }
 }
 
 export function createOAuthOptionsConstructor() {
