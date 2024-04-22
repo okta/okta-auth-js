@@ -34,7 +34,8 @@ export async function introspect (
   }
 
   // call idx.introspect if no existing idx response available in storage
-  if (!rawIdxResponse) {
+  // or if response was unsuccessful
+  if (!rawIdxResponse || requestDidSucceed === false) {
     const version = options.version || IDX_API_VERSION;
     const domain = getOAuthDomain(authClient);
     const { interactionHandle, stateHandle } = options;
