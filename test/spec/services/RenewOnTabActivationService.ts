@@ -103,7 +103,7 @@ describe('RenewOnTabActivationService', () => {
       expect(client.tokenManager.renew).not.toHaveBeenCalled();
     });
 
-    it('should not renew if visibility toggle occurs within 30mins', async () => {
+    it('should not renew if visibility toggle occurs within inactivity duration', async () => {
       jest.spyOn(document, 'hidden', 'get')
         .mockReturnValueOnce(true)
         .mockReturnValueOnce(false);
@@ -154,6 +154,21 @@ describe('RenewOnTabActivationService', () => {
       jest.advanceTimersByTime((1800 * 1000) + 500);
       service.onPageVisbilityChange();
       expect(client.tokenManager.renew).toHaveBeenCalled();
+    });
+
+    it('should accept configured inactivity duration', async () => {
+      const accessToken = tokens.standardAccessTokenParsed;
+      const idToken = tokens.standardIdTokenParsed;
+      const refreshToken = tokens.standardRefreshTokenParsed;
+      jest.spyOn(document, 'hidden', 'get')
+        .mockReturnValueOnce(true)
+        .mockReturnValueOnce(false);
+      await setup({ services: { tabInactivityDuration: 3600 }});    // 1 hr in seconds
+      jest.spyOn(client.tokenManager, 'getTokensSync').mockReturnValue({ accessToken, idToken, refreshToken });
+      service.onPageVisbilityChange();
+      jest.advanceTimersByTime((1800 * 1000) + 500);  // advance timer by 30 mins (and change)
+      service.onPageVisbilityChange();
+      expect(client.tokenManager.renew).not.toHaveBeenCalled();
     });
   });
 });

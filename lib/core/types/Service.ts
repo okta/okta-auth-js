@@ -31,8 +31,11 @@ export interface LeaderElectionServiceOptions {
   broadcastChannelName?: string;
 }
 
+type seconds = number;
+
 export interface RenewOnTabActivationServiceOptions {
   renewOnTabActivation?: boolean;
+  tabInactivityDuration?: seconds;
 }
 
 export type ServiceManagerOptions =

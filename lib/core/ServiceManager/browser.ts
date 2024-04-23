@@ -54,7 +54,8 @@ implements ServiceManagerInterface
     autoRenew: true,
     autoRemove: true,
     syncStorage: true,
-    renewOnTabActivation: true
+    renewOnTabActivation: true,
+    tabInactivityDuration: 1800,    // 30 mins in seconds
   };
 
   constructor(sdk: OktaAuthCoreInterface<M, S, O>, options: ServiceManagerOptions = {}) {

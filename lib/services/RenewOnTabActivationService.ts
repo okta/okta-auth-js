@@ -24,8 +24,8 @@ export class RenewOnTabActivationService implements ServiceInterface {
     if (document.hidden) {
       this.lastHidden = getNow();
     }
-    // renew will only attempt if tab was inactive for 30 mins
-    else if (this.lastHidden > 0 && (getNow() - this.lastHidden >= 1800)) {
+    // renew will only attempt if tab was inactive for duration
+    else if (this.lastHidden > 0 && (getNow() - this.lastHidden >= this.options.tabInactivityDuration!)) {
       const { accessToken, idToken } = this.tokenManager.getTokensSync();
       if (!!accessToken && this.tokenManager.hasExpired(accessToken)) {
         const key = this.tokenManager.getStorageKeyByType('accessToken');
