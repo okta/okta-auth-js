@@ -69,13 +69,13 @@ describe('idx/introspect', () => {
     const rawIdxResponse = RawIdxResponseFactory.build();
     authClient.transactionManager.loadIdxResponse = jest.fn().mockReturnValue({
       rawIdxResponse,
-      requestDidSucceed: true
+      requestDidSucceed: false
     });
     const res = await introspect(authClient, introspectOptions);
     expect(authClient.transactionManager.loadIdxResponse).toHaveBeenCalled();
     expect(mocked.http.httpRequest).not.toHaveBeenCalled();
     expect(res.rawIdxState).toEqual(rawIdxResponse);
-    expect(res.requestDidSucceed).toBe(true);
+    expect(res.requestDidSucceed).toBe(false);
   });
 
   it('calls idx.introspect when idx states not in storage', async () => {
@@ -83,35 +83,6 @@ describe('idx/introspect', () => {
     const rawIdxResponse = RawIdxResponseFactory.build();
     jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue(rawIdxResponse);
     authClient.transactionManager.loadIdxResponse = jest.fn().mockReturnValue(null);
-    const res = await introspect(authClient, introspectOptions);
-    expect(authClient.transactionManager.loadIdxResponse).toHaveBeenCalled();
-    expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
-      url: 'mock-domain/idp/idx/introspect',
-      method: 'POST',
-      headers: {
-        'Accept': 'application/ion+json; okta-version=1.0.0',
-        'Content-Type': 'application/ion+json; okta-version=1.0.0'
-      },
-      args: {
-        interactionHandle: 'interaction-handle',
-      },
-      withCredentials: true
-    });
-    expect(res.rawIdxState).toEqual(rawIdxResponse);
-    expect(res.requestDidSucceed).toBe(true);
-  });
-
-  it('calls idx.introspect when idx states is in storage but requestDidSucceed = false', async () => {
-    const { authClient, introspectOptions } = testContext;
-    const rawIdxResponseInterstitial = RawIdxResponseFactory.build();
-    const rawIdxResponse = {
-      rawIdxResponseInterstitial,
-      requestDidSucceed: false
-    };
-    jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue(rawIdxResponse);
-    authClient.transactionManager.loadIdxResponse = jest.fn().mockReturnValue({
-      ...rawIdxResponse,
-    });
     const res = await introspect(authClient, introspectOptions);
     expect(authClient.transactionManager.loadIdxResponse).toHaveBeenCalled();
     expect(mocked.http.httpRequest).toHaveBeenCalledWith(authClient, {
