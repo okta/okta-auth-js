@@ -849,6 +849,8 @@ services: {
   autoRenew: true,
   autoRemove: true,
   syncStorage: true,
+  renewOnTabActivation: true,
+  tabInactivityDuration: 1800   // seconds
 }
 ```
 
@@ -871,6 +873,15 @@ By default, the library will attempt to remove expired tokens when `autoRemove` 
 Automatically syncs tokens across browser tabs when it's supported in browser (browser supports native broadcastchannel API, IndexDB or localStorage). To disable this behavior, set `syncStorage` to false.
 
 This is accomplished by selecting a single tab to handle the network requests to refresh the tokens and broadcasting to the other tabs. This is done to avoid all tabs sending refresh requests simultaneously, which can cause rate limiting/throttling issues.
+
+#### `renewOnTabActivation`
+> NOTE: This service requires `autoRenew: true`
+
+When enabled (`{ autoRenew: true, renewOnTabActivation: true }`), this service binds a handler to the [Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API) which attempts a token renew (if needed) when the tab becomes active after a (configurable) inactivity period
+
+#### `tabInactivityDuration`
+The amount of time, in seconds, a tab needs to be inactive for the `RenewOnTabActivation` service to attempt a token renew. Defaults to `1800` (30 mins)
+
 
 ## API Reference
 <!-- no toc -->
