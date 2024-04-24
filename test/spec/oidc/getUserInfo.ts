@@ -134,7 +134,7 @@ describe('token.getUserInfo', function() {
       url: accessToken.userinfoUrl,
       method: 'GET',
       headers: {
-        DPoP: 'dpopproofyay',
+        Dpop: 'dpopproofyay',
         Authorization: `DPoP ${accessToken.accessToken}`
       }
     });

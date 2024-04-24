@@ -45,7 +45,7 @@ export function isDPoPNonceError(obj: any): obj is OAuthError | WWWAuthError {
 
 /////////// crypto ///////////
 
-export async function writeJwt(header: object, claims: object, signingKey: CryptoKey): Promise<string> {
+export async function createJwt(header: object, claims: object, signingKey: CryptoKey): Promise<string> {
   const head = stringToBase64Url(JSON.stringify(header));
   const body = stringToBase64Url(JSON.stringify(claims));
   const signature = await webcrypto.subtle.sign(
@@ -170,7 +170,6 @@ export async function clearAllDPoPKeyPairs (): Promise<void> {
 
 // generates a crypto (non-extractable) private key pair and writes it to indexeddb, returns key (id)
 export async function createDPoPKeyPair (): Promise<{keyPair: CryptoKeyPair, keyPairId: string}> {
-  // TODO: clear exist keys when creating new one?
   const keyPairId = cryptoRandomValue(4);
   const keyPair = await generateKeyPair();
   await storeKeyPair(keyPairId, keyPair);
@@ -226,7 +225,7 @@ export async function generateDPoPProof ({ keyPair, url, method, nonce, accessTo
     claims.ath = await hashAccessToken(accessToken);
   }
 
-  return writeJwt(header, claims, keyPair.privateKey);
+  return createJwt(header, claims, keyPair.privateKey);
 }
 
 /* eslint max-len: [2, 132] */

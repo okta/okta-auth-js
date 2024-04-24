@@ -475,7 +475,7 @@ async function dpopAuthenticatedFetch (url, options) {
 ```
 
 #### Ensure browser can support DPoP (*Recommended*)
-DPoP requires certain browser features. A user using a browser without the required features will unable to complete a request for tokens. It's recommended to verify browser support during application bootstrapping
+DPoP requires certain browser features. A user using a browser without the required features will unable to complete a request for tokens. It's recommended to verify browser support during application bootstrapping.
 
 ```javascript
 // App.tsx
@@ -488,7 +488,7 @@ useEffect(() => {
 ```
 
 #### Clear DPoP Storage (*Recommended*)
-DPoP requires the generation of a `CryptoKeyPair` which needs to persist in storage. Methods like `signOut()` or `revokeAccessToken()` will clear the key pair, however users don't always explicitly logout. It's good practice to clear storage before login to flush any orphaned key pairs generated from previously requested tokens
+DPoP requires the generation of a `CryptoKeyPair` which needs to be persisted in storage. Methods like `signOut()` or `revokeAccessToken()` will clear the key pair, however users don't always explicitly logout. It's therefore good practice to clear storage before login to flush any orphaned key pairs generated from previously requested tokens.
 
 ```javascript
 async function login (options) {

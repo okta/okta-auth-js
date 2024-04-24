@@ -14,11 +14,11 @@ describe('dpop', () => {
   });
 
   describe('Crypto', () => {
-    it('writeJwt', async () => {
+    it('createJwt', async () => {
       const head = {foo: 1};
       const claims = {bar: 1};
       const keyPair = await dpop.generateKeyPair();
-      const jwt = await dpop.writeJwt(head, claims, keyPair.privateKey);
+      const jwt = await dpop.createJwt(head, claims, keyPair.privateKey);
       expect(typeof jwt).toBe('string');
       const decoded = decodeToken(jwt);
       expect(decoded.header).toEqual(head);

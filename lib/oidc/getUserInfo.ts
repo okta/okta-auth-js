@@ -14,7 +14,6 @@
 import { AuthSdkError, OAuthError, WWWAuthError, AuthApiError } from '../errors';
 import { httpRequest } from '../http';
 import { AccessToken, IDToken, UserClaims, isAccessToken, isIDToken, CustomUserClaims } from './types';
-import { findKeyPair, generateDPoPProof } from './dpop';
 
 export async function getUserInfo<T extends CustomUserClaims = CustomUserClaims>(
   sdk, accessTokenObject: AccessToken,
@@ -43,12 +42,8 @@ export async function getUserInfo<T extends CustomUserClaims = CustomUserClaims>
   };
 
   if (sdk.options.dpop) {
-    const keyPair = await findKeyPair(accessTokenObject.dpopPairId);
-    const proof = await generateDPoPProof({ ...options, keyPair });
-    options.headers = {
-      DPoP: proof,
-      Authorization: `DPoP ${accessTokenObject.accessToken}`
-    };
+    const headers = await sdk.getDPoPAuthorizationHeaders({...options, accessToken: accessTokenObject });
+    options.headers = headers;
     delete options.accessToken;      // unset to prevent overriding Auth header with Bearer Token
   }
 
