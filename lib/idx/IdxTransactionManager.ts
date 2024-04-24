@@ -52,7 +52,10 @@ export function createIdxTransactionManager
       }
 
       if (options) {
-        const { interactionHandle } = options;
+        const { stateHandle, interactionHandle } = options;
+        if (stateHandle && storedValue.stateHandle !== stateHandle) {
+          return null;
+        }
         if (interactionHandle && storedValue.interactionHandle !== interactionHandle) {
           return null;
         }
