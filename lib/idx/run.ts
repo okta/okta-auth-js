@@ -269,7 +269,7 @@ async function finalizeData(authClient: OktaAuthIdxInterface, data: RunData): Pr
       shouldClearTransaction = true;
     } else {
       // save response if there are actions available (ignore messages)
-      shouldSaveResponse = shouldSaveResponse && hasActions;
+      shouldSaveResponse = !!hasActions;
     }
     // leave shared storage intact so the transaction can be continued in another tab
     clearSharedStorage = false;
