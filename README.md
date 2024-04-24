@@ -2051,7 +2051,7 @@ to
 const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 ```
 
-* For Typescript users: definitions for types in this library are now included. If you were providing your own definitions for `@okta/okta-auth-js` you should remove these in favor of the types exported by this library.
+* For Typescript users: definitions for types in this library are now included. If you were providing your own definitions for `@okta/okta-auth-js` you should remove these in favour of the types exported by this library.
 
 * `onSessionExpired` option has been removed. [TokenManager events](#tokenmanageronevent-callback-context) can be used to detect and handle token renewal errors.
 
