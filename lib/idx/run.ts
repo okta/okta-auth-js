@@ -155,7 +155,7 @@ async function getDataFromIntrospect(authClient: OktaAuthIdxInterface, data: Run
     }
   
     // Introspect to get idx response
-    idxResponse = await introspect(authClient, { withCredentials, version, interactionHandle });
+    idxResponse = await introspect(authClient, { withCredentials, version, interactionHandle, useGenericRemediator });
   }
   return { ...data, idxResponse, meta };
 }
