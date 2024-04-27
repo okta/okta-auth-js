@@ -127,13 +127,14 @@ async function getDataFromIntrospect(authClient: OktaAuthIdxInterface, data: Run
     maxAge,
     acrValues,
     nonce,
+    useGenericRemediator,
   } = options;
 
   let idxResponse;
   let meta = getSavedTransactionMeta(authClient, { state, recoveryToken, activationToken }); // may be undefined
 
   if (stateHandle) {
-    idxResponse = await introspect(authClient, { withCredentials, version, stateHandle });
+    idxResponse = await introspect(authClient, { withCredentials, version, stateHandle, useGenericRemediator });
   } else {
     let interactionHandle = meta?.interactionHandle; // may be undefined
     if (!interactionHandle) {

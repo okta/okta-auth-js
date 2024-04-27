@@ -59,6 +59,7 @@ export interface IntrospectOptions extends IdxOptions {
   interactionHandle?: string;
   stateHandle?: string;
   version?: string;
+  useGenericRemediator?: boolean;
 }
 
 export interface RemediateOptions extends IdxOptions {

@@ -53,7 +53,8 @@ export function createIdxTransactionManager
 
       if (options) {
         const { stateHandle, interactionHandle } = options;
-        if (stateHandle && storedValue.stateHandle !== stateHandle) {
+        // only perform this check if NOT using generic remediator
+        if (!options.useGenericRemediator && stateHandle && storedValue.stateHandle !== stateHandle) {
           return null;
         }
         if (interactionHandle && storedValue.interactionHandle !== interactionHandle) {
