@@ -120,6 +120,18 @@ export interface OriginalUriApi {
   removeOriginalUri(state?: string): void;
 }
 
+export interface DPoPRequest {
+  url: string;
+  method: string;
+  nonce?: string;
+  accessToken?: AccessToken;
+}
+
+export interface DPoPHeaders {
+  Authorization: string;
+  Dpop: string;
+}
+
 export interface MinimalOktaOAuthInterface
 <
   M extends OAuthTransactionMeta = PKCETransactionMeta,
@@ -169,4 +181,8 @@ export interface OktaAuthOAuthInterface
   
   revokeAccessToken(accessToken?: AccessToken): Promise<unknown>;
   revokeRefreshToken(refreshToken?: RefreshToken): Promise<unknown>;
+
+  getDPoPAuthorizationHeaders(params: DPoPRequest): Promise<DPoPHeaders>;
+  clearDPoPStorage(clearAll: boolean): Promise<void>;
+  parseUseDPoPNonceError(headers: HeadersInit): string | null;
 }

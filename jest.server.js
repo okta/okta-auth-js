@@ -25,6 +25,7 @@ const config = Object.assign({}, baseConfig, {
     'oidc/renewToken.ts',
     'oidc/renewTokens.ts',
     'oidc/enrollAuthenticator',
+    'oidc/dpop',
     'TokenManager/browser',
     'SyncStorageService',
     'LeaderElectionService',

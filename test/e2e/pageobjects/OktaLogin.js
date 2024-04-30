@@ -60,9 +60,21 @@ class OktaLogin {
   }
 
   async signinOIE(username, password) {
-    await this.OIEsigninUsername.then(el => el.setValue(username));
-    await this.OIEsigninPassword.then(el => el.setValue(password));
-    await this.OIEsigninSubmitBtn.then(el => el.click());
+    await this.OIEsigninUsername.setValue(username);
+    // const isIdFirst = !(await (await this.OIEsigninPassword).isDisplayed());
+    const isIdFirst = !(await this.OIEsigninPassword.isDisplayed());
+
+    // Identifier first config
+    if (isIdFirst) {
+      await this.OIEsigninSubmitBtn.click();
+      await this.OIEsigninPassword.setValue(password);
+      await this.OIEsigninSubmitBtn.click();
+    }
+    else {
+      // Identifier and passcode on same screen
+      await this.OIEsigninPassword.setValue(password);
+      await this.OIEsigninSubmitBtn.click();
+    }
   }
 
   async signinLegacy(username, password) {

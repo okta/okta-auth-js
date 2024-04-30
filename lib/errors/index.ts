@@ -15,6 +15,7 @@ import AuthApiError from './AuthApiError';
 import AuthPollStopError from './AuthPollStopError';
 import AuthSdkError from './AuthSdkError';
 import OAuthError from './OAuthError';
+import WWWAuthError from './WWWAuthError';
 
 function isAuthApiError(obj: any): obj is AuthApiError {
   return (obj instanceof AuthApiError);
@@ -24,13 +25,19 @@ function isOAuthError(obj: any): obj is OAuthError {
   return (obj instanceof OAuthError);
 }
 
+function isWWWAuthError(obj: any): obj is WWWAuthError {
+  return (obj instanceof WWWAuthError);
+}
+
 export {
   isAuthApiError,
   isOAuthError,
+  isWWWAuthError,
   AuthApiError,
   AuthPollStopError,
   AuthSdkError,
-  OAuthError
+  OAuthError,
+  WWWAuthError
 };
 
 export * from './types';

@@ -8,7 +8,7 @@ setup_e2e
 export USERNAME=email-login@email.ghostinspector.com
 # NOTE: uses same password as george
 
-export TEST_NAME=@okta/test.app.react-mfa-v1
+export TEST_NAME=e2e-mfa
 
 # This client has MFA (security question) enabled
 export CLIENT_ID=0oa41zpqqxar7OFl84x7

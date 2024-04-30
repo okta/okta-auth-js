@@ -24,7 +24,7 @@ const getTask = (config) => () => {
     // start the dev server
     const server = spawn('yarn', [
       'workspace',
-      config.name,
+      config.app,
       'start'
     ], { stdio: 'inherit' });
 

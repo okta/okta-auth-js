@@ -10,12 +10,24 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+jest.mock('../../../lib/http', () => {
+  const actual = jest.requireActual('../../../lib/http');
+  return {
+    __esModule: true,
+    ...actual,
+  };
+});
+
+const findKeyPair = jest.fn();
+const generateDPoPProof = jest.fn();
+jest.mock('../../../lib/oidc/dpop', () => { return { generateDPoPProof, findKeyPair }; });
 
 import { OktaAuth, AccessToken, IDToken, Token } from '@okta/okta-auth-js';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 
 const _ = require('lodash');
+const http = require('../../../lib/http');
 
 function setupSync(options?) {
   options = Object.assign({ issuer: 'http://example.okta.com', pkce: false }, options);
@@ -55,7 +67,6 @@ describe('token.getUserInfo', function() {
       expect(res).toEqual(responseXHR.response);
     }
   });
-
 
   util.itMakesCorrectRequestResponse({
     title: 'allows retrieving UserInfo with no arguments if valid tokens exist in token manager',
@@ -106,6 +117,27 @@ describe('token.getUserInfo', function() {
     expectations: function(test, res) {
       expect(res).toEqual(responseXHR.response);
     }
+  });
+
+  it('can authenticate with dpop', async () => {
+    findKeyPair.mockResolvedValue({});
+    generateDPoPProof.mockResolvedValue('dpopproofyay');
+    const httpSpy = jest.spyOn(http, 'httpRequest').mockResolvedValue({
+      'sub': tokens.standardIdTokenParsed.claims.sub,
+      'email': 'samljackson@example.com',
+      'email_verified': true
+    });
+    const accessToken = {...tokens.standardAccessTokenParsed, dpopPairId: 'foobar'};
+    const oa = await setupSync({ dpop: true });
+    await oa.token.getUserInfo(accessToken, tokens.standardIdTokenParsed);
+    expect(httpSpy).toHaveBeenCalledWith(oa, {
+      url: accessToken.userinfoUrl,
+      method: 'GET',
+      headers: {
+        Dpop: 'dpopproofyay',
+        Authorization: `DPoP ${accessToken.accessToken}`
+      }
+    });
   });
 
   it('throws an error if no arguments are passed', function() {
@@ -219,4 +251,5 @@ describe('token.getUserInfo', function() {
       expect(err.errorSummary).toEqual('The access token is invalid.');
     }
   });
+
 });

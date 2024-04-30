@@ -33,7 +33,7 @@ import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import SdkClock from '../../../lib/clock';
 import { TokenManager } from '../../../lib/oidc/TokenManager';
-  
+
 describe('TokenManager (browser)', function() {
   let client;
 

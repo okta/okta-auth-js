@@ -11,12 +11,24 @@
  */
 
 
-import { AuthSdkError } from '../../errors';
+import { AuthSdkError, AuthApiError } from '../../errors';
 import { CustomUrls, OAuthParams, OAuthResponse, RefreshToken, TokenParams } from '../types';
 import { removeNils, toQueryString } from '../../util';
 import { httpRequest, OktaAuthHttpInterface } from '../../http';
+import { generateDPoPForTokenRequest, isDPoPNonceError } from '../dpop';
 
-function validateOptions(options: TokenParams) {
+export interface TokenEndpointParams extends TokenParams {
+  dpopKeyPair?: CryptoKeyPair;
+}
+
+interface TokenRequestParams {
+  url: string;
+  data: any;
+  dpopKeyPair?: CryptoKeyPair;
+  nonce?: string;
+}
+
+function validateOptions(options: TokenEndpointParams) {
   // Quick validation
   if (!options.clientId) {
     throw new AuthSdkError('A clientId must be specified in the OktaAuth constructor to get a token');
@@ -59,43 +71,81 @@ function getPostData(sdk, options: TokenParams): string {
   return toQueryString(params).slice(1);
 }
 
+/* eslint complexity: [2, 10] */
+async function makeTokenRequest (sdk, { url, data, nonce, dpopKeyPair }: TokenRequestParams): Promise<OAuthResponse> {
+  const method = 'POST';
+  const headers: any = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  };
+
+  if (sdk.options.dpop) {
+    if (!dpopKeyPair) {
+      throw new AuthSdkError('DPoP is configured but no key pair was provided');
+    }
+
+    const proof = await generateDPoPForTokenRequest({ url, method, nonce, keyPair: dpopKeyPair });
+    headers.DPoP = proof;
+  }
+
+  try {
+    const resp = await httpRequest(sdk, {
+      url,
+      method,
+      args: data,
+      headers
+    });
+    return resp;
+  }
+  catch (err) {
+    if (isDPoPNonceError(err) && !nonce) {
+      const dpopNonce = err.resp?.headers['dpop-nonce'];
+      if (!dpopNonce) {
+        // throws error is dpop-nonce header cannot be found, prevents infinite loop
+        throw new AuthApiError(
+          {errorSummary: 'No `dpop-nonce` header found when required'},
+          err.resp ?? undefined    // yay ts
+        );
+      }
+      return makeTokenRequest(sdk, { url, data, dpopKeyPair, nonce: dpopNonce });
+    }
+    throw err;
+  }
+}
+
 // exchange authorization code for an access token
-export function postToTokenEndpoint(sdk, options: TokenParams, urls: CustomUrls): Promise<OAuthResponse> {
+export async function postToTokenEndpoint(sdk, options: TokenEndpointParams, urls: CustomUrls): Promise<OAuthResponse> {
   validateOptions(options);
   var data = getPostData(sdk, options);
 
-  const headers = {
-    'Content-Type': 'application/x-www-form-urlencoded'
+  const params: TokenRequestParams = {
+    url: urls.tokenUrl!,
+    data,
+    dpopKeyPair: options?.dpopKeyPair
   };
 
-  return httpRequest(sdk, {
-    url: urls.tokenUrl,
-    method: 'POST',
-    args: data,
-    headers
-  });
+  return makeTokenRequest(sdk, params);
 }
 
-export function postRefreshToken(
+export async function postRefreshToken(
   sdk: OktaAuthHttpInterface,
-  options: TokenParams,
+  options: TokenEndpointParams,
   refreshToken: RefreshToken
 ): Promise<OAuthResponse> {
-  return httpRequest(sdk, {
-    url: refreshToken.tokenUrl,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
+  const data = Object.entries({
+    client_id: options.clientId, // eslint-disable-line camelcase
+    grant_type: 'refresh_token', // eslint-disable-line camelcase
+    scope: refreshToken.scopes.join(' '),
+    refresh_token: refreshToken.refreshToken, // eslint-disable-line camelcase
+  }).map(function ([name, value]) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return name + '=' + encodeURIComponent(value!);
+  }).join('&');
 
-    args: Object.entries({
-      client_id: options.clientId, // eslint-disable-line camelcase
-      grant_type: 'refresh_token', // eslint-disable-line camelcase
-      scope: refreshToken.scopes.join(' '),
-      refresh_token: refreshToken.refreshToken, // eslint-disable-line camelcase
-    }).map(function ([name, value]) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return name + '=' + encodeURIComponent(value!);
-    }).join('&'),
-  });
+  const params: TokenRequestParams = {
+    url: refreshToken.tokenUrl,
+    data,
+    dpopKeyPair: options?.dpopKeyPair
+  };
+
+  return makeTokenRequest(sdk, params);
 }

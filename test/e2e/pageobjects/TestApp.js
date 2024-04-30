@@ -37,6 +37,7 @@ class TestApp {
   get testConcurrentGetTokenBtn() { return $('#test-concurrent-get-token'); }
   get loginWithAcrBtn() { return $('#login-acr'); }
   get enrollAuthenticator() { return $('#enroll-authenticator'); }
+  get generateDPoPProofBtn () { return $('#dpop-proof'); }
 
   get tokenError() { return $('#token-error'); }
   get tokenMsg() { return $('#token-msg'); }
@@ -57,6 +58,8 @@ class TestApp {
   get responseModeFragment() { return $('#f_responseMode [value="fragment"]'); }
   get pkceOptionOn() { return $('#f_pkce-on'); }
   get pkceOptionOff() { return $('#f_pkce-off'); }
+  get dpopOptionOn() { return $('#f_dpop-on'); }
+  get dpopOptionOff() { return $('#f_dpop-off'); }
   get clientId() { return $('#f_clientId'); }
   get issuer() { return $('#f_issuer'); }
   get interactionCodeOption() { return $('#f_useInteractionCodeFlow-on'); }
@@ -246,6 +249,18 @@ class TestApp {
 
   async selectPkceOptionOff(){
     await this.pkceOptionOff.then(el=> el.click());
+  }
+
+  async selectDPoPOptionOn(){
+    await this.dpopOptionOn.then(el=> el.click());
+  }
+
+  async selectDPoPOptionOff(){
+    await this.dpopOptionOff.then(el=> el.click());
+  }
+
+  async generateDPoPProof(){
+    await this.generateDPoPProofBtn.then(el=> el.click());
   }
 
   async waitForLoginBtn() {
