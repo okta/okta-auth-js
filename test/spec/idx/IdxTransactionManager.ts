@@ -165,6 +165,20 @@ describe('IdxTransactionManager', () => {
       expect(res).toBeNull();
     });
     describe('with options.stateHandle', () => {
+      it('returns null if options.stateHandle does not match saved stateHandle and useGenericRemediator = undefined', () => {
+        const { transactionManager, idxResponseStorage, savedResponse } = testContext;
+        idxResponseStorage.getStorage.mockReturnValue(savedResponse);
+        const res = transactionManager.loadIdxResponse({ stateHandle: 'a' });
+        expect(idxResponseStorage.getStorage).toHaveBeenCalled();
+        expect(res).toBeNull();
+      });
+      it('returns savedResponse if options.stateHandle does not match saved stateHandle and useGenericRemediator = true', () => {
+        const { transactionManager, idxResponseStorage, savedResponse } = testContext;
+        idxResponseStorage.getStorage.mockReturnValue(savedResponse);
+        const res = transactionManager.loadIdxResponse({ stateHandle: 'a', useGenericRemediator: true });
+        expect(idxResponseStorage.getStorage).toHaveBeenCalled();
+        expect(res).toBe(savedResponse);
+      });
       it('returns data if options.stateHandle matches saved stateHandle', () => {
         const { transactionManager, idxResponseStorage, savedResponse } = testContext;
         savedResponse.stateHandle = 'a';
