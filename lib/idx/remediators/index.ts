@@ -31,4 +31,5 @@ export * from './SelectEnrollProfile';
 export * from './AuthenticatorVerificationData';
 export * from './AuthenticatorEnrollmentData';
 export * from './Skip';
+export * from './DeviceAppleSSOExtension';
 export * from './GenericRemediator';
