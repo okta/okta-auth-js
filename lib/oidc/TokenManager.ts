@@ -445,7 +445,9 @@ export class TokenManager implements TokenManagerInterface {
   
     // A refresh token means a replace instead of renewal
     // Store the renew promise state, to avoid renewing again
-    const renewPromise = this.state.renewPromise = this.sdk.token.renewTokens()
+
+    const extraParams = this.sdk.storageManager.getSharedTansactionStorage().getItem('extraParams');
+    const renewPromise = this.state.renewPromise = this.sdk.token.renewTokens({ extraParams })
       .then(tokens => {
         this.setTokens(tokens);
 
