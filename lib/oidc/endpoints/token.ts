@@ -71,7 +71,21 @@ function getPostData(sdk, options: TokenParams): string {
   return toQueryString(params).slice(1);
 }
 
-/* eslint complexity: [2, 11] */
+function createTokenRequestUrl(url: string, options: TokenEndpointParams): string {
+  // URL API has been added to the polyfill
+  // eslint-disable-next-line compat/compat
+  const requestUrl = new URL(url);
+  const { extraParams } = options;
+
+  for (const [key, value] of Object.entries(extraParams ?? {})) {
+    if (!requestUrl.searchParams.has(key)) {
+      requestUrl.searchParams.append(key, value);
+    }
+  }
+  return requestUrl.toString();
+}
+
+/* eslint complexity: [2, 10] */
 async function makeTokenRequest(
   sdk,
   options: TokenEndpointParams,
@@ -92,19 +106,8 @@ async function makeTokenRequest(
   }
 
   try {
-    // URL API has been added to the polyfill
-    // eslint-disable-next-line compat/compat
-    const requestUrl = new URL(url);
-    const { extraParams } = options;
-
-    for (const [key, value] of Object.entries(extraParams ?? {})) {
-      if (!requestUrl.searchParams.has(key)) {
-        requestUrl.searchParams.append(key, value);
-      }
-    }
-
     const resp = await httpRequest(sdk, {
-      url: requestUrl.toString(),
+      url: createTokenRequestUrl(url, options),
       method,
       args: data,
       headers
@@ -117,7 +120,7 @@ async function makeTokenRequest(
       if (!dpopNonce) {
         // throws error is dpop-nonce header cannot be found, prevents infinite loop
         throw new AuthApiError(
-          {errorSummary: 'No `dpop-nonce` header found when required'},
+          { errorSummary: 'No `dpop-nonce` header found when required' },
           err.resp ?? undefined    // yay ts
         );
       }
