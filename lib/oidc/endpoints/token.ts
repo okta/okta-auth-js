@@ -72,7 +72,11 @@ function getPostData(sdk, options: TokenParams): string {
 }
 
 /* eslint complexity: [2, 10] */
-async function makeTokenRequest (sdk, { url, data, nonce, dpopKeyPair }: TokenRequestParams): Promise<OAuthResponse> {
+async function makeTokenRequest(
+  sdk,
+  options: TokenEndpointParams,
+  { url, data, nonce, dpopKeyPair }: TokenRequestParams
+): Promise<OAuthResponse> {
   const method = 'POST';
   const headers: any = {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -88,8 +92,9 @@ async function makeTokenRequest (sdk, { url, data, nonce, dpopKeyPair }: TokenRe
   }
 
   try {
+    const requestUrl = url + toQueryString(options.extraParams || '');
     const resp = await httpRequest(sdk, {
-      url,
+      url: requestUrl,
       method,
       args: data,
       headers
@@ -106,7 +111,7 @@ async function makeTokenRequest (sdk, { url, data, nonce, dpopKeyPair }: TokenRe
           err.resp ?? undefined    // yay ts
         );
       }
-      return makeTokenRequest(sdk, { url, data, dpopKeyPair, nonce: dpopNonce });
+      return makeTokenRequest(sdk, options, { url, data, dpopKeyPair, nonce: dpopNonce });
     }
     throw err;
   }
@@ -123,7 +128,7 @@ export async function postToTokenEndpoint(sdk, options: TokenEndpointParams, url
     dpopKeyPair: options?.dpopKeyPair
   };
 
-  return makeTokenRequest(sdk, params);
+  return makeTokenRequest(sdk, options, params);
 }
 
 export async function postRefreshToken(
@@ -147,5 +152,5 @@ export async function postRefreshToken(
     dpopKeyPair: options?.dpopKeyPair
   };
 
-  return makeTokenRequest(sdk, params);
+  return makeTokenRequest(sdk, options, params);
 }
