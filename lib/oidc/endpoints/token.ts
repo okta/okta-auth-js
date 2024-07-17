@@ -71,7 +71,7 @@ function getPostData(sdk, options: TokenParams): string {
   return toQueryString(params).slice(1);
 }
 
-/* eslint complexity: [2, 10] */
+/* eslint complexity: [2, 11] */
 async function makeTokenRequest(
   sdk,
   options: TokenEndpointParams,
@@ -92,9 +92,19 @@ async function makeTokenRequest(
   }
 
   try {
-    const requestUrl = url + toQueryString(options.extraParams || '');
+    // URL API has been added to the polyfill
+    // eslint-disable-next-line compat/compat
+    const requestUrl = new URL(url);
+    const { extraParams } = options;
+
+    for (const [key, value] of Object.entries(extraParams ?? {})) {
+      if (!requestUrl.searchParams.has(key)) {
+        requestUrl.searchParams.append(key, value);
+      }
+    }
+
     const resp = await httpRequest(sdk, {
-      url: requestUrl,
+      url: requestUrl.toString(),
       method,
       args: data,
       headers
