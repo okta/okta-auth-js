@@ -6,7 +6,7 @@ export TEST_SUITE_TYPE="checkstyle"
 export TEST_RESULT_FILE_DIR="${REPO}/build2"
 
 if ! yarn test:types; then
-  echo "tsd failed! Exiting..."
+  echo "tstyche failed! Exiting..."
   exit ${PUBLISH_TYPE_AND_RESULT_DIR_BUT_ALWAYS_FAIL}
 fi
 

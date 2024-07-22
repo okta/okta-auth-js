@@ -419,17 +419,27 @@ export class TokenManager implements TokenManagerInterface {
     if (this.state.renewPromise) {
       return this.state.renewPromise;
     }
-  
+
     try {
       var token = this.getSync(key);
-      if (!token) {
+      let shouldRenew = token !== undefined;
+      // explicitly check if key='accessToken' because token keys are not guaranteed (long story, features dragons)
+      if (!token && key === 'accessToken') {
+        // attempt token renewal if refresh token is present (improves consistency of autoRenew)
+        const refreshKey = this.getStorageKeyByType('refreshToken');
+        const refreshToken = this.getSync(refreshKey);
+        shouldRenew = refreshToken !== undefined;
+      }
+
+      if (!shouldRenew) {
         throw new AuthSdkError('The tokenManager has no token for the key: ' + key);
       }
-    } catch (err) {
+    }
+    catch (err) {
       this.emitError(err);
       return Promise.reject(err);
     }
-  
+
     // Remove existing autoRenew timeout
     this.clearExpireEventTimeout(key);
   
@@ -438,6 +448,14 @@ export class TokenManager implements TokenManagerInterface {
     const renewPromise = this.state.renewPromise = this.sdk.token.renewTokens()
       .then(tokens => {
         this.setTokens(tokens);
+
+        // return accessToken in case where access token doesn't exist
+        // but refresh token exists
+        if (!token && key === 'accessToken') {
+          const accessToken = tokens['accessToken'];
+          this.emitRenewed(key, accessToken, null);
+          return accessToken;
+        }
 
         // resolve token based on the key
         const tokenType = this.getTokenType(token!);

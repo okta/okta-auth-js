@@ -67,7 +67,7 @@ describe('OktaAuth (constructor)', () => {
   ]);
 
   it('saves expected options', () => {
-    const config = {};
+    const config: any = {};
     savedOptions.forEach((option) => {
       let val: string | object | boolean = 'fake_' + option; // default "fake" value
       switch (option) { // some types are strictly enforced. These should differ from the default
@@ -126,7 +126,7 @@ describe('OktaAuth (constructor)', () => {
   });
 
   it('removes trailing slash from api urls', () => {
-    const config = {};
+    const config: any = {};
     apiUrlOptions.forEach((option) => {
       config[option] = 'http://fake_' + option + '/';
     });

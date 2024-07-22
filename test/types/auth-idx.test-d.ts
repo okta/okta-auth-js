@@ -18,36 +18,37 @@ import {
   InteractResponse,
   OktaAuth,
 } from '@okta/okta-auth-js';
-import { expectType } from 'tsd';
+import { expect } from 'tstyche';
 
-const authClient = new OktaAuth({});
-expectType<IdxTransaction>(await authClient.idx.register());
-expectType<IdxTransaction>(await authClient.idx.recoverPassword());
-expectType<IdxTransaction>(await authClient.idx.unlockAccount());
-expectType<IdxTransaction>(await authClient.idx.startTransaction());
-expectType<IdxTransaction>(await authClient.idx.poll());
-expectType<IdxTransaction>(await authClient.idx.start());
-expectType<IdxTransaction>(await authClient.idx.proceed());
-expectType<IdxTransaction>(await authClient.idx.cancel());
-expectType<IdxTransaction>(await authClient.idx.authenticate());
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
+expect((await authClient.idx.register())).type.toEqual<IdxTransaction>();
+expect((await authClient.idx.recoverPassword())).type.toEqual<IdxTransaction>();
+expect((await authClient.idx.unlockAccount())).type.toEqual<IdxTransaction>();
+expect((await authClient.idx.startTransaction())).type.toEqual<IdxTransaction>();
+expect((await authClient.idx.poll())).type.toEqual<IdxTransaction>();
+expect((await authClient.idx.start())).type.toEqual<IdxTransaction>();
+expect((await authClient.idx.proceed())).type.toEqual<IdxTransaction>();
+expect((await authClient.idx.cancel())).type.toEqual<IdxTransaction>();
+expect((await authClient.idx.authenticate())).type.toEqual<IdxTransaction>();
 
 const transaction = await authClient.idx.start();
-expectType<IdxContextUIDisplay | undefined>(transaction.context.uiDisplay);
-expectType<boolean | undefined>(transaction.context.currentAuthenticator.value.deviceKnown);
+expect(transaction.context.uiDisplay).type.toEqual<IdxContextUIDisplay | undefined>();
+expect(transaction.context.currentAuthenticator.value.deviceKnown).type.toEqual<boolean | undefined>();
 
-expectType<InteractResponse>(await authClient.idx.interact());
-expectType<IdxResponse>(await authClient.idx.introspect());
-expectType<IdxTransaction>(await authClient.idx.proceed());
+expect((await authClient.idx.interact())).type.toEqual<InteractResponse>();
+expect((await authClient.idx.introspect())).type.toEqual<IdxResponse>();
+expect((await authClient.idx.proceed())).type.toEqual<IdxTransaction>();
 
-expectType<boolean>(authClient.idx.canProceed());
-expectType<void>(authClient.idx.setFlow('register'));
-expectType<boolean>(authClient.idx.isInteractionRequired());
-expectType<boolean>(authClient.idx.isInteractionRequiredError(new Error));
-expectType<void>(await authClient.idx.handleInteractionCodeRedirect('http://foo'));
-expectType<boolean>(authClient.idx.isEmailVerifyCallback('https://foo'));
-expectType<IdxTransactionMeta|undefined>(authClient.idx.getSavedTransactionMeta());
-expectType<IdxTransactionMeta>(await authClient.idx.createTransactionMeta());
-expectType<IdxTransactionMeta>(await authClient.idx.getTransactionMeta());
-expectType<void>(authClient.idx.saveTransactionMeta({}));
-expectType<void>(authClient.idx.clearTransactionMeta());
-expectType<boolean>(authClient.idx.isTransactionMetaValid({}));
+expect((authClient.idx.canProceed())).type.toEqual<boolean>();
+expect((authClient.idx.setFlow('register'))).type.toEqual<void>();
+expect((authClient.idx.isInteractionRequired())).type.toEqual<boolean>();
+expect((authClient.idx.isInteractionRequiredError(new Error))).type.toEqual<boolean>();
+expect((await authClient.idx.handleInteractionCodeRedirect('http://foo'))).type.toEqual<void>();
+expect((authClient.idx.isEmailVerifyCallback('https://foo'))).type.toEqual<boolean>();
+expect(authClient.idx.getSavedTransactionMeta()).type.toEqual<IdxTransactionMeta | undefined>();
+expect((await authClient.idx.createTransactionMeta())).type.toEqual<IdxTransactionMeta>();
+expect((await authClient.idx.getTransactionMeta())).type.toEqual<IdxTransactionMeta>();
+expect((authClient.idx.saveTransactionMeta({}))).type.toEqual<void>();
+expect((authClient.idx.clearTransactionMeta())).type.toEqual<void>();
+expect(authClient.idx.clearTransactionMeta()).type.toEqual<void>();
+expect((authClient.idx.isTransactionMetaValid({}))).type.toEqual<boolean>();

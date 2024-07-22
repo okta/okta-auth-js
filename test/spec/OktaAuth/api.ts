@@ -12,6 +12,23 @@
 
 
 /* eslint-disable no-new */
+
+const mocked = {
+  findKeyPair: jest.fn(),
+  // generateDPoPProof: jest.fn(),
+  clearDPoPKeyPair: jest.fn(),
+  clearAllDPoPKeyPairs: jest.fn(),
+  clearDPoPKeyPairAfterRevoke: jest.fn(),
+};
+jest.mock('../../../lib/oidc/dpop', () => {
+  const actual = jest.requireActual('../../../lib/oidc/dpop');
+  return {
+    __esModule: true,
+    ...actual,
+    ...mocked
+  };
+});
+
 import { 
   OktaAuth, 
   AuthApiError,
@@ -20,6 +37,7 @@ import {
   isAccessToken,
   isIDToken
 } from '@okta/okta-auth-js';
+import { generateKeyPair } from '../../../lib/oidc/dpop';
 import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 
@@ -161,6 +179,17 @@ describe('OktaAuth (api)', function() {
           expect(auth.tokenManager.getTokens).toHaveBeenCalled();
           expect(auth.token.revoke).not.toHaveBeenCalled();
         });
+    });
+
+    it('will clear dpop key pair from storage', async () => {
+      const accessToken = { accessToken: 'fake' };
+      auth.options.dpop = true;
+      spyOn(auth.token, 'revoke').and.returnValue(Promise.resolve());
+      spyOn(auth.tokenManager, 'getTokens').and.returnValue(Promise.resolve({ accessToken }));
+      mocked.clearDPoPKeyPairAfterRevoke.mockResolvedValue(true);
+      await auth.revokeAccessToken();
+
+      expect(mocked.clearDPoPKeyPairAfterRevoke).toHaveBeenCalledWith('access', { accessToken });
     });
   });
 
@@ -427,6 +456,60 @@ describe('OktaAuth (api)', function() {
     });
   });
 
+  describe('getOrRenewAccessToken', () => {
+    beforeEach(() => {
+      auth = new OktaAuth({ issuer, pkce: true, services: {
+        autoRenew: false,
+        syncStorage: false
+      }});
+      auth.tokenManager.clear();
+    });
+
+    const now = Math.floor(Date.now() / 1000);
+    it('returns valid access token from storage', async () => {
+      const accessToken = {...tokens.standardAccessTokenParsed, expiresAt: now + 300};
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({ accessToken });
+      const retVal = await auth.getOrRenewAccessToken();
+      expect(retVal).toBe(accessToken.accessToken);
+    });
+
+    it('returns renewed access token when stored token is expired', async () => {
+      const currentToken = {...tokens.standardAccessTokenParsed};
+      const renewedToken = {...tokens.standardAccessTokenParsed, expiresAt: now + 300};
+      const renewSpy = jest.spyOn(auth.token, 'renewTokens').mockResolvedValue({ accessToken: renewedToken });
+      auth.tokenManager.add('accessToken', currentToken);
+      const retVal = await auth.getOrRenewAccessToken();
+      expect(retVal).toBe(renewedToken.accessToken);
+      expect(renewSpy).toHaveBeenCalled();
+    });
+
+    it('returns renewed access token when only refresh token exists', async () => {
+      const refreshToken = {...tokens.standardRefreshTokenParsed};
+      const renewedToken = {...tokens.standardAccessTokenParsed, expiresAt: now + 300};
+      const renewSpy = jest.spyOn(auth.token, 'renewTokens').mockResolvedValue({ accessToken: renewedToken });
+      auth.tokenManager.add('refreshToken', refreshToken);
+      const retVal = await auth.getOrRenewAccessToken();
+      expect(retVal).toBe(renewedToken.accessToken);
+      expect(renewSpy).toHaveBeenCalled();
+    });
+
+    it('returns `null` when no token exists and unable to refresh', async () => {
+      const currentToken = {...tokens.standardAccessTokenParsed};
+      const renewSpy = jest.spyOn(auth.token, 'renewTokens').mockRejectedValue(new Error('Bad Request'));
+      auth.tokenManager.add('accessToken', currentToken);
+      const retVal = await auth.getOrRenewAccessToken();
+      expect(retVal).toBe(null);
+      expect(renewSpy).toHaveBeenCalled();
+    });
+
+    it('returns `null` when no token exists (unauthenticated)', async () => {
+      const renewSpy = jest.spyOn(auth.token, 'renewTokens').mockRejectedValue(new Error('Bad Request'));
+      const retVal = await auth.getOrRenewAccessToken();
+      expect(retVal).toBe(null);
+      expect(renewSpy).not.toHaveBeenCalled();
+    });
+  });
+
   describe('isPKCE', () => {
     it('is true by default', () => {
       auth = new OktaAuth({ issuer });
@@ -604,5 +687,103 @@ describe('OktaAuth (api)', function() {
       );
     });
 
+  });
+
+  describe('getDPoPAuthorizationHeaders', () => {
+    beforeEach(() => {
+      auth = new OktaAuth({ issuer, dpop: true });
+    });
+
+    it('should throw if dpop is not enabled', async () => {
+      auth.options.dpop = false;
+      await expect(auth.getDPoPAuthorizationHeaders({
+        url: 'localhost:8080/test', method: 'GET'
+      })).rejects.toThrow(new AuthSdkError('DPoP is not configured for this client instance'));
+    });
+
+    it('should return DPoP headers (from tokenManager)', async () => {
+      const accessToken = { accessToken: 'fake' };
+      jest.spyOn(auth.tokenManager, 'getTokensSync').mockReturnValue({ accessToken });
+      mocked.findKeyPair.mockImplementation(async () => await generateKeyPair());
+
+      const headers = await auth.getDPoPAuthorizationHeaders({ url: 'localhost:8080/test', method: 'GET' });
+
+      expect(headers).toMatchObject({
+        Authorization: `DPoP ${accessToken.accessToken}`,
+        Dpop: expect.any(String)
+      });
+    });
+
+    it('should throw if no accessToken exists', async () => {
+      await expect(auth.getDPoPAuthorizationHeaders({ url: 'localhost:8080/test', method: 'GET' }))
+        .rejects.toThrow(new AuthSdkError('AccessToken is required to generate a DPoP Proof'));
+    });
+
+    it('should return DPoP headers (from options)', async () => {
+      const accessToken = { accessToken: 'fake' };
+      mocked.findKeyPair.mockImplementation(async () => await generateKeyPair());
+
+      const headers = await auth.getDPoPAuthorizationHeaders(
+        { url: 'localhost:8080/test', method: 'GET', accessToken }
+      );
+
+      expect(headers).toMatchObject({
+        Authorization: `DPoP ${accessToken.accessToken}`,
+        Dpop: expect.any(String)
+      });
+    });
+  });
+
+  describe('clearDPoPStorage', () => {
+    beforeEach(() => {
+      auth = new OktaAuth({ issuer, dpop: true });
+    });
+
+    it('should clear all DPoP keys', async () => {
+      await auth.clearDPoPStorage(true);
+      expect(mocked.clearAllDPoPKeyPairs).toHaveBeenCalled();
+      expect(mocked.clearDPoPKeyPair).not.toHaveBeenCalled();
+    });
+
+    it('should no-op', async () => {
+      await auth.clearDPoPStorage();
+      expect(mocked.clearDPoPKeyPair).not.toHaveBeenCalled();
+      expect(mocked.clearAllDPoPKeyPairs).not.toHaveBeenCalled();
+    });
+
+    it('should clear specific key pair', async () => {
+      const accessToken = { accessToken: 'fake', dpopPairId: 'foo' };
+      jest.spyOn(auth.tokenManager, 'getTokens').mockReturnValue({ accessToken });
+      await auth.clearDPoPStorage();
+      expect(mocked.clearDPoPKeyPair).toHaveBeenCalledWith('foo');
+      expect(mocked.clearAllDPoPKeyPairs).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('parseUseDPoPNonceError', () => {
+    it('get header from Headers instance', () => {
+      if (!global.Headers) {
+        // do not fail in node tests
+        expect(true).toEqual(true);
+        return;
+      }
+      const headers = new Headers({
+        'DPoP-Nonce': 'nonceuponatime',
+        'WWW-Authenticate': `DPoP error="use_dpop_nonce", error_description="Resource server requires nonce in DPoP proof"`
+      });
+
+      const nonce = auth.parseUseDPoPNonceError(headers);
+      expect(nonce).toEqual('nonceuponatime');
+    });
+
+    it('get header from object', () => {
+      const headers = {
+        'DPoP-Nonce': 'nonceuponatime',
+        'WWW-Authenticate': `DPoP error="use_dpop_nonce", error_description="Resource server requires nonce in DPoP proof"`
+      };
+
+      const nonce = auth.parseUseDPoPNonceError(headers);
+      expect(nonce).toEqual('nonceuponatime');
+    });
   });
 });

@@ -12,20 +12,17 @@
  *
  */
 import { OktaAuth, ServiceManagerInterface, ServiceInterface } from '@okta/okta-auth-js';
-import { expectType } from 'tsd';
+import { expect } from 'tstyche';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 
-(async () => {
-  // start/stop background services
-  expectType<void>(await authClient.start());
-  expectType<void>(await authClient.stop());
+// start/stop background services
+expect(await authClient.start()).type.toEqual<void>();
+expect(await authClient.stop()).type.toEqual<void>();
 
-  expectType<ServiceManagerInterface>(authClient.serviceManager);
-  expectType<ServiceInterface|undefined>(authClient.serviceManager.getService('serviceName'));
-  expectType<boolean>(authClient.serviceManager.isLeader());
-  expectType<boolean>(authClient.serviceManager.isLeaderRequired());
-  expectType<void>(await authClient.serviceManager.start());
-  expectType<void>(await authClient.serviceManager.stop());
-
-})();
+expect(authClient.serviceManager).type.toEqual<ServiceManagerInterface>();
+expect(authClient.serviceManager.getService('serviceName')).type.toEqual<ServiceInterface | undefined>();
+expect(authClient.serviceManager.isLeader()).type.toEqual<boolean>();
+expect(authClient.serviceManager.isLeaderRequired()).type.toEqual<boolean>();
+expect(await authClient.serviceManager.start()).type.toEqual<void>();
+expect(await authClient.serviceManager.stop()).type.toEqual<void>();

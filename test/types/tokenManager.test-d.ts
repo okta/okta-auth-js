@@ -21,49 +21,49 @@ import {
   TokenManagerError,
   TokenManagerInterface
 } from '@okta/okta-auth-js';
-import { expectType, expectAssignable } from 'tsd';
+import { expect } from 'tstyche';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 
 (async () => {
   const tokenManager = authClient.tokenManager;
-  expectType<TokenManagerInterface>(tokenManager);
+  expect(tokenManager).type.toEqual<TokenManagerInterface>();
 
   // Get
   const tokens = await tokenManager.getTokens();
-  expectType<Tokens>(tokens);
+  expect(tokens).type.toEqual<Tokens>();
   const accessToken = await tokenManager.get('accessToken') as AccessToken;
-  expectType<AccessToken>(accessToken);
+  expect(accessToken).type.toEqual<AccessToken>();
   const idToken = await tokenManager.get('idToken') as IDToken;
-  expectType<IDToken>(idToken);
+  expect(idToken).type.toEqual<IDToken>();
   const refreshToken = await tokenManager.get('refreshToken') as RefreshToken;
-  expectType<RefreshToken>(refreshToken);
+  expect(refreshToken).type.toEqual<RefreshToken>();
 
   // Manage
   tokenManager.setTokens(tokens);
-  expectType<void>(tokenManager.add('accessToken', tokens.accessToken!));
-  expectType<void>(tokenManager.remove('accessToken'));
-  expectType<void>(tokenManager.clear());
+  expect(tokenManager.add('accessToken', tokens.accessToken!)).type.toEqual<void>();
+  expect(tokenManager.remove('accessToken')).type.toEqual<void>();
+  expect(tokenManager.clear()).type.toEqual<void>();
 
   // Renew
-  expectType<boolean>(tokenManager.hasExpired(accessToken));
-  expectType<Token | undefined>(await tokenManager.renew('idToken'));
+  expect(tokenManager.hasExpired(accessToken)).type.toEqual<boolean>();
+  expect(await tokenManager.renew('idToken')).type.toEqual<Token | undefined>();
 
-  expectType<void>(tokenManager.clearPendingRemoveTokens());
+  expect(tokenManager.clearPendingRemoveTokens()).type.toEqual<void>();
 
   // Events
   tokenManager.on('expired', function (key, expiredToken) {
-    expectType<string>(key);
-    expectType<Token>(expiredToken);
+    expect(key).type.toEqual<string>();
+    expect(expiredToken).type.toEqual<Token>();
   });
   tokenManager.on('renewed', function (key, newToken, oldToken) {
-    expectType<string>(key);
-    expectType<Token>(newToken);
-    expectType<Token>(oldToken!);
+    expect(key).type.toEqual<string>();
+    expect(newToken).type.toEqual<Token>();
+    expect(oldToken!).type.toEqual<Token>();
   });
   tokenManager.on('error', function (error: TokenManagerError) {
-    expectType<TokenManagerError>(error);
-    expectAssignable<Error>(error);
+    expect(error).type.toEqual<TokenManagerError>();
+    expect<Error>().type.toBeAssignable(error);
   });
   tokenManager.off('error', () => {});
   tokenManager.off('error');

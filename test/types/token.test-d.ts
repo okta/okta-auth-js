@@ -25,9 +25,9 @@ import {
   OktaAuth,
   JWTPayload,
 } from '@okta/okta-auth-js';
-import { expectType, expectAssignable, expectError } from 'tsd';
+import { expect } from 'tstyche';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 
 // Tokens
 const idTokenExample = {
@@ -40,7 +40,7 @@ const idTokenExample = {
   clientId: 'NPSfOkH5eZrTy8PMDlvx',
   pendingRemove: true,
 };
-expectAssignable<IDToken>(idTokenExample);
+expect<IDToken>().type.toBeAssignable(idTokenExample);
 
 const accessTokenExample = {
   expiresAt: 1449699930,
@@ -52,7 +52,7 @@ const accessTokenExample = {
   userinfoUrl: 'https://some.com/userinfo',
   pendingRemove: true,
 };
-expectAssignable<AccessToken>(accessTokenExample);
+expect<AccessToken>().type.toBeAssignable(accessTokenExample);
 
 const refreshTokenExample = {
   expiresAt: 1449699930,
@@ -63,7 +63,7 @@ const refreshTokenExample = {
   issuer: 'https://{yourOktaDomain}',
   pendingRemove: false,
 };
-expectAssignable<RefreshToken>(refreshTokenExample);
+expect<RefreshToken>().type.toBeAssignable(refreshTokenExample);
 
 const DEFAULT_ACR_VALUES = 'urn:okta:2fa:any:ifpossible';
 
@@ -73,112 +73,99 @@ const tokens = {
   refreshToken: refreshTokenExample,
 };
 
-(async () => {
-  const authorizeOptions: TokenParams = {
-    responseType: ['token', 'id_token'],
-  };
+const authorizeOptions: TokenParams = {
+  responseType: ['token', 'id_token'],
+};
 
-  const tokenRes = await authClient.token.getWithoutPrompt(authorizeOptions);
-  expectType<TokenResponse>(tokenRes);
-  expectType<Tokens>(tokenRes.tokens);
-  expectType<AccessToken>(tokenRes.tokens.accessToken!);
-  expectType<IDToken>(tokenRes.tokens.idToken!);
-  expectType<RefreshToken>(tokenRes.tokens.refreshToken!);
+const tokenRes = await authClient.token.getWithoutPrompt(authorizeOptions);
+expect(tokenRes).type.toEqual<TokenResponse>();
+expect(tokenRes.tokens).type.toEqual<Tokens>();
+expect(tokenRes.tokens.accessToken!).type.toEqual<AccessToken>();
+expect(tokenRes.tokens.idToken!).type.toEqual<IDToken>();
+expect(tokenRes.tokens.refreshToken!).type.toEqual<RefreshToken>();
 
-  expectType<TokenResponse>(await authClient.token.getWithPopup(authorizeOptions));
-  expectType<void>(await authClient.token.getWithRedirect(authorizeOptions));
-  expectType<TokenResponse>(await authClient.token.parseFromUrl());
+expect(await authClient.token.getWithPopup(authorizeOptions)).type.toEqual<TokenResponse>();
+expect(await authClient.token.getWithRedirect(authorizeOptions)).type.toEqual<void>();
+expect(await authClient.token.parseFromUrl()).type.toEqual<TokenResponse>();
 
-  const enrollAuthenticatorOptons: EnrollAuthenticatorOptions = {
+const enrollAuthenticatorOptons: EnrollAuthenticatorOptions = {
+  enrollAmrValues: ['email', 'kba'],
+  acrValues: DEFAULT_ACR_VALUES
+};
+const enrollAuthenticatorOptons2: EnrollAuthenticatorOptions = {
+  enrollAmrValues: 'email',
+  acrValues: DEFAULT_ACR_VALUES,
+  responseType: 'none'
+};
+expect(authClient.endpoints.authorize.enrollAuthenticator(enrollAuthenticatorOptons)).type.toEqual<void>();
+expect(authClient.endpoints.authorize.enrollAuthenticator(enrollAuthenticatorOptons2)).type.toEqual<void>();
+expect(authClient.endpoints.authorize.enrollAuthenticator({
     enrollAmrValues: ['email', 'kba'],
+  })
+).type.toRaiseError();
+expect(authClient.endpoints.authorize.enrollAuthenticator({
     acrValues: DEFAULT_ACR_VALUES
-  };
-  const enrollAuthenticatorOptons2: EnrollAuthenticatorOptions = {
-    enrollAmrValues: 'email',
-    acrValues: DEFAULT_ACR_VALUES,
-    responseType: 'none'
-  };
-  expectType<void>(await authClient.endpoints.authorize.enrollAuthenticator(enrollAuthenticatorOptons));
-  expectType<void>(await authClient.endpoints.authorize.enrollAuthenticator(enrollAuthenticatorOptons2));
-  expectError(async () => {
-    // missing acrValues
-    await authClient.endpoints.authorize.enrollAuthenticator({
-      enrollAmrValues: ['email', 'kba'],
-    });
-  });
-  expectError(async () => {
-    // missing enrollAmrValues
-    await authClient.endpoints.authorize.enrollAuthenticator({
-      acrValues: DEFAULT_ACR_VALUES
-    });
-  });
-  expectError(async () => {
-    await authClient.endpoints.authorize.enrollAuthenticator();
-  });
+  })
+).type.toRaiseError();
+expect(authClient.endpoints.authorize.enrollAuthenticator()).type.toRaiseError();
 
-  const customUrls = {
-    issuer: 'https://{yourOktaDomain}/oauth2/{authorizationServerId}',
-    authorizeUrl: 'https://{yourOktaDomain}/oauth2/v1/authorize',
-    userinfoUrl: 'https://{yourOktaDomain}/oauth2/v1/userinfo',
-    tokenUrl: 'https://{yourOktaDomain}/oauth2/v1/userinfo',
-    revokeUrl: 'https://{yourOktaDomain}/oauth2/v1/revoke',
-    logoutUrl: 'https://{yourOktaDomain}/oauth2/v1/logout',
-  };
+const customUrls = {
+  issuer: 'https://{yourOktaDomain}/oauth2/{authorizationServerId}',
+  authorizeUrl: 'https://{yourOktaDomain}/oauth2/v1/authorize',
+  userinfoUrl: 'https://{yourOktaDomain}/oauth2/v1/userinfo',
+  tokenUrl: 'https://{yourOktaDomain}/oauth2/v1/userinfo',
+  revokeUrl: 'https://{yourOktaDomain}/oauth2/v1/revoke',
+  logoutUrl: 'https://{yourOktaDomain}/oauth2/v1/logout',
+};
 
-  expectType<TokenResponse>(await authClient.token.exchangeCodeForTokens(authorizeOptions, customUrls));
+expect(await authClient.token.exchangeCodeForTokens(authorizeOptions, customUrls)).type.toEqual<TokenResponse>();
 
-  const decodedToken = authClient.token.decode('ID_TOKEN_JWT');
-  expectType<JWTObject>(decodedToken);
-  expectType<JWTPayload>(decodedToken.payload);
-  expectType<string>(decodedToken.header.alg);
-  expectType<string>(decodedToken.signature);
+const decodedToken = authClient.token.decode('ID_TOKEN_JWT');
+expect(decodedToken).type.toEqual<JWTObject>();
+expect(decodedToken.payload).type.toEqual<JWTPayload>();
+expect(decodedToken.header.alg).type.toEqual<string>();
+expect(decodedToken.signature).type.toEqual<string>();
 
-  expectType<Token | undefined>(await authClient.token.renew(accessTokenExample));
+expect(await authClient.token.renew(accessTokenExample)).type.toEqual<Token | undefined>();
 
-  const userInfo = await authClient.token.getUserInfo(accessTokenExample, idTokenExample);
-  expectType<UserClaims>(userInfo);
+const userInfo = await authClient.token.getUserInfo(accessTokenExample, idTokenExample);
+expect(userInfo).type.toEqual<UserClaims>();
 
-  const validationOptions = {
-    issuer: 'https://{yourOktaDomain}/oauth2/{authorizationServerId}'
-  };
-  expectType<IDToken>(await authClient.token.verify(idTokenExample, validationOptions));
+const validationOptions = {
+  issuer: 'https://{yourOktaDomain}/oauth2/{authorizationServerId}'
+};
+expect(await authClient.token.verify(idTokenExample, validationOptions)).type.toEqual<IDToken>();
 
-  expectType<TokenParams>(await authClient.token.prepareTokenParams(authorizeOptions));
-})();
+expect(await authClient.token.prepareTokenParams(authorizeOptions)).type.toEqual<TokenParams>();
+
 
 // UserClaims
-(async () => {
+const basicUserClaims = await authClient.getUser();
+expect(basicUserClaims).type.toEqual<UserClaims>();
 
-  const basicUserClaims = await authClient.getUser();
-  expectType<UserClaims>(basicUserClaims);
-
-  type MyCustomClaims = {
-    groups: string[];
-    isAdmin: boolean;
-    age: number;
-    applicationProfile: {
-      companyId: string;
-      family_name: string;
-      given_name: string;
-      locale: string;
-      name: string;
-      userId: number;
-      userName: string;
-      zoneinfo: string;
-    };
-    optional?: string;
-    pair: [{
-      foo: string
-    }, {
-      bar: boolean
-    }]
+type MyCustomClaims = {
+  groups: string[];
+  isAdmin: boolean;
+  age: number;
+  applicationProfile: {
+    companyId: string;
+    family_name: string;
+    given_name: string;
+    locale: string;
+    name: string;
+    userId: number;
+    userName: string;
+    zoneinfo: string;
   };
+  optional?: string;
+  pair: [{
+    foo: string
+  }, {
+    bar: boolean
+  }]
+};
 
-  const customUserClaims = await authClient.getUser<MyCustomClaims>();
-  expectType<UserClaims<MyCustomClaims>>(customUserClaims);
+const customUserClaims = await authClient.getUser<MyCustomClaims>();
+expect(customUserClaims).type.toEqual<UserClaims<MyCustomClaims>>();
 
-  expectError(() => {
-    type InvalidCustomClaims = UserClaims<{ func: () => boolean }>;
-  });
-
-})();
+expect<UserClaims<{ func: () => boolean }>>().type.toRaiseError();

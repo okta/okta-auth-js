@@ -50,11 +50,15 @@ export function isPopupPostMessageSupported() {
   return false;
 }
 
-export function isTokenVerifySupported() {
+function isWebCryptoSubtleSupported () {
   return typeof webcrypto !== 'undefined'
     && webcrypto !== null
     && typeof webcrypto.subtle !== 'undefined'
     && typeof Uint8Array !== 'undefined';
+}
+
+export function isTokenVerifySupported() {
+  return isWebCryptoSubtleSupported();
 }
 
 export function hasTextEncoder() {
@@ -77,3 +81,10 @@ export function isLocalhost() {
   return isBrowser() && window.location.hostname === 'localhost';
 }
 
+// For now, DPoP is only supported on browsers
+export function isDPoPSupported () {
+  return !isIE11OrLess() &&
+    typeof window.indexedDB !== 'undefined' &&
+    hasTextEncoder() &&
+    isWebCryptoSubtleSupported();
+}

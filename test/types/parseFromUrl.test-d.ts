@@ -12,13 +12,11 @@
  */
 
 import { OktaAuth, TokenResponse } from '@okta/okta-auth-js';
-import { expectType } from 'tsd';
+import { expect } from 'tstyche';
 
-const authClient = new OktaAuth({});
-(async () => {
-  expectType<TokenResponse>(await authClient.token.parseFromUrl());
-  expectType<TokenResponse>(await authClient.token.parseFromUrl({
-    url: 'http://org.com?token',
-    responseMode: 'query'
-  }));
-})();
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
+expect(await authClient.token.parseFromUrl()).type.toEqual<TokenResponse>();
+expect(await authClient.token.parseFromUrl({
+  url: 'http://org.com?token',
+  responseMode: 'query'
+})).type.toEqual<TokenResponse>();

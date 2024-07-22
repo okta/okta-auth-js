@@ -318,6 +318,7 @@ When(
 
 When(
   /^she clicks the Email magic link$/,
+  { timeout: 40000 },
   openEmailMagicLink
 );
 

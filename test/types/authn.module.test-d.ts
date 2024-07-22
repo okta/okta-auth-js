@@ -20,49 +20,44 @@ import {
   AuthnTransaction,
   OktaAuthCoreInterface,
   OktaAuthHttpInterface,
-  FingerprintAPI
+  FingerprintAPI,
+  TokenAPI,
+  AuthStateManagerInterface
 } from '@okta/okta-auth-js/authn';
+import { expect } from 'tstyche';
 
-import { expectType, expectAssignable, expectError } from 'tsd';
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
+expect<OktaAuthTxInterface>().type.toBeAssignable(authClient);
+expect<OktaAuthHttpInterface>().type.toBeAssignable(authClient);
+expect<OktaAuthCoreInterface>().type.toBeAssignable(authClient);
 
-const authClient = new OktaAuth({});
-expectAssignable<OktaAuthTxInterface>(authClient);
-expectAssignable<OktaAuthHttpInterface>(authClient);
-expectAssignable<OktaAuthCoreInterface>(authClient);
+expect(authClient.tx).type.toEqual<AuthnTransactionAPI>();
+expect(authClient.authn).type.toEqual<AuthnTransactionAPI>();
+expect(authClient.fingerprint).type.toEqual<FingerprintAPI>();
 
-expectType<AuthnTransactionAPI>(authClient.tx);
-expectType<AuthnTransactionAPI>(authClient.authn);
-expectType<FingerprintAPI>(authClient.fingerprint);
-
-// does not include OAuth
-expectError<undefined>(authClient.token);
-
-// does not include Core
-expectError<undefined>(authClient.authStateManager);
+expect(authClient.token).type.toEqual<TokenAPI>();
+expect(authClient.authStateManager).type.toEqual<AuthStateManagerInterface>();
 
 // test async methods
-(async () => {
-  expectType<string>(await authClient.fingerprint());
-  expectType<AuthnTransaction>(await authClient.signIn({}));
-  expectError(authClient.signInWithCredentials({})); // must provide credentials
-  expectType<AuthnTransaction>(await authClient.signInWithCredentials({ username: 'foo', password: 'blah' }));
-  expectType<AuthnTransaction>(await authClient.forgotPassword({}));
-  expectType<AuthnTransaction>(await authClient.unlockAccount({ username: 'foo', factorType: 'SMS' }));
-  expectType<AuthnTransaction>(await authClient.verifyRecoveryToken({ recoveryToken: 'foo' }));
-})();
+expect(await authClient.fingerprint()).type.toEqual<string>();
+expect(await authClient.signIn({})).type.toEqual<AuthnTransaction>();
+expect(authClient.signInWithCredentials({})).type.toRaiseError(); // must provide credentials
+expect(await authClient.signInWithCredentials({ username: 'foo', password: 'blah' })).type.toEqual<AuthnTransaction>();
+expect(await authClient.forgotPassword({})).type.toEqual<AuthnTransaction>();
+expect(await authClient.unlockAccount({ username: 'foo', factorType: 'SMS' })).type.toEqual<AuthnTransaction>();
+expect(await authClient.verifyRecoveryToken({ recoveryToken: 'foo' })).type.toEqual<AuthnTransaction>();
+
 
 // test factory
 const authn = createAuthnTransactionAPI(authClient);
-expectType<AuthnTransactionAPI>(authn);
+expect(authn).type.toEqual<AuthnTransactionAPI>();
 
 // test sync methods
-expectType<boolean>(authn.exists());
-expectType<AuthnTransaction>(authn.createTransaction());
+expect(authn.exists()).type.toEqual<boolean>();
+expect(authn.createTransaction()).type.toEqual<AuthnTransaction>();
 
 // test async methods
-(async () => {
-  expectType<object>(await authn.status());
-  expectType<AuthnTransaction>(await authn.resume());
-  expectType<AuthnTransaction>(await authn.introspect());
-  expectType<AuthnTransaction>(await authn.postToTransaction('/url'));
-})();
+expect(await authn.status()).type.toEqual<object>();
+expect(await authn.resume()).type.toEqual<AuthnTransaction>();
+expect(await authn.introspect()).type.toEqual<AuthnTransaction>();
+expect(await authn.postToTransaction('/url')).type.toEqual<AuthnTransaction>();

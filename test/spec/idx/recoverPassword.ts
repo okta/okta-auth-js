@@ -328,9 +328,15 @@ describe('idx/recoverPassword', () => {
 
       // Sixth call, submit new password
       jest.spyOn(resetAuthenticatorResponse, 'proceed');
-      res = await recoverPassword(authClient, { password: 'fake_password' });
+      res = await recoverPassword(authClient, {
+        password: 'fake_password',
+        revokeSessions: true,
+      });
       expect(resetAuthenticatorResponse.proceed).toHaveBeenCalledWith('reset-authenticator', { 
-        credentials: { passcode: 'fake_password' }
+        credentials: {
+          passcode: 'fake_password',
+          revokeSessions: true,
+        }
       });
       expect(authClient.token.exchangeCodeForTokens).toHaveBeenCalled();
     });

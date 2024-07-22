@@ -18,9 +18,9 @@ import {
   AuthState,
   OktaAuth
 } from '@okta/okta-auth-js';
-import { expectType } from 'tsd';
+import { expect} from 'tstyche';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 
 (async () => {
   const authStateManager = authClient.authStateManager;
@@ -34,11 +34,11 @@ const authClient = new OktaAuth({});
 
   const authState = authStateManager.getAuthState()!;
 
-  expectType<AuthState>(authStateManager.getPreviousAuthState()!);
-  expectType<AuthState>(authState);
-  expectType<AccessToken>(authState.accessToken!);
-  expectType<IDToken>(authState.idToken!);
-  expectType<RefreshToken>(authState.refreshToken!);
-  expectType<boolean>(authState.isAuthenticated!);
-  expectType<string>(authState.error!.message);
+  expect(authStateManager.getPreviousAuthState()!).type.toEqual<AuthState>();
+  expect(authState).type.toEqual<AuthState>();
+  expect(authState.accessToken!).type.toEqual<AccessToken>();
+  expect(authState.idToken!).type.toEqual<IDToken>();
+  expect(authState.refreshToken!).type.toEqual<RefreshToken>();
+  expect(authState.isAuthenticated!).type.toEqual<boolean>();
+  expect(authState.error!.message).type.toEqual<string>();
 })();

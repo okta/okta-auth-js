@@ -18,7 +18,8 @@ const mocked = {
     isIE11OrLess: () => false,
     isHTTPS: () => false,
     isPKCESupported: () => true,
-    hasTextEncoder: () => true
+    hasTextEncoder: () => true,
+    isDPoPSupported: () => true,
   },
   wellKnown: {
     getWellKnown: (): Promise<unknown> => Promise.resolve()
@@ -116,4 +117,17 @@ describe('prepareTokenParams', function() {
     });
   });
   
+  it('throws an error if dpop is true but not supported', function () {
+    spyOn(mocked.features, 'isDPoPSupported').and.returnValue(false);
+    const sdk = new OktaAuth({ issuer: 'https://foo.com', pkce: false, dpop: true });
+    return prepareTokenParams(sdk, {})
+    .then(function() {
+      // Should never hit this
+      expect(true).toBe(false);
+    })
+    .catch(function (e) {
+      expect(e.name).toEqual('AuthSdkError');
+      expect(e.errorSummary).toEqual('DPoP has been configured, but is not supported by browser');
+    });
+  });
 });

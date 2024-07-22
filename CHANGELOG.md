@@ -1,5 +1,37 @@
 # Changelog
 
+## 7.7.0
+
+### Features
+
+- [#1495](https://github.com/okta/okta-auth-js/pull/1495) add: DPoP support
+
+### Fixes
+
+- [#1508](https://github.com/okta/okta-auth-js/pull/1508) IDX: add condition to compare stateHandles when loading saved idxResponse only when useGenericRemediator option is false or undefined
+
+
+## 7.6.0
+
+### Features
+
+- [#1507](https://github.com/okta/okta-auth-js/pull/1507) add: new method `getOrRenewAccessToken`
+- [#1505](https://github.com/okta/okta-auth-js/pull/1505) add: support of `revokeSessions` param for `OktaPassword` authenticator (can be used in `reset-authenticator` remediation)
+- [#1512](https://github.com/okta/okta-auth-js/pull/1512) add: new service `RenewOnTabActivation`
+
+### Bug Fix
+
+- [#1513](https://github.com/okta/okta-auth-js/pull/1513) fix: restricts `issuer` "-admin" validation to `.okta` domain
+
+## 7.5.1
+
+### Bug Fix
+
+ - [#1488](https://github.com/okta/okta-auth-js/pull/1488) fix: type `OktaAuthOptions` now requires `issuer`
+ - [#1482](https://github.com/okta/okta-auth-js/pull/1482) fix: idToken claim validation now accepts `aud` array
+    * Resolves [#1481](https://github.com/okta/okta-auth-js/pull/1481)
+ - [#1487](https://github.com/okta/okta-auth-js/pull/1487) fix: Handle fetch exceptions
+
 ## 7.5.0
 
 ### Bug Fix

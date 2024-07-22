@@ -36,30 +36,30 @@ import {
   ProfileTransaction,
   ProfileSchemaTransaction,
 } from '@okta/okta-auth-js/myaccount';
-import { expectType } from 'tsd';
+import { expect } from 'tstyche';
 
-const authClient = new OktaAuth({});
+const authClient = new OktaAuth({issuer: 'https://{yourOktaDomain}/oauth2/default'});
 
 (async () => {
   // Email API
-  expectType<Promise<EmailTransaction[]>>(getEmails(authClient, {}));
-  expectType<Promise<EmailTransaction>>(getEmail(authClient, {}));
-  expectType<Promise<EmailTransaction>>(addEmail(authClient, {}));
-  expectType<Promise<BaseTransaction>>(deleteEmail(authClient, {}));
-  expectType<Promise<EmailChallengeTransaction>>(sendEmailChallenge(authClient, {}));
-  expectType<Promise<EmailChallengeTransaction>>(getEmailChallenge(authClient, {}));
-  expectType<Promise<BaseTransaction>>(verifyEmailChallenge(authClient, {}));
+  expect(getEmails(authClient, {})).type.toEqual<Promise<EmailTransaction[]>>();
+  expect(getEmail(authClient, {})).type.toEqual<Promise<EmailTransaction>>();
+  expect(addEmail(authClient, {})).type.toEqual<Promise<EmailTransaction>>();
+  expect(deleteEmail(authClient, {})).type.toEqual<Promise<BaseTransaction>>();
+  expect(sendEmailChallenge(authClient, {})).type.toEqual<Promise<EmailChallengeTransaction>>();
+  expect(getEmailChallenge(authClient, {})).type.toEqual<Promise<EmailChallengeTransaction>>();
+  expect(verifyEmailChallenge(authClient, {})).type.toEqual<Promise<BaseTransaction>>();
 
   // Phone API
-  expectType<Promise<PhoneTransaction[]>>(getPhones(authClient, {}));
-  expectType<Promise<PhoneTransaction>>(getPhone(authClient, {}));
-  expectType<Promise<PhoneTransaction>>(addPhone(authClient, {}));
-  expectType<Promise<BaseTransaction>>(deletePhone(authClient, {}));
-  expectType<Promise<BaseTransaction>>(sendPhoneChallenge(authClient, {}));
-  expectType<Promise<BaseTransaction>>(verifyPhoneChallenge(authClient, {}));
+  expect(getPhones(authClient, {})).type.toEqual<Promise<PhoneTransaction[]>>();
+  expect(getPhone(authClient, {})).type.toEqual<Promise<PhoneTransaction>>();
+  expect(addPhone(authClient, {})).type.toEqual<Promise<PhoneTransaction>>();
+  expect(deletePhone(authClient, {})).type.toEqual<Promise<BaseTransaction>>();
+  expect(sendPhoneChallenge(authClient, {})).type.toEqual<Promise<BaseTransaction>>();
+  expect(verifyPhoneChallenge(authClient, {})).type.toEqual<Promise<BaseTransaction>>();
 
   // Profile API
-  expectType<Promise<ProfileTransaction>>(getProfile(authClient, {}));
-  expectType<Promise<ProfileTransaction>>(updateProfile(authClient, {}));
-  expectType<Promise<ProfileSchemaTransaction>>(getProfileSchema(authClient, {}));
+  expect(getProfile(authClient, {})).type.toEqual<Promise<ProfileTransaction>>();
+  expect(updateProfile(authClient, {})).type.toEqual<Promise<ProfileTransaction>>();
+  expect(getProfileSchema(authClient, {})).type.toEqual<Promise<ProfileSchemaTransaction>>();
 })();
