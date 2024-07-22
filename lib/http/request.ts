@@ -12,7 +12,7 @@
  *
  */
 
-/* eslint-disable complexity */
+/* eslint-disable complexity, max-statements */
 import { isString, clone, isAbsoluteUrl, removeNils } from '../util';
 import { STATE_TOKEN_KEY_NAME, DEFAULT_CACHE_DURATION } from '../constants';
 import {
@@ -25,7 +25,11 @@ import {
 import { AuthApiError, OAuthError, APIError, WWWAuthError } from '../errors';
 
 
-const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): AuthApiError | OAuthError => {
+const formatError = (
+  sdk: OktaAuthHttpInterface,
+  error: HttpResponse | Error,
+  requestOptions?: RequestOptions
+): AuthApiError | OAuthError => {
   if (error instanceof Error) {
     // fetch() can throw exceptions
     // see https://developer.mozilla.org/en-US/docs/Web/API/fetch#exceptions
@@ -91,6 +95,13 @@ const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): A
     //   // WWWAuthError.parseHeader may return null, only overwrite if !null
     //   err = wwwAuthErr ?? err;
     // }
+  }
+
+  if (requestOptions && err instanceof AuthApiError) {
+    err.meta = {
+      ...(err.meta ?? {}),
+      url: requestOptions.url as string,
+    };
   }
 
   return err;
@@ -179,7 +190,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       return res;
     })
     .catch(function(resp) {
-      err = formatError(sdk, resp);
+      err = formatError(sdk, resp, options);
 
       if (err.errorCode === 'E0000011') {
         storage.delete(STATE_TOKEN_KEY_NAME);
