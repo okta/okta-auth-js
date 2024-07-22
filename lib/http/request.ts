@@ -102,6 +102,8 @@ const formatError = (
       ...(err.meta ?? {}),
       url: requestOptions.url as string,
     };
+    // test
+    err.errorSummary += ` (${requestOptions.method} ${requestOptions.url})`;
   }
 
   return err;
