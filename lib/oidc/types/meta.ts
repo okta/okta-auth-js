@@ -26,7 +26,8 @@ export interface OAuthTransactionMeta extends
     'ignoreSignature' |
     'nonce' |
     'acrValues' |
-    'enrollAmrValues'
+    'enrollAmrValues' |
+    'extraParams'
   >
 {
   urls: CustomUrls;

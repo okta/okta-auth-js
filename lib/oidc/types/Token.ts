@@ -17,6 +17,7 @@ export interface AbstractToken {
   authorizeUrl: string;
   scopes: string[];
   pendingRemove?: boolean;
+  extraParams?: Record<string, string>;
 }
 
 export interface AccessToken extends AbstractToken {

@@ -31,6 +31,11 @@ export async function renewTokensWithRefresh(
 
   try {
     const renewTokenParams: TokenParams = Object.assign({}, tokenParams, { clientId });
+
+    if (refreshTokenObject.extraParams) {
+      renewTokenParams.extraParams = refreshTokenObject.extraParams;
+    }
+
     const endpointParams: TokenEndpointParams = {...renewTokenParams};
 
     if (dpop) {

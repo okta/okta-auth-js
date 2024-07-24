@@ -131,12 +131,18 @@ export async function postRefreshToken(
   options: TokenEndpointParams,
   refreshToken: RefreshToken
 ): Promise<OAuthResponse> {
-  const data = Object.entries({
+  let requestParams = {
     client_id: options.clientId, // eslint-disable-line camelcase
     grant_type: 'refresh_token', // eslint-disable-line camelcase
     scope: refreshToken.scopes.join(' '),
     refresh_token: refreshToken.refreshToken, // eslint-disable-line camelcase
-  }).map(function ([name, value]) {
+  };
+
+  if (options.extraParams) {
+    requestParams = { ...options.extraParams, ...requestParams };
+  }
+
+  const data = Object.entries(requestParams).map(function ([name, value]) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return name + '=' + encodeURIComponent(value!);
   }).join('&');

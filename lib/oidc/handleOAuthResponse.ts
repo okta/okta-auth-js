@@ -55,6 +55,7 @@ export async function handleOAuthResponse(
 ): Promise<TokenResponse> {
   const pkce = sdk.options.pkce !== false;
 
+
   // The result contains an authorization_code and PKCE is enabled 
   // `exchangeCodeForTokens` will call /token then call `handleOauthResponse` recursively with the result
   if (pkce && (res.code || res.interaction_code)) {
@@ -106,6 +107,10 @@ export async function handleOAuthResponse(
     if (tokenParams.dpopPairId) {
       tokenDict.accessToken.dpopPairId = tokenParams.dpopPairId;
     }
+
+    if (tokenParams.extraParams) {
+      tokenDict.accessToken.extraParams = tokenParams.extraParams;
+    }
   }
 
   if (refreshToken) {
@@ -123,6 +128,10 @@ export async function handleOAuthResponse(
     if (tokenParams.dpopPairId) {
       tokenDict.refreshToken.dpopPairId = tokenParams.dpopPairId;
     }
+
+    if (tokenParams.extraParams) {
+      tokenDict.refreshToken.extraParams = tokenParams.extraParams;
+    }
   }
 
   if (idToken) {
@@ -136,6 +145,10 @@ export async function handleOAuthResponse(
       issuer: urls.issuer!,
       clientId: clientId!
     };
+
+    if (tokenParams.extraParams) {
+      idTokenObj.extraParams = tokenParams.extraParams;
+    }
 
     const validationParams: TokenVerifyParams = {
       clientId: clientId!,
