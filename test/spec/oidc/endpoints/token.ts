@@ -40,6 +40,7 @@ describe('token endpoint', function() {
   var endpoint = '/oauth2/v1/token';
   var codeVerifier = 'superfake';
   var authorizationCode = 'notreal';
+  var extraParams = { foo: 'bar' };
 
   util.itMakesCorrectRequestResponse({
     title: 'requests a token',
@@ -55,7 +56,8 @@ describe('token endpoint', function() {
             data: {
               client_id: CLIENT_ID,
               grant_type: 'authorization_code',
-              redirect_uri: REDIRECT_URI
+              redirect_uri: REDIRECT_URI,
+              extraParams: extraParams
             },
             headers: {
               'Accept': 'application/json',
@@ -81,6 +83,7 @@ describe('token endpoint', function() {
         redirectUri: REDIRECT_URI,
         authorizationCode: authorizationCode,
         codeVerifier: codeVerifier,
+        extraParams: extraParams
       }, {
         tokenUrl: ISSUER + endpoint
       });
