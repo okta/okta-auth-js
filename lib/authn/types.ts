@@ -1,3 +1,5 @@
+
+import { FingerprintAPI } from '../base/types';
 import { StorageManagerInterface } from '../storage/types';
 import { RequestData, RequestOptions, OktaAuthHttpInterface, OktaAuthHttpOptions } from '../http/types';
 
@@ -120,14 +122,6 @@ export interface AuthnAPI extends SigninAPI {
   verifyRecoveryToken(opts: VerifyRecoveryTokenOptions): Promise<AuthnTransaction>;
 }
 
-// Fingerprint
-export interface FingerprintOptions {
-  timeout?: number;
-}
-
-export type FingerprintAPI = (options?: FingerprintOptions) => Promise<string>;
-
-
 export interface OktaAuthTxInterface
 <
   S extends StorageManagerInterface = StorageManagerInterface,
@@ -138,5 +132,4 @@ export interface OktaAuthTxInterface
   tx: AuthnTransactionAPI; // legacy name
   authn: AuthnTransactionAPI; // new name
   fingerprint: FingerprintAPI;
-
 }

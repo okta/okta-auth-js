@@ -17,7 +17,7 @@ import {
   addListener,
   removeListener
 } from '../oidc';
-import { FingerprintOptions } from '../authn/types';
+import { FingerprintOptions } from '../base/types';
 import { OktaAuthHttpInterface } from '../http/types';
 
 export default function fingerprint(sdk: OktaAuthHttpInterface, options?: FingerprintOptions): Promise<string> {

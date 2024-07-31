@@ -1,7 +1,6 @@
-import { OktaAuthConstructor } from '../base/types';
+import { FingerprintAPI, OktaAuthConstructor } from '../base/types';
 import { MinimalOktaOAuthInterface } from '../oidc/types';
 import {
-  FingerprintAPI,
   IdxTransactionManagerInterface,
   OktaAuthIdxConstructor,
   OktaAuthIdxOptions,

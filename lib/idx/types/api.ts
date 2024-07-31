@@ -54,7 +54,7 @@ import type {
   WebauthnEnrollValues,
   WebauthnVerificationValues
 } from '../authenticator';
-import { OktaAuthConstructor } from '../../base/types';
+import { OktaAuthConstructor, FingerprintAPI } from '../../base/types';
 
 export enum IdxStatus {
   SUCCESS = 'SUCCESS',
@@ -257,12 +257,6 @@ export interface WebauthnAPI {
     activationData: ActivationData, authenticatorEnrollments: IdxAuthenticator[]
   ): CredentialCreationOptions;
 }
-
-export interface FingerprintOptions {
-  timeout?: number;
-}
-
-export type FingerprintAPI = (options?: FingerprintOptions) => Promise<string>;
 
 
 export interface OktaAuthIdxInterface
