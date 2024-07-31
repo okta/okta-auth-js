@@ -24,12 +24,11 @@ const isMessageFromCorrectSource = (iframe: HTMLIFrameElement, event: MessageEve
 : boolean => event.source === iframe.contentWindow;
 
 export default function fingerprint(sdk: OktaAuthHttpInterface, options?: FingerprintOptions): Promise<string> {
-  options = options || {};
-
   if (!isFingerprintSupported()) {
     return Promise.reject(new AuthSdkError('Fingerprinting is not supported on this device'));
   }
 
+  const container = options?.element ?? document.body;
   let timeout: NodeJS.Timeout;
   let iframe: HTMLIFrameElement;
   let listener: (this: Window, ev: MessageEvent) => void;
@@ -71,7 +70,7 @@ export default function fingerprint(sdk: OktaAuthHttpInterface, options?: Finger
     addListener(window, 'message', listener);
 
     iframe.src = sdk.getIssuerOrigin() + '/auth/services/devicefingerprint';
-    document.body.appendChild(iframe);
+    container.appendChild(iframe);
 
     timeout = setTimeout(function() {
       reject(new AuthSdkError('Fingerprinting timed out'));
@@ -81,7 +80,7 @@ export default function fingerprint(sdk: OktaAuthHttpInterface, options?: Finger
   return promise.finally(function() {
     clearTimeout(timeout);
     removeListener(window, 'message', listener);
-    if (document.body.contains(iframe)) {
+    if (container.contains(iframe)) {
       iframe.parentElement?.removeChild(iframe);
     }
   }) as Promise<string>;
