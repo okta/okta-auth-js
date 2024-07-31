@@ -258,6 +258,13 @@ export interface WebauthnAPI {
   ): CredentialCreationOptions;
 }
 
+export interface FingerprintOptions {
+  timeout?: number;
+}
+
+export type FingerprintAPI = (options?: FingerprintOptions) => Promise<string>;
+
+
 export interface OktaAuthIdxInterface
 <
   M extends IdxTransactionMeta = IdxTransactionMeta,
@@ -268,6 +275,7 @@ export interface OktaAuthIdxInterface
   extends OktaAuthOAuthInterface<M, S, O, TM>
 {
   idx: IdxAPI;
+  fingerprint: FingerprintAPI;
 }
 
 export interface MinimalOktaAuthIdxInterface
@@ -280,6 +288,7 @@ export interface MinimalOktaAuthIdxInterface
   extends MinimalOktaOAuthInterface<M, S, O, TM>
 {
   idx: MinimalIdxAPI;
+  fingerprint: FingerprintAPI;
 }
 
 export interface OktaAuthIdxConstructor

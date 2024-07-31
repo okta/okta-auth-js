@@ -1,6 +1,7 @@
 import { OktaAuthConstructor } from '../base/types';
 import { MinimalOktaOAuthInterface } from '../oidc/types';
 import {
+  FingerprintAPI,
   IdxTransactionManagerInterface,
   OktaAuthIdxConstructor,
   OktaAuthIdxOptions,
@@ -11,6 +12,7 @@ import {
 import { IdxTransactionMeta } from './types/meta';
 import { IdxStorageManagerInterface } from './types/storage';
 import { createMinimalIdxAPI } from '../idx/factory/minimalApi';
+import fingerprint from '../browser/fingerprint';
 import * as webauthn from './webauthn';
 
 export function mixinMinimalIdx
@@ -29,11 +31,13 @@ export function mixinMinimalIdx
   return class OktaAuthIdx extends Base implements MinimalOktaAuthIdxInterface<M, S, O, TM>
   {
     idx: MinimalIdxAPI;
+    fingerprint: FingerprintAPI;
     static webauthn: WebauthnAPI = webauthn;
     
     constructor(...args: any[]) {
       super(...args);
       this.idx = createMinimalIdxAPI(this);
+      this.fingerprint = fingerprint.bind(null, this);
     }
   };
 }
