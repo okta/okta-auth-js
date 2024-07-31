@@ -33,7 +33,7 @@ export interface FeaturesAPI {
 
 export interface FingerprintOptions {
   timeout?: number;
-  element?: Element;
+  element?: Element | null;
 }
 export type FingerprintAPI = (options?: FingerprintOptions) => Promise<string>;
 
