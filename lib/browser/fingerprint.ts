@@ -20,6 +20,9 @@ import {
 import { FingerprintOptions } from '../base/types';
 import { OktaAuthHttpInterface } from '../http/types';
 
+const isMessageFromCorrectSource = (iframe: HTMLIFrameElement, event: MessageEvent)
+: boolean => event.source === iframe.contentWindow;
+
 export default function fingerprint(sdk: OktaAuthHttpInterface, options?: FingerprintOptions): Promise<string> {
   options = options || {};
 
@@ -27,21 +30,26 @@ export default function fingerprint(sdk: OktaAuthHttpInterface, options?: Finger
     return Promise.reject(new AuthSdkError('Fingerprinting is not supported on this device'));
   }
 
-  var timeout;
-  var iframe;
-  var listener;
-  var promise = new Promise(function (resolve, reject) {
+  let timeout: NodeJS.Timeout;
+  let iframe: HTMLIFrameElement;
+  let listener: (this: Window, ev: MessageEvent) => void;
+  let msg;
+  const promise = new Promise(function (resolve, reject) {
     iframe = document.createElement('iframe');
     iframe.style.display = 'none';
 
     // eslint-disable-next-line complexity
-    listener = function listener(e) {
+    listener = function listener(e: MessageEvent) {
+      if (!isMessageFromCorrectSource(iframe, e)) {
+        return;
+      }
+
       if (!e || !e.data || e.origin !== sdk.getIssuerOrigin()) {
         return;
       }
 
       try {
-        var msg = JSON.parse(e.data);
+        msg = JSON.parse(e.data);
       } catch (err) {
         // iframe messages should all be parsable
         // skip not parsable messages come from other sources in same origin (browser extensions)
@@ -52,11 +60,12 @@ export default function fingerprint(sdk: OktaAuthHttpInterface, options?: Finger
       if (!msg) { return; }
       if (msg.type === 'FingerprintAvailable') {
         return resolve(msg.fingerprint as string);
-      }
-      if (msg.type === 'FingerprintServiceReady') {
-        e.source.postMessage(JSON.stringify({
+      } else if (msg.type === 'FingerprintServiceReady') {
+        iframe?.contentWindow?.postMessage(JSON.stringify({
           type: 'GetFingerprint'
         }), e.origin);
+      } else {
+        return reject(new Error('No data'));
       }
     };
     addListener(window, 'message', listener);
@@ -73,7 +82,7 @@ export default function fingerprint(sdk: OktaAuthHttpInterface, options?: Finger
     clearTimeout(timeout);
     removeListener(window, 'message', listener);
     if (document.body.contains(iframe)) {
-      iframe.parentElement.removeChild(iframe);
+      iframe.parentElement?.removeChild(iframe);
     }
   }) as Promise<string>;
 }
