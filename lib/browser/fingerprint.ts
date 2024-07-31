@@ -28,7 +28,7 @@ export default function fingerprint(sdk: OktaAuthHttpInterface, options?: Finger
     return Promise.reject(new AuthSdkError('Fingerprinting is not supported on this device'));
   }
 
-  const container = options?.element ?? document.body;
+  const container = options?.container ?? document.body;
   let timeout: NodeJS.Timeout;
   let iframe: HTMLIFrameElement;
   let listener: (this: Window, ev: MessageEvent) => void;
