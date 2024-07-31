@@ -40,7 +40,8 @@ describe('fingerprint', function() {
           type: 'FingerprintAvailable',
           fingerprint: 'ABCD'
         }),
-        origin: 'http://example.okta.com'
+        origin: 'http://example.okta.com',
+        source: test.iframe.contentWindow
       });
     });
 
@@ -48,6 +49,9 @@ describe('fingerprint', function() {
       style: {},
       parentElement: {
         removeChild: jest.fn()
+      },
+      contentWindow: {
+        postMessage: postMessageSpy
       }
     };
 
@@ -61,11 +65,22 @@ describe('fingerprint', function() {
     jest.spyOn(document.body, 'appendChild').mockImplementation(function() {
       if (options.timeout) { return; }
       // mimic async page load with setTimeouts
-      if (options.sendOtherMessage) {
+      if (options.sendMessageFromAnotherOrigin) {
         setTimeout(function() {
           listeners.message({
             data: '{"not":"forUs"}',
             origin: 'http://not.okta.com'
+          });
+        });
+      }
+      if (options.sendMessageFromAnotherSource) {
+        setTimeout(function() {
+          listeners.message({
+            data: '{"not":"forUs"}',
+            origin: 'http://example.okta.com',
+            source: {
+              postMessage: postMessageSpy
+            }
           });
         });
       }
@@ -75,9 +90,7 @@ describe('fingerprint', function() {
             type: 'FingerprintServiceReady'
           }),
           origin: 'http://example.okta.com',
-          source: {
-            postMessage: postMessageSpy
-          }
+          source: test.iframe.contentWindow
         });
       });
     });
@@ -112,8 +125,18 @@ describe('fingerprint', function() {
       });
   });
 
-  it('allows non-Okta postMessages', function () {
-    return setup({ sendOtherMessage: true }).fingerprint()
+  it('ignores postMessages from another origin', function () {
+    return setup({ sendMessageFromAnotherOrigin: true }).fingerprint()
+    .catch(function(err) {
+      expect(err).toBeUndefined();
+    })
+    .then(function(fingerprint) {
+      expect(fingerprint).toEqual('ABCD');
+    });
+  });
+
+  it('ignores postMessages from another source', function () {
+    return setup({ sendMessageFromAnotherSource: true }).fingerprint()
     .catch(function(err) {
       expect(err).toBeUndefined();
     })
