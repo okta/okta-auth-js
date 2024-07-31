@@ -12,8 +12,7 @@
  *
  */
 
-import * as Cookies from 'js-cookie';
-import type { CookieAttributes } from 'js-cookie';
+import Cookies from 'js-cookie';
 import AuthSdkError from '../errors/AuthSdkError';
 import {
   StorageOptions,
@@ -40,6 +39,7 @@ export interface BrowserStorageUtil extends StorageUtil {
   getInMemoryStorage(): SimpleStorage;
   getCookieStorage(options?: StorageOptions): CookieStorage;
   testStorage(storage: any): boolean;
+  storage: Cookies;
   inMemoryStore: Record<string, unknown>;
 }
 
@@ -233,22 +233,15 @@ var storageUtil: BrowserStorageUtil = {
   },
 
   storage: {
-    /* eslint complexity:[0,8] */
-    set: function(name: string, value: string, expiresAt: string, options: CookieOptions): string | undefined {
-      const { secure } = options;
-      if (typeof secure === 'undefined' || typeof options.sameSite === 'undefined') {
+    set: function(name: string, value: string, expiresAt: string, options: CookieOptions): string {
+      const { sameSite, secure } = options;
+      if (typeof secure === 'undefined' || typeof sameSite === 'undefined') {
         throw new AuthSdkError('storage.set: "secure" and "sameSite" options must be provided');
       }
-      let sameSite: CookieAttributes['sameSite'];
-      if (typeof options.sameSite === 'string') {
-        sameSite = options.sameSite as CookieAttributes['sameSite'];
-      } else if (typeof options.sameSite === 'boolean') {
-        sameSite = options.sameSite ? 'lax' : 'none';
-      }
-      var cookieOptions: CookieAttributes = {
+      var cookieOptions: CookieOptions = {
         path: options.path || '/',
         secure,
-        sameSite,
+        sameSite
       };
 
       // eslint-disable-next-line no-extra-boolean-cast
@@ -264,15 +257,15 @@ var storageUtil: BrowserStorageUtil = {
       return this.get(name);
     },
 
-    get: function(name?: string): string | undefined {
+    get: function(name?: string): string {
       // return all cookies when no args is provided
       if (!arguments.length) {
-        return Object.values(Cookies.get() ?? {}).map(([k, v]) => `${k}=${v}`).join(';');
+        return Cookies.get();
       }
-      return name ? Cookies.get(name) : undefined;
+      return Cookies.get(name);
     },
 
-    delete: function(name: string): void {
+    delete: function(name: string): string {
       return Cookies.remove(name, { path: '/' });
     }
   }

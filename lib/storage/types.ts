@@ -55,9 +55,9 @@ export interface StorageOptions extends CookieOptions {
 
 // for V1 authn interface: tx.resume()
 export interface TxStorage {
-  get(name: string): string | undefined;
-  set(name: string, value: string, expiresAt: string, options: CookieOptions): string | undefined;
-  delete(name: string): void;
+  get(name: string): string;
+  set(name: string, value: string, expiresAt: string, options: CookieOptions): string;
+  delete(name: string): string;
 }
 
 export interface StorageUtil {
