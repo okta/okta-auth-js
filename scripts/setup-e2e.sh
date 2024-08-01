@@ -76,10 +76,10 @@ setup_sample_tests () {
   export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 
   export USERNAME=mary@acme.com
-  get_vault_secret_key repo_gh-okta-okta-auth-js/default password PASSWORD
+  get_terminus_secret "/default" password PASSWORD
 
   export ORG_OIE_ENABLED=true
-  get_vault_secret_key devex/auth-js-sdk-vars a18n_api_key A18N_API_KEY
+  get_terminus_secret "/default" a18n_api_key A18N_API_KEY
 
   # If this script is run as a bacon task, run against trexcloud environment
   if [[ "${BACON_TASK}" == true ]]; then
@@ -87,24 +87,24 @@ setup_sample_tests () {
     export ISSUER=https://javascript-idx-sdk.trexcloud.com
     export CLIENT_ID=0oa3r1keeeFFb7VMG0g7
     export SPA_CLIENT_ID=0oa3r92jj01DWBeWC0g7
-    get_vault_secret_key devex/trex-js-idx-sdk-vars trex_client_secret CLIENT_SECRET
-    get_vault_secret_key devex/trex-js-idx-sdk-vars trex_idx_sdk_org_api_key OKTA_API_KEY
+    get_terminus_secret "/default" trex_client_secret CLIENT_SECRET
+    get_terminus_secret "/default" trex_idx_sdk_org_api_key OKTA_API_KEY
   else
     if [ -n "$USE_OK_14" ]; then
       echo "Running tests against production (ok14) org"
       export CLIENT_ID=0oax3dcx0sak1KKb9696
       export ISSUER=https://javascript-idx-sdk-new.okta.com
       export ISSUER_IDFIRST=https://javascript-idx-sdk-idfirst.okta.com
-      get_vault_secret_key devex/prod-js-idx-sdk-vars prod_client_secret_new CLIENT_SECRET
-      get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_sdk_org_api_key_new OKTA_API_KEY
-      get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_idfirst_sdk_org_api_key OKTA_API_KEY_IDFIRST
+      get_terminus_secret "/default" prod_client_secret_new CLIENT_SECRET
+      get_terminus_secret "/default" prod_idx_sdk_org_api_key_new OKTA_API_KEY
+      get_terminus_secret "/default" prod_idx_idfirst_sdk_org_api_key OKTA_API_KEY_IDFIRST
     else
       echo "Running tests against production (ok12) org"
       export ISSUER=https://javascript-idx-sdk.okta.com
       export CLIENT_ID=0oav2oxnlYjULp0Cy5d6
       export SPA_CLIENT_ID=0oa17suj5x9khaVH75d7
-      get_vault_secret_key devex/prod-js-idx-sdk-vars prod_client_secret CLIENT_SECRET
-      get_vault_secret_key devex/prod-js-idx-sdk-vars prod_idx_sdk_org_api_key OKTA_API_KEY
+      get_terminus_secret "/default" prod_client_secret CLIENT_SECRET
+      get_terminus_secret "/default" prod_idx_sdk_org_api_key OKTA_API_KEY
     fi
   fi
   finish_log_group $?

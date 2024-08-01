@@ -15,7 +15,7 @@ export CLIENT_ID=0oa41zpqqxar7OFl84x7
 export SPA_CLIENT_ID=0oa41zpqqxar7OFl84x7
 export MFA_ENABLED=true
 
-get_vault_secret_key devex/auth-js-sdk-vars security_question_answer SECURITY_QUESTION_ANSWER
-get_vault_secret_key devex/auth-js-sdk-vars a18n_api_key A18N_API_KEY
+get_terminus_secret "/default" security_question_answer SECURITY_QUESTION_ANSWER
+get_terminus_secret "/default" a18n_api_key A18N_API_KEY
 
 run_e2e
