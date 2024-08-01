@@ -13,9 +13,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   setup_service google-chrome-stable 118.0.5993.70-1
   # uses new chrome for testing installation utility (https://developer.chrome.com/blog/chrome-for-testing/)
   # output format: chrome@118.0.5993.70 /path/to/chrome/binary
-  npm config set registry https://registry.npmjs.com
-  npm i -g @puppeteer/browsers
-  CHROME_INSTALL=$(npx @puppeteer/browsers install chrome@stable)
+  CHROME_INSTALL=$(npx @puppeteer/browsers@1.x install chrome@stable)
   echo "CHROME_INSTALL: $CHROME_INSTALL"
   # extract installed version
   export CHROMEDRIVER_VERSION=$(echo $CHROME_INSTALL | awk '{print $1}' | cut -d'@' -f 2)
