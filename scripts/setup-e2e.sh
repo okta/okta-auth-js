@@ -14,7 +14,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # uses new chrome for testing installation utility (https://developer.chrome.com/blog/chrome-for-testing/)
   # output format: chrome@118.0.5993.70 /path/to/chrome/binary
   CHROME_INSTALL=$(npx @puppeteer/browsers install chrome@stable)
-  echo $CHROME_INSTALL
+  echo "CHROME_INSTALL: $CHROME_INSTALL"
   # extract installed version
   export CHROMEDRIVER_VERSION=$(echo $CHROME_INSTALL | awk '{print $1}' | cut -d'@' -f 2)
   echo $CHROMEDRIVER_VERSION
@@ -45,7 +45,7 @@ setup_e2e () {
 
   export ISSUER=https://samples-javascript.okta.com/oauth2/default
   export USERNAME=george@acme.com
-  get_vault_secret_key repo_gh-okta-okta-auth-js/default password PASSWORD
+  get_terminus_secret "/default" password PASSWORD
   finish_log_group $?
 }
 
