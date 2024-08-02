@@ -14,6 +14,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # uses new chrome for testing installation utility (https://developer.chrome.com/blog/chrome-for-testing/)
   # output format: chrome@118.0.5993.70 /path/to/chrome/binary
   npm i -g @puppeteer/browsers@1.x
+  @puppeteer/browsers@1.x install chrome@stable
   echo "Running puppeteer install"
   CHROME_INSTALL=$(npx @puppeteer/browsers@1.x install chrome@stable)
   echo "CHROME_INSTALL: $CHROME_INSTALL"
