@@ -10,7 +10,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   setup_service java 1.8.222
 
   # this chrome install is not used, however it will install linux deps chrome needs (via apt-get)
-  setup_service google-chrome-stable 127.0.6533.88
+  setup_service google-chrome-stable 127.0.6533.88-1
   # uses new chrome for testing installation utility (https://developer.chrome.com/blog/chrome-for-testing/)
   # output format: chrome@118.0.5993.70 /path/to/chrome/binary
   # npm i -g @puppeteer/browsers@1.x
@@ -34,6 +34,8 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # echo $CHROME_BINARY
 
   # npm config set registry $OLD_NPM_REGISTRY
+  wget -v https://storage.googleapis.com/chrome-for-testing-public/127.0.6533.88/linux64/chrome-linux64.zip
+  echo $(ls)
 
   export CI=true
 else
