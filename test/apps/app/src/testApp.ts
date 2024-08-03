@@ -189,7 +189,8 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     startService: testApp.startService.bind(testApp),
     stopService: testApp.stopService.bind(testApp),
     enrollAuthenticator: testApp.enrollAuthenticator.bind(testApp),
-    getDPoPAuthorizationHeaders: testApp.getDPoPAuthorizationHeaders.bind(testApp)
+    getDPoPAuthorizationHeaders: testApp.getDPoPAuthorizationHeaders.bind(testApp),
+    getOrRenewAccessToken: testApp.getOrRenewAccessToken.bind(testApp)
   };
   Object.keys(boundFunctions).forEach(functionName => {
     (window as any)[functionName] = makeClickHandler((boundFunctions as any)[functionName]);
@@ -739,6 +740,12 @@ class TestApp {
       });
   }
 
+  async getOrRenewAccessToken(): Promise<any> {
+    const accessToken = await this.oktaAuth.getOrRenewAccessToken();
+    console.log('at: ', accessToken);
+    alert(accessToken);
+  }
+
   async getDPoPAuthorizationHeaders(): Promise<string> {
     // passes dummy values for url and method
     const headers = await this.oktaAuth.getDPoPAuthorizationHeaders({
@@ -960,6 +967,9 @@ class TestApp {
                 </li>
                 <li class="pure-menu-item">
                   <a id="get-token" href="/" onclick="getToken(event)" class="pure-menu-link">Get Token (without prompt)</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a id="get-token" href="/" onclick="getOrRenewAccessToken(event)" class="pure-menu-link">Get Or Renew</a>
                 </li>
                 <li class="pure-menu-item"> 
                   <a id="clear-tokens" href="/" onclick="clearTokens(event)" class="pure-menu-link">Clear Tokens</a>

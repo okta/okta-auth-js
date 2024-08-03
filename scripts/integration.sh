@@ -8,11 +8,13 @@ export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/unit"
 export CI=true
 export ISSUER=https://javascript-idx-sdk-idfirst.okta.com
 export USERNAME=george@acme.com
-get_terminus_secret "/default" password PASSWORD
+# get_terminus_secret "/default" password PASSWORD
+get_vault_secret_key repo_gh-okta-okta-auth-js/default password PASSWORD
 
 # for myaccount password API testing
 export PASSWORDLESS_USERNAME=password.optional@mailinator.com
-get_terminus_secret "/default" a18n_api_key A18N_API_KEY
+# get_terminus_secret "/default" a18n_api_key A18N_API_KEY
+get_vault_secret_key repo_gh-okta-okta-auth-js/default a18n_api_key A18N_API_KEY
 
 # This client has refresh token enabled and password optional
 export CLIENT_ID=0oa3b5fp4h02UIrjZ697

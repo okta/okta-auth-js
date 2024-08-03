@@ -39,15 +39,37 @@ export function getDefaultConfig(): Config {
   const CLIENT_ID = process.env.CLIENT_ID;
   const CLIENT_SECRET = process.env.CLIENT_SECRET || '';
 
+  // return {
+  //   issuer: ISSUER,
+  //   clientId: CLIENT_ID,
+  //   redirectUri: REDIRECT_URI,
+  //   useInteractionCodeFlow: true,
+  //   responseType: ['token', 'id_token'],
+  //   scopes: ['openid', 'email', 'offline_access'],
+  //   pkce: true,
+  //   dpop: true,
+  //   forceRedirect: false,
+  //   siwVersion: DEFAULT_SIW_VERSION,
+  //   siwAuthClient: false,
+  //   idps: '',
+  //   postLogoutRedirectUri: POST_LOGOUT_REDIRECT_URI,
+  //   clientSecret: CLIENT_SECRET,
+  //   defaultScopes: false,
+  //   cookies: {
+  //     secure: true
+  //   },
+  //   enableSharedStorage: true,
+  //   crossTabsCount: DEFAULT_CROSS_TABS_COUNT
+  // };
   return {
     issuer: ISSUER,
     clientId: CLIENT_ID,
     redirectUri: REDIRECT_URI,
     useInteractionCodeFlow: true,
     responseType: ['token', 'id_token'],
-    scopes: ['openid', 'email', 'offline_access'],
+    scopes: ['openid', 'offline_access'],
     pkce: true,
-    dpop: true,
+    dpop: false,
     forceRedirect: false,
     siwVersion: DEFAULT_SIW_VERSION,
     siwAuthClient: false,
@@ -59,7 +81,29 @@ export function getDefaultConfig(): Config {
       secure: true
     },
     enableSharedStorage: true,
-    crossTabsCount: DEFAULT_CROSS_TABS_COUNT
+    crossTabsCount: 0,
+    tokenManager: {
+      "storage": "sessionStorage",
+      "expireEarlySeconds": 30
+      },
+    storageManager: {
+      "token": {
+        "storageType": "sessionStorage",
+        "storageTypes": []
+      },
+      "cache": {
+        "storageType": "sessionStorage",
+        "storageTypes": []
+      },
+      "transaction": {
+        "storageType": "sessionStorage",
+        "storageTypes": []
+      }
+    },
+    services: {
+      autoRemove: false,
+      autoRenew: false
+    }
   };
 }
 
