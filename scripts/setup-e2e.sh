@@ -10,30 +10,30 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   setup_service java 1.8.222
 
   # this chrome install is not used, however it will install linux deps chrome needs (via apt-get)
-  setup_service google-chrome-stable 127.0.6533.88-1
+  setup_service google-chrome-stable 127.0.6533.88
   # uses new chrome for testing installation utility (https://developer.chrome.com/blog/chrome-for-testing/)
   # output format: chrome@118.0.5993.70 /path/to/chrome/binary
   # npm i -g @puppeteer/browsers@1.x
   # @puppeteer/browsers install chrome@stable]
 
-  OLD_NPM_REGISTRY=$(npm config get registry)
-  npm config set registry https://registry.npmjs.org
-  npm config get registry
+  # OLD_NPM_REGISTRY=$(npm config get registry)
+  # npm config set registry https://registry.npmjs.org
+  # npm config get registry
 
-  echo "Running npx @puppeteer/browsers"
-  npx @puppeteer/browsers install chrome@stable --version
-  npx @puppeteer/browsers install chrome@stable
-  echo "Running puppeteer install"
-  CHROME_INSTALL=$(npx @puppeteer/browsers@1.x install chrome@stable)
-  echo "CHROME_INSTALL: $CHROME_INSTALL"
-  # extract installed version
-  export CHROMEDRIVER_VERSION=$(echo $CHROME_INSTALL | awk '{print $1}' | cut -d'@' -f 2)
-  echo $CHROMEDRIVER_VERSION
-  # extract binary path
-  export CHROME_BINARY=$(echo $CHROME_INSTALL | awk '{print $2}')
-  echo $CHROME_BINARY
+  # echo "Running npx @puppeteer/browsers"
+  # npx @puppeteer/browsers install chrome@stable --version
+  # npx @puppeteer/browsers install chrome@stable
+  # echo "Running puppeteer install"
+  # CHROME_INSTALL=$(npx @puppeteer/browsers@1.x install chrome@stable)
+  # echo "CHROME_INSTALL: $CHROME_INSTALL"
+  # # extract installed version
+  # export CHROMEDRIVER_VERSION=$(echo $CHROME_INSTALL | awk '{print $1}' | cut -d'@' -f 2)
+  # echo $CHROMEDRIVER_VERSION
+  # # extract binary path
+  # export CHROME_BINARY=$(echo $CHROME_INSTALL | awk '{print $2}')
+  # echo $CHROME_BINARY
 
-  npm config set registry $OLD_NPM_REGISTRY
+  # npm config set registry $OLD_NPM_REGISTRY
 
   export CI=true
 else
@@ -108,16 +108,16 @@ setup_sample_tests () {
       export CLIENT_ID=0oax3dcx0sak1KKb9696
       export ISSUER=https://javascript-idx-sdk-new.okta.com
       export ISSUER_IDFIRST=https://javascript-idx-sdk-idfirst.okta.com
-      get_terminus_secret "/default" prod_client_secret_new CLIENT_SECRET
-      get_terminus_secret "/default" prod_idx_sdk_org_api_key_new OKTA_API_KEY
-      get_terminus_secret "/default" prod_idx_idfirst_sdk_org_api_key OKTA_API_KEY_IDFIRST
+      get_terminus_secret "/prod/idx" prod_client_secret_new CLIENT_SECRET
+      get_terminus_secret "/prod/idx" prod_idx_sdk_org_api_key_new OKTA_API_KEY
+      get_terminus_secret "/prod/idx" prod_idx_idfirst_sdk_org_api_key OKTA_API_KEY_IDFIRST
     else
       echo "Running tests against production (ok12) org"
       export ISSUER=https://javascript-idx-sdk.okta.com
       export CLIENT_ID=0oav2oxnlYjULp0Cy5d6
       export SPA_CLIENT_ID=0oa17suj5x9khaVH75d7
-      get_terminus_secret "/default" prod_client_secret CLIENT_SECRET
-      get_terminus_secret "/default" prod_idx_sdk_org_api_key OKTA_API_KEY
+      get_terminus_secret "/prod/idx" prod_client_secret CLIENT_SECRET
+      get_terminus_secret "/prod/idx" prod_idx_sdk_org_api_key OKTA_API_KEY
     fi
   fi
   finish_log_group $?
