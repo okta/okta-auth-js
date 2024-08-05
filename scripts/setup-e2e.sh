@@ -98,7 +98,7 @@ setup_sample_tests () {
 
   export ORG_OIE_ENABLED=true
   # get_terminus_secret "/default" a18n_api_key A18N_API_KEY
-  get_vault_secret_key repo_gh-okta-okta-auth-js/default password PASSWORD
+  get_vault_secret_key repo_gh-okta-okta-auth-js/default a18n_api_key A18N_API_KEY
   
 
   # If this script is run as a bacon task, run against trexcloud environment
