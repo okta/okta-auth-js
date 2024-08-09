@@ -68,7 +68,7 @@ setup_e2e () {
 run_e2e () {
   create_log_group "E2E Test Run"
 
-  if [ -n "${PASSWORD}" ]; then
+  if [ -z "${PASSWORD}" ]; then
     echo "No PASSWORD has been set! Exiting..."
     exit ${TEST_FAILURE}
   fi
@@ -136,7 +136,7 @@ setup_sample_tests () {
 run_sample_tests () {
   create_log_group "E2E Test Run"
 
-  if [ -n "${PASSWORD}" ]; then
+  if [ -z "${PASSWORD}" ]; then
     echo "No PASSWORD has been set! Exiting..."
     exit ${TEST_FAILURE}
   fi
