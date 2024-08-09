@@ -67,6 +67,12 @@ setup_e2e () {
 
 run_e2e () {
   create_log_group "E2E Test Run"
+
+  if [ -n "${PASSWORD}" ]; then
+    echo "No PASSWORD has been set! Exiting..."
+    exit ${TEST_FAILURE}
+  fi
+
   if [ -n "${RUN_CUCUMBER}" ]; then
     if ! yarn test:e2e:cucumber; then
       echo "Cucumber tests failed! Exiting..."
@@ -129,6 +135,12 @@ setup_sample_tests () {
 
 run_sample_tests () {
   create_log_group "E2E Test Run"
+
+  if [ -n "${PASSWORD}" ]; then
+    echo "No PASSWORD has been set! Exiting..."
+    exit ${TEST_FAILURE}
+  fi
+
   # Run the tests
   if ! yarn test:samples; then
     echo "tests failed! Exiting..."
