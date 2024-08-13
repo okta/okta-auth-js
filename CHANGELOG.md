@@ -1,5 +1,9 @@
 # Changelog
 
+# 7.7.1
+
+- [#1529](https://github.com/okta/okta-auth-js/pull/1529) fix: persist `extraParams` passed to `/authorize` and include them during token refresh
+
 ## 7.7.0
 
 ### Features
