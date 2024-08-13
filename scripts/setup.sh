@@ -47,6 +47,14 @@ else
     fi
   }
 
+  get_terminus_secret () {
+    # ensures the env var is set
+    if [ -z "$(echo "$3")" ]; then
+      echo "$3 is not defined. Exiting..."
+      exit 1
+    fi
+  }
+
   junit () {
     echo 'noop'
   }
