@@ -159,20 +159,12 @@ describe('token endpoint', function() {
 
   describe('postRefreshToken', () => {
     var authClient;
-    var oauthOptions;
 
     beforeEach(function() {
       spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
       authClient = new OktaAuth({
         issuer: 'https://auth-js-test.okta.com'
       });
-
-      oauthOptions = {
-        clientId: CLIENT_ID,
-        redirectUri: REDIRECT_URI,
-        authorizationCode: authorizationCode,
-        codeVerifier: codeVerifier,
-      };
     });
 
     it('should append extra params as query params', async () => {

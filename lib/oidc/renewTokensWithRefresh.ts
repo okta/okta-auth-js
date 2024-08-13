@@ -19,6 +19,7 @@ import { TokenEndpointParams, postRefreshToken } from './endpoints/token';
 import { findKeyPair } from './dpop';
 import { isRefreshTokenInvalidError } from './util/errors';
 
+/* eslint complexity:[0,8] */
 export async function renewTokensWithRefresh(
   sdk: OktaAuthOAuthInterface,
   tokenParams: TokenParams,
