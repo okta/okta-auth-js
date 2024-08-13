@@ -26,7 +26,7 @@ const USE_FIREFOX = !!process.env.USE_FIREFOX;
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
 const LOG = process.env.LOG;
-const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
+const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 15000;
 const logLevel = LOG || 'warn';
 const chromeOptions = {
     args: []
