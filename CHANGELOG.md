@@ -1,13 +1,26 @@
 # Changelog
 
-## 7.6.0
+# 7.7.1
+
+- [#1529](https://github.com/okta/okta-auth-js/pull/1529) fix: persist `extraParams` passed to `/authorize` and include them during token refresh
+
+## 7.7.0
 
 ### Features
 
 - [#1495](https://github.com/okta/okta-auth-js/pull/1495) add: DPoP support
+
+### Fixes
+
+- [#1508](https://github.com/okta/okta-auth-js/pull/1508) IDX: add condition to compare stateHandles when loading saved idxResponse only when useGenericRemediator option is false or undefined
+
+
+## 7.6.0
+
+### Features
+
 - [#1507](https://github.com/okta/okta-auth-js/pull/1507) add: new method `getOrRenewAccessToken`
 - [#1505](https://github.com/okta/okta-auth-js/pull/1505) add: support of `revokeSessions` param for `OktaPassword` authenticator (can be used in `reset-authenticator` remediation)
-- [#1508](https://github.com/okta/okta-auth-js/pull/1508) IDX: add condition to compare stateHandles when loading saved idxResponse only when useGenericRemediator option is false or undefined
 - [#1512](https://github.com/okta/okta-auth-js/pull/1512) add: new service `RenewOnTabActivation`
 
 ### Bug Fix

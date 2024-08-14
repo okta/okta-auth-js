@@ -141,8 +141,13 @@ export async function postRefreshToken(
     return name + '=' + encodeURIComponent(value!);
   }).join('&');
 
+  let url = refreshToken.tokenUrl;
+  if (options.extraParams && Object.keys(options.extraParams).length >= 1) {
+    url += toQueryString(options.extraParams);
+  }
+
   const params: TokenRequestParams = {
-    url: refreshToken.tokenUrl,
+    url,
     data,
     dpopKeyPair: options?.dpopKeyPair
   };

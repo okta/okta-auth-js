@@ -37,6 +37,7 @@ export async function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenPa
     acrValues,
     dpop,
     dpopPairId,
+    extraParams
   } = tokenParams;
 
   // postToTokenEndpoint() params
@@ -64,6 +65,7 @@ export async function exchangeCodeForTokens(sdk: OktaAuthOAuthInterface, tokenPa
     responseType,
     ignoreSignature,
     acrValues,
+    extraParams
   };
 
   try {

@@ -293,6 +293,23 @@ describe('token.renewTokens', function() {
       });
     });
 
+    it('extraParams', async () => {
+      const { sdk, accessToken, idToken, getWihoutPromptResponse, withoutPromptSpy } = testContext;
+      accessToken.extraParams = { foo: 'bar' };
+      const tokens = { fake: true };
+      getWihoutPromptResponse.tokens = tokens;
+      const res = await renewTokens(sdk, {});
+      expect(res).toBe(tokens);
+      expect(withoutPromptSpy).toHaveBeenCalledWith(sdk, {
+        authorizeUrl: accessToken.authorizeUrl,
+        issuer: idToken.issuer,
+        responseType: ['token', 'id_token'],
+        scopes: accessToken.scopes,
+        userinfoUrl: accessToken.userinfoUrl,
+        extraParams: { foo: 'bar' }
+      });
+    });
+
   });
  
 });

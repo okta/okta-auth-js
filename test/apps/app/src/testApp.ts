@@ -674,6 +674,9 @@ class TestApp {
       scopes: this.config.defaultScopes ? [] : this.config.scopes,
       acrValues: this.config.acrValues,
       state: this.config.state,
+      extraParams: {
+        foo: 'bar'
+      }
     }, options);
     return this.oktaAuth.token.getWithRedirect(options)
       .catch(e => {

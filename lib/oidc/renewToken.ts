@@ -55,14 +55,15 @@ export async function renewToken(sdk: OktaAuthOAuthInterface, token: Token): Pro
     responseType = 'id_token';
   }
 
-  const { scopes, authorizeUrl, userinfoUrl, issuer, dpopPairId } = token as (AccessToken & IDToken);
+  const { scopes, authorizeUrl, userinfoUrl, issuer, dpopPairId, extraParams } = token as (AccessToken & IDToken);
   return getWithoutPrompt(sdk, {
     responseType,
     scopes,
     authorizeUrl,
     userinfoUrl,
     issuer,
-    dpopPairId
+    dpopPairId,
+    extraParams
   })
     .then(function (res) {
       return getSingleToken(token, res.tokens);

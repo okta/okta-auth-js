@@ -52,7 +52,13 @@ describe('exchangeCodeForTokens', () => {
     (postToTokenEndpoint as jest.Mock).mockResolvedValue(oauthResponse);
     (handleOAuthResponse as jest.Mock).mockResolvedValue(tokenResponse);
     const acrValues = 'foo';
-    const tokenParams = { ...testParams, acrValues };
+    const tokenParams = {
+      ...testParams,
+      acrValues,
+      extraParams: {
+        foo: 'bar'
+      }
+    };
     const urls = getOAuthUrls(sdk);
     await exchangeCodeForTokens(sdk, tokenParams);
     expect(postToTokenEndpoint).toHaveBeenCalledWith(sdk, testParams, urls);
@@ -62,7 +68,8 @@ describe('exchangeCodeForTokens', () => {
       redirectUri: testParams.redirectUri,
       responseType: ['token', 'id_token'],
       scopes: ['openid', 'email'],
-      acrValues
+      acrValues,
+      extraParams: tokenParams.extraParams
     }, oauthResponse, urls);
   });
 
