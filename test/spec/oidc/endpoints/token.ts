@@ -40,6 +40,7 @@ describe('token endpoint', function() {
   var endpoint = '/oauth2/v1/token';
   var codeVerifier = 'superfake';
   var authorizationCode = 'notreal';
+  var extraParams = { foo: 'bar' };
 
   util.itMakesCorrectRequestResponse({
     title: 'requests a token',
@@ -55,7 +56,7 @@ describe('token endpoint', function() {
             data: {
               client_id: CLIENT_ID,
               grant_type: 'authorization_code',
-              redirect_uri: REDIRECT_URI
+              redirect_uri: REDIRECT_URI,
             },
             headers: {
               'Accept': 'application/json',
@@ -80,7 +81,7 @@ describe('token endpoint', function() {
         clientId: CLIENT_ID,
         redirectUri: REDIRECT_URI,
         authorizationCode: authorizationCode,
-        codeVerifier: codeVerifier,
+        codeVerifier: codeVerifier
       }, {
         tokenUrl: ISSUER + endpoint
       });
@@ -154,6 +155,29 @@ describe('token endpoint', function() {
       }
     });
 
+  });
+
+  describe('postRefreshToken', () => {
+    var authClient;
+
+    beforeEach(function() {
+      spyOn(OktaAuth.features, 'isPKCESupported').and.returnValue(true);
+      authClient = new OktaAuth({
+        issuer: 'https://auth-js-test.okta.com'
+      });
+    });
+
+    it('should append extra params as query params', async () => {
+      var httpRequest = jest.spyOn(mocked.http, 'httpRequest').mockImplementation();
+      const refreshToken = tokens.standardRefreshTokenParsed;
+      await postRefreshToken(authClient, { extraParams }, refreshToken);
+      expect(httpRequest).toHaveBeenCalled();
+      expect(httpRequest).toHaveBeenLastCalledWith(expect.any(OktaAuth), expect.objectContaining({
+        url: 'https://auth-js-test.okta.com/oauth2/v1/token?foo=bar',
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded' }
+      }));
+    });
   });
 
   describe('dpop', () => {

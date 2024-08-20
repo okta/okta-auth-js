@@ -20,6 +20,7 @@ export function createOAuthMeta(
     nonce: tokenParams.nonce!,
     ignoreSignature: tokenParams.ignoreSignature!,
     acrValues: tokenParams.acrValues,
+    extraParams: tokenParams.extraParams
   };
 
   if (tokenParams.pkce === false) {

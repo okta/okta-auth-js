@@ -51,7 +51,8 @@ describe('token.parseFromUrl', function() {
       oktaAuthArgs: {
         pkce: false,
         responseMode: 'query',
-        responseType: ['code']
+        responseType: ['code'],
+        extraParams: { foo: 'bar' }
       },
       searchMock: '?code=fake' +
       '&state=' + oauthUtil.mockedState,
@@ -65,7 +66,8 @@ describe('token.parseFromUrl', function() {
           tokenUrl: 'https://auth-js-test.okta.com/oauth2/v1/token',
           authorizeUrl: 'https://auth-js-test.okta.com/oauth2/v1/authorize',
           userinfoUrl: 'https://auth-js-test.okta.com/oauth2/v1/userinfo'
-        }
+        },
+        extraParams: { foo: 'bar' }
       },
       expectedResp: {
         code: 'fake',
