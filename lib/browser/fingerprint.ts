@@ -32,7 +32,6 @@ export default function fingerprint(sdk: OktaAuthHttpInterface, options?: Finger
   let timeout: NodeJS.Timeout;
   let iframe: HTMLIFrameElement;
   let listener: (this: Window, ev: MessageEvent) => void;
-  let msg;
   const promise = new Promise(function (resolve, reject) {
     iframe = document.createElement('iframe');
     iframe.style.display = 'none';
@@ -47,6 +46,7 @@ export default function fingerprint(sdk: OktaAuthHttpInterface, options?: Finger
         return;
       }
 
+      let msg;
       try {
         msg = JSON.parse(e.data);
       } catch (err) {
@@ -64,7 +64,7 @@ export default function fingerprint(sdk: OktaAuthHttpInterface, options?: Finger
           type: 'GetFingerprint'
         }), e.origin);
       } else {
-        return reject(new Error('No data'));
+        return reject(new AuthSdkError('No data'));
       }
     };
     addListener(window, 'message', listener);
