@@ -31,6 +31,12 @@ export interface FeaturesAPI {
 }
 
 
+export interface FingerprintOptions {
+  timeout?: number;
+  container?: Element | null;
+}
+export type FingerprintAPI = (options?: FingerprintOptions) => Promise<string>;
+
 // options that can be passed to AuthJS
 export interface OktaAuthBaseOptions {
   devMode?: boolean;

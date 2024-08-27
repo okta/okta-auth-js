@@ -17,31 +17,38 @@ import {
   addListener,
   removeListener
 } from '../oidc';
-import { FingerprintOptions } from '../authn/types';
+import { FingerprintOptions } from '../base/types';
 import { OktaAuthHttpInterface } from '../http/types';
 
-export default function fingerprint(sdk: OktaAuthHttpInterface, options?: FingerprintOptions): Promise<string> {
-  options = options || {};
+const isMessageFromCorrectSource = (iframe: HTMLIFrameElement, event: MessageEvent)
+: boolean => event.source === iframe.contentWindow;
 
+export default function fingerprint(sdk: OktaAuthHttpInterface, options?: FingerprintOptions): Promise<string> {
   if (!isFingerprintSupported()) {
     return Promise.reject(new AuthSdkError('Fingerprinting is not supported on this device'));
   }
 
-  var timeout;
-  var iframe;
-  var listener;
-  var promise = new Promise(function (resolve, reject) {
+  const container = options?.container ?? document.body;
+  let timeout: NodeJS.Timeout;
+  let iframe: HTMLIFrameElement;
+  let listener: (this: Window, ev: MessageEvent) => void;
+  const promise = new Promise(function (resolve, reject) {
     iframe = document.createElement('iframe');
     iframe.style.display = 'none';
 
     // eslint-disable-next-line complexity
-    listener = function listener(e) {
+    listener = function listener(e: MessageEvent) {
+      if (!isMessageFromCorrectSource(iframe, e)) {
+        return;
+      }
+
       if (!e || !e.data || e.origin !== sdk.getIssuerOrigin()) {
         return;
       }
 
+      let msg;
       try {
-        var msg = JSON.parse(e.data);
+        msg = JSON.parse(e.data);
       } catch (err) {
         // iframe messages should all be parsable
         // skip not parsable messages come from other sources in same origin (browser extensions)
@@ -52,17 +59,18 @@ export default function fingerprint(sdk: OktaAuthHttpInterface, options?: Finger
       if (!msg) { return; }
       if (msg.type === 'FingerprintAvailable') {
         return resolve(msg.fingerprint as string);
-      }
-      if (msg.type === 'FingerprintServiceReady') {
-        e.source.postMessage(JSON.stringify({
+      } else if (msg.type === 'FingerprintServiceReady') {
+        iframe?.contentWindow?.postMessage(JSON.stringify({
           type: 'GetFingerprint'
         }), e.origin);
+      } else {
+        return reject(new AuthSdkError('No data'));
       }
     };
     addListener(window, 'message', listener);
 
     iframe.src = sdk.getIssuerOrigin() + '/auth/services/devicefingerprint';
-    document.body.appendChild(iframe);
+    container.appendChild(iframe);
 
     timeout = setTimeout(function() {
       reject(new AuthSdkError('Fingerprinting timed out'));
@@ -72,8 +80,8 @@ export default function fingerprint(sdk: OktaAuthHttpInterface, options?: Finger
   return promise.finally(function() {
     clearTimeout(timeout);
     removeListener(window, 'message', listener);
-    if (document.body.contains(iframe)) {
-      iframe.parentElement.removeChild(iframe);
+    if (container.contains(iframe)) {
+      iframe.parentElement?.removeChild(iframe);
     }
   }) as Promise<string>;
 }

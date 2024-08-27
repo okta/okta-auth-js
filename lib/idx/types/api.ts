@@ -54,7 +54,7 @@ import type {
   WebauthnEnrollValues,
   WebauthnVerificationValues
 } from '../authenticator';
-import { OktaAuthConstructor } from '../../base/types';
+import { OktaAuthConstructor, FingerprintAPI } from '../../base/types';
 
 export enum IdxStatus {
   SUCCESS = 'SUCCESS',
@@ -258,6 +258,7 @@ export interface WebauthnAPI {
   ): CredentialCreationOptions;
 }
 
+
 export interface OktaAuthIdxInterface
 <
   M extends IdxTransactionMeta = IdxTransactionMeta,
@@ -268,6 +269,7 @@ export interface OktaAuthIdxInterface
   extends OktaAuthOAuthInterface<M, S, O, TM>
 {
   idx: IdxAPI;
+  fingerprint: FingerprintAPI;
 }
 
 export interface MinimalOktaAuthIdxInterface
@@ -280,6 +282,7 @@ export interface MinimalOktaAuthIdxInterface
   extends MinimalOktaOAuthInterface<M, S, O, TM>
 {
   idx: MinimalIdxAPI;
+  fingerprint: FingerprintAPI;
 }
 
 export interface OktaAuthIdxConstructor

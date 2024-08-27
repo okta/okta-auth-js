@@ -17,7 +17,6 @@ import {
 } from '../util';
 import fingerprint from '../browser/fingerprint';
 import {
-  FingerprintAPI,
   SigninWithCredentialsOptions,
   ForgotPasswordOptions,
   VerifyRecoveryTokenOptions,
@@ -31,7 +30,7 @@ import {
 } from './factory';
 import { StorageManagerInterface } from '../storage/types';
 import { OktaAuthHttpInterface, OktaAuthHttpOptions } from '../http/types';
-import { OktaAuthConstructor } from '../base/types';
+import { FingerprintAPI, OktaAuthConstructor } from '../base/types';
 
 export function mixinAuthn
 <

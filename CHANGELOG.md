@@ -1,5 +1,11 @@
 # Changelog
 
+# 7.8.0
+
+### Features
+
+- [#1530](https://github.com/okta/okta-auth-js/pull/1530) add: fingerprint API to IDX bundle
+
 # 7.7.1
 
 - [#1529](https://github.com/okta/okta-auth-js/pull/1529) fix: persist `extraParams` passed to `/authorize` and include them during token refresh
