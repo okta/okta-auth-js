@@ -43,7 +43,7 @@ function stringify(obj) {
 var config = {
   issuer: '',
   clientId: '',
-  scopes: ['openid','email'],
+  scopes: ['openid','email','offline_access'],
   storage: 'sessionStorage',
   useInteractionCodeFlow: true,
   requireUserSession: 'true',
