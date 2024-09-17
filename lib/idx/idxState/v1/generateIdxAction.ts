@@ -64,6 +64,8 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdx
         idxResponse.stepUp = true;
       }
 
+      idxResponse.httpMeta = { statusCode: err.xhr.status };
+
       return idxResponse;
     }
   };

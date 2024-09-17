@@ -25,6 +25,7 @@ export async function introspect (
 ): Promise<IdxResponse> {
   let rawIdxResponse;
   let requestDidSucceed;
+  let statusCode;
 
   // try load from storage first
   const savedIdxResponse = authClient.transactionManager.loadIdxResponse(options);
@@ -58,6 +59,7 @@ export async function introspect (
     } catch (err) {
       if (isAuthApiError(err) && err.xhr && isRawIdxResponse(err.xhr.responseJSON)) {
         rawIdxResponse = err.xhr.responseJSON;
+        statusCode = err.xhr.status;
         requestDidSucceed = false;
       } else {
         throw err;
@@ -66,5 +68,9 @@ export async function introspect (
   }
 
   const { withCredentials } = options;
-  return makeIdxState(authClient, rawIdxResponse, { withCredentials }, requestDidSucceed);
+  const idxResponse = makeIdxState(authClient, rawIdxResponse, { withCredentials }, requestDidSucceed);
+  if (!requestDidSucceed) {
+    idxResponse.httpMeta = { statusCode };
+  }
+  return idxResponse;
 }

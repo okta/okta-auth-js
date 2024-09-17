@@ -121,7 +121,7 @@ describe('generateIdxAction', () => {
           },
           method: 'POST'
         });
-        expect( result ).toEqual({stepUp: true});
+        expect( result ).toEqual({stepUp: true, httpMeta: { statusCode: 401 }});
       });
   });
 

@@ -256,6 +256,10 @@ export interface IdxActionFunction {
   neededParams?: Array<Array<IdxRemediationValue>>;
 }
 
+export interface IdxHttpMeta {
+  statusCode: number;
+}
+
 export interface IdxResponse {
   proceed: (remediationName: string, params: unknown) => Promise<IdxResponse>;
   neededToProceed: IdxRemediation[];
@@ -266,6 +270,7 @@ export interface IdxResponse {
   context?: IdxContext;
   requestDidSucceed?: boolean;
   stepUp?: boolean;
+  httpMeta?: IdxHttpMeta;
 }
 
 export function isIdxResponse(obj: any): obj is IdxResponse {

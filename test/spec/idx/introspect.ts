@@ -127,7 +127,10 @@ describe('idx/introspect', () => {
   it('on IDX error, calls makeIdxState to return a wrapped idxResponse', async () => {
     const { authClient, introspectOptions } = testContext;
     const rawIdxResponse = RawIdxResponseFactory.build();
-    jest.spyOn(mocked.http, 'httpRequest').mockRejectedValueOnce(new AuthApiError({} as APIError, { responseJSON: rawIdxResponse } as unknown as HttpResponse));
+    jest.spyOn(mocked.http, 'httpRequest').mockRejectedValueOnce(
+      new AuthApiError({} as APIError,
+      { responseJSON: rawIdxResponse, status: 401 } as unknown as HttpResponse)
+    );
     jest.spyOn(mocked.idxState, 'makeIdxState');
     authClient.transactionManager.loadIdxResponse = jest.fn().mockReturnValue(null);
     const res = await introspect(authClient, introspectOptions);
@@ -147,6 +150,7 @@ describe('idx/introspect', () => {
     expect(mocked.idxState.makeIdxState).toHaveBeenCalled();
     expect(res.rawIdxState).toEqual(rawIdxResponse);
     expect(res.requestDidSucceed).toBe(false);
+    expect(res.httpMeta).toEqual({ statusCode: 401 });
   });
 
   it('on non-IDX error, the error is thrown', async () => {
