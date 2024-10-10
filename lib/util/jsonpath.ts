@@ -4,5 +4,5 @@ export function jsonpath(options: JSONPathOptions): any {
   // eslint-disable-next-line new-cap
   return JSONPath({
     // Disable javascript evaluation by default
-	eval: true, ...options, });
+	eval: false, ...options, });
 }
