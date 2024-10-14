@@ -14,7 +14,7 @@ describe('jsonpath', () => {
     expect(() => {
       jsonpath({
         json: {},
-        path: `$[(this.constructor.constructor("require(\"child_process\").exec(\"echo 'foo'\")")())]`
+        path: `$[(this.constructor.constructor("require("child_process").exec("echo 'foo'")")())]`
       });
     }).toThrow();
   });
