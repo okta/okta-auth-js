@@ -89,8 +89,8 @@ const samples = [
       // group sms related specs together, so they do not run in parallel
       // this spec takes time to finish, run it first
       [
-        'self-service-registration',
-        // 'mfa-password-and-sms',
+        // 'self-service-registration',
+        'mfa-password-and-sms',
       ],
       // 'root-page', 
       // 'basic-auth', 
