@@ -15,8 +15,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # Install required node version
   export NVM_DIR="/root/.nvm"
 
-  # setup_service node "${1:-v14.18.0}"
-  setup_service node "${1:-v16.20.2}"
+  setup_service node "${1:-v18.20.4}"
   # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
   setup_service yarn 1.21.1 /etc/pki/tls/certs/ca-bundle.crt
 else
@@ -82,6 +81,7 @@ if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
+nvm install 16.20.2
 finish_log_group $?
 
 npm_siw_install () {

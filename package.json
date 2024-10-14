@@ -159,7 +159,7 @@
     "cross-fetch": "^3.1.5",
     "fast-text-encoding": "^1.0.6",
     "js-cookie": "^3.0.1",
-    "jsonpath-plus": "^6.0.1",
+    "jsonpath-plus": "^10.0.0",
     "node-cache": "^5.1.2",
     "p-cancelable": "^2.0.0",
     "tiny-emitter": "1.1.0",
@@ -235,7 +235,8 @@
     "**/cacheable-request/http-cache-semantics": "^4.0.0",
     "**/has-ansi/ansi-regex": "^4.1.1",
     "**/strip-ansi/ansi-regex": "^3.0.1",
-    "**/download/got": "^11.8.5"
+    "**/download/got": "^11.8.5",
+    "**/rollup-plugin-typescript2/tslib": "^2.6.2"
   },
   "workspaces": {
     "packages": [
