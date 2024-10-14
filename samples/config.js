@@ -85,13 +85,8 @@ const samples = [
     template: 'express-embedded-auth-with-sdk',
     generateType: GENERATE_TYPE_OVERWRITE,
     specs: ['express-embedded-auth-with-sdk'],
-    features: [
-      // group sms related specs together, so they do not run in parallel
-      // this spec takes time to finish, run it first
-      [
-        'self-service-registration',
-        'mfa-password-and-sms',
-      ],
+    // double array groups all tests together so they do not run in parallel
+    features: [[
       'root-page', 
       'basic-auth', 
       'identifier-first-auth',
@@ -112,7 +107,9 @@ const samples = [
       'totp-okta-verify-signin',
       'webauthn-signup',
       'mfa-password-and-webauthn',
-    ],
+      'self-service-registration',
+      'mfa-password-and-sms',
+    ]],
     useEnv: true,
   },
   {
