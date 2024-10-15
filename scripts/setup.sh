@@ -15,10 +15,9 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # Install required node version
   export NVM_DIR="/root/.nvm"
 
-  setup_service node "${1:-v18.20.4}" 1> /dev/null
+  setup_service node "${1:-v16.20.2}" 1> /dev/null
   # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
-  # setup_service yarn 1.21.1 /etc/pki/tls/certs/ca-bundle.crt
-  setup_service yarn-berry 1.21.1
+  setup_service yarn 1.21.1 /etc/pki/tls/certs/ca-bundle.crt
 else
   # bacon defines OKTA_HOME and REPO, define these relative to this file
   export OKTA_HOME=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd)
@@ -78,11 +77,10 @@ cd ${OKTA_HOME}/${REPO}
 
 create_log_group "Yarn Install"
 # Install dependencies. --ignore-scripts will prevent chromedriver from attempting to install
-if ! yarn install --frozen-lockfile --ignore-scripts; then
+if ! yarn install --frozen-lockfile --ignore-scripts --ignore-engines; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
-nvm install --reinstall-packages-from=18 16.20.2
 finish_log_group $?
 
 npm_siw_install () {
