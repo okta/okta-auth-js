@@ -82,7 +82,7 @@ if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
-nvm install 16.20.2
+nvm install --reinstall-packages-from=18 16.20.2
 finish_log_group $?
 
 npm_siw_install () {
