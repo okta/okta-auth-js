@@ -22,7 +22,7 @@ test_suites:
       timeout: '20'
       script_name: unit
       criteria: MERGE
-      queue_name: ci-queue-productionJenga-AL2023
+      queue_name: small
     - name: integration
       script_path: ../okta-auth-js/scripts
       sort_order: '3'
@@ -37,7 +37,7 @@ test_suites:
       timeout: '20'
       script_name: e2e
       criteria: MERGE
-      queue_name: ci-queue-productionJenga-AL2023
+      queue_name: small
     - name: e2e-cucumber
       script_path: ../okta-auth-js/scripts/e2e
       sort_order: '4'
@@ -107,7 +107,7 @@ test_suites:
       timeout: '20'
       script_name: e2e-react-embedded-auth-with-sdk
       criteria: MERGE
-      queue_name: ci-queue-productionJenga-AL2023
+      queue_name: small
 
     - name: verify-registry-install
       prereq_test_suite_name: publish
