@@ -1,15 +1,6 @@
-import { JSONPath, JSONPathOptions } from 'jsonpath-plus';
-
-// export function jsonpath(options: JSONPathOptions): any {
-//   // eslint-disable-next-line new-cap
-//   return JSONPath({
-//     // Disable javascript evaluation by default
-// 	  eval: false,...options,
-//   });
-// }
-
 const jsonpathRegex = /\$?(?<step>\w+)|(?:\[(?<index>\d+)\])/g;
 
+/* eslint complexity:[0,8] */
 export function jsonpath({ path, json }) {
   const steps: string[] = [];
   let match: RegExpExecArray | null;
@@ -21,7 +12,7 @@ export function jsonpath({ path, json }) {
 	}
 
   if (steps.length < 1) {
-    return [undefined];
+    return undefined;
   }
 
   // array length check above guarantees .pop() will return a value
@@ -29,16 +20,14 @@ export function jsonpath({ path, json }) {
   const lastStep = steps.pop()!;
   let curr = json;
   for (const step of steps) {
-    if (curr.hasOwnProperty(step)) {
-      if (!curr[step] || typeof curr[step] !== 'object') {
-        // TODO: does this need to be an array?
-        return [undefined];
+    if (Object.prototype.hasOwnProperty.call(curr, step)) {
+      if (typeof curr[step] !== 'object') {
+        return undefined;
       }
 
       curr = curr[step];
     }
   }
 
-  // TODO: does this need to be an array?
-  return [curr[lastStep]];
+  return curr[lastStep];
 }
