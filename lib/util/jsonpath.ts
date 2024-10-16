@@ -4,12 +4,12 @@ const jsonpathRegex = /\$?(?<step>\w+)|(?:\[(?<index>\d+)\])/g;
 export function jsonpath({ path, json }) {
   const steps: string[] = [];
   let match: RegExpExecArray | null;
-	while ((match = jsonpathRegex.exec(path)) !== null) {
-		const step = match?.groups?.step ?? match?.groups?.index;
+  while ((match = jsonpathRegex.exec(path)) !== null) {
+    const step = match?.groups?.step ?? match?.groups?.index;
     if (step) {
       steps.push(step);
     }
-	}
+  }
 
   if (steps.length < 1) {
     return undefined;
