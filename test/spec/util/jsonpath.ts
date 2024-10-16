@@ -13,14 +13,18 @@ describe('jsonpath', () => {
       json: { foo: { bar: { baz: 'pass' } } }
     })).toEqual({ baz: 'pass' });
 
+    const arrValues1 = Array(30).fill('fail');
+    arrValues1[12] = 'pass';
     expect(jsonpath({
       path: '$.foo.bar[12]',
-      json: { foo: { bar: Array(15).fill('pass') } }
+      json: { foo: { bar: arrValues1 } }
     })).toEqual('pass');
 
+    const arrValues2 = Array(30).fill({ bar: 'fail' });
+    arrValues2[25].bar = 'pass';
     expect(jsonpath({
       path: 'foo[22].bar',
-      json: { foo: Array(25).fill({ bar: 'pass' }) }
+      json: { foo: arrValues2 }
     })).toEqual('pass');
 
     expect(jsonpath({
