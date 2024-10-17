@@ -1,5 +1,11 @@
 # Changelog
 
+# 7.8.1
+
+### Bug Fix
+- [#1547](https://github.com/okta/okta-auth-js/pull/1547) fix: replaces `jsonpath-plus` module
+  - Address https://security.snyk.io/vuln/SNYK-JS-JSONPATHPLUS-7945884
+
 # 7.8.0
 
 ### Features
