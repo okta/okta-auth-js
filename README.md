@@ -121,7 +121,33 @@ Many browsers have started blocking cross-origin or "third party" cookies by def
   * [token.getWithoutPrompt](#tokengetwithoutpromptoptions) must have access to cookies on the Okta domain via an iFrame running on your application's page.
   * [token.renew](#tokenrenewtokentorenew) uses [token.getWithoutPrompt](#tokengetwithoutpromptoptions) and is subject to the same limitations.
 
-If your application depends on any of these methods, you should try to either rewrite your application to avoid using these methods or communicate to your users that they must enable third party cookies. Okta engineers are currently working on a better long-term solution to this problem.
+Notably, a browser blocking 3rd party cookies prevents automatic token renewal from working.   The code will behave as if the user's session at the issuer site has expired.
+
+#### How to handle Third party cookie issues
+
+Note that third party cookie blocking is controlled by the browser.  `okta-auth-js` calls run in the browser can be affected, but `okta-auth-js` calls made on the server cannot.  These solutions assume you are running `okta-auth-js` from the browser.
+
+##### Solution 1: Use a custom domain URL  
+  * If the domain of your app and the domain that holds the session cookie are the same domain, there is no "third" party to trigger issues with third-party cookies
+  * You can learn more about how to use this feature here: https://developer.okta.com/docs/guides/custom-url-domain/overview/
+  * After making those changes, you will need to make sure your app is configured to use the matching url
+  * This should prevent third-party cookie issues
+
+##### Solution 2: Rely on redirects
+  * If the user is redirected to the issuer site for any transaction that requires a session cookie, and redirected back to the application once that is complete, there is never a "third" party interaction to trigger issues with third-party cookies
+  * When token renewal fails, direct the user to login via OIDC redirect (as they did originally), either by sending them to an okta-hosted sign-in page or your application's sign-in page that starts an OIDC redirect authentication
+  * You can detect token renewal failure by catching the rejected promise returned by (for example) [token.getWithoutPrompt()](https://github.com/okta/okta-auth-js#example)
+  * Remember that token renewal failure will look exactly like a session expiring - in both cases, the browser does not send a cookie to the issuer site
+
+##### Solution 3: Use a "popup"
+  * The redirect-based solutions above can be problematic for apps that want to avoid the overhead of reloading the app
+  * You can avoid this overhead by performing the redirect within an iframe, which is done using [token.getWithPopUp()](https://github.com/okta/okta-auth-js#tokengetwithpopupoptions)
+  * This can run afoul of browser-based pop-up blockers
+
+##### Solution 4: Rely on your backend
+  * Complications introduced by browsers can be avoided by moving the processing of tokens to the backend
+  * Okta has a number of backend SDKs for various languages to allow passing credentials to the issuer site and receive tokens
+  * If you [add the tokens](https://github.com/okta/okta-auth-js#tokenmanageraddkey-token) received by the backend to the tokenManager of a front-end instance of `okta-auth-js`, that front-end instance can interact with the tokens for the purposes of UI decisions  
 
 ## Getting started
 
