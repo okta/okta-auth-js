@@ -12,12 +12,13 @@
  */
 
 import { post } from '../../http';
-import { isNumber, isObject, getLink, toQueryString, delay as delayFn } from '../../util';
+import { isNumber, isObject, getLink, toQueryString } from '../../util';
 import { DEFAULT_POLLING_DELAY } from '../../constants';
 import AuthSdkError from '../../errors/AuthSdkError';
 import AuthPollStopError from '../../errors/AuthPollStopError';
 import { AuthnTransactionState } from '../types';
 import { getStateToken } from './stateToken';
+import { isIOS } from '../../features';
 
 interface PollOptions {
   delay?: number;
@@ -82,6 +83,44 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
       });
     }
 
+    const delayNextPoll = (delayTimeout: number) => {
+      let timeoutId: NodeJS.Timeout;
+      const delayFn = () => {
+        return new Promise((resolve) => {
+          timeoutId = setTimeout(resolve, delayTimeout);
+        });
+      };
+
+      // no need for extra logic in non-iOS environments, just continue polling
+      if (!isIOS) {
+        return delayFn();
+      }
+
+      let pageVisibilityHandler;
+      const delayForFocus = () => {
+        return new Promise<void>((resolve) => {
+          pageVisibilityHandler = () => {
+            if (document.hidden) {
+              clearTimeout(timeoutId);
+            }
+            else {
+              resolve();
+            }
+          };
+
+          document.addEventListener('visibilitychange', pageVisibilityHandler);
+        });
+      }
+
+      return Promise.race([
+        delayFn(),
+        delayForFocus(),
+      ])
+      .then(() => {
+        document.removeEventListener('visibilitychange', pageVisibilityHandler);
+      });
+    }
+
     ref.isPolling = true;
 
     var retryCount = 0;
@@ -108,7 +147,7 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
             }
 
             // Continue poll
-            return delayFn(delay).then(recursivePoll);
+            return delayNextPoll(delay).then(recursivePoll);
 
           } else {
             // Any non-waiting result, even if polling was stopped
@@ -124,7 +163,7 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
               retryCount <= 4) {
             var delayLength = Math.pow(2, retryCount) * 1000;
             retryCount++;
-            return delayFn(delayLength)
+            return delayNextPoll(delayLength)
               .then(recursivePoll);
           }
           throw err;
