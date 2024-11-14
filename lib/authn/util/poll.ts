@@ -92,18 +92,20 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
       };
 
       // no need for extra logic in non-iOS environments, just continue polling
-      if (!isIOS) {
+      if (!isIOS()) {
         return delayFn();
       }
 
       let pageVisibilityHandler;
       const delayForFocus = () => {
         return new Promise<void>((resolve) => {
+          let pageDidHide = false;
           pageVisibilityHandler = () => {
             if (document.hidden) {
               clearTimeout(timeoutId);
+              pageDidHide = true;
             }
-            else {
+            else if (pageDidHide) {
               resolve();
             }
           };
@@ -113,8 +115,8 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
       }
 
       return Promise.race([
-        delayFn(),
-        delayForFocus(),
+        delayFn(),          // this function will never resolve if the page changes to hidden because the timeout gets cleared
+        delayForFocus(),    // this function won't resolve until the page becomes visible after being hidden
       ])
       .then(() => {
         document.removeEventListener('visibilitychange', pageVisibilityHandler);
