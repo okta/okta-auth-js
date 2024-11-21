@@ -12,7 +12,7 @@
  */
 
 import { post } from '../../http';
-import { isNumber, isObject, getLink, toQueryString } from '../../util';
+import { isNumber, isObject, getLink, toQueryString, delay as delayFn } from '../../util';
 import { DEFAULT_POLLING_DELAY } from '../../constants';
 import AuthSdkError from '../../errors/AuthSdkError';
 import AuthPollStopError from '../../errors/AuthPollStopError';
@@ -83,18 +83,18 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
       });
     }
 
-    const delayNextPoll = (delayTimeout: number) => {
-      let timeoutId: NodeJS.Timeout;
-      const delayFn = () => {
-        return new Promise((resolve) => {
-          timeoutId = setTimeout(resolve, delayTimeout);
-        });
-      };
-
+    const delayNextPoll = (ms) => {
       // no need for extra logic in non-iOS environments, just continue polling
       if (!isIOS()) {
-        return delayFn();
+        return delayFn(ms);
       }
+
+      let timeoutId: NodeJS.Timeout;
+      const cancelableDelay = () => {
+        return new Promise(function(resolve) {
+          timeoutId = setTimeout(resolve, ms);
+        });
+      };
 
       const delayForFocus = () => {
         let pageVisibilityHandler;
@@ -119,7 +119,7 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
 
       return Promise.race([
         // this function will never resolve if the page changes to hidden because the timeout gets cleared
-        delayFn(),
+        cancelableDelay(),
         // this function won't resolve until the page becomes visible after being hidden
         delayForFocus(),
       ]);

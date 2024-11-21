@@ -91,6 +91,7 @@ export function isDPoPSupported () {
 
 export function isIOS () {
   // iOS detection from: http://stackoverflow.com/a/9039885/177710
-  // @ts-expect-error - MSStream is not in `window` type, unsurprisingly
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  return isBrowser() && typeof navigator !== 'undefined' && typeof navigator.userAgent !== 'undefined' &&
+    // @ts-expect-error - MSStream is not in `window` type, unsurprisingly
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
 }
