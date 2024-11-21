@@ -96,8 +96,8 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
         return delayFn();
       }
 
-      let pageVisibilityHandler;
       const delayForFocus = () => {
+        let pageVisibilityHandler;
         return new Promise<void>((resolve) => {
           let pageDidHide = false;
           pageVisibilityHandler = () => {
@@ -111,16 +111,16 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
           };
 
           document.addEventListener('visibilitychange', pageVisibilityHandler);
+        })
+        .then(() => {
+          document.removeEventListener('visibilitychange', pageVisibilityHandler);
         });
       }
 
       return Promise.race([
         delayFn(),          // this function will never resolve if the page changes to hidden because the timeout gets cleared
         delayForFocus(),    // this function won't resolve until the page becomes visible after being hidden
-      ])
-      .then(() => {
-        document.removeEventListener('visibilitychange', pageVisibilityHandler);
-      });
+      ]);
     }
 
     ref.isPolling = true;
