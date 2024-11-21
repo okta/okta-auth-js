@@ -115,13 +115,15 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
         .then(() => {
           document.removeEventListener('visibilitychange', pageVisibilityHandler);
         });
-      }
+      };
 
       return Promise.race([
-        delayFn(),          // this function will never resolve if the page changes to hidden because the timeout gets cleared
-        delayForFocus(),    // this function won't resolve until the page becomes visible after being hidden
+        // this function will never resolve if the page changes to hidden because the timeout gets cleared
+        delayFn(),
+        // this function won't resolve until the page becomes visible after being hidden
+        delayForFocus(),
       ]);
-    }
+    };
 
     ref.isPolling = true;
 
