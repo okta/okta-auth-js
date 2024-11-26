@@ -133,6 +133,24 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
       if (!ref.isPolling) {
         return Promise.reject(new AuthPollStopError());
       }
+
+      // don't trigger polling request if page is hidden wait until window is visible again
+      if (isIOS() && document.hidden) {
+        let handler;
+        return new Promise<void>((resolve) => {
+          handler = () => {
+            if (!document.hidden) {
+              resolve();
+            }
+          };
+          document.addEventListener('visibilitychange', handler);
+        })
+        .then(() => {
+          document.removeEventListener('visibilitychange', handler);
+          return recursivePoll();
+        });
+      }
+
       return pollFn()
         .then(function (pollRes) {
           // Reset our retry counter on success

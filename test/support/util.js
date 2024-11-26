@@ -115,6 +115,7 @@ function generateXHRPair(request, response, uri, responseVars) {
     });
   });
 }
+util.generateXHRPair = generateXHRPair;
 
 function mockAjax(pairs) {
 
