@@ -89,9 +89,9 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
         return delayFn(ms);
       }
 
-      let timeoutId: NodeJS.Timeout;
+      let timeoutId: ReturnType<typeof setTimeout>;
       const cancelableDelay = () => {
-        return new Promise(function(resolve) {
+        return new Promise((resolve) => {
           timeoutId = setTimeout(resolve, ms);
         });
       };

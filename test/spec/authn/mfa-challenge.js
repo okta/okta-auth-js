@@ -37,6 +37,7 @@ jest.mock('lib/features', () => {
 });
 import OktaAuth from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
+import { setImmediate } from 'timers';
 
 const mocked = {
   http: require('../../../lib/http'),
@@ -1561,8 +1562,7 @@ describe('MFA_CHALLENGE', function () {
       const advanceTestTimers = async () => {
         jest.runOnlyPendingTimers();
         // flushes promise queue
-        await Promise.resolve();
-        await Promise.resolve();
+        return new Promise(resolve => setImmediate(resolve));
       };
 
       const context = {};
@@ -1692,10 +1692,49 @@ describe('MFA_CHALLENGE', function () {
         expect(count).toEqual(2);
 
         togglePageVisibility();
-        await Promise.resolve();
         for (let i=0; i<2; i++) {
           await advanceTestTimers();
         }
+
+        const result = await pollPromise;
+
+        expect(count).toEqual(3);
+        expect(httpSpy).toHaveBeenCalledTimes(4);
+        expect(result.status).toEqual('SUCCESS');
+      });
+
+      it('should handle document visibility being toggled consistently', async () => {
+        const { httpSpy, transaction } = context;
+        expect(document.hidden).toBe(false);
+
+        let count = 0;
+        const pollPromise = transaction.poll({
+          delay: 2000,
+          transactionCallBack: () => {
+            count += 1;
+          }
+        });
+
+        for (let i=0; i<8; i++) {
+          if (i % 2 === 0) {
+            expect(document.hidden).toBe(false);
+          }
+          else {
+            expect(document.hidden).toBe(true);
+          }
+
+          await advanceTestTimers();
+          togglePageVisibility();
+
+          if (i % 2 === 0) {
+            expect(document.hidden).toBe(true);
+          }
+          else {
+            expect(document.hidden).toBe(false);
+          }
+        }
+
+        expect(document.hidden).toBe(false);
 
         const result = await pollPromise;
 
