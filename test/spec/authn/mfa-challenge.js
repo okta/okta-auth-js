@@ -1668,7 +1668,7 @@ describe('MFA_CHALLENGE', function () {
         expect(result.status).toEqual('SUCCESS');
       });
 
-      it('should pause flow is document is hidden amist polling', async () => {
+      it('should pause flow is document is hidden amidst polling', async () => {
         const { httpSpy, transaction } = context;
         expect(document.hidden).toBe(false);
 
