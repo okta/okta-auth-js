@@ -1552,6 +1552,7 @@ describe('MFA_CHALLENGE', function () {
 
     // OKTA-823470: iOS18 polling issue
     // NOTE: only run these tests in browser environments
+    // eslint-disable-next-line no-extra-boolean-cast
     (!!global.document ? describe : describe.skip)('iOS18 polling', () => {
       const togglePageVisibility = () => {
         document.hidden = !document.hidden;
