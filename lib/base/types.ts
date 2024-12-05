@@ -28,6 +28,7 @@ export interface FeaturesAPI {
   isPKCESupported(): boolean;
   isIE11OrLess(): boolean;
   isDPoPSupported(): boolean;
+  isIOS(): boolean;
 }
 
 

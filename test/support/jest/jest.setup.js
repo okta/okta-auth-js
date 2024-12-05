@@ -33,3 +33,12 @@ global.console.warn = function() {};
 // broadcast-channel should not detect node environment
 // https://github.com/pubkey/broadcast-channel/blob/master/src/util.js#L61
 process[Symbol.toStringTag] = 'Process';
+
+if (global.document) {
+  let docHidden = false;
+  Object.defineProperty(global.document, 'hidden', {
+    configurable: true,
+    get () { return docHidden; },
+    set (bool) { docHidden = Boolean(bool); }
+  });
+}

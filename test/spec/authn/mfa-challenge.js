@@ -10,13 +10,40 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+/* global document */
 
-jest.mock('../../../lib/util/misc', () => {
+jest.mock('lib/util', () => {
+  const actual = jest.requireActual('../../../lib/util');
   return {
+    ...actual,
     delay: () => { return Promise.resolve(); }
   };
 });
+
+jest.mock('lib/http', () => {
+  const actual = jest.requireActual('../../../lib/http');
+  return {
+    ...actual,
+    post: actual.post
+  };
+});
+
+jest.mock('lib/features', () => {
+  const actual = jest.requireActual('../../../lib/features');
+  return {
+    ...actual,
+    isIOS: () => false
+  };
+});
+import OktaAuth from '@okta/okta-auth-js';
 import util from '@okta/test.support/util';
+import { setImmediate } from 'timers';
+
+const mocked = {
+  http: require('../../../lib/http'),
+  util: require('../../../lib/util'),
+  features: require('../../../lib/features')
+};
 
 describe('MFA_CHALLENGE', function () {
 
@@ -1521,6 +1548,201 @@ describe('MFA_CHALLENGE', function () {
         expect(err.errorId).toBeUndefined();
         expect(err.errorCauses).toBeUndefined();
       }
+    });
+
+    // OKTA-823470: iOS18 polling issue
+    // NOTE: only run these tests in browser environments
+    // eslint-disable-next-line no-extra-boolean-cast
+    (!!global.document ? describe : describe.skip)('iOS18 polling', () => {
+      const togglePageVisibility = () => {
+        document.hidden = !document.hidden;
+        document.dispatchEvent(new Event('visibilitychange'));
+      };
+
+      // see https://stackoverflow.com/a/52196951 for more info about jest/promises/timers
+      const advanceTestTimers = async () => {
+        jest.runOnlyPendingTimers();
+        // flushes promise queue
+        return new Promise(resolve => setImmediate(resolve));
+      };
+
+      const context = {};
+
+      beforeEach(async () => {
+        jest.useFakeTimers();
+        document.hidden = false;
+
+        // delay must be mocked (essentially to original implementation) because other tests
+        // mock this function to remove any timer delays
+        jest.spyOn(mocked.util, 'delay').mockImplementation((ms) => {
+          return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+          });
+        });
+
+        // mocks iOS environment
+        jest.spyOn(mocked.features, 'isIOS').mockReturnValue(true);
+
+        const { response: mfaPush } = await util.generateXHRPair({
+          uri: 'https://auth-js-test.okta.com'
+        }, 'mfa-challenge-push', 'https://auth-js-test.okta.com');
+
+        const { response: success } = await util.generateXHRPair({
+          uri: 'https://auth-js-test.okta.com'
+        }, 'success', 'https://auth-js-test.okta.com');
+
+        // mocks flow of wait, wait, wait, success
+        context.httpSpy = jest.spyOn(mocked.http, 'post')
+          .mockResolvedValueOnce(mfaPush.response)
+          .mockResolvedValueOnce(mfaPush.response)
+          .mockResolvedValueOnce(mfaPush.response)
+          .mockResolvedValueOnce(success.response);
+
+
+        const oktaAuth = new OktaAuth({
+          issuer: 'https://auth-js-test.okta.com'
+        });
+        
+        context.transaction = oktaAuth.tx.createTransaction(mfaPush.response);
+      });
+
+      afterEach(() => {
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
+      });
+
+      it('should proceed with flow as normal if document is never hidden', async () => {
+        const { httpSpy, transaction } = context;
+        expect(document.hidden).toBe(false);
+
+        let count = 0;
+        const pollPromise = transaction.poll({
+          delay: 2000,
+          transactionCallBack: () => {
+            count += 1;
+          }
+        });
+
+        for (let i=0; i<4; i++) {
+          await advanceTestTimers();
+        }
+
+        const result = await pollPromise;
+
+        expect(count).toEqual(3);
+        expect(httpSpy).toHaveBeenCalledTimes(4);
+        expect(result.status).toEqual('SUCCESS');
+      });
+
+      it('should not proceed with flow if document is hidden', async () => {
+        const { httpSpy, transaction } = context;
+        expect(document.hidden).toBe(false);
+
+        togglePageVisibility();
+
+        let count = 0;
+        const pollPromise = transaction.poll({
+          delay: 2000,
+          transactionCallBack: () => {
+            count += 1;
+          }
+        });
+
+        // advance the timers so the flow would have succeed in normal circumstances
+        for (let i=0; i<4; i++) {
+          await advanceTestTimers();
+        }
+
+        // ensure flow did not advance, awaits document focus to return 
+        expect(count).toEqual(0);
+
+        togglePageVisibility();
+        for (let i=0; i<4; i++) {
+          await advanceTestTimers();
+        }
+
+        const result = await pollPromise;
+
+        expect(count).toEqual(3);
+        expect(httpSpy).toHaveBeenCalledTimes(4);
+        expect(result.status).toEqual('SUCCESS');
+      });
+
+      it('should pause flow is document is hidden amidst polling', async () => {
+        const { httpSpy, transaction } = context;
+        expect(document.hidden).toBe(false);
+
+        let count = 0;
+        const pollPromise = transaction.poll({
+          delay: 2000,
+          transactionCallBack: () => {
+            count += 1;
+          }
+        });
+
+        // advance the timers so the flow would have succeed in normal circumstances
+        for (let i=0; i<4; i++) {
+          await advanceTestTimers();
+          if (i == 1) {
+            // hide document in middle of flow
+            togglePageVisibility();
+          }
+        }
+
+        // ensure flow pauses, awaits document focus to return 
+        expect(count).toEqual(2);
+
+        togglePageVisibility();
+        for (let i=0; i<2; i++) {
+          await advanceTestTimers();
+        }
+
+        const result = await pollPromise;
+
+        expect(count).toEqual(3);
+        expect(httpSpy).toHaveBeenCalledTimes(4);
+        expect(result.status).toEqual('SUCCESS');
+      });
+
+      it('should handle document visibility being toggled consistently', async () => {
+        const { httpSpy, transaction } = context;
+        expect(document.hidden).toBe(false);
+
+        let count = 0;
+        const pollPromise = transaction.poll({
+          delay: 2000,
+          transactionCallBack: () => {
+            count += 1;
+          }
+        });
+
+        for (let i=0; i<8; i++) {
+          if (i % 2 === 0) {
+            expect(document.hidden).toBe(false);
+          }
+          else {
+            expect(document.hidden).toBe(true);
+          }
+
+          await advanceTestTimers();
+          togglePageVisibility();
+
+          if (i % 2 === 0) {
+            expect(document.hidden).toBe(true);
+          }
+          else {
+            expect(document.hidden).toBe(false);
+          }
+        }
+
+        expect(document.hidden).toBe(false);
+
+        const result = await pollPromise;
+
+        expect(count).toEqual(3);
+        expect(httpSpy).toHaveBeenCalledTimes(4);
+        expect(result.status).toEqual('SUCCESS');
+      });
     });
   });
 

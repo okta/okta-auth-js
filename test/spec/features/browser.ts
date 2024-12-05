@@ -63,4 +63,30 @@ describe('features (browser)', function() {
       expect(OktaAuth.features.isIE11OrLess()).toBe(true);
     });
   });
+
+  describe('isIOS', () => {
+    it('can succeed', () => {
+      const iOSAgents = [
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/92.0.4515.90 Mobile/15E148 Safari/604.1',
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Mobile/15E148 Safari/604.1',
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/92.0.4515.90 Mobile/15E148 Safari/604.1',
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
+      ];
+
+      for (let userAgent of iOSAgents) {
+        jest.spyOn(global.navigator, 'userAgent', 'get').mockReturnValue(userAgent);
+        expect(OktaAuth.features.isIOS()).toBe(true);
+      }
+    });
+
+    it('returns false if navigator is unavailable', () => {
+      jest.spyOn(global, 'navigator', 'get').mockReturnValue(undefined as never);
+      expect(OktaAuth.features.isIOS()).toBe(false);
+    });
+
+    it('returns false if userAgent is unavailable', () => {
+      jest.spyOn(global.navigator, 'userAgent', 'get').mockReturnValue(undefined as never);
+      expect(OktaAuth.features.isIOS()).toBe(false);
+    });
+  });
 });

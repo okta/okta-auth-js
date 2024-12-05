@@ -18,6 +18,7 @@ import AuthSdkError from '../../errors/AuthSdkError';
 import AuthPollStopError from '../../errors/AuthPollStopError';
 import { AuthnTransactionState } from '../types';
 import { getStateToken } from './stateToken';
+import { isIOS } from '../../features';
 
 interface PollOptions {
   delay?: number;
@@ -82,6 +83,48 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
       });
     }
 
+    const delayNextPoll = (ms) => {
+      // no need for extra logic in non-iOS environments, just continue polling
+      if (!isIOS()) {
+        return delayFn(ms);
+      }
+
+      let timeoutId: ReturnType<typeof setTimeout>;
+      const cancelableDelay = () => {
+        return new Promise((resolve) => {
+          timeoutId = setTimeout(resolve, ms);
+        });
+      };
+
+      const delayForFocus = () => {
+        let pageVisibilityHandler;
+        return new Promise<void>((resolve) => {
+          let pageDidHide = false;
+          pageVisibilityHandler = () => {
+            if (document.hidden) {
+              clearTimeout(timeoutId);
+              pageDidHide = true;
+            }
+            else if (pageDidHide) {
+              resolve();
+            }
+          };
+
+          document.addEventListener('visibilitychange', pageVisibilityHandler);
+        })
+        .then(() => {
+          document.removeEventListener('visibilitychange', pageVisibilityHandler);
+        });
+      };
+
+      return Promise.race([
+        // this function will never resolve if the page changes to hidden because the timeout gets cleared
+        cancelableDelay(),
+        // this function won't resolve until the page becomes visible after being hidden
+        delayForFocus(),
+      ]);
+    };
+
     ref.isPolling = true;
 
     var retryCount = 0;
@@ -90,6 +133,24 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
       if (!ref.isPolling) {
         return Promise.reject(new AuthPollStopError());
       }
+
+      // don't trigger polling request if page is hidden wait until window is visible again
+      if (isIOS() && document.hidden) {
+        let handler;
+        return new Promise<void>((resolve) => {
+          handler = () => {
+            if (!document.hidden) {
+              resolve();
+            }
+          };
+          document.addEventListener('visibilitychange', handler);
+        })
+        .then(() => {
+          document.removeEventListener('visibilitychange', handler);
+          return recursivePoll();
+        });
+      }
+
       return pollFn()
         .then(function (pollRes) {
           // Reset our retry counter on success
@@ -108,7 +169,7 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
             }
 
             // Continue poll
-            return delayFn(delay).then(recursivePoll);
+            return delayNextPoll(delay).then(recursivePoll);
 
           } else {
             // Any non-waiting result, even if polling was stopped
@@ -124,7 +185,7 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
               retryCount <= 4) {
             var delayLength = Math.pow(2, retryCount) * 1000;
             retryCount++;
-            return delayFn(delayLength)
+            return delayNextPoll(delayLength)
               .then(recursivePoll);
           }
           throw err;

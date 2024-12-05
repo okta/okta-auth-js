@@ -88,3 +88,10 @@ export function isDPoPSupported () {
     hasTextEncoder() &&
     isWebCryptoSubtleSupported();
 }
+
+export function isIOS () {
+  // iOS detection from: http://stackoverflow.com/a/9039885/177710
+  return isBrowser() && typeof navigator !== 'undefined' && typeof navigator.userAgent !== 'undefined' &&
+    // @ts-expect-error - MSStream is not in `window` type, unsurprisingly
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
+}
