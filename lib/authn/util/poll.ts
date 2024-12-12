@@ -16,6 +16,7 @@ import { isNumber, isObject, getLink, toQueryString, delay as delayFn } from '..
 import { DEFAULT_POLLING_DELAY } from '../../constants';
 import AuthSdkError from '../../errors/AuthSdkError';
 import AuthPollStopError from '../../errors/AuthPollStopError';
+import { isAuthApiError } from '../../errors';
 import { AuthnTransactionState } from '../types';
 import { getStateToken } from './stateToken';
 import { isIOS } from '../../features';
@@ -179,11 +180,13 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
           }
         })
         .catch(function(err) {
+          const isTooManyRequests = err.xhr &&
+            (err.xhr.status === 0 || err.xhr.status === 429);
+          const isNetworkError = isAuthApiError(err) && err.message === 'Load failed';
+          const canRetry = isTooManyRequests || isNetworkError;
           // Exponential backoff, up to 16 seconds
-          if (err.xhr &&
-              (err.xhr.status === 0 || err.xhr.status === 429) &&
-              retryCount <= 4) {
-            var delayLength = Math.pow(2, retryCount) * 1000;
+          if (canRetry && retryCount <= 4) {
+            var delayLength = isNetworkError ? 200 : Math.pow(2, retryCount) * 1000;
             retryCount++;
             return delayNextPoll(delayLength)
               .then(recursivePoll);
