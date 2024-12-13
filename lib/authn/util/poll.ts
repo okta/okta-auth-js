@@ -13,10 +13,10 @@
 
 import { post } from '../../http';
 import { isNumber, isObject, getLink, toQueryString, delay as delayFn } from '../../util';
-import { DEFAULT_POLLING_DELAY } from '../../constants';
+import { DEFAULT_POLLING_DELAY, POLL_REQUEST_TIMEOUT_FOR_IOS } from '../../constants';
 import AuthSdkError from '../../errors/AuthSdkError';
 import AuthPollStopError from '../../errors/AuthPollStopError';
-import { isAuthApiError } from '../../errors';
+import { isAuthApiError, AuthApiError } from '../../errors';
 import { AuthnTransactionState } from '../types';
 import { getStateToken } from './stateToken';
 import { isIOS } from '../../features';
@@ -78,10 +78,23 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
       }
 
       var href = pollLink.href + toQueryString(opts);
-      return post(sdk, href, getStateToken(res), {
+      const postPromise = post(sdk, href, getStateToken(res), {
         saveAuthnState: false,
         withCredentials: true
       });
+  
+      if (isIOS()) {
+        return Promise.race([
+          postPromise,
+          new Promise((_, reject) => {
+            setTimeout(() => reject(new AuthApiError({
+              errorSummary: 'Load timeout',
+            })), POLL_REQUEST_TIMEOUT_FOR_IOS);
+          })
+        ]);
+      } else {
+        return postPromise;
+      }
     }
 
     const delayNextPoll = (ms) => {
@@ -183,10 +196,11 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
           const isTooManyRequests = err.xhr &&
             (err.xhr.status === 0 || err.xhr.status === 429);
           const isNetworkError = isAuthApiError(err) && err.message === 'Load failed';
-          const canRetry = isTooManyRequests || isNetworkError;
+          const isTimeout = isAuthApiError(err) && err.message === 'Load timeout';
+          const canRetry = isTooManyRequests || isNetworkError || isTimeout;
           // Exponential backoff, up to 16 seconds
           if (canRetry && retryCount <= 4) {
-            var delayLength = isNetworkError ? 200 : Math.pow(2, retryCount) * 1000;
+            var delayLength = isTooManyRequests ? Math.pow(2, retryCount) * 1000 : 200;
             retryCount++;
             return delayNextPoll(delayLength)
               .then(recursivePoll);
