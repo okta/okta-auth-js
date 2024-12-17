@@ -181,10 +181,10 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
           }
         })
         .catch(function(err) {
-          const isTooManyRequests = err.xhr &&
-            (err.xhr.status === 0 || err.xhr.status === 429);
           // Exponential backoff, up to 16 seconds
-          if (isTooManyRequests && retryCount <= 4) {
+          if (err.xhr &&
+              (err.xhr.status === 0 || err.xhr.status === 429) &&
+              retryCount <= 4) {
             var delayLength = Math.pow(2, retryCount) * 1000;
             retryCount++;
             return delayNextPoll(delayLength)
