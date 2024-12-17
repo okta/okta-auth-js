@@ -22,7 +22,7 @@ import {
   RequestData,
   HttpResponse
 } from './types';
-import { AuthApiError, OAuthError, APIError, WWWAuthError } from '../errors';
+import { AuthApiError, OAuthError, APIError, WWWAuthError, isAuthApiError } from '../errors';
 
 
 const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): AuthApiError | OAuthError => {
@@ -113,7 +113,9 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       withCredentials = options.withCredentials === true, // default value is false
       storageUtil = sdk.options.storageUtil,
       storage = storageUtil!.storage,
-      httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies);
+      httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies),
+      timeout = options.timeout,
+      canRetry = options.canRetry;
 
   if (options.cacheResponse) {
     var cacheContents = httpCache.getStorage();
@@ -142,8 +144,21 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     withCredentials
   };
 
-  var err, res;
-  return sdk.options.httpRequestClient!(method!, url!, ajaxOptions)
+  var err, res, promise;
+  const postPromise = sdk.options.httpRequestClient!(method!, url!, ajaxOptions)
+  if (timeout) {
+    promise = Promise.race([
+      postPromise,
+      new Promise((_, reject) => {
+        setTimeout(() => reject(new AuthApiError({
+          errorSummary: 'Load timeout',
+        })), timeout);
+      })
+    ]);
+  } else {
+    promise = postPromise;
+  }
+  return promise
     .then(function(resp) {
       res = resp.responseText;
       if (res && isString(res)) {
@@ -180,6 +195,12 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     })
     .catch(function(resp) {
       err = formatError(sdk, resp);
+
+      const isNetworkError = isAuthApiError(err) && err.message === 'Load failed';
+      const isTimeout = isAuthApiError(err) && err.message === 'Load timeout';
+      if (canRetry && (isNetworkError || isTimeout)) {
+        return httpRequest(sdk, options);
+      }
 
       if (err.errorCode === 'E0000011') {
         storage.delete(STATE_TOKEN_KEY_NAME);
