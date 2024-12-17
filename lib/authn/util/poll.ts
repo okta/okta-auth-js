@@ -16,7 +16,6 @@ import { isNumber, isObject, getLink, toQueryString, delay as delayFn } from '..
 import { DEFAULT_POLLING_DELAY, POLL_REQUEST_TIMEOUT_FOR_IOS } from '../../constants';
 import AuthSdkError from '../../errors/AuthSdkError';
 import AuthPollStopError from '../../errors/AuthPollStopError';
-import { isAuthApiError, AuthApiError } from '../../errors';
 import { AuthnTransactionState } from '../types';
 import { getStateToken } from './stateToken';
 import { isIOS } from '../../features';
@@ -78,23 +77,12 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
       }
 
       var href = pollLink.href + toQueryString(opts);
-      const postPromise = post(sdk, href, getStateToken(res), {
+      return post(sdk, href, getStateToken(res), {
         saveAuthnState: false,
-        withCredentials: true
+        withCredentials: true,
+        canRetry: isIOS(),
+        timeout: isIOS() ? POLL_REQUEST_TIMEOUT_FOR_IOS : undefined,
       });
-  
-      if (isIOS()) {
-        return Promise.race([
-          postPromise,
-          new Promise((_, reject) => {
-            setTimeout(() => reject(new AuthApiError({
-              errorSummary: 'Load timeout',
-            })), POLL_REQUEST_TIMEOUT_FOR_IOS);
-          })
-        ]);
-      } else {
-        return postPromise;
-      }
     }
 
     const delayNextPoll = (ms) => {
@@ -195,12 +183,9 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
         .catch(function(err) {
           const isTooManyRequests = err.xhr &&
             (err.xhr.status === 0 || err.xhr.status === 429);
-          const isNetworkError = isAuthApiError(err) && err.message === 'Load failed';
-          const isTimeout = isAuthApiError(err) && err.message === 'Load timeout';
-          const canRetry = isTooManyRequests || isNetworkError || isTimeout;
           // Exponential backoff, up to 16 seconds
-          if (canRetry && retryCount <= 4) {
-            var delayLength = isTooManyRequests ? Math.pow(2, retryCount) * 1000 : 200;
+          if (isTooManyRequests && retryCount <= 4) {
+            var delayLength = Math.pow(2, retryCount) * 1000;
             retryCount++;
             return delayNextPoll(delayLength)
               .then(recursivePoll);

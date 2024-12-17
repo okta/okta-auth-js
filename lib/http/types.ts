@@ -33,6 +33,8 @@ export interface RequestOptions {
   storageUtil?: StorageUtil;
   cacheResponse?: boolean;
   headers?: RequestHeaders;
+  canRetry?: boolean;
+  timeout?: number;
 }
 
 export interface FetchOptions {
