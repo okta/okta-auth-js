@@ -1,6 +1,7 @@
 {
   "name": "@okta/test.e2e.samples",
   "version": "1.0.0",
+  "private": true,
   "main": "index.js",
   "license": "Apache-2.0",
   "scripts": {
@@ -35,7 +36,7 @@
     "@wdio/sauce-service": "^8.35.1",
     "@wdio/spec-reporter": "^8.32.4",
     "ts-node": "^10.9.1",
-    "wait-on": "^6.0.1",
+    "wait-on": "^8.0.1",
     "webdriverio": "^8.35.1",
     "junit-report-merger": "^3.0.5"
   }

@@ -1,6 +1,7 @@
 {
   "name": "@okta/test.e2e",
   "version": "1.0.0",
+  "private": true,
   "main": "index.js",
   "license": "Apache-2.0",
   "scripts": {
@@ -29,7 +30,7 @@
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.0",
     "regenerator-runtime": "^0.13.3",
-    "wait-on": "^6.0.1"
+    "wait-on": "^8.0.1"
   },
   "devDependencies": {
     "@wdio/types": "^8.32.4",
