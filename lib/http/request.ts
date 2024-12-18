@@ -14,7 +14,7 @@
 
 /* eslint-disable complexity */
 import { isString, clone, isAbsoluteUrl, removeNils } from '../util';
-import { STATE_TOKEN_KEY_NAME, DEFAULT_CACHE_DURATION } from '../constants';
+import { STATE_TOKEN_KEY_NAME, DEFAULT_CACHE_DURATION, IOS_PAGE_AWAKEN_TIMEOUT } from '../constants';
 import {
   OktaAuthHttpInterface,
   RequestOptions,
@@ -22,8 +22,22 @@ import {
   RequestData,
   HttpResponse
 } from './types';
-import { AuthApiError, OAuthError, APIError, WWWAuthError, isAuthApiError } from '../errors';
+import { AuthApiError, OAuthError, APIError, WWWAuthError } from '../errors';
+import { isIOS } from '../features';
 
+
+// For iOS track last date of document become visible
+let lastDateOfVisibleDocument = 0;
+let globalVisibilityHandler: () => void;
+if (isIOS()) {
+  lastDateOfVisibleDocument = Date.now();
+  globalVisibilityHandler = () => {
+    if (!document.hidden) {
+      lastDateOfVisibleDocument = Date.now();
+    }
+  };
+  document.addEventListener('visibilitychange', globalVisibilityHandler);
+}
 
 const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): AuthApiError | OAuthError => {
   if (error instanceof Error) {
@@ -96,6 +110,8 @@ const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): A
   return err;
 };
 
+let rcg = 0;
+
 export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions): Promise<any> {
   options = options || {};
 
@@ -114,7 +130,6 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       storageUtil = sdk.options.storageUtil,
       storage = storageUtil!.storage,
       httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies),
-      timeout = options.timeout,
       canRetry = options.canRetry;
 
   if (options.cacheResponse) {
@@ -145,19 +160,90 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
   };
 
   var err, res, promise;
-  const postPromise = sdk.options.httpRequestClient!(method!, url!, ajaxOptions)
-  if (timeout) {
-    promise = Promise.race([
-      postPromise,
-      new Promise((_, reject) => {
-        setTimeout(() => reject(new AuthApiError({
-          errorSummary: 'Load timeout',
-        })), timeout);
-      })
-    ]);
+
+  if (isIOS()) {
+    const waitForAwakenDocument = () => {
+      const timeSinceDocumentIsVisible = Date.now() - lastDateOfVisibleDocument;
+      if (isIOS() && timeSinceDocumentIsVisible < IOS_PAGE_AWAKEN_TIMEOUT) {
+        return new Promise<void>((resolve) => setTimeout( () => {
+          if (!document.hidden) {
+            resolve();
+          } else {
+            resolve(waitForVisibleAndAwakenDocument());
+          }
+        }, IOS_PAGE_AWAKEN_TIMEOUT - timeSinceDocumentIsVisible));
+      } else {
+        return Promise.resolve();
+      }
+    };
+
+    const waitForVisibleAndAwakenDocument = () => {
+      if (document.hidden) {
+        let pageVisibilityHandler: () => void;
+        return new Promise<void>((resolve) => {
+          pageVisibilityHandler = () => {
+            if (!document.hidden) {
+              document.removeEventListener('visibilitychange', pageVisibilityHandler);
+              resolve(waitForAwakenDocument());
+            }
+          };
+          document.addEventListener('visibilitychange', pageVisibilityHandler);
+        });
+      } else {
+        return waitForAwakenDocument();
+      }
+    };
+
+    const makePromise = (): Promise<HttpResponse> => {
+      return waitForVisibleAndAwakenDocument().then(makeProtectedFetchPromise);
+    };
+
+    // Restarts fetch if document become hidden / on network error
+    const makeProtectedFetchPromise = (): Promise<HttpResponse> => {
+      let timeoutId: ReturnType<typeof setTimeout>;
+      let pageVisibilityHandler: () => void;
+
+      const postPromise = sdk.options.httpRequestClient!(method!, url!, ajaxOptions);
+
+      // Reject if document become hidden
+      const backgroundPromise = new Promise<void>((_, reject) => {
+        pageVisibilityHandler = () => {
+          if (document.hidden) {
+            reject({ reason: 'background' });
+          }
+        };
+        document.addEventListener('visibilitychange', pageVisibilityHandler);
+      });
+
+      // Reject on timeout
+      // const timeoutPromise = new Promise<void>((_, reject) => {
+      //   timeoutId = setTimeout(() => {
+      //     reject({ reason: 'timeout' });
+      //   }, REQUEST_TIMEOUT_FOR_IOS);
+      // });
+
+      return Promise.race([
+        postPromise,
+        //timeoutPromise,
+        backgroundPromise,
+      ]).finally(() => {
+        clearTimeout(timeoutId);
+        document.removeEventListener('visibilitychange', pageVisibilityHandler);
+      }).catch((err) => {
+        const isNetworkError = err?.message === 'Load failed';
+        const isRejection = (err?.reason === 'background' || err?.reason === 'timeout'); // todo: remove 'timeout'
+        if (isNetworkError || isRejection) { // todo: canRetry && isNetworkError
+          return makePromise();
+        }
+        throw err;
+      }) as Promise<HttpResponse>;
+    };
+
+    promise = makePromise();
   } else {
-    promise = postPromise;
+    promise = sdk.options.httpRequestClient!(method!, url!, ajaxOptions);
   }
+
   return promise
     .then(function(resp) {
       res = resp.responseText;
@@ -195,12 +281,6 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     })
     .catch(function(resp) {
       err = formatError(sdk, resp);
-
-      const isNetworkError = isAuthApiError(err) && err.message === 'Load failed';
-      const isTimeout = isAuthApiError(err) && err.message === 'Load timeout';
-      if (canRetry && (isNetworkError || isTimeout)) {
-        return httpRequest(sdk, options);
-      }
 
       if (err.errorCode === 'E0000011') {
         storage.delete(STATE_TOKEN_KEY_NAME);
