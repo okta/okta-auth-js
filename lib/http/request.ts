@@ -110,8 +110,6 @@ const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): A
   return err;
 };
 
-let rcg = 0;
-
 export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions): Promise<any> {
   options = options || {};
 
