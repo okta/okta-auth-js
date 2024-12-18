@@ -2,6 +2,7 @@
   "name": "@okta/samples",
   "version": "1.0.0",
   "main": "index.js",
+  "private": true,
   "license": "Apache-2.0",
   "scripts": {
     "clean": "gulp clean",
@@ -10,7 +11,7 @@
     "test": "yarn workspace @okta/test.e2e.samples start"
   },
   "devDependencies": {
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.0",
     "gulp-clean": "^0.4.0",
     "gulp-cli": "^2.3.0",
     "gulp-compile-handlebars": "^0.6.1",
