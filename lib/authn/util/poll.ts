@@ -13,7 +13,7 @@
 
 import { post } from '../../http';
 import { isNumber, isObject, getLink, toQueryString, delay as delayFn } from '../../util';
-import { DEFAULT_POLLING_DELAY, POLL_REQUEST_TIMEOUT_FOR_IOS } from '../../constants';
+import { DEFAULT_POLLING_DELAY } from '../../constants';
 import AuthSdkError from '../../errors/AuthSdkError';
 import AuthPollStopError from '../../errors/AuthPollStopError';
 import { AuthnTransactionState } from '../types';
@@ -81,7 +81,6 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
         saveAuthnState: false,
         withCredentials: true,
         canRetry: isIOS(),
-        timeout: isIOS() ? POLL_REQUEST_TIMEOUT_FOR_IOS : undefined,
       });
     }
 

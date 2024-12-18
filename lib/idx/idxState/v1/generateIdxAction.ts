@@ -16,7 +16,6 @@ import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
 import { IdxActionFunction, IdxActionParams, IdxResponse, IdxToPersist } from '../../types/idx-js';
 import { divideActionParamsByMutability } from './actionParser';
 import AuthApiError from '../../../errors/AuthApiError';
-import { POLL_REQUEST_TIMEOUT_FOR_IOS } from '../../../constants';
 import { isIOS } from '../../../features';
 
 const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdxInterface, { 
@@ -48,7 +47,6 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdx
       const isPolling = target.endsWith('/poll');
       if (isIOS() && isPolling) {
         options.canRetry = true;
-        options.timeout = POLL_REQUEST_TIMEOUT_FOR_IOS;
       }
       const response = await httpRequest(authClient, options);
 
