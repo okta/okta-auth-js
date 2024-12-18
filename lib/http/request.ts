@@ -26,17 +26,17 @@ import { AuthApiError, OAuthError, APIError, WWWAuthError } from '../errors';
 import { isIOS } from '../features';
 
 
-// For iOS track last date of document become visible
-let lastDateOfVisibleDocument = 0;
-let globalVisibilityHandler: () => void;
+// For iOS track last date when document became visible
+let dateDocumentBecameVisible = 0;
+let trackDateDocumentBecameVisible: () => void;
 if (isIOS()) {
-  lastDateOfVisibleDocument = Date.now();
-  globalVisibilityHandler = () => {
+  dateDocumentBecameVisible = Date.now();
+  trackDateDocumentBecameVisible = () => {
     if (!document.hidden) {
-      lastDateOfVisibleDocument = Date.now();
+      dateDocumentBecameVisible = Date.now();
     }
   };
-  document.addEventListener('visibilitychange', globalVisibilityHandler);
+  document.addEventListener('visibilitychange', trackDateDocumentBecameVisible);
 }
 
 const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): AuthApiError | OAuthError => {
@@ -162,8 +162,11 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
   var err, res, promise;
 
   if (isIOS()) {
+    // Safari on iOS has bug:
+    //  Performing `fetch` right after document became visible can fail with `Load failed` error.
+    // Running fetch after short timeout fixes this issue.
     const waitForAwakenDocument = () => {
-      const timeSinceDocumentIsVisible = Date.now() - lastDateOfVisibleDocument;
+      const timeSinceDocumentIsVisible = Date.now() - dateDocumentBecameVisible;
       if (isIOS() && timeSinceDocumentIsVisible < IOS_PAGE_AWAKEN_TIMEOUT) {
         return new Promise<void>((resolve) => setTimeout( () => {
           if (!document.hidden) {
@@ -177,6 +180,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       }
     };
 
+    // Returns a promise that resolves when document is visible for 500 ms
     const waitForVisibleAndAwakenDocument = () => {
       if (document.hidden) {
         let pageVisibilityHandler: () => void;
@@ -194,22 +198,24 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       }
     };
 
-    // Restarts fetch on network error
-    const makeProtectedFetchPromise = (): Promise<HttpResponse> => {
+    // Restarts fetch on 'Load failed' error
+    // This error can occur when `fetch` does not respond (due to CORS error, non-existing host, or network error)
+    const retryableFetch = (): Promise<HttpResponse> => {
       return sdk.options.httpRequestClient!(method!, url!, ajaxOptions).catch((err) => {
         const isNetworkError = err?.message === 'Load failed';
-        if (isNetworkError) {
-          return makePromise();
+        if (canRetry && isNetworkError) {
+          return recursiveFetch();
         }
         throw err;
       });
     };
 
-    const makePromise = (): Promise<HttpResponse> => {
-      return waitForVisibleAndAwakenDocument().then(makeProtectedFetchPromise);
+    // Final promise to fetch that wraps logic with waiting for visible document and retrying fetch request on network error
+    const recursiveFetch = (): Promise<HttpResponse> => {
+      return waitForVisibleAndAwakenDocument().then(retryableFetch);
     };
 
-    promise = makePromise();
+    promise = recursiveFetch();
   } else {
     promise = sdk.options.httpRequestClient!(method!, url!, ajaxOptions);
   }
