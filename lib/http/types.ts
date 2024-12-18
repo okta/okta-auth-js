@@ -34,7 +34,6 @@ export interface RequestOptions {
   cacheResponse?: boolean;
   headers?: RequestHeaders;
   canRetry?: boolean;
-  timeout?: number;
 }
 
 export interface FetchOptions {

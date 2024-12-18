@@ -194,49 +194,19 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       }
     };
 
-    const makePromise = (): Promise<HttpResponse> => {
-      return waitForVisibleAndAwakenDocument().then(makeProtectedFetchPromise);
-    };
-
-    // Restarts fetch if document become hidden / on network error
+    // Restarts fetch on network error
     const makeProtectedFetchPromise = (): Promise<HttpResponse> => {
-      let timeoutId: ReturnType<typeof setTimeout>;
-      let pageVisibilityHandler: () => void;
-
-      const postPromise = sdk.options.httpRequestClient!(method!, url!, ajaxOptions);
-
-      // Reject if document become hidden
-      const backgroundPromise = new Promise<void>((_, reject) => {
-        pageVisibilityHandler = () => {
-          if (document.hidden) {
-            reject({ reason: 'background' });
-          }
-        };
-        document.addEventListener('visibilitychange', pageVisibilityHandler);
-      });
-
-      // Reject on timeout
-      // const timeoutPromise = new Promise<void>((_, reject) => {
-      //   timeoutId = setTimeout(() => {
-      //     reject({ reason: 'timeout' });
-      //   }, REQUEST_TIMEOUT_FOR_IOS);
-      // });
-
-      return Promise.race([
-        postPromise,
-        //timeoutPromise,
-        backgroundPromise,
-      ]).finally(() => {
-        clearTimeout(timeoutId);
-        document.removeEventListener('visibilitychange', pageVisibilityHandler);
-      }).catch((err) => {
+      return sdk.options.httpRequestClient!(method!, url!, ajaxOptions).catch((err) => {
         const isNetworkError = err?.message === 'Load failed';
-        const isRejection = (err?.reason === 'background' || err?.reason === 'timeout'); // todo: remove 'timeout'
-        if (isNetworkError || isRejection) { // todo: canRetry && isNetworkError
+        if (isNetworkError) {
           return makePromise();
         }
         throw err;
-      }) as Promise<HttpResponse>;
+      });
+    };
+
+    const makePromise = (): Promise<HttpResponse> => {
+      return waitForVisibleAndAwakenDocument().then(makeProtectedFetchPromise);
     };
 
     promise = makePromise();
