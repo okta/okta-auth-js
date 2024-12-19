@@ -1592,17 +1592,17 @@ describe('MFA_CHALLENGE', function () {
         }, 'success', 'https://auth-js-test.okta.com');
 
         // mocks flow of wait, wait, wait, success
-        context.httpSpy = jest.spyOn(mocked.http, 'post')
-          .mockResolvedValueOnce(mfaPush.response)
-          .mockResolvedValueOnce(mfaPush.response)
-          .mockResolvedValueOnce(mfaPush.response)
-          .mockResolvedValueOnce(success.response);
-
+        context.httpSpy = jest.fn()
+          .mockResolvedValueOnce({responseText: JSON.stringify(mfaPush.response)})
+          .mockResolvedValueOnce({responseText: JSON.stringify(mfaPush.response)})
+          .mockResolvedValueOnce({responseText: JSON.stringify(mfaPush.response)})
+          .mockResolvedValueOnce({responseText: JSON.stringify(success.response)});
 
         const oktaAuth = new OktaAuth({
-          issuer: 'https://auth-js-test.okta.com'
+          issuer: 'https://auth-js-test.okta.com',
+          httpRequestClient: context.httpSpy
         });
-        
+
         context.transaction = oktaAuth.tx.createTransaction(mfaPush.response);
       });
 

@@ -11,11 +11,12 @@
  */
 
 /* eslint-disable max-len, complexity */
-import { httpRequest } from '../../../http';
+import { httpRequest, RequestOptions } from '../../../http';
 import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
 import { IdxActionFunction, IdxActionParams, IdxResponse, IdxToPersist } from '../../types/idx-js';
 import { divideActionParamsByMutability } from './actionParser';
 import AuthApiError from '../../../errors/AuthApiError';
+import { isIOS } from '../../../features';
 
 const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdxInterface, { 
   actionDefinition, 
@@ -36,13 +37,18 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdx
     });
 
     try {
-      const response = await httpRequest(authClient, {
+      const options: RequestOptions = {
         url: target,
         method: actionDefinition.method,
         headers,
         args: body,
         withCredentials: toPersist?.withCredentials ?? true
-      });
+      };
+      const isPolling = target.endsWith('/poll');
+      if (isIOS() && isPolling) {
+        options.canRetry = true;
+      }
+      const response = await httpRequest(authClient, options);
 
       return authClient.idx.makeIdxResponse({ ...response }, toPersist, true);
     }
