@@ -364,6 +364,8 @@ describe('HTTP Requestor', () => {
 
     // TODO: OAuthError includes response object
   });
+
+  // eslint-disable-next-line no-extra-boolean-cast
   (!!global.document ? describe : describe.skip)('iOS 18 bug', () => {
     beforeEach(() => {
       jest.useFakeTimers();
