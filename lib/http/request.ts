@@ -14,7 +14,7 @@
 
 /* eslint-disable complexity */
 import { isString, clone, isAbsoluteUrl, removeNils } from '../util';
-import { STATE_TOKEN_KEY_NAME, DEFAULT_CACHE_DURATION } from '../constants';
+import { STATE_TOKEN_KEY_NAME, DEFAULT_CACHE_DURATION, IOS_PAGE_AWAKEN_TIMEOUT } from '../constants';
 import {
   OktaAuthHttpInterface,
   RequestOptions,
@@ -23,7 +23,21 @@ import {
   HttpResponse
 } from './types';
 import { AuthApiError, OAuthError, APIError, WWWAuthError } from '../errors';
+import { isIOS } from '../features';
 
+
+// For iOS track last date when document became visible
+let dateDocumentBecameVisible = 0;
+let trackDateDocumentBecameVisible: () => void;
+if (isIOS()) {
+  dateDocumentBecameVisible = Date.now();
+  trackDateDocumentBecameVisible = () => {
+    if (!document.hidden) {
+      dateDocumentBecameVisible = Date.now();
+    }
+  };
+  document.addEventListener('visibilitychange', trackDateDocumentBecameVisible);
+}
 
 const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): AuthApiError | OAuthError => {
   if (error instanceof Error) {
@@ -96,6 +110,7 @@ const formatError = (sdk: OktaAuthHttpInterface, error: HttpResponse | Error): A
   return err;
 };
 
+// eslint-disable-next-line max-statements
 export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions): Promise<any> {
   options = options || {};
 
@@ -113,7 +128,8 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       withCredentials = options.withCredentials === true, // default value is false
       storageUtil = sdk.options.storageUtil,
       storage = storageUtil!.storage,
-      httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies);
+      httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies),
+      canRetry = options.canRetry;
 
   if (options.cacheResponse) {
     var cacheContents = httpCache.getStorage();
@@ -142,8 +158,74 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     withCredentials
   };
 
-  var err, res;
-  return sdk.options.httpRequestClient!(method!, url!, ajaxOptions)
+  var err, res, promise;
+
+  if (isIOS()) {
+    let waitForVisibleAndAwakenDocument: () => Promise<void>;
+    let waitForAwakenDocument: () => Promise<void>;
+    let recursiveFetch: () => Promise<HttpResponse>;
+
+    // Safari on iOS has bug:
+    //  Performing `fetch` right after document became visible can fail with `Load failed` error.
+    // Running fetch after short timeout fixes this issue.
+    waitForAwakenDocument = () => {
+      const timeSinceDocumentIsVisible = Date.now() - dateDocumentBecameVisible;
+      if (isIOS() && timeSinceDocumentIsVisible < IOS_PAGE_AWAKEN_TIMEOUT) {
+        return new Promise<void>((resolve) => setTimeout(() => {
+          if (!document.hidden) {
+            resolve();
+          } else {
+            resolve(waitForVisibleAndAwakenDocument());
+          }
+        }, IOS_PAGE_AWAKEN_TIMEOUT - timeSinceDocumentIsVisible));
+      } else {
+        return Promise.resolve();
+      }
+    };
+
+    // Returns a promise that resolves when document is visible for 500 ms
+    waitForVisibleAndAwakenDocument = () => {
+      if (document.hidden) {
+        let pageVisibilityHandler: () => void;
+        return new Promise<void>((resolve) => {
+          pageVisibilityHandler = () => {
+            if (!document.hidden) {
+              document.removeEventListener('visibilitychange', pageVisibilityHandler);
+              resolve(waitForAwakenDocument());
+            }
+          };
+          document.addEventListener('visibilitychange', pageVisibilityHandler);
+        });
+      } else {
+        return waitForAwakenDocument();
+      }
+    };
+
+    // Restarts fetch on 'Load failed' error
+    // This error can occur when `fetch` does not respond
+    //  (due to CORS error, non-existing host, or network error)
+    const retryableFetch = (): Promise<HttpResponse> => {
+      return sdk.options.httpRequestClient!(method!, url!, ajaxOptions).catch((err) => {
+        const isNetworkError = err?.message === 'Load failed';
+        if (canRetry && isNetworkError) {
+          return recursiveFetch();
+        }
+        throw err;
+      });
+    };
+
+    // Final promise to fetch that wraps logic with waiting for visible document
+    //  and retrying fetch request on network error
+    recursiveFetch = (): Promise<HttpResponse> => {
+      return waitForVisibleAndAwakenDocument().then(retryableFetch);
+    };
+
+    promise = recursiveFetch();
+  } else {
+    promise = sdk.options.httpRequestClient!(method!, url!, ajaxOptions);
+  }
+
+  return promise
     .then(function(resp) {
       res = resp.responseText;
       if (res && isString(res)) {
