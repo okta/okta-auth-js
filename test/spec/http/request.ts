@@ -13,16 +13,33 @@
 
 declare var USER_AGENT: string; // set in jest config
 
-import { httpRequest } from '../../../lib/http';
+import { httpRequest as originalHttpRequest } from '../../../lib/http';
 import {
   OktaAuth, 
   DEFAULT_CACHE_DURATION, 
   AuthApiError, 
   STATE_TOKEN_KEY_NAME 
 } from '../../../lib/exports/core';
+import { setImmediate } from 'timers';
+
+
+jest.mock('../../../lib/features', () => {
+  return {
+    isBrowser: () => typeof window !== 'undefined',
+    isIE11OrLess: () => false,
+    isLocalhost: () => false,
+    isHTTPS: () => false,
+    isIOS: () => false
+  };
+});
+
+const mocked = {
+  features: require('../../../lib/features'),
+};
 
 describe('HTTP Requestor', () => {
   let sdk;
+  let httpRequest = originalHttpRequest;
   let httpRequestClient;
   let url;
   let response1;
@@ -346,5 +363,79 @@ describe('HTTP Requestor', () => {
     });
 
     // TODO: OAuthError includes response object
+  });
+  describe('iOS 18 bug', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      // Simulate iOS and reload `request.ts` module
+      jest.resetModules();
+      jest.mock('../../../lib/features', () => {
+        return {
+          ...mocked.features,
+          isIOS: () => true 
+        };
+      });
+      const { httpRequest: reloadedHttpRequest } = jest.requireActual('../../../lib/http');
+      httpRequest = reloadedHttpRequest;
+    });
+
+    afterEach(() => {
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+      httpRequest = originalHttpRequest;
+      jest.mock('../../../lib/features', () => {
+        return {
+          ...mocked.features,
+          isIOS: () => false 
+        };
+      });
+    });
+
+    const togglePageVisibility = () => {
+      (document as any).hidden = !document.hidden;
+      document.dispatchEvent(new Event('visibilitychange'));
+    };
+
+    const advanceTestTimers = async (ms?: number) => {
+      // see https://stackoverflow.com/a/52196951 for more info about jest/promises/timers
+      if (ms) {
+        jest.advanceTimersByTime(ms);
+      } else {
+        jest.runOnlyPendingTimers();
+      }
+      // flushes promise queue
+      return new Promise(resolve => setImmediate(resolve));
+    };
+
+    it('should wait for awaken document for 500 ms before making request', async () => {
+      createAuthClient();
+      expect(document.hidden).toBe(false);
+
+      // Document is hidden
+      togglePageVisibility();
+      const requestPromise = httpRequest(sdk, { url });
+      await advanceTestTimers();
+      expect(httpRequestClient).toHaveBeenCalledTimes(0);
+
+      // Document is visible for 200 ms
+      togglePageVisibility();
+      await advanceTestTimers(200);
+      expect(httpRequestClient).toHaveBeenCalledTimes(0);
+
+      // Document is visible for 600 ms
+      await advanceTestTimers(400);
+      expect(httpRequestClient).toHaveBeenCalledTimes(1);
+      expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+        data: undefined,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Okta-User-Agent-Extended': USER_AGENT
+        },
+        withCredentials: false
+      });
+      const res = await requestPromise;
+      expect(res).toBe(response1);
+    });
   });
 });
