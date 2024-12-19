@@ -171,7 +171,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     waitForAwakenDocument = () => {
       const timeSinceDocumentIsVisible = Date.now() - dateDocumentBecameVisible;
       if (isIOS() && timeSinceDocumentIsVisible < IOS_PAGE_AWAKEN_TIMEOUT) {
-        return new Promise<void>((resolve) => setTimeout( () => {
+        return new Promise<void>((resolve) => setTimeout(() => {
           if (!document.hidden) {
             resolve();
           } else {
