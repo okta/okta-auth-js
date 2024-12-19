@@ -364,7 +364,7 @@ describe('HTTP Requestor', () => {
 
     // TODO: OAuthError includes response object
   });
-  describe('iOS 18 bug', () => {
+  (!!global.document ? describe : describe.skip)('iOS 18 bug', () => {
     beforeEach(() => {
       jest.useFakeTimers();
       // Simulate iOS and reload `request.ts` module
