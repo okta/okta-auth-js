@@ -2,7 +2,6 @@ import { OktaAuthHttpInterface } from '../../http/types';
 import { find, omit, toQueryString } from '../../util';
 import AuthSdkError from '../../errors/AuthSdkError';
 import { get } from '../../http';
-import { isIOS } from '../../features';
 import { AuthnTransactionAPI, AuthnTransactionState } from '../types';
 import { postToTransaction } from '../api';
 import { addStateToken } from './stateToken';
@@ -99,9 +98,7 @@ export function link2fn(sdk: OktaAuthHttpInterface, tx: AuthnTransactionAPI, res
             data.profile = omit(data.profile, 'updatePhone');
           }
           var href = link.href + toQueryString(params);
-          return postToTransaction(sdk, tx, href, data, {
-            canRetry: isIOS(),
-          });
+          return postToTransaction(sdk, tx, href, data);
         };
     }
   }
