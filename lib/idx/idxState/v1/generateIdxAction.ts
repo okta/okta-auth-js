@@ -43,7 +43,7 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdx
         args: body,
         withCredentials: toPersist?.withCredentials ?? true
       };
-      const isPolling = target.endsWith('/poll');
+      const isPolling = actionDefinition.name === 'poll' || actionDefinition.name?.endsWith('-poll');
       if (isPolling) {
         options.pollingIntent = true;
       }
