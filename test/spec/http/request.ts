@@ -366,7 +366,7 @@ describe('HTTP Requestor', () => {
   });
 
   // eslint-disable-next-line no-extra-boolean-cast
-  (!!global.document ? describe : describe.skip)('iOS 18 bug', () => {
+  (!!global.document ? describe : describe.skip)('iOS18 polling', () => {
     beforeEach(() => {
       jest.useFakeTimers();
       // Simulate iOS and reload `request.ts` module
@@ -415,7 +415,10 @@ describe('HTTP Requestor', () => {
 
       // Document is hidden
       togglePageVisibility();
-      const requestPromise = httpRequest(sdk, { url });
+      const requestPromise = httpRequest(sdk, {
+        url,
+        pollingIntent: true,
+      });
       await advanceTestTimers();
       expect(httpRequestClient).toHaveBeenCalledTimes(0);
 
