@@ -99,6 +99,7 @@ export function isIOS () {
 
 export function isMobileSafari18 () {
   if (isBrowser() && typeof navigator !== 'undefined' && typeof navigator.userAgent !== 'undefined') {
+    // eslint-disable-next-line new-cap
     const { browser, os } = UAParser(navigator.userAgent);
     return os.name?.toLowerCase() === 'ios' && !!browser.name?.toLowerCase()?.includes('safari')
       && browser.major === '18';
