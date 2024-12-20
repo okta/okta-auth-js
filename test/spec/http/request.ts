@@ -365,6 +365,8 @@ describe('HTTP Requestor', () => {
     // TODO: OAuthError includes response object
   });
 
+  // OKTA-823470: iOS18 polling issue
+  // NOTE: only run these tests in browser environments
   // eslint-disable-next-line no-extra-boolean-cast
   (!!global.document ? describe : describe.skip)('iOS18 polling', () => {
     beforeEach(() => {
@@ -409,7 +411,7 @@ describe('HTTP Requestor', () => {
       return new Promise(resolve => setImmediate(resolve));
     };
 
-    it('should wait for awaken document for 500 ms before making request', async () => {
+    it('should wait for document to be visible for 500 ms before making request', async () => {
       createAuthClient();
       expect(document.hidden).toBe(false);
 
@@ -442,5 +444,33 @@ describe('HTTP Requestor', () => {
       const res = await requestPromise;
       expect(res).toBe(response1);
     });
+
+    it('should retry on network error', async () => {
+      httpRequestClient = jest.fn()
+        .mockRejectedValueOnce(new TypeError('Load failed'))
+        .mockResolvedValueOnce({
+          responseText: JSON.stringify(response1)
+        });
+      createAuthClient();
+      expect(document.hidden).toBe(false);
+      const requestPromise = httpRequest(sdk, {
+        url,
+        pollingIntent: true,
+      });
+      await advanceTestTimers();  
+      expect(httpRequestClient).toHaveBeenCalledTimes(2);
+      expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+        data: undefined,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Okta-User-Agent-Extended': USER_AGENT
+        },
+        withCredentials: false
+      });
+      const res = await requestPromise;
+      expect(res).toBe(response1);
+    });
+
   });
 });
