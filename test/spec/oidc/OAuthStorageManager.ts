@@ -31,7 +31,7 @@ jest.mock('../../../lib/util', () => {
 jest.mock('../../../lib/features', () => {
   return {
     isBrowser: () => {},
-    isIOS: () => false
+    isMobileSafari18: () => false
   };
 });
 

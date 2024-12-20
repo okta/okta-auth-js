@@ -64,29 +64,47 @@ describe('features (browser)', function() {
     });
   });
 
-  describe('isIOS', () => {
-    it('can succeed', () => {
-      const iOSAgents = [
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/92.0.4515.90 Mobile/15E148 Safari/604.1',
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Mobile/15E148 Safari/604.1',
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/92.0.4515.90 Mobile/15E148 Safari/604.1',
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
-      ];
+  describe('isIOS, isMobileSafari18', () => {
+    const iOSAgents = [
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/92.0.4515.90 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/92.0.4515.90 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) EdgiOS/130.0.2849.80 Version/18.0 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) EdgiOS/132.0.2957.32 Version/18.0 Mobile/15E148 Safari/604.1',
+    ];
+    const mobileSafari18Agents = [
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Teak/5.9 Version/18 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (iPad; CPU OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2 Mobile/15E148 Safari/604.1',
+    ];
 
-      for (let userAgent of iOSAgents) {
+    for (let userAgent of iOSAgents) {
+      it('can succeed for ' + userAgent, () => {
         jest.spyOn(global.navigator, 'userAgent', 'get').mockReturnValue(userAgent);
         expect(OktaAuth.features.isIOS()).toBe(true);
-      }
-    });
+        expect(OktaAuth.features.isMobileSafari18()).toBe(false);
+      });
+    }
+    for (let userAgent of mobileSafari18Agents) {
+      it('can succeed for ' + userAgent, () => {
+        jest.spyOn(global.navigator, 'userAgent', 'get').mockReturnValue(userAgent);
+        expect(OktaAuth.features.isIOS()).toBe(true);
+        expect(OktaAuth.features.isMobileSafari18()).toBe(true);
+      });
+    }
 
     it('returns false if navigator is unavailable', () => {
       jest.spyOn(global, 'navigator', 'get').mockReturnValue(undefined as never);
       expect(OktaAuth.features.isIOS()).toBe(false);
+      expect(OktaAuth.features.isMobileSafari18()).toBe(false);
     });
 
     it('returns false if userAgent is unavailable', () => {
       jest.spyOn(global.navigator, 'userAgent', 'get').mockReturnValue(undefined as never);
       expect(OktaAuth.features.isIOS()).toBe(false);
+      expect(OktaAuth.features.isMobileSafari18()).toBe(false);
     });
   });
 });

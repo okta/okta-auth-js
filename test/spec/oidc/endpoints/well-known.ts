@@ -18,7 +18,7 @@ const mocked = {
     isBrowser: () => typeof window !== 'undefined',
     isIE11OrLess: () => false,
     isLocalhost: () => false,
-    isIOS: () => false
+    isMobileSafari18: () => false
   }
 };
 jest.mock('../../../../lib/features', () => {

@@ -20,7 +20,7 @@ const mocked = {
     isPKCESupported: () => true,
     hasTextEncoder: () => true,
     isDPoPSupported: () => true,
-    isIOS: () => false,
+    isMobileSafari18: () => false,
   },
   wellKnown: {
     getWellKnown: (): Promise<unknown> => Promise.resolve()

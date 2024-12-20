@@ -29,7 +29,7 @@ jest.mock('../../../lib/features', () => {
     isIE11OrLess: () => false,
     isLocalhost: () => false,
     isHTTPS: () => false,
-    isIOS: () => false
+    isMobileSafari18: () => false
   };
 });
 
@@ -376,7 +376,7 @@ describe('HTTP Requestor', () => {
       jest.mock('../../../lib/features', () => {
         return {
           ...mocked.features,
-          isIOS: () => true 
+          isMobileSafari18: () => true 
         };
       });
       const { httpRequest: reloadedHttpRequest } = jest.requireActual('../../../lib/http');
@@ -390,7 +390,7 @@ describe('HTTP Requestor', () => {
       jest.mock('../../../lib/features', () => {
         return {
           ...mocked.features,
-          isIOS: () => false 
+          isMobileSafari18: () => false 
         };
       });
     });
