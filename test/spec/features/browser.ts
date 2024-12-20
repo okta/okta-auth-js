@@ -88,6 +88,7 @@ describe('features (browser)', function() {
       });
     }
     for (let userAgent of mobileSafari18Agents) {
+      // eslint-disable-next-line  jasmine/no-spec-dupes
       it('can succeed for ' + userAgent, () => {
         jest.spyOn(global.navigator, 'userAgent', 'get').mockReturnValue(userAgent);
         expect(OktaAuth.features.isIOS()).toBe(true);
