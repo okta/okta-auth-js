@@ -80,7 +80,7 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
       return post(sdk, href, getStateToken(res), {
         saveAuthnState: false,
         withCredentials: true,
-        canRetry: isIOS(),
+        pollingIntent: true,
       });
     }
 

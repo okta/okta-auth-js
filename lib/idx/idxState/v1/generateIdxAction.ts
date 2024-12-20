@@ -16,7 +16,6 @@ import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
 import { IdxActionFunction, IdxActionParams, IdxResponse, IdxToPersist } from '../../types/idx-js';
 import { divideActionParamsByMutability } from './actionParser';
 import AuthApiError from '../../../errors/AuthApiError';
-import { isIOS } from '../../../features';
 
 const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdxInterface, { 
   actionDefinition, 
@@ -45,8 +44,8 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdx
         withCredentials: toPersist?.withCredentials ?? true
       };
       const isPolling = target.endsWith('/poll');
-      if (isIOS() && isPolling) {
-        options.canRetry = true;
+      if (isPolling) {
+        options.pollingIntent = true;
       }
       const response = await httpRequest(authClient, options);
 

@@ -129,7 +129,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       storageUtil = sdk.options.storageUtil,
       storage = storageUtil!.storage,
       httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies),
-      canRetry = options.canRetry;
+      pollingIntent = options.pollingIntent;
 
   if (options.cacheResponse) {
     var cacheContents = httpCache.getStorage();
@@ -165,7 +165,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     let waitForAwakenDocument: () => Promise<void>;
     let recursiveFetch: () => Promise<HttpResponse>;
 
-    // Safari on iOS has bug:
+    // Safari on iOS has a bug:
     //  Performing `fetch` right after document became visible can fail with `Load failed` error.
     // Running fetch after short timeout fixes this issue.
     waitForAwakenDocument = () => {
@@ -207,7 +207,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     const retryableFetch = (): Promise<HttpResponse> => {
       return sdk.options.httpRequestClient!(method!, url!, ajaxOptions).catch((err) => {
         const isNetworkError = err?.message === 'Load failed';
-        if (canRetry && isNetworkError) {
+        if (pollingIntent && isNetworkError) {
           return recursiveFetch();
         }
         throw err;
