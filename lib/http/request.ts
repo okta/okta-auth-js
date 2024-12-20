@@ -160,7 +160,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
 
   var err, res, promise;
 
-  if (isIOS()) {
+  if (pollingIntent && isIOS()) {
     let waitForVisibleAndAwakenDocument: () => Promise<void>;
     let waitForAwakenDocument: () => Promise<void>;
     let recursiveFetch: () => Promise<HttpResponse>;
@@ -207,7 +207,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     const retryableFetch = (): Promise<HttpResponse> => {
       return sdk.options.httpRequestClient!(method!, url!, ajaxOptions).catch((err) => {
         const isNetworkError = err?.message === 'Load failed';
-        if (pollingIntent && isNetworkError) {
+        if (isNetworkError) {
           return recursiveFetch();
         }
         throw err;
