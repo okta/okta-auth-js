@@ -170,7 +170,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     // Running fetch after short timeout fixes this issue.
     waitForAwakenDocument = () => {
       const timeSinceDocumentIsVisible = Date.now() - dateDocumentBecameVisible;
-      if (isIOS() && timeSinceDocumentIsVisible < IOS_PAGE_AWAKEN_TIMEOUT) {
+      if (timeSinceDocumentIsVisible < IOS_PAGE_AWAKEN_TIMEOUT) {
         return new Promise<void>((resolve) => setTimeout(() => {
           if (!document.hidden) {
             resolve();
