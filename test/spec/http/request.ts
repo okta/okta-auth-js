@@ -472,5 +472,39 @@ describe('HTTP Requestor', () => {
       expect(res).toBe(response1);
     });
 
+    it('should retry on network error 3 times maximum', async () => {
+      httpRequestClient = jest.fn()
+        .mockRejectedValueOnce(new TypeError('Load failed'))
+        .mockRejectedValueOnce(new TypeError('Load failed'))
+        .mockRejectedValueOnce(new TypeError('Load failed'))
+        .mockRejectedValueOnce(new TypeError('Load failed'))
+        .mockResolvedValueOnce({
+          responseText: JSON.stringify(response1)
+        });
+      createAuthClient();
+      expect(document.hidden).toBe(false);
+      let didThrow = false;
+      const requestPromise = httpRequest(sdk, {
+        url,
+        pollingIntent: true,
+      }).catch(error => {
+        didThrow = true;
+        expect((error as Error).message).toBe('Load failed');
+      });
+      await advanceTestTimers();
+      expect(httpRequestClient).toHaveBeenCalledTimes(4);
+      expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+        data: undefined,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Okta-User-Agent-Extended': USER_AGENT
+        },
+        withCredentials: false
+      });
+      await requestPromise;
+      expect(didThrow).toBe(true);
+    });
+
   });
 });

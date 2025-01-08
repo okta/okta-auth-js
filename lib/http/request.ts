@@ -14,7 +14,12 @@
 
 /* eslint-disable complexity */
 import { isString, clone, isAbsoluteUrl, removeNils } from '../util';
-import { STATE_TOKEN_KEY_NAME, DEFAULT_CACHE_DURATION, IOS_PAGE_AWAKEN_TIMEOUT } from '../constants';
+import {
+  STATE_TOKEN_KEY_NAME,
+  DEFAULT_CACHE_DURATION,
+  IOS_MAX_RETRY_COUNT,
+  IOS_PAGE_AWAKEN_TIMEOUT
+} from '../constants';
 import {
   OktaAuthHttpInterface,
   RequestOptions,
@@ -164,6 +169,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     let waitForVisibleAndAwakenDocument: () => Promise<void>;
     let waitForAwakenDocument: () => Promise<void>;
     let recursiveFetch: () => Promise<HttpResponse>;
+    let retryCount = 0;
 
     // Safari on iOS has a bug:
     //  Performing `fetch` right after document became visible can fail with `Load failed` error.
@@ -207,7 +213,8 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     const retryableFetch = (): Promise<HttpResponse> => {
       return sdk.options.httpRequestClient!(method!, url!, ajaxOptions).catch((err) => {
         const isNetworkError = err?.message === 'Load failed';
-        if (isNetworkError) {
+        if (isNetworkError && retryCount < IOS_MAX_RETRY_COUNT) {
+          retryCount++;
           return recursiveFetch();
         }
         throw err;
