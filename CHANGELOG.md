@@ -1,8 +1,15 @@
 # Changelog
 
+# 7.10.0
+
+### Bug Fix
+
+- [#1552](https://github.com/okta/okta-auth-js/pull/1552) fix: start poll request when document is visible and awaken in Mobile Safari 18.x
+
 # 7.8.1
 
 ### Bug Fix
+
 - [#1547](https://github.com/okta/okta-auth-js/pull/1547) fix: replaces `jsonpath-plus` module
   - Address https://security.snyk.io/vuln/SNYK-JS-JSONPATHPLUS-7945884
 
