@@ -13,6 +13,7 @@
 /* eslint-disable node/no-unsupported-features/node-builtins */
 /* global document, window, TextEncoder, navigator */
 
+import { UAParser } from 'ua-parser-js';
 import { webcrypto } from './crypto';
 
 const isWindowsPhone = /windows phone|iemobile|wpdesktop/i;	
@@ -94,4 +95,13 @@ export function isIOS () {
   return isBrowser() && typeof navigator !== 'undefined' && typeof navigator.userAgent !== 'undefined' &&
     // @ts-expect-error - MSStream is not in `window` type, unsurprisingly
     (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
+}
+
+export function isMobileSafari18 () {
+  if (isBrowser()) {
+    const { browser, os } = new UAParser().getResult();
+    return os.name?.toLowerCase() === 'ios' && !!browser.name?.toLowerCase()?.includes('safari')
+      && browser.major === '18';
+  }
+  return false;
 }

@@ -33,6 +33,7 @@ export interface RequestOptions {
   storageUtil?: StorageUtil;
   cacheResponse?: boolean;
   headers?: RequestHeaders;
+  pollingIntent?: boolean;
 }
 
 export interface FetchOptions {

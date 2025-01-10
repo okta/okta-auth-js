@@ -11,7 +11,7 @@
  */
 
 /* eslint-disable max-len, complexity */
-import { httpRequest } from '../../../http';
+import { httpRequest, RequestOptions } from '../../../http';
 import { OktaAuthIdxInterface } from '../../types';    // auth-js/types
 import { IdxActionFunction, IdxActionParams, IdxResponse, IdxToPersist } from '../../types/idx-js';
 import { divideActionParamsByMutability } from './actionParser';
@@ -36,13 +36,18 @@ const generateDirectFetch = function generateDirectFetch(authClient: OktaAuthIdx
     });
 
     try {
-      const response = await httpRequest(authClient, {
+      const options: RequestOptions = {
         url: target,
         method: actionDefinition.method,
         headers,
         args: body,
         withCredentials: toPersist?.withCredentials ?? true
-      });
+      };
+      const isPolling = actionDefinition.name === 'poll' || actionDefinition.name?.endsWith('-poll');
+      if (isPolling) {
+        options.pollingIntent = true;
+      }
+      const response = await httpRequest(authClient, options);
 
       return authClient.idx.makeIdxResponse({ ...response }, toPersist, true);
     }
