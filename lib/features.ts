@@ -13,7 +13,6 @@
 /* eslint-disable node/no-unsupported-features/node-builtins */
 /* global document, window, TextEncoder, navigator */
 
-import { UAParser } from 'ua-parser-js';
 import { webcrypto } from './crypto';
 
 const isWindowsPhone = /windows phone|iemobile|wpdesktop/i;	
@@ -97,11 +96,15 @@ export function isIOS () {
     (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
 }
 
-export function isMobileSafari18 () {
-  if (isBrowser()) {
-    const { browser, os } = new UAParser().getResult();
-    return os.name?.toLowerCase() === 'ios' && !!browser.name?.toLowerCase()?.includes('safari')
-      && browser.major === '18';
+export function isMobileSafari18() {
+  if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    const isSafari = /safari/.test(userAgent) && !/chrome/.test(userAgent); // Ensure it's not Chrome on iOS
+    const versionMatch = userAgent.match(/version\/(\d+)/); // Safari version is specified as "Version/XX"
+    const safariVersion = versionMatch ? parseInt(versionMatch[1], 10) : null;
+
+    return isIOS && isSafari && safariVersion === 18;
   }
   return false;
 }
