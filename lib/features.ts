@@ -96,15 +96,19 @@ export function isIOS () {
     (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
 }
 
+const isIOSRegex = /iPad|iPhone|iPod/;
+const v18Regex = /Version\/18(\.| |$)/;
+const notSafariRegex = /EdgiOS|CriOS|Chrome/;
+
 /* eslint complexity:[0,8] */
 export function isSafari18 () {
   if (isBrowser() && typeof navigator !== 'undefined' && typeof navigator.userAgent !== 'undefined') {
-    const isMobile = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isIOS = isIOSRegex.test(navigator.userAgent);
     // Mobile Safari in desktop mode emulates Macintosh in user agent
-    const isDesktop = /Macintosh/.test(navigator.userAgent);
-    const isSafari18 = /Safari\//.test(navigator.userAgent) && /Version\/18(\.| |$)/.test(navigator.userAgent);
-    const isOtherBrowser = /EdgiOS|CriOS|Chrome/.test(navigator.userAgent);
-    return isSafari18 && !isOtherBrowser && (isMobile || isDesktop);
+    const isDesktop = navigator.userAgent.includes('Macintosh');
+    const isSafari18 = navigator.userAgent.includes('Safari/') && v18Regex.test(navigator.userAgent);
+    const isOtherBrowser = notSafariRegex.test(navigator.userAgent);
+    return isSafari18 && !isOtherBrowser && (isIOS || isDesktop);
   }
   return false;
 }
