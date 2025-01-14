@@ -2,7 +2,7 @@ jest.mock('../../../lib/features', () => {
   return {
     isLocalhost: () => true, // to allow configuring expireEarlySeconds
     isIE11OrLess: () => false,
-    isMobileSafari18: () => false
+    isSafari18: () => false
   };
 });
 

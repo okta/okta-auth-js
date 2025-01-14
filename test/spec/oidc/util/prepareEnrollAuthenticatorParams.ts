@@ -17,7 +17,7 @@ const mocked = {
     isLocalhost: () => true,
     isHTTPS: () => false,
     isPKCESupported: () => true,
-    isMobileSafari18: () => false,
+    isSafari18: () => false,
   },
 };
 jest.mock('../../../../lib/features', () => {

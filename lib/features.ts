@@ -13,7 +13,6 @@
 /* eslint-disable node/no-unsupported-features/node-builtins */
 /* global document, window, TextEncoder, navigator */
 
-import { UAParser } from 'ua-parser-js';
 import { webcrypto } from './crypto';
 
 const isWindowsPhone = /windows phone|iemobile|wpdesktop/i;	
@@ -97,11 +96,14 @@ export function isIOS () {
     (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
 }
 
-export function isMobileSafari18 () {
-  if (isBrowser()) {
-    const { browser, os } = new UAParser().getResult();
-    return os.name?.toLowerCase() === 'ios' && !!browser.name?.toLowerCase()?.includes('safari')
-      && browser.major === '18';
+export function isSafari18 () {
+  if (isBrowser() && typeof navigator !== 'undefined' && typeof navigator.userAgent !== 'undefined') {
+    const isMobile = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    // Mobile Safari in desktop mode emulates Macintosh in user agent
+    const isDesktop = /Macintosh/.test(navigator.userAgent);
+    const isSafari18 = /Safari\//.test(navigator.userAgent) && /Version\/18(\.| |$)/.test(navigator.userAgent);
+    const isOtherBrowser = /EdgiOS|CriOS|Chrome/.test(navigator.userAgent);
+    return isSafari18 && !isOtherBrowser && (isMobile || isDesktop);
   }
   return false;
 }
