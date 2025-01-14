@@ -96,6 +96,7 @@ export function isIOS () {
     (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
 }
 
+/* eslint complexity:[0,8] */
 export function isSafari18 () {
   if (isBrowser() && typeof navigator !== 'undefined' && typeof navigator.userAgent !== 'undefined') {
     const isMobile = /iPad|iPhone|iPod/.test(navigator.userAgent);
