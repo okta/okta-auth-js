@@ -1,5 +1,11 @@
 # Changelog
 
+# 7.10.1
+
+### Other
+
+- [#1562](https://github.com/okta/okta-auth-js/pull/1562) chore: Remove `ua-parser-js`. Change `isMobileSafari18` to `isSafari18`
+
 # 7.10.0
 
 ### Bug Fix
