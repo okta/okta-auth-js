@@ -162,7 +162,6 @@
     "node-cache": "^5.1.2",
     "p-cancelable": "^2.0.0",
     "tiny-emitter": "1.1.0",
-    "ua-parser-js": "^2.0.0",
     "webcrypto-shim": "^0.1.5",
     "xhr2": "0.1.3"
   },

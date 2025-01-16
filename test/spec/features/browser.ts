@@ -64,7 +64,7 @@ describe('features (browser)', function() {
     });
   });
 
-  describe('isIOS, isMobileSafari18', () => {
+  describe('isIOS, isSafari18', () => {
     const iOSAgents = [
       'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/92.0.4515.90 Mobile/15E148 Safari/604.1',
       'Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Mobile/15E148 Safari/604.1',
@@ -79,33 +79,47 @@ describe('features (browser)', function() {
       'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2 Mobile/15E148 Safari/604.1',
       'Mozilla/5.0 (iPad; CPU OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2 Mobile/15E148 Safari/604.1',
     ];
+    const desktopSafari18Agents = [
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15',
+    ];
+    const notSafariAgents = [
+      'Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.260 Mobile Safari/537.36',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/92.0.4515.90 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) EdgiOS/132.0.2957.32 Version/18.0 Mobile/15E148 Safari/604.1',
+    ];
 
     for (let userAgent of iOSAgents) {
-      it('can succeed for ' + userAgent, () => {
+      it('isIOS() should be true for ' + userAgent, () => {
         jest.spyOn(global.navigator, 'userAgent', 'get').mockReturnValue(userAgent);
         expect(OktaAuth.features.isIOS()).toBe(true);
-        expect(OktaAuth.features.isMobileSafari18()).toBe(false);
       });
     }
-    for (let userAgent of mobileSafari18Agents) {
+    for (let userAgent of [...mobileSafari18Agents, ...desktopSafari18Agents]) {
       // eslint-disable-next-line  jasmine/no-spec-dupes
-      it('can succeed for ' + userAgent, () => {
+      it('isSafari18() should be true for ' + userAgent, () => {
         jest.spyOn(global.navigator, 'userAgent', 'get').mockReturnValue(userAgent);
-        expect(OktaAuth.features.isIOS()).toBe(true);
-        expect(OktaAuth.features.isMobileSafari18()).toBe(true);
+        expect(OktaAuth.features.isSafari18()).toBe(true);
+      });
+    }
+    for (let userAgent of notSafariAgents) {
+      // eslint-disable-next-line  jasmine/no-spec-dupes
+      it('isSafari18() should be false for ' + userAgent, () => {
+        jest.spyOn(global.navigator, 'userAgent', 'get').mockReturnValue(userAgent);
+        expect(OktaAuth.features.isSafari18()).toBe(false);
       });
     }
 
     it('returns false if navigator is unavailable', () => {
       jest.spyOn(global, 'navigator', 'get').mockReturnValue(undefined as never);
       expect(OktaAuth.features.isIOS()).toBe(false);
-      expect(OktaAuth.features.isMobileSafari18()).toBe(false);
+      expect(OktaAuth.features.isSafari18()).toBe(false);
     });
 
     it('returns false if userAgent is unavailable', () => {
       jest.spyOn(global.navigator, 'userAgent', 'get').mockReturnValue(undefined as never);
       expect(OktaAuth.features.isIOS()).toBe(false);
-      expect(OktaAuth.features.isMobileSafari18()).toBe(false);
+      expect(OktaAuth.features.isSafari18()).toBe(false);
     });
   });
 });

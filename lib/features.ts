@@ -13,7 +13,6 @@
 /* eslint-disable node/no-unsupported-features/node-builtins */
 /* global document, window, TextEncoder, navigator */
 
-import { UAParser } from 'ua-parser-js';
 import { webcrypto } from './crypto';
 
 const isWindowsPhone = /windows phone|iemobile|wpdesktop/i;	
@@ -97,11 +96,19 @@ export function isIOS () {
     (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
 }
 
-export function isMobileSafari18 () {
-  if (isBrowser()) {
-    const { browser, os } = new UAParser().getResult();
-    return os.name?.toLowerCase() === 'ios' && !!browser.name?.toLowerCase()?.includes('safari')
-      && browser.major === '18';
+const isIOSRegex = /iPad|iPhone|iPod/;
+const v18Regex = /Version\/18(\.| |$)/;
+const notSafariRegex = /EdgiOS|CriOS|Chrome/;
+
+/* eslint complexity:[0,8] */
+export function isSafari18 () {
+  if (isBrowser() && typeof navigator !== 'undefined' && typeof navigator.userAgent !== 'undefined') {
+    const isIOS = isIOSRegex.test(navigator.userAgent);
+    // Mobile Safari in desktop mode emulates Macintosh in user agent
+    const isDesktop = navigator.userAgent.includes('Macintosh');
+    const isSafari18 = navigator.userAgent.includes('Safari/') && v18Regex.test(navigator.userAgent);
+    const isOtherBrowser = notSafariRegex.test(navigator.userAgent);
+    return isSafari18 && !isOtherBrowser && (isIOS || isDesktop);
   }
   return false;
 }
