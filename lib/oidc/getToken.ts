@@ -166,14 +166,25 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
             popupWindow.location.assign(requestUrl);
           }
 
-          // The popup may be closed without receiving an OAuth response. Setup a poller to monitor the window.
           var popupPromise = new Promise(function (resolve, reject) {
-            var closePoller = setInterval(function () {
-              if (!popupWindow || popupWindow.closed) {
-                clearInterval(closePoller);
-                reject(new AuthSdkError('Unable to parse OAuth flow response'));
+            let closePoller;
+            // Using external IDPs within a popup can cause `popupWindow.closed` to prematurely return `true`
+            // the origin of the popup changes (to the external IDP). Disable the popup monitor to avoid this
+            // WARNING: This resulting promise will remain pending until the user completes the flow or timeout
+            if (options?.monitorPopupWindow === false) {
+              if (!options.timeout) {
+                throw new AuthSdkError('`timeout` must be set when `monitorPopupWindow` is set to `false`!');
               }
-            }, 100);
+            }
+            else {
+              // The popup may be closed without receiving an OAuth response. Setup a poller to monitor the window.
+              closePoller = setInterval(function () {
+                if (!popupWindow || popupWindow.closed) {
+                  clearInterval(closePoller);
+                  reject(new AuthSdkError('Unable to parse OAuth flow response'));
+                }
+              }, 100);
+            }
 
             // Proxy the OAuth promise results
             oauthPromise

@@ -24,6 +24,9 @@ import tokens from '@okta/test.support/tokens';
 import util from '@okta/test.support/util';
 import oauthUtil from '@okta/test.support/oauthUtil';
 import waitFor from '@okta/test.support/waitFor';
+import { setImmediate } from 'timers';
+import { AuthSdkError } from 'lib/errors';
+
 
 describe('token.getWithPopup', function() {
   beforeEach(() => {
@@ -497,6 +500,67 @@ describe('token.getWithPopup', function() {
         }
       }
     });
+  });
+
+  it('does not detect when popup window closes', async function () {
+    // `oauthUtil.setupPopup` performs 2 assertions (other 3 are locally in this test)
+    expect.assertions(5);   // ensures the expect()s in .catch are called
+    const intervalSpy = jest.spyOn(global, 'setInterval');
+
+    jest.useFakeTimers();
+    const promise = oauthUtil.setupPopup({
+      willFail: true,
+      closePopup: true,
+      oktaAuthArgs: {
+        pkce: false,
+        issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect'
+      },
+      getWithPopupArgs: {
+        monitorPopupWindow: false,
+        timeout: 120000
+      },
+    })
+    .catch(err => {
+      expect(err).toBeInstanceOf(AuthSdkError);
+      expect(err.message).toBe('OAuth flow timed out');
+    });
+
+    // flushes promise queue (can be replaced by `jest.advanceTimersByTimeAsync` in jest@29)
+    await (new Promise(resolve => setImmediate(resolve)));
+    jest.advanceTimersByTime(150000);
+    await promise;
+
+    expect(intervalSpy).not.toHaveBeenCalled();
+
+    jest.useRealTimers();
+  });
+
+  it('throws if timeout is not provided', async function () {
+    // `oauthUtil.setupPopup` performs 2 assertions (other 3 are locally in this test)
+    expect.assertions(5);   // ensures the expect()s in .catch are called
+    const intervalSpy = jest.spyOn(global, 'setInterval');
+
+    await oauthUtil.setupPopup({
+      willFail: true,
+      closePopup: true,
+      oktaAuthArgs: {
+        pkce: false,
+        issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
+        clientId: 'NPSfOkH5eZrTy8PMDlvx',
+        redirectUri: 'https://example.com/redirect'
+      },
+      getWithPopupArgs: {
+        monitorPopupWindow: false,
+      },
+    })
+    .catch(err => {
+      expect(err).toBeInstanceOf(AuthSdkError);
+      expect(err.message).toBe('`timeout` must be set when `monitorPopupWindow` is set to `false`!');
+    });
+
+    expect(intervalSpy).not.toHaveBeenCalled();
   });
 
 });
