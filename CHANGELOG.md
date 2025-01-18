@@ -1,5 +1,11 @@
 # Changelog
 
+# 7.10.2
+
+### Other
+
+- [#1566](https://github.com/okta/okta-auth-js/pull/1566) feat: adds advance option `monitorPopupWindow` to `getWithPopup`
+
 # 7.10.1
 
 ### Other

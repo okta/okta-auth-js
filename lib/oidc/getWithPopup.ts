@@ -11,12 +11,17 @@
  *
  */
 import { AuthSdkError } from '../errors';
-import { OktaAuthOAuthInterface, TokenParams, TokenResponse } from './types';
+import { OktaAuthOAuthInterface, WithPopupOptions, TokenResponse } from './types';
 import { clone } from '../util';
 import { getToken } from './getToken';
 import { loadPopup } from './util';
 
-export function getWithPopup(sdk: OktaAuthOAuthInterface, options: TokenParams): Promise<TokenResponse> {
+
+// `monitorPopupWindow: false` is an advance setting. Use with caution! 
+// When `false`, polling to determine whether or not the popup is open is perforemd.
+// A `timeout` must be provided when `monitorPopupWindow` is set to `false`
+
+export function getWithPopup(sdk: OktaAuthOAuthInterface, options: WithPopupOptions): Promise<TokenResponse> {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithPopup" takes only a single set of options'));
   }

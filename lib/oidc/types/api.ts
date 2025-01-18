@@ -25,6 +25,7 @@ import { Endpoints } from './endpoints';
 export interface PopupParams {
   popupTitle?: string;
   popupWindow?: Window;
+  monitorPopupWindow?: boolean;
 }
 
 export interface TokenResponse {
@@ -57,6 +58,8 @@ export interface BaseTokenAPI {
   exchangeCodeForTokens(params: TokenParams, urls?: CustomUrls): Promise<TokenResponse>;
 }
 
+export type WithPopupOptions = TokenParams & { monitorPopupWindow?: boolean; };
+
 export interface TokenAPI extends BaseTokenAPI {
   getUserInfo<S extends CustomUserClaims = CustomUserClaims>(
     accessToken?: AccessToken,
@@ -65,7 +68,7 @@ export interface TokenAPI extends BaseTokenAPI {
   getWithRedirect: GetWithRedirectFunction;
   parseFromUrl: ParseFromUrlInterface;
   getWithoutPrompt(params?: TokenParams): Promise<TokenResponse>;
-  getWithPopup(params?: TokenParams): Promise<TokenResponse>;
+  getWithPopup(params?: WithPopupOptions): Promise<TokenResponse>;
   revoke(token: RevocableToken): Promise<object>;
   renew(token: Token): Promise<Token | undefined>;
   renewTokens(options?: RenewTokensParams): Promise<Tokens>;
