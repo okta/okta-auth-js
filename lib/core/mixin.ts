@@ -11,6 +11,7 @@ import {
 import { AuthStateManager } from './AuthStateManager';
 import { ServiceManager } from './ServiceManager';
 import { OktaAuthCoreInterface, OktaAuthCoreOptions } from './types';
+import { TokenSet } from './TokenSet';
 
 export function mixinCore
 <
@@ -27,6 +28,7 @@ export function mixinCore
   {
     authStateManager: AuthStateManager<M, S, O>;
     serviceManager: ServiceManager<M, S, O>;
+    tokenSet: TokenSet;
     
     constructor(...args: any[]) {
       super(...args);
@@ -34,8 +36,8 @@ export function mixinCore
       // AuthStateManager
       this.authStateManager = new AuthStateManager<M, S, O>(this);
 
-      // ServiceManager
-      this.serviceManager = new ServiceManager<M, S, O>(this, this.options.services);
+      this.tokenSet = new TokenSet(this);
+      this.tokenSet.useTokenSet(this.options.tokenManager.storageKey);
     }
 
     async start() {

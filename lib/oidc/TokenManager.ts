@@ -106,7 +106,7 @@ export class TokenManager implements TokenManagerInterface {
   // eslint-disable-next-line complexity
   constructor(sdk: OktaAuthOAuthInterface, options: TokenManagerOptions = {}) {
     this.sdk = sdk;
-    this.emitter = (sdk as any).emitter;
+    this.emitter = new EventEmitter();
     if (!this.emitter) {
       throw new AuthSdkError('Emitter should be initialized before TokenManager');
     }
