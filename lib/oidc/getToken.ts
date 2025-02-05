@@ -16,7 +16,8 @@
 import {
   getOAuthUrls,
   loadFrame,
-  addPostMessageListener
+  addPostMessageListener,
+  addIDPPopupLisenter
 } from './util';
 
 import AuthSdkError from '../errors/AuthSdkError';
@@ -127,9 +128,14 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
       var flowType;
       if (tokenParams.sessionToken || tokenParams.display === null) {
         flowType = 'IFRAME';
-      } else if (tokenParams.display === 'popup') {
+      }
+      else if (tokenParams.display === 'popup') {
         flowType = 'POPUP';
-      } else {
+      } 
+      else if (tokenParams.display === 'idp_popup') {
+        flowType = 'IDP_POPUP';
+      }
+      else {
         flowType = 'IMPLICIT';
       }
 
@@ -196,6 +202,23 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
                 popupWindow.close();
               }
             });
+
+        case 'IDP_POPUP':
+          let idpPromise; // resolves with OAuth response
+
+          // TODO:
+          idpPromise = addIDPPopupLisenter(sdk, options.timeout, tokenParams.state);
+
+          // Redirect for authorization
+          // popupWindown can be null when popup is blocked
+          if (popupWindow) { 
+            popupWindow.location.assign(requestUrl);
+          }
+
+          return idpPromise
+          .then(function (res) {
+            return handleOAuthResponse(sdk, tokenParams, res as OAuthResponse, urls);
+          });
 
         default:
           throw new AuthSdkError('The full page redirect flow is not supported');

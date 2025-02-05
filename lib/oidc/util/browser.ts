@@ -80,3 +80,32 @@ export function addPostMessageListener(sdk: OktaAuthOAuthInterface, timeout, sta
       removeListener(window, 'message', responseHandler);
     });
 }
+
+export function addIDPPopupLisenter (sdk: OktaAuthOAuthInterface, timeout, state) {
+  let listener;
+  let timeoutId;
+
+  const promise = new Promise((resolve, reject) => {
+    listener = (event) => {
+      if (event.target !== window || !event.isTrusted ||
+          event.storageArea !== localStorage || event.key !== ''
+      ) {
+        return;
+      }
+  
+      // check event.newValue has code/state
+      resolve(event.newValue);
+    };
+    addListener(window, 'storage', listener);
+
+    timeoutId = setTimeout(function () {
+      reject(new AuthSdkError('OAuth flow timed out'));
+    }, timeout || 120000);
+  });
+
+  return promise
+  .finally(() => {
+    clearTimeout(timeoutId);
+    removeListener(window, 'storage', listener);
+  });
+}
