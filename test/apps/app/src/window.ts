@@ -119,6 +119,13 @@ Object.assign(window, {
     app.bootstrapLoginCallback();
   },
 
+  bootstrapIDPPopupCallback: function(): void {
+    config = getConfigFromStorage();
+    mount();
+    app.bootstrapIDPPopupCallback();
+  },
+
+
   bootstrapRenew: function(): void {
     rootElem.innerHTML = 'Loading...';
     window.postMessage({
