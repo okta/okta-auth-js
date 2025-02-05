@@ -25,6 +25,8 @@ import { Endpoints } from './endpoints';
 export interface PopupParams {
   popupTitle?: string;
   popupWindow?: Window;
+  idpPopup?: boolean;
+  channel?: BroadcastChannel;
 }
 
 export interface TokenResponse {
@@ -66,6 +68,7 @@ export interface TokenAPI extends BaseTokenAPI {
   parseFromUrl: ParseFromUrlInterface;
   getWithoutPrompt(params?: TokenParams): Promise<TokenResponse>;
   getWithPopup(params?: TokenParams): Promise<TokenResponse>;
+  getWithIDPPopup(params?: TokenParams): { cancel: () => void, promise: Promise<TokenResponse> };
   revoke(token: RevocableToken): Promise<object>;
   renew(token: Token): Promise<Token | undefined>;
   renewTokens(options?: RenewTokensParams): Promise<Tokens>;

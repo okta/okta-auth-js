@@ -16,7 +16,7 @@ import { decodeToken } from '../decodeToken';
 import { exchangeCodeForTokens } from '../exchangeCodeForTokens';
 import { getUserInfo } from '../getUserInfo';
 import { getWithoutPrompt } from '../getWithoutPrompt';
-import { getWithPopup } from '../getWithPopup';
+import { getWithPopup, getWithIDPPopup } from '../getWithPopup';
 import { getWithRedirect } from '../getWithRedirect';
 import { parseFromUrl } from '../parseFromUrl';
 import { renewToken } from '../renewToken';
@@ -71,6 +71,7 @@ export function createTokenAPI(sdk: OktaAuthOAuthInterface, queue: PromiseQueue)
     exchangeCodeForTokens: exchangeCodeForTokens.bind(null, sdk),
     getWithoutPrompt: getWithoutPrompt.bind(null, sdk),
     getWithPopup: getWithPopup.bind(null, sdk),
+    getWithIDPPopup: getWithIDPPopup.bind(null, sdk),
     getWithRedirect: getWithRedirectFn,
     parseFromUrl: parseFromUrlApi,
     decode: decodeToken,
