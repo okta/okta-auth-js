@@ -39,6 +39,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # echo $(ls)
 
   export CI=true
+  export E2E_LOG_DIR=/tmp/e2e-logs
 else
 # if running locally
   # https://gist.github.com/mihow/9c7f559807069a03e302605691f85572
@@ -144,6 +145,7 @@ run_sample_tests () {
   # Run the tests
   if ! yarn test:samples; then
     echo "tests failed! Exiting..."
+    log_extra_dir_as_zip ${E2E_LOG_DIR} "e2e-logs.zip"
     exit ${TEST_FAILURE}
   fi
 

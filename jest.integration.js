@@ -11,11 +11,14 @@ const config = Object.assign({}, baseConfig, {
     '**/test/integration/spec/**/*.{js,ts}'
   ],
   setupFiles: [
+    'fake-indexeddb/auto',
     '<rootDir>/test/support/nodeExceptions.js',
     '<rootDir>/test/support/jest/jest.setup.js',
-    '<rootDir>/test/support/jest/jest.setup.node.js'
   ],
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
+  moduleNameMapper: Object.assign({}, baseConfig.moduleNameMapper, {
+    '^./node$': './browser'
+  }),
   globals: Object.assign({}, baseConfig.globals, {
     USER_AGENT,
     ISSUER: process.env.ISSUER,
@@ -33,5 +36,9 @@ const config = Object.assign({}, baseConfig, {
   // extend timeout to 10s for
   testTimeout: 15 * 1000 
 });
+
+if (process.env.USE_DPOP == '1') {
+  config.testPathIgnorePatterns.push('renewTokens')
+}
 
 module.exports = config;
