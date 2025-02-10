@@ -28,13 +28,13 @@ import {
   HttpResponse
 } from './types';
 import { AuthApiError, OAuthError, APIError, WWWAuthError } from '../errors';
-import { isSafari18 } from '../features';
+import { isBrowser } from '../features';
 
 
 // For iOS track last date when document became visible
 let dateDocumentBecameVisible = 0;
 let trackDateDocumentBecameVisible: () => void;
-if (isSafari18()) {
+if (isBrowser()) {
   dateDocumentBecameVisible = Date.now();
   trackDateDocumentBecameVisible = () => {
     if (!document.hidden) {
@@ -165,7 +165,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
 
   var err, res, promise;
 
-  if (pollingIntent && isSafari18()) {
+  if (pollingIntent && isBrowser()) {
     let waitForVisibleAndAwakenDocument: () => Promise<void>;
     let waitForAwakenDocument: () => Promise<void>;
     let recursiveFetch: () => Promise<HttpResponse>;

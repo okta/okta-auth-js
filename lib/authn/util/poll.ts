@@ -18,7 +18,7 @@ import AuthSdkError from '../../errors/AuthSdkError';
 import AuthPollStopError from '../../errors/AuthPollStopError';
 import { AuthnTransactionState } from '../types';
 import { getStateToken } from './stateToken';
-import { isSafari18 } from '../../features';
+import { isBrowser } from '../../features';
 
 interface PollOptions {
   delay?: number;
@@ -86,7 +86,7 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
 
     const delayNextPoll = (ms) => {
       // no need for extra logic in non-iOS environments, just continue polling
-      if (!isSafari18()) {
+      if (!isBrowser()) {
         return delayFn(ms);
       }
 
@@ -136,7 +136,7 @@ export function getPollFn(sdk, res: AuthnTransactionState, ref) {
       }
 
       // don't trigger polling request if page is hidden wait until window is visible again
-      if (isSafari18() && document.hidden) {
+      if (isBrowser() && document.hidden) {
         let handler;
         return new Promise<void>((resolve) => {
           handler = () => {

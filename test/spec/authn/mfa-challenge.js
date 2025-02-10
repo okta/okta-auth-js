@@ -32,7 +32,6 @@ jest.mock('lib/features', () => {
   const actual = jest.requireActual('../../../lib/features');
   return {
     ...actual,
-    isSafari18: () => false
   };
 });
 import OktaAuth from '@okta/okta-auth-js';
@@ -1579,9 +1578,6 @@ describe('MFA_CHALLENGE', function () {
             setTimeout(resolve, ms);
           });
         });
-
-        // mocks iOS environment
-        jest.spyOn(mocked.features, 'isSafari18').mockReturnValue(true);
 
         const { response: mfaPush } = await util.generateXHRPair({
           uri: 'https://auth-js-test.okta.com'

@@ -29,7 +29,6 @@ jest.mock('../../../lib/features', () => {
     isIE11OrLess: () => false,
     isLocalhost: () => false,
     isHTTPS: () => false,
-    isSafari18: () => false
   };
 });
 
@@ -371,14 +370,8 @@ describe('HTTP Requestor', () => {
   (!!global.document ? describe : describe.skip)('iOS18 polling', () => {
     beforeEach(() => {
       jest.useFakeTimers();
-      // Simulate iOS and reload `request.ts` module
+      // reload `request.ts` module
       jest.resetModules();
-      jest.mock('../../../lib/features', () => {
-        return {
-          ...mocked.features,
-          isSafari18: () => true 
-        };
-      });
       const { httpRequest: reloadedHttpRequest } = jest.requireActual('../../../lib/http');
       httpRequest = reloadedHttpRequest;
     });
@@ -387,12 +380,6 @@ describe('HTTP Requestor', () => {
       jest.runOnlyPendingTimers();
       jest.useRealTimers();
       httpRequest = originalHttpRequest;
-      jest.mock('../../../lib/features', () => {
-        return {
-          ...mocked.features,
-          isSafari18: () => false 
-        };
-      });
     });
 
     const togglePageVisibility = () => {

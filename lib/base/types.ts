@@ -29,7 +29,7 @@ export interface FeaturesAPI {
   isIE11OrLess(): boolean;
   isDPoPSupported(): boolean;
   isIOS(): boolean;
-  isSafari18(): boolean;
+  isBrowser(): boolean;
 }
 
 
