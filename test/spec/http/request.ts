@@ -32,10 +32,6 @@ jest.mock('../../../lib/features', () => {
   };
 });
 
-const mocked = {
-  features: require('../../../lib/features'),
-};
-
 describe('HTTP Requestor', () => {
   let sdk;
   let httpRequest = originalHttpRequest;
