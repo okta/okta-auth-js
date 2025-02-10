@@ -370,7 +370,6 @@ describe('HTTP Requestor', () => {
   (!!global.document ? describe : describe.skip)('iOS18 polling', () => {
     beforeEach(() => {
       jest.useFakeTimers();
-      // reload `request.ts` module
       jest.resetModules();
       const { httpRequest: reloadedHttpRequest } = jest.requireActual('../../../lib/http');
       httpRequest = reloadedHttpRequest;
