@@ -1,4 +1,5 @@
 import { OktaAuthHttpInterface } from '../../http/types';
+import { AccessToken } from '../../oidc/types';
 
 export type TransactionLink = {
   href: string;
@@ -19,7 +20,7 @@ type TransactionOptions = {
     _links?: Record<string, TransactionLink>;
     [property: string]: unknown;
   };
-  accessToken: string;
+  accessToken: string | AccessToken;
 };
 
 export default class BaseTransaction {

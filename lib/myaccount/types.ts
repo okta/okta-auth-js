@@ -3,7 +3,8 @@ import {
   OAuthTransactionMeta,
   OktaAuthOAuthInterface,
   OktaAuthOAuthOptions,
-  PKCETransactionMeta
+  PKCETransactionMeta,
+  AccessToken
 } from '../oidc/types';
 
 export type { 
@@ -100,7 +101,7 @@ export type MyAccountRequestOptions = {
     | UpdateProfilePayload
     | EnrollPasswordPayload
     | UpdatePasswordPayload;
-  accessToken?: string;
+  accessToken?: string | AccessToken;
 }
 
 export type IAPIFunction<T> = (
