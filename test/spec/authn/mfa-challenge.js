@@ -1552,7 +1552,7 @@ describe('MFA_CHALLENGE', function () {
     // OKTA-823470: iOS18 polling issue
     // NOTE: only run these tests in browser environments
     // eslint-disable-next-line no-extra-boolean-cast
-    (!!global.document ? describe : describe.skip)('iOS18 polling', () => {
+    (!!global.document ? describe : describe.skip)('enablePollDelay', () => {
       const togglePageVisibility = () => {
         document.hidden = !document.hidden;
         document.dispatchEvent(new Event('visibilitychange'));
@@ -1596,7 +1596,8 @@ describe('MFA_CHALLENGE', function () {
 
         const oktaAuth = new OktaAuth({
           issuer: 'https://auth-js-test.okta.com',
-          httpRequestClient: context.httpSpy
+          httpRequestClient: context.httpSpy,
+          enablePollDelay: true
         });
 
         context.transaction = oktaAuth.tx.createTransaction(mfaPush.response);

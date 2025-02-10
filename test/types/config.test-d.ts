@@ -50,6 +50,7 @@ const config: OktaAuthOptions = {
   ignoreSignature: true,
   ignoreLifetime: true,
   maxClockSkew: 10,
+  enablePollDelay: true,
 
   storageManager: {
     token: {

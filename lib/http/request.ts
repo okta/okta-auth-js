@@ -134,7 +134,8 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       storageUtil = sdk.options.storageUtil,
       storage = storageUtil!.storage,
       httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies),
-      pollingIntent = options.pollingIntent;
+      pollingIntent = options.pollingIntent,
+      enablePollDelay = sdk.options.enablePollDelay;
 
   if (options.cacheResponse) {
     var cacheContents = httpCache.getStorage();
@@ -165,7 +166,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
 
   var err, res, promise;
 
-  if (pollingIntent && isBrowser()) {
+  if (pollingIntent && isBrowser() && enablePollDelay) {
     let waitForVisibleAndAwakenDocument: () => Promise<void>;
     let waitForAwakenDocument: () => Promise<void>;
     let recursiveFetch: () => Promise<HttpResponse>;

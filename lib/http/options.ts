@@ -22,6 +22,7 @@ export function createHttpOptionsConstructor() {
     headers: object;
     httpRequestClient: HttpRequestClient;
     httpRequestInterceptors: ((request: RequestOptions) => void)[];
+    enablePollDelay: boolean;
     
     constructor(args: any) {
       super(args);
@@ -30,6 +31,7 @@ export function createHttpOptionsConstructor() {
       this.headers = args.headers;
       this.httpRequestClient = args.httpRequestClient || fetchRequest;
       this.httpRequestInterceptors = args.httpRequestInterceptors;
+      this.enablePollDelay = !!args.enablePollDelay;
     }
   };
 }

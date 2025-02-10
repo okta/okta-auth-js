@@ -363,7 +363,7 @@ describe('HTTP Requestor', () => {
   // OKTA-823470: iOS18 polling issue
   // NOTE: only run these tests in browser environments
   // eslint-disable-next-line no-extra-boolean-cast
-  (!!global.document ? describe : describe.skip)('iOS18 polling', () => {
+  (!!global.document ? describe : describe.skip)('enablePollDelay', () => {
     beforeEach(() => {
       jest.useFakeTimers();
       jest.resetModules();
@@ -394,7 +394,7 @@ describe('HTTP Requestor', () => {
     };
 
     it('should wait for document to be visible for 500 ms before making request', async () => {
-      createAuthClient();
+      createAuthClient({enablePollDelay: true});
       expect(document.hidden).toBe(false);
 
       // Document is hidden
@@ -433,7 +433,7 @@ describe('HTTP Requestor', () => {
         .mockResolvedValueOnce({
           responseText: JSON.stringify(response1)
         });
-      createAuthClient();
+      createAuthClient({enablePollDelay: true});
       expect(document.hidden).toBe(false);
       const requestPromise = httpRequest(sdk, {
         url,
@@ -463,7 +463,7 @@ describe('HTTP Requestor', () => {
         .mockResolvedValueOnce({
           responseText: JSON.stringify(response1)
         });
-      createAuthClient();
+      createAuthClient({enablePollDelay: true});
       expect(document.hidden).toBe(false);
       let didThrow = false;
       const requestPromise = httpRequest(sdk, {

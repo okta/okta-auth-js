@@ -61,6 +61,7 @@ describe('OktaAuth (constructor)', () => {
     'pkce',
     'headers',
     'devMode',
+    'enablePollDelay',
     'ignoreSignature',
     'ignoreLifetime',
     'storageUtil',
@@ -108,6 +109,7 @@ describe('OktaAuth (constructor)', () => {
         case 'ignoreSignature':
         case 'ignoreLifetime':
         case 'devMode':
+        case 'enablePollDelay':
           val = true;
           break;
         case 'pkce':

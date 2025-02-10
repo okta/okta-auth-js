@@ -47,7 +47,7 @@ const OktaAuthBase = createOktaAuthBase(BaseOptions);
 // Cannot mixin on a Base interface
 expect(mixinAuthn(OktaAuthBase)).type.toRaiseError();
 
-const httpOptions: OktaAuthHttpOptions = { ...baseOptions };
+const httpOptions: OktaAuthHttpOptions = { ...baseOptions, enablePollDelay: true };
 const HttpOptions: OktaAuthOptionsConstructor<OktaAuthHttpOptions> = createHttpOptionsConstructor();
 const OktaAuthWithHttp = mixinHttp(mixinStorage(createOktaAuthBase(HttpOptions), BaseStorageManager));
 
