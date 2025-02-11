@@ -1,5 +1,11 @@
 # Changelog
 
+# 7.11.0
+
+### Features
+
+- [#1571](https://github.com/okta/okta-auth-js/pull/1571) add: `enablePollDelay` option for `OktaAuth` contructor to fix polling issue in Mobile Safari 17.x and 18.x
+
 # 7.10.1
 
 ### Other
