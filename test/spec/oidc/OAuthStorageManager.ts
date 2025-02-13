@@ -31,7 +31,6 @@ jest.mock('../../../lib/util', () => {
 jest.mock('../../../lib/features', () => {
   return {
     isBrowser: () => {},
-    isSafari18: () => false
   };
 });
 

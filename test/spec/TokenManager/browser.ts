@@ -21,7 +21,6 @@ const mocked = {
     isIE11OrLess: () => false,
     isLocalhost: () => false,
     isTokenVerifySupported: () => true,
-    isSafari18: () => false
   }
 };
 jest.mock('../../../lib/features', () => {
