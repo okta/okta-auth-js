@@ -369,6 +369,7 @@ describe('HTTP Requestor', () => {
       jest.resetModules();
       const { httpRequest: reloadedHttpRequest } = jest.requireActual('../../../lib/http');
       httpRequest = reloadedHttpRequest;
+      (document as any).hidden = false;
     });
 
     afterEach(() => {
@@ -393,99 +394,158 @@ describe('HTTP Requestor', () => {
       return new Promise(resolve => setImmediate(resolve));
     };
 
-    it('should wait for document to be visible for 500 ms before making request', async () => {
-      createAuthClient({enablePollDelay: true});
-      expect(document.hidden).toBe(false);
-
-      // Document is hidden
-      togglePageVisibility();
-      const requestPromise = httpRequest(sdk, {
-        url,
-        pollingIntent: true,
+    describe('enablePollDelay = true', () => {
+      it('should wait for document to be visible for 500 ms before making request', async () => {
+        createAuthClient({enablePollDelay: true});
+        expect(document.hidden).toBe(false);
+  
+        // Document is hidden
+        togglePageVisibility();
+        const requestPromise = httpRequest(sdk, {
+          url,
+          pollingIntent: true,
+        });
+        await advanceTestTimers();
+        expect(httpRequestClient).toHaveBeenCalledTimes(0);
+  
+        // Document is visible for 200 ms
+        togglePageVisibility();
+        await advanceTestTimers(200);
+        expect(httpRequestClient).toHaveBeenCalledTimes(0);
+  
+        // Document is visible for 600 ms
+        await advanceTestTimers(400);
+        expect(httpRequestClient).toHaveBeenCalledTimes(1);
+        expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+          data: undefined,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': USER_AGENT
+          },
+          withCredentials: false
+        });
+        const res = await requestPromise;
+        expect(res).toBe(response1);
       });
-      await advanceTestTimers();
-      expect(httpRequestClient).toHaveBeenCalledTimes(0);
-
-      // Document is visible for 200 ms
-      togglePageVisibility();
-      await advanceTestTimers(200);
-      expect(httpRequestClient).toHaveBeenCalledTimes(0);
-
-      // Document is visible for 600 ms
-      await advanceTestTimers(400);
-      expect(httpRequestClient).toHaveBeenCalledTimes(1);
-      expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
-        data: undefined,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-Okta-User-Agent-Extended': USER_AGENT
-        },
-        withCredentials: false
+  
+      it('should retry on network error', async () => {
+        httpRequestClient = jest.fn()
+          .mockRejectedValueOnce(new TypeError('Load failed'))
+          .mockResolvedValueOnce({
+            responseText: JSON.stringify(response1)
+          });
+        createAuthClient({enablePollDelay: true});
+        expect(document.hidden).toBe(false);
+        const requestPromise = httpRequest(sdk, {
+          url,
+          pollingIntent: true,
+        });
+        await advanceTestTimers();  
+        expect(httpRequestClient).toHaveBeenCalledTimes(2);
+        expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+          data: undefined,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': USER_AGENT
+          },
+          withCredentials: false
+        });
+        const res = await requestPromise;
+        expect(res).toBe(response1);
       });
-      const res = await requestPromise;
-      expect(res).toBe(response1);
+  
+      it('should retry on network error 3 times maximum', async () => {
+        httpRequestClient = jest.fn()
+          .mockRejectedValueOnce(new TypeError('Load failed'))
+          .mockRejectedValueOnce(new TypeError('Load failed'))
+          .mockRejectedValueOnce(new TypeError('Load failed'))
+          .mockRejectedValueOnce(new TypeError('Load failed'))
+          .mockResolvedValueOnce({
+            responseText: JSON.stringify(response1)
+          });
+        createAuthClient({enablePollDelay: true});
+        expect(document.hidden).toBe(false);
+        let didThrow = false;
+        const requestPromise = httpRequest(sdk, {
+          url,
+          pollingIntent: true,
+        }).catch(error => {
+          didThrow = true;
+          expect((error as Error).message).toBe('Load failed');
+        });
+        await advanceTestTimers();
+        expect(httpRequestClient).toHaveBeenCalledTimes(4);
+        expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+          data: undefined,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': USER_AGENT
+          },
+          withCredentials: false
+        });
+        await requestPromise;
+        expect(didThrow).toBe(true);
+      });
     });
 
-    it('should retry on network error', async () => {
-      httpRequestClient = jest.fn()
-        .mockRejectedValueOnce(new TypeError('Load failed'))
-        .mockResolvedValueOnce({
-          responseText: JSON.stringify(response1)
+    describe('enablePollDelay = false', () => {
+      it('should NOT wait for document to be visible before making request', async () => {
+        createAuthClient({enablePollDelay: false});
+        expect(document.hidden).toBe(false);
+  
+        togglePageVisibility();
+        const requestPromise = httpRequest(sdk, {
+          url,
+          pollingIntent: true,
         });
-      createAuthClient({enablePollDelay: true});
-      expect(document.hidden).toBe(false);
-      const requestPromise = httpRequest(sdk, {
-        url,
-        pollingIntent: true,
-      });
-      await advanceTestTimers();  
-      expect(httpRequestClient).toHaveBeenCalledTimes(2);
-      expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
-        data: undefined,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-Okta-User-Agent-Extended': USER_AGENT
-        },
-        withCredentials: false
-      });
-      const res = await requestPromise;
-      expect(res).toBe(response1);
-    });
-
-    it('should retry on network error 3 times maximum', async () => {
-      httpRequestClient = jest.fn()
-        .mockRejectedValueOnce(new TypeError('Load failed'))
-        .mockRejectedValueOnce(new TypeError('Load failed'))
-        .mockRejectedValueOnce(new TypeError('Load failed'))
-        .mockRejectedValueOnce(new TypeError('Load failed'))
-        .mockResolvedValueOnce({
-          responseText: JSON.stringify(response1)
+        await advanceTestTimers();
+        expect(httpRequestClient).toHaveBeenCalledTimes(1);
+        expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+          data: undefined,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': USER_AGENT
+          },
+          withCredentials: false
         });
-      createAuthClient({enablePollDelay: true});
-      expect(document.hidden).toBe(false);
-      let didThrow = false;
-      const requestPromise = httpRequest(sdk, {
-        url,
-        pollingIntent: true,
-      }).catch(error => {
-        didThrow = true;
-        expect((error as Error).message).toBe('Load failed');
+        const res = await requestPromise;
+        expect(res).toBe(response1);
       });
-      await advanceTestTimers();
-      expect(httpRequestClient).toHaveBeenCalledTimes(4);
-      expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
-        data: undefined,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-Okta-User-Agent-Extended': USER_AGENT
-        },
-        withCredentials: false
+  
+      it('should NOT retry on network error', async () => {
+        httpRequestClient = jest.fn()
+          .mockRejectedValueOnce(new TypeError('Load failed'))
+          .mockResolvedValueOnce({
+            responseText: JSON.stringify(response1)
+          });
+        createAuthClient({enablePollDelay: false});
+        expect(document.hidden).toBe(false);
+        let didThrow = false;
+        const requestPromise = httpRequest(sdk, {
+          url,
+          pollingIntent: true,
+        }).catch(error => {
+          didThrow = true;
+          expect((error as Error).message).toBe('Load failed');
+        });
+        await advanceTestTimers();  
+        expect(httpRequestClient).toHaveBeenCalledTimes(1);
+        expect(httpRequestClient).toHaveBeenCalledWith(undefined, url, {
+          data: undefined,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Okta-User-Agent-Extended': USER_AGENT
+          },
+          withCredentials: false
+        });
+        await requestPromise;
+        expect(didThrow).toBe(true);
       });
-      await requestPromise;
-      expect(didThrow).toBe(true);
     });
 
   });
