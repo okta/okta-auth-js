@@ -496,7 +496,6 @@ describe('HTTP Requestor', () => {
         createAuthClient();
         expect(document.hidden).toBe(false);
   
-        togglePageVisibility();
         const requestPromise = httpRequest(sdk, {
           url,
           pollingIntent: true,
