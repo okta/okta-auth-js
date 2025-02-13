@@ -18,7 +18,6 @@ import {
   STATE_TOKEN_KEY_NAME,
   DEFAULT_CACHE_DURATION,
   IOS_MAX_RETRY_COUNT,
-  IOS_PAGE_AWAKEN_TIMEOUT
 } from '../constants';
 import {
   OktaAuthHttpInterface,
@@ -135,7 +134,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       storage = storageUtil!.storage,
       httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies),
       pollingIntent = options.pollingIntent,
-      enablePollDelay = sdk.options.enablePollDelay;
+      pollDelay = sdk.options.pollDelay;
 
   if (options.cacheResponse) {
     var cacheContents = httpCache.getStorage();
@@ -166,7 +165,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
 
   var err, res, promise;
 
-  if (pollingIntent && isBrowser() && enablePollDelay) {
+  if (pollingIntent && isBrowser() && pollDelay) {
     let waitForVisibleAndAwakenDocument: () => Promise<void>;
     let waitForAwakenDocument: () => Promise<void>;
     let recursiveFetch: () => Promise<HttpResponse>;
@@ -177,14 +176,14 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     // Running fetch after short timeout fixes this issue.
     waitForAwakenDocument = () => {
       const timeSinceDocumentIsVisible = Date.now() - dateDocumentBecameVisible;
-      if (timeSinceDocumentIsVisible < IOS_PAGE_AWAKEN_TIMEOUT) {
+      if (timeSinceDocumentIsVisible < pollDelay!) {
         return new Promise<void>((resolve) => setTimeout(() => {
           if (!document.hidden) {
             resolve();
           } else {
             resolve(waitForVisibleAndAwakenDocument());
           }
-        }, IOS_PAGE_AWAKEN_TIMEOUT - timeSinceDocumentIsVisible));
+        }, pollDelay! - timeSinceDocumentIsVisible));
       } else {
         return Promise.resolve();
       }

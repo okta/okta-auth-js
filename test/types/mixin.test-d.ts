@@ -56,7 +56,7 @@ expect<FeaturesAPI>().type.toBeAssignable(baseClient.features);
 
 expect(mixinIdx(OktaAuthBase)).type.toRaiseError();
 
-const oauthOptions: OktaAuthOAuthOptions = { ...baseOptions, enablePollDelay: true };
+const oauthOptions: OktaAuthOAuthOptions = { ...baseOptions, pollDelay: 500 };
 const OAuthOptions: OktaAuthOauthOptionsConstructor = createOAuthOptionsConstructor();
 const OAuthStorageManager: OAuthStorageManagerConstructor = createOAuthStorageManager();
 const TransactionManager: TransactionManagerConstructor = createTransactionManager();

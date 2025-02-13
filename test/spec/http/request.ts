@@ -363,7 +363,7 @@ describe('HTTP Requestor', () => {
   // OKTA-823470: iOS18 polling issue
   // NOTE: only run these tests in browser environments
   // eslint-disable-next-line no-extra-boolean-cast
-  (!!global.document ? describe : describe.skip)('enablePollDelay', () => {
+  (!!global.document ? describe : describe.skip)('pollDelay', () => {
     beforeEach(() => {
       jest.useFakeTimers();
       jest.resetModules();
@@ -394,9 +394,9 @@ describe('HTTP Requestor', () => {
       return new Promise(resolve => setImmediate(resolve));
     };
 
-    describe('enablePollDelay = true', () => {
+    describe('pollDelay = 500', () => {
       it('should wait for document to be visible for 500 ms before making request', async () => {
-        createAuthClient({enablePollDelay: true});
+        createAuthClient({pollDelay: 500});
         expect(document.hidden).toBe(false);
   
         // Document is hidden
@@ -435,7 +435,7 @@ describe('HTTP Requestor', () => {
           .mockResolvedValueOnce({
             responseText: JSON.stringify(response1)
           });
-        createAuthClient({enablePollDelay: true});
+        createAuthClient({pollDelay: 500});
         expect(document.hidden).toBe(false);
         const requestPromise = httpRequest(sdk, {
           url,
@@ -465,7 +465,7 @@ describe('HTTP Requestor', () => {
           .mockResolvedValueOnce({
             responseText: JSON.stringify(response1)
           });
-        createAuthClient({enablePollDelay: true});
+        createAuthClient({pollDelay: 500});
         expect(document.hidden).toBe(false);
         let didThrow = false;
         const requestPromise = httpRequest(sdk, {
@@ -491,9 +491,9 @@ describe('HTTP Requestor', () => {
       });
     });
 
-    describe('enablePollDelay = false', () => {
+    describe('pollDelay = 0 (default)', () => {
       it('should NOT wait for document to be visible before making request', async () => {
-        createAuthClient({enablePollDelay: false});
+        createAuthClient();
         expect(document.hidden).toBe(false);
   
         togglePageVisibility();
@@ -522,7 +522,7 @@ describe('HTTP Requestor', () => {
           .mockResolvedValueOnce({
             responseText: JSON.stringify(response1)
           });
-        createAuthClient({enablePollDelay: false});
+        createAuthClient();
         expect(document.hidden).toBe(false);
         let didThrow = false;
         const requestPromise = httpRequest(sdk, {

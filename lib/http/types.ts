@@ -75,7 +75,7 @@ export interface OktaAuthHttpOptions extends OktaAuthStorageOptions
   headers?: object;
   httpRequestClient?: HttpRequestClient;
   httpRequestInterceptors?: ((request: RequestOptions) => void)[];
-  enablePollDelay?: boolean;
+  pollDelay?: number;
 }
 
 // an instance of AuthJS with HTTP capabilities
