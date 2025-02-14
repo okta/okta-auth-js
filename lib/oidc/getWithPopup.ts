@@ -33,3 +33,18 @@ export function getWithPopup(sdk: OktaAuthOAuthInterface, options: TokenParams):
   });
   return getToken(sdk, options);
 }
+
+export function getWithIDPPopup(sdk: OktaAuthOAuthInterface, options: TokenParams): Promise<TokenResponse> {
+  // some browsers (safari, firefox) block popup if it's initialed from an async process
+  // here we create the popup window immediately after user interaction
+  // then redirect to the /authorize endpoint when the requestUrl is available
+  const popupWindow = loadPopup('/', options);
+  options = clone(options) || {};
+  Object.assign(options, {
+    display: 'popup',
+    responseMode: 'query',
+    popupWindow,
+    idpPopup: true,
+  });
+  return getToken(sdk, options);
+}

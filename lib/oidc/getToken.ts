@@ -29,7 +29,8 @@ import {
   OAuthResponse,
 } from './types';
 
-import { prepareTokenParams } from './util/prepareTokenParams';
+import { prepareTokenParams, } from './util/prepareTokenParams';
+import { createOAuthMeta } from './util/oauthMeta';
 import { buildAuthorizeParams } from './endpoints/authorize';
 import { handleOAuthResponse } from './handleOAuthResponse';
 /*
@@ -130,10 +131,7 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
         flowType = 'IFRAME';
       }
       else if (tokenParams.display === 'popup') {
-        flowType = 'POPUP';
-      } 
-      else if (tokenParams.display === 'idp_popup') {
-        flowType = 'IDP_POPUP';
+        flowType = options.idpPopup ? 'IDP_POPUP' : 'POPUP'
       }
       else {
         flowType = 'IMPLICIT';
@@ -168,7 +166,7 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
 
           // Redirect for authorization
           // popupWindown can be null when popup is blocked
-          if (popupWindow) { 
+          if (popupWindow) {
             popupWindow.location.assign(requestUrl);
           }
 
@@ -205,6 +203,11 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
 
         case 'IDP_POPUP':
           let idpPromise; // resolves with OAuth response
+
+          console.log('request: ', requestUrl)
+
+          const meta = createOAuthMeta(sdk, tokenParams);
+          sdk.transactionManager.save(meta);
 
           // TODO:
           idpPromise = addIDPPopupLisenter(sdk, options.timeout, tokenParams.state);
