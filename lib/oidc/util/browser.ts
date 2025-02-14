@@ -87,14 +87,16 @@ export function addIDPPopupLisenter (sdk: OktaAuthOAuthInterface, timeout, state
 
   const promise = new Promise((resolve, reject) => {
     listener = (event) => {
+      console.log('storage event: ', event);
+
       if (event.target !== window || !event.isTrusted ||
           event.storageArea !== localStorage || event.key !== ''
       ) {
         return;
       }
-  
+
       // check event.newValue has code/state
-      resolve(event.newValue);
+      // resolve(event.newValue);
     };
     addListener(window, 'storage', listener);
 
