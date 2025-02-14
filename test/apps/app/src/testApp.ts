@@ -831,6 +831,7 @@ class TestApp {
 
   async handleIDPCallback (): Promise<void> {
     const res = await this.oktaAuth.token.parseFromUrl();
+    this.oktaAuth.tokenManager.setTokens(res.tokens);
     console.log('response', res);
   }
 
