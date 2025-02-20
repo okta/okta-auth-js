@@ -61,6 +61,7 @@ describe('OktaAuth (constructor)', () => {
     'pkce',
     'headers',
     'devMode',
+    'pollDelay',
     'ignoreSignature',
     'ignoreLifetime',
     'storageUtil',
@@ -69,7 +70,7 @@ describe('OktaAuth (constructor)', () => {
   it('saves expected options', () => {
     const config: any = {};
     savedOptions.forEach((option) => {
-      let val: string | object | boolean = 'fake_' + option; // default "fake" value
+      let val: string | object | boolean | number = 'fake_' + option; // default "fake" value
       switch (option) { // some types are strictly enforced. These should differ from the default
         case 'issuer':
         case 'redirectUri':
@@ -112,6 +113,9 @@ describe('OktaAuth (constructor)', () => {
           break;
         case 'pkce':
           val = false;
+          break;
+        case 'pollDelay':
+          val = 500;
           break;
         case 'scopes':
           val = [val];

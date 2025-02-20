@@ -48,7 +48,7 @@ const OktaAuthBase = createOktaAuthBase(BaseOptions);
 // Cannot mixin on a Base interface
 expect(mixinIdx(OktaAuthBase)).type.toRaiseError();
 
-const oauthOptions: OktaAuthOAuthOptions = { ...baseOptions };
+const oauthOptions: OktaAuthOAuthOptions = { ...baseOptions, pollDelay: 500 };
 const OAuthOptions: OktaAuthOauthOptionsConstructor = createOAuthOptionsConstructor();
 const OAuthStorageManager: OAuthStorageManagerConstructor = createOAuthStorageManager();
 const TransactionManager: TransactionManagerConstructor = createTransactionManager();

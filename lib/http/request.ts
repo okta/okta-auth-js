@@ -18,7 +18,6 @@ import {
   STATE_TOKEN_KEY_NAME,
   DEFAULT_CACHE_DURATION,
   IOS_MAX_RETRY_COUNT,
-  IOS_PAGE_AWAKEN_TIMEOUT
 } from '../constants';
 import {
   OktaAuthHttpInterface,
@@ -28,13 +27,13 @@ import {
   HttpResponse
 } from './types';
 import { AuthApiError, OAuthError, APIError, WWWAuthError } from '../errors';
-import { isSafari18 } from '../features';
+import { isBrowser } from '../features';
 
 
 // For iOS track last date when document became visible
 let dateDocumentBecameVisible = 0;
 let trackDateDocumentBecameVisible: () => void;
-if (isSafari18()) {
+if (isBrowser()) {
   dateDocumentBecameVisible = Date.now();
   trackDateDocumentBecameVisible = () => {
     if (!document.hidden) {
@@ -134,7 +133,8 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
       storageUtil = sdk.options.storageUtil,
       storage = storageUtil!.storage,
       httpCache = sdk.storageManager.getHttpCache(sdk.options.cookies),
-      pollingIntent = options.pollingIntent;
+      pollingIntent = options.pollingIntent,
+      pollDelay = sdk.options.pollDelay ?? 0;
 
   if (options.cacheResponse) {
     var cacheContents = httpCache.getStorage();
@@ -165,7 +165,7 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
 
   var err, res, promise;
 
-  if (pollingIntent && isSafari18()) {
+  if (pollingIntent && isBrowser() && pollDelay > 0) {
     let waitForVisibleAndAwakenDocument: () => Promise<void>;
     let waitForAwakenDocument: () => Promise<void>;
     let recursiveFetch: () => Promise<HttpResponse>;
@@ -176,14 +176,14 @@ export function httpRequest(sdk: OktaAuthHttpInterface, options: RequestOptions)
     // Running fetch after short timeout fixes this issue.
     waitForAwakenDocument = () => {
       const timeSinceDocumentIsVisible = Date.now() - dateDocumentBecameVisible;
-      if (timeSinceDocumentIsVisible < IOS_PAGE_AWAKEN_TIMEOUT) {
+      if (timeSinceDocumentIsVisible < pollDelay) {
         return new Promise<void>((resolve) => setTimeout(() => {
           if (!document.hidden) {
             resolve();
           } else {
             resolve(waitForVisibleAndAwakenDocument());
           }
-        }, IOS_PAGE_AWAKEN_TIMEOUT - timeSinceDocumentIsVisible));
+        }, pollDelay - timeSinceDocumentIsVisible));
       } else {
         return Promise.resolve();
       }

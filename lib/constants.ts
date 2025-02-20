@@ -12,7 +12,6 @@
 
 export const STATE_TOKEN_KEY_NAME = 'oktaStateToken';
 export const DEFAULT_POLLING_DELAY = 500;
-export const IOS_PAGE_AWAKEN_TIMEOUT = 500;
 export const IOS_MAX_RETRY_COUNT = 3;
 export const DEFAULT_MAX_CLOCK_SKEW = 300;
 export const DEFAULT_CACHE_DURATION = 86400;
