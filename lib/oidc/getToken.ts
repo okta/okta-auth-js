@@ -16,7 +16,8 @@
 import {
   getOAuthUrls,
   loadFrame,
-  addPostMessageListener
+  addPostMessageListener,
+  addIDPPopupLisenter
 } from './util';
 
 import AuthSdkError from '../errors/AuthSdkError';
@@ -28,7 +29,8 @@ import {
   OAuthResponse,
 } from './types';
 
-import { prepareTokenParams } from './util/prepareTokenParams';
+import { prepareTokenParams, } from './util/prepareTokenParams';
+import { createOAuthMeta } from './util/oauthMeta';
 import { buildAuthorizeParams } from './endpoints/authorize';
 import { handleOAuthResponse } from './handleOAuthResponse';
 /*
@@ -127,9 +129,11 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
       var flowType;
       if (tokenParams.sessionToken || tokenParams.display === null) {
         flowType = 'IFRAME';
-      } else if (tokenParams.display === 'popup') {
-        flowType = 'POPUP';
-      } else {
+      }
+      else if (tokenParams.display === 'popup') {
+        flowType = options.idpPopup ? 'IDP_POPUP' : 'POPUP'
+      }
+      else {
         flowType = 'IMPLICIT';
       }
 
@@ -162,7 +166,7 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
 
           // Redirect for authorization
           // popupWindown can be null when popup is blocked
-          if (popupWindow) { 
+          if (popupWindow) {
             popupWindow.location.assign(requestUrl);
           }
 
@@ -196,6 +200,24 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
                 popupWindow.close();
               }
             });
+
+        case 'IDP_POPUP':
+          let idpPromise; // resolves with OAuth response
+
+          console.log('request: ', requestUrl)
+
+          idpPromise = addIDPPopupLisenter(sdk, options.timeout, tokenParams.state);
+
+          // Redirect for authorization
+          // popupWindown can be null when popup is blocked
+          if (popupWindow) { 
+            popupWindow.location.assign(requestUrl);
+          }
+
+          return idpPromise
+          .then(function (res) {
+            return handleOAuthResponse(sdk, tokenParams, res as OAuthResponse, urls);
+          });
 
         default:
           throw new AuthSdkError('The full page redirect flow is not supported');

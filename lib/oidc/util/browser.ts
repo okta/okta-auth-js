@@ -15,6 +15,7 @@
 import { AuthSdkError } from '../../errors';
 import { OktaAuthOAuthInterface } from '../types';
 
+
 export function addListener(eventTarget, name, fn) {
   if (eventTarget.addEventListener) {
     eventTarget.addEventListener(name, fn);
@@ -79,4 +80,41 @@ export function addPostMessageListener(sdk: OktaAuthOAuthInterface, timeout, sta
       clearTimeout(timeoutId);
       removeListener(window, 'message', responseHandler);
     });
+}
+
+export function addIDPPopupLisenter (sdk: OktaAuthOAuthInterface, timeout, state) {
+  let listener;
+  let timeoutId;
+
+  const promise = new Promise((resolve, reject) => {
+    listener = (event) => {
+      console.log('storage event: ', event);
+
+      const storageKey = `popup-code:${state}`;
+
+      if (event.target !== window || !event.isTrusted || 
+        event.storageArea !== localStorage || event.key !== storageKey) 
+      {
+        return;
+      }
+
+      if (event.newValue) {
+        localStorage.removeItem(storageKey);
+        return resolve({ state, code: event.newValue });
+      }
+
+      reject(new AuthSdkError('Unable to complete auth code exchange'));
+    };
+    addListener(window, 'storage', listener);
+
+    timeoutId = setTimeout(function () {
+      reject(new AuthSdkError('OAuth flow timed out'));
+    }, timeout || 120000);
+  });
+
+  return promise
+  .finally(() => {
+    clearTimeout(timeoutId);
+    removeListener(window, 'storage', listener);
+  });
 }
