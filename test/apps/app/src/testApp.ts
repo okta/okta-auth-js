@@ -719,7 +719,10 @@ class TestApp {
       redirectUri: 'http://localhost:8080/popup/callback'
     }, options);
 
-    const res = await this.oktaAuth.token.getWithIDPPopup(options);
+    const { promise, cancel } = this.oktaAuth.token.getWithIDPPopup(options);
+    const res = await promise;
+    console.log('res', res);
+    this.oktaAuth.tokenManager.setTokens(res.tokens);
     this.render();
   }
 
@@ -830,9 +833,8 @@ class TestApp {
   }
 
   async handleIDPCallback (): Promise<void> {
-    const res = await this.oktaAuth.token.parseFromUrl();
-    this.oktaAuth.tokenManager.setTokens(res.tokens);
-    console.log('response', res);
+    this.oktaAuth.handleIDPPopupRedirect();
+    window.close();
   }
 
   async renderCallback(res: TokenResponse): Promise<void> {
