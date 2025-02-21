@@ -206,10 +206,6 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
 
           console.log('request: ', requestUrl)
 
-          const meta = createOAuthMeta(sdk, tokenParams);
-          sdk.transactionManager.save(meta);
-
-          // TODO:
           idpPromise = addIDPPopupLisenter(sdk, options.timeout, tokenParams.state);
 
           // Redirect for authorization

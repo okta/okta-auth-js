@@ -15,6 +15,7 @@
 import { AuthSdkError } from '../../errors';
 import { OktaAuthOAuthInterface } from '../types';
 
+
 export function addListener(eventTarget, name, fn) {
   if (eventTarget.addEventListener) {
     eventTarget.addEventListener(name, fn);
@@ -89,14 +90,20 @@ export function addIDPPopupLisenter (sdk: OktaAuthOAuthInterface, timeout, state
     listener = (event) => {
       console.log('storage event: ', event);
 
-      if (event.target !== window || !event.isTrusted ||
-          event.storageArea !== localStorage || event.key !== ''
-      ) {
+      const storageKey = `popup-code:${state}`;
+
+      if (event.target !== window || !event.isTrusted || 
+        event.storageArea !== localStorage || event.key !== storageKey) 
+      {
         return;
       }
 
-      // check event.newValue has code/state
-      // resolve(event.newValue);
+      if (event.newValue) {
+        localStorage.removeItem(storageKey);
+        return resolve({ state, code: event.newValue });
+      }
+
+      reject(new AuthSdkError('Unable to complete auth code exchange'));
     };
     addListener(window, 'storage', listener);
 

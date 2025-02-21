@@ -34,7 +34,7 @@ export function getWithPopup(sdk: OktaAuthOAuthInterface, options: TokenParams):
   return getToken(sdk, options);
 }
 
-export function getWithIDPPopup(sdk: OktaAuthOAuthInterface, options: TokenParams): Promise<TokenResponse> {
+export function getWithIDPPopup(sdk: OktaAuthOAuthInterface, options: TokenParams): { cancel: () => void, promise: Promise<TokenResponse> } {
   // some browsers (safari, firefox) block popup if it's initialed from an async process
   // here we create the popup window immediately after user interaction
   // then redirect to the /authorize endpoint when the requestUrl is available
@@ -46,5 +46,9 @@ export function getWithIDPPopup(sdk: OktaAuthOAuthInterface, options: TokenParam
     popupWindow,
     idpPopup: true,
   });
-  return getToken(sdk, options);
+
+  return {
+    promise: getToken(sdk, options),
+    cancel: () => {}
+  };
 }
