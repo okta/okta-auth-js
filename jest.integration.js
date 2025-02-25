@@ -38,7 +38,7 @@ const config = Object.assign({}, baseConfig, {
 });
 
 if (process.env.USE_DPOP == '1') {
-  config.testPathIgnorePatterns.push('renewTokens')
+  config.testPathIgnorePatterns.push('renewTokens');
 }
 
 module.exports = config;

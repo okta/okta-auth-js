@@ -3,7 +3,7 @@ jest.mock('../../../../lib/features', () => {
   return {
     ...actual,
     isDPoPSupported: () => true
-  }
+  };
 });
 
 jest.mock('../../../../lib/oidc/dpop', () => {
@@ -16,9 +16,9 @@ jest.mock('../../../../lib/oidc/dpop', () => {
     findKeyPair: async () => await keyPair,
     createDPoPKeyPair: async () => {
       const kp = await keyPair;
-      return  { keyPair: kp, keyPairId: 'foo' }
+      return  { keyPair: kp, keyPairId: 'foo' };
     }
-  }
+  };
 });
 
 import { getProfile, getProfileSchema, updateProfile } from '../../../../lib/myaccount';
