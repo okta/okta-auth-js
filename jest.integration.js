@@ -38,7 +38,7 @@ if (process.env.USE_DPOP == '1') {
   config.testEnvironment = 'jsdom';
   config.moduleNameMapper = Object.assign({}, baseConfig.moduleNameMapper, {
     '^./node$': './browser'
-  }),
+  });
   config.testPathIgnorePatterns.push('renewTokens');
 }
 else {
