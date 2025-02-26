@@ -13,7 +13,6 @@ const config = Object.assign({}, baseConfig, {
   setupFiles: [
     '<rootDir>/test/support/nodeExceptions.js',
     '<rootDir>/test/support/jest/jest.setup.js',
-    '<rootDir>/test/support/jest/jest.setup.node.js'
   ],
   testEnvironment: 'node',
   globals: Object.assign({}, baseConfig.globals, {
@@ -33,5 +32,17 @@ const config = Object.assign({}, baseConfig, {
   // extend timeout to 10s for
   testTimeout: 15 * 1000 
 });
+
+if (process.env.USE_DPOP == '1') {
+  config.setupFiles.unshift('fake-indexeddb/auto');
+  config.testEnvironment = 'jsdom';
+  config.moduleNameMapper = Object.assign({}, baseConfig.moduleNameMapper, {
+    '^./node$': './browser'
+  });
+  config.testPathIgnorePatterns.push('renewTokens');
+}
+else {
+  config.setupFiles.push('<rootDir>/test/support/jest/jest.setup.node.js');
+}
 
 module.exports = config;

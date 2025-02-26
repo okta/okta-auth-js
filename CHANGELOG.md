@@ -1,5 +1,11 @@
 # Changelog
 
+# 7.11.1
+
+### Fixes
+
+- [#1572](https://github.com/okta/okta-auth-js/pull/1572) fix: adds DPoP support to MyAccount API client
+
 # 7.11.0
 
 ### Features

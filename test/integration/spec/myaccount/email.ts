@@ -1,3 +1,26 @@
+jest.mock('../../../../lib/features', () => {
+  const actual = jest.requireActual('../../../../lib/features');
+  return {
+    ...actual,
+    isDPoPSupported: () => true
+  };
+});
+
+jest.mock('../../../../lib/oidc/dpop', () => {
+  const actual = jest.requireActual('../../../../lib/oidc/dpop');
+  const keyPair = actual.generateKeyPair();
+
+  return {
+    ...actual,
+    generateKeyPair: async () => await keyPair,
+    findKeyPair: async () => await keyPair,
+    createDPoPKeyPair: async () => {
+      const kp = await keyPair;
+      return  { keyPair: kp, keyPairId: 'foo' };
+    }
+  };
+});
+
 import {
   addEmail,
   deleteEmail,
@@ -22,7 +45,7 @@ describe('MyAccount Email API', () => {
     client = createClient({});
     const {
       tokens: {
-        accessToken: { accessToken } = {}
+        accessToken
       }
     } = await signinAndGetTokens(client, {
       scopes: [
@@ -34,6 +57,13 @@ describe('MyAccount Email API', () => {
       acrValues: 'urn:okta:loa:2fa:any:ifpossible',
     });
     token = accessToken;
+
+    if (process.env.USE_DPOP == '1') {
+      token = accessToken;
+    }
+    else {
+      token = accessToken?.accessToken;
+    }
   });
 
   describe('getEmail/s', () => {

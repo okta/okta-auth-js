@@ -1,10 +1,11 @@
+import tokens from '@okta/test.support/tokens';
 import { OktaAuth } from '@okta/okta-auth-js';
 import {
   EmailTransaction,
   EmailChallengeTransaction,
   BaseTransaction
 } from '../../../lib/myaccount/transactions';
-import { AuthApiError } from '../../../lib/errors';
+import { AuthApiError, AuthSdkError } from '../../../lib/errors';
 import { sendRequest, generateRequestFnFromLinks } from '../../../lib/myaccount/request';
 
 jest.mock('../../../lib/http', () => {
@@ -74,6 +75,55 @@ describe('sendRequest', () => {
         Accept: '*/*;okta-version=1.0.0'
       }
     });
+  });
+
+  it('will make dpop signed requests', async () => {
+    auth = createOktaAuth({
+      issuer: 'http://my-okta-domain/oauth2/default',
+      dpop: true,
+      pkce: true
+    });
+    jest.spyOn(auth, 'getDPoPAuthorizationHeaders').mockResolvedValue({
+      Authorization: 'auth-header',
+      Dpop: 'dpop-header'
+    });
+    jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue({
+      fake: 'fake-response'
+    });
+    await sendRequest(auth, {
+      url: '/idp/myaccount/profile',
+      method: 'GET',
+      accessToken: { ...tokens.standardAccessTokenParsed }
+    });
+    expect(mocked.http.httpRequest).toHaveBeenCalledWith(auth, {
+      url: 'http://my-okta-domain/idp/myaccount/profile',
+      method: 'GET',
+      headers: {
+        Accept: '*/*;okta-version=1.0.0',
+        Authorization: 'auth-header',
+        Dpop: 'dpop-header'
+      }
+    });
+  });
+
+  it('will throw when token string is passed with dpop configured', async () => {
+    auth = createOktaAuth({
+      issuer: 'http://my-okta-domain/oauth2/default',
+      dpop: true,
+      pkce: true
+    });
+    jest.spyOn(auth, 'getDPoPAuthorizationHeaders').mockResolvedValue({
+      Authorization: 'auth-header',
+      Dpop: 'dpop-header'
+    });
+    jest.spyOn(mocked.http, 'httpRequest').mockResolvedValue({
+      fake: 'fake-response'
+    });
+    await expect(sendRequest(auth, {
+      url: '/idp/myaccount/profile',
+      method: 'GET',
+      accessToken: 'fake-token',
+    })).rejects.toThrow(AuthSdkError);
   });
 
   it('throws AuthApiError', async () => {
