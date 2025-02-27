@@ -100,7 +100,8 @@ export function mixinCore
     handleIDPPopupRedirect (url = window.location.href) {
       const res = parseOAuthResponseFromUrl(this, { responseMode: 'query', url });
       if (res.state && res.code) {
-        localStorage.setItem(`popup-code:${res.state}`, res.code);
+        const channel = new BroadcastChannel(`popup-callback:${res.state}`);
+        channel.postMessage(res.code);
       }
       else {
         throw new AuthSdkError('Unable to parse auth code params');
