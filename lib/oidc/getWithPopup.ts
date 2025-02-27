@@ -14,7 +14,7 @@ import { AuthSdkError } from '../errors';
 import { OktaAuthOAuthInterface, TokenParams, TokenResponse } from './types';
 import { clone } from '../util';
 import { getToken } from './getToken';
-import { loadPopup } from './util';
+import { loadPopup, generateState } from './util';
 
 export function getWithPopup(sdk: OktaAuthOAuthInterface, options: TokenParams): Promise<TokenResponse> {
   if (arguments.length > 2) {
@@ -35,20 +35,45 @@ export function getWithPopup(sdk: OktaAuthOAuthInterface, options: TokenParams):
 }
 
 export function getWithIDPPopup(sdk: OktaAuthOAuthInterface, options: TokenParams): { cancel: () => void, promise: Promise<TokenResponse> } {
+  if (!BroadcastChannel) {
+    throw new AuthSdkError('Modern browser with `BroadcastChannel` support is required to use this method');
+  }
+
+  if (!options.state) {
+    options.state = generateState();
+  }
+
   // some browsers (safari, firefox) block popup if it's initialed from an async process
   // here we create the popup window immediately after user interaction
   // then redirect to the /authorize endpoint when the requestUrl is available
   const popupWindow = loadPopup('/', options);
+  const channel = new BroadcastChannel(`popup-callback:${options.state}`);
+
   options = clone(options) || {};
   Object.assign(options, {
     display: 'popup',
     responseMode: 'query',
     popupWindow,
     idpPopup: true,
+    channel,
   });
 
+  let cancelPromise;
+  const promise = new Promise<TokenResponse>((resolve, reject) => {
+    cancelPromise = reject;
+    return getToken(sdk, options)
+    .then((res) => {
+      return resolve(res);
+    });
+  });
+
+  const cancel = () => {
+    channel.close();
+    cancelPromise(new AuthSdkError('Popup flow canceled'));
+  };
+
   return {
-    promise: getToken(sdk, options),
-    cancel: () => {}
+    promise,
+    cancel
   };
 }

@@ -82,30 +82,26 @@ export function addPostMessageListener(sdk: OktaAuthOAuthInterface, timeout, sta
     });
 }
 
-export function addIDPPopupLisenter (sdk: OktaAuthOAuthInterface, timeout, state) {
-  let listener;
+export function addIDPPopupLisenter (
+  sdk: OktaAuthOAuthInterface,
+  timeout: number | undefined,
+  channel: BroadcastChannel,
+  state: string
+) {
   let timeoutId;
 
   const promise = new Promise((resolve, reject) => {
-    listener = (event) => {
-      console.log('storage event: ', event);
-
-      const storageKey = `popup-code:${state}`;
-
-      if (event.target !== window || !event.isTrusted || 
-        event.storageArea !== localStorage || event.key !== storageKey) 
-      {
+    channel.onmessage = (event) => {
+      if (!event.isTrusted || !event.data) {
         return;
       }
 
-      if (event.newValue) {
-        localStorage.removeItem(storageKey);
-        return resolve({ state, code: event.newValue });
+      if (typeof event.data === 'string') {
+        return resolve({ state, code: event.data });
       }
 
       reject(new AuthSdkError('Unable to complete auth code exchange'));
     };
-    addListener(window, 'storage', listener);
 
     timeoutId = setTimeout(function () {
       reject(new AuthSdkError('OAuth flow timed out'));
@@ -115,6 +111,6 @@ export function addIDPPopupLisenter (sdk: OktaAuthOAuthInterface, timeout, state
   return promise
   .finally(() => {
     clearTimeout(timeoutId);
-    removeListener(window, 'storage', listener);
+    channel.close();
   });
 }

@@ -26,6 +26,7 @@ export interface PopupParams {
   popupTitle?: string;
   popupWindow?: Window;
   idpPopup?: boolean;
+  channel?: BroadcastChannel;
 }
 
 export interface TokenResponse {

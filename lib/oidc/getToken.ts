@@ -204,9 +204,8 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
         case 'IDP_POPUP':
           let idpPromise; // resolves with OAuth response
 
-          console.log('request: ', requestUrl)
-
-          idpPromise = addIDPPopupLisenter(sdk, options.timeout, tokenParams.state);
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          idpPromise = addIDPPopupLisenter(sdk, options.timeout, options.channel!, tokenParams.state!);
 
           // Redirect for authorization
           // popupWindown can be null when popup is blocked
