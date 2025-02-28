@@ -1,3 +1,26 @@
+jest.mock('../../../../lib/features', () => {
+  const actual = jest.requireActual('../../../../lib/features');
+  return {
+    ...actual,
+    isDPoPSupported: () => true
+  };
+});
+
+jest.mock('../../../../lib/oidc/dpop', () => {
+  const actual = jest.requireActual('../../../../lib/oidc/dpop');
+  const keyPair = actual.generateKeyPair();
+
+  return {
+    ...actual,
+    generateKeyPair: async () => await keyPair,
+    findKeyPair: async () => await keyPair,
+    createDPoPKeyPair: async () => {
+      const kp = await keyPair;
+      return  { keyPair: kp, keyPairId: 'foo' };
+    }
+  };
+});
+
 import {
   getPassword,
   enrollPassword,
@@ -27,7 +50,12 @@ describe('MyAccount Password API', () => {
       });
       console.log(tokens);
 
-      token = tokens.accessToken!.accessToken;
+      if (process.env.USE_DPOP == '1') {
+        token = tokens.accessToken;
+      }
+      else {
+        token = tokens.accessToken!.accessToken;
+      }
     }
     catch (err) {
       console.log('SETUP FAILED');

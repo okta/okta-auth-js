@@ -14,15 +14,26 @@ get_terminus_secret "/" password PASSWORD
 export PASSWORDLESS_USERNAME=password.optional@mailinator.com
 get_terminus_secret "/" a18n_api_key A18N_API_KEY
 
-# This client has refresh token enabled and password optional
+# These clients have refresh token enabled and password optional
 export CLIENT_ID=0oa3b5fp4h02UIrjZ697
+export DPOP_CLIENT_ID=0oaole6c9ngbidHdX697
 
-create_log_group "Integration Test Run"
+create_log_group "Standard Integration Test Run"
 if ! yarn test:integration; then
   echo "integration failed! Exiting..."
   exit ${TEST_FAILURE}
 fi
+finish_log_group $?
 
+create_log_group "DPoP Integration Test Run"
+export USE_DPOP=1
+if ! yarn test:integration; then
+  echo "integration failed (with DPoP)! Exiting..."
+  exit ${TEST_FAILURE}
+fi
+finish_log_group $?
+
+create_log_group "Cleanup"
 echo ${TEST_SUITE_TYPE} > ${TEST_SUITE_TYPE_FILE}
 echo ${TEST_RESULT_FILE_DIR} > ${TEST_RESULT_FILE_DIR_FILE}
 exit ${PUBLISH_TYPE_AND_RESULT_DIR}
