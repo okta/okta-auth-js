@@ -720,10 +720,26 @@ class TestApp {
     }, options);
 
     const { promise, cancel } = this.oktaAuth.token.getWithIDPPopup(options);
-    const res = await promise;
-    console.log('res', res);
-    this.oktaAuth.tokenManager.setTokens(res.tokens);
-    this.render();
+
+    // @ts-expect-error
+    window.cancelPopup = makeClickHandler(cancel.bind(this));
+
+    const content = `
+      <a id="handle-popup-cancel" href="/" onclick="cancelPopup(event)">Cancel popup login</a>
+    `;
+    const elem = document.createElement('div');
+    elem.innerHTML = content;
+    this.contentElem.prepend(elem);
+
+    try {
+      const res = await promise;
+      console.log('res', res);
+      this.oktaAuth.tokenManager.setTokens(res.tokens);
+      this.render();
+    }
+    finally {
+      document.getElementById('handle-popup-cancel').remove();
+    }
   }
 
   async getToken(options?: OktaAuthOptions): Promise<void> {
