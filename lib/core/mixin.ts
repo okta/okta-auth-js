@@ -102,6 +102,7 @@ export function mixinCore
       if (res.state && res.code) {
         const channel = new BroadcastChannel(`popup-callback:${res.state}`);
         channel.postMessage(res.code);
+        channel.close();
       }
       else {
         throw new AuthSdkError('Unable to parse auth code params');

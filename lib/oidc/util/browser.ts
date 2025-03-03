@@ -15,6 +15,7 @@
 import { AuthSdkError } from '../../errors';
 import { OktaAuthOAuthInterface } from '../types';
 
+const DEFAULT_TIMEOUT = 120000;
 
 export function addListener(eventTarget, name, fn) {
   if (eventTarget.addEventListener) {
@@ -72,7 +73,7 @@ export function addPostMessageListener(sdk: OktaAuthOAuthInterface, timeout, sta
 
     timeoutId = setTimeout(function () {
       reject(new AuthSdkError('OAuth flow timed out'));
-    }, timeout || 120000);
+    }, timeout || DEFAULT_TIMEOUT);
   });
 
   return msgReceivedOrTimeout
@@ -92,10 +93,12 @@ export function addIDPPopupLisenter (
 
   const promise = new Promise((resolve, reject) => {
     channel.onmessage = (event) => {
+      // ignore invalid or untrusted events
       if (!event.isTrusted || !event.data) {
         return;
       }
 
+      // the auth code is expected to be passed directly via bc.postMessage as a simple string
       if (typeof event.data === 'string') {
         return resolve({ state, code: event.data });
       }
@@ -105,7 +108,7 @@ export function addIDPPopupLisenter (
 
     timeoutId = setTimeout(function () {
       reject(new AuthSdkError('OAuth flow timed out'));
-    }, timeout || 120000);
+    }, timeout || DEFAULT_TIMEOUT);
   });
 
   return promise
