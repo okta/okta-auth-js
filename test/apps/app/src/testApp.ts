@@ -721,7 +721,7 @@ class TestApp {
 
     const { promise, cancel } = this.oktaAuth.token.getWithIDPPopup(options);
 
-    // @ts-expect-error
+    // @ts-expect-error binds handler to window object for access
     window.cancelPopup = makeClickHandler(cancel.bind(this));
 
     const content = `

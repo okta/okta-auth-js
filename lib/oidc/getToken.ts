@@ -30,7 +30,6 @@ import {
 } from './types';
 
 import { prepareTokenParams, } from './util/prepareTokenParams';
-import { createOAuthMeta } from './util/oauthMeta';
 import { buildAuthorizeParams } from './endpoints/authorize';
 import { handleOAuthResponse } from './handleOAuthResponse';
 /*
@@ -126,12 +125,12 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
       requestUrl = endpoint + buildAuthorizeParams(tokenParams);
 
       // Determine the flow type
-      var flowType;
+      var flowType: 'IFRAME' | 'POPUP' | 'IDP_POPUP' | 'IMPLICIT' = 'IMPLICIT';
       if (tokenParams.sessionToken || tokenParams.display === null) {
         flowType = 'IFRAME';
       }
       else if (tokenParams.display === 'popup') {
-        flowType = options.idpPopup ? 'IDP_POPUP' : 'POPUP'
+        flowType = options.idpPopup ? 'IDP_POPUP' : 'POPUP';
       }
       else {
         flowType = 'IMPLICIT';
@@ -165,7 +164,7 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
           }
 
           // Redirect for authorization
-          // popupWindown can be null when popup is blocked
+          // popupWindow can be null when popup is blocked
           if (popupWindow) {
             popupWindow.location.assign(requestUrl);
           }
@@ -202,13 +201,13 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
             });
 
         case 'IDP_POPUP':
-          let idpPromise; // resolves with OAuth response
+          var idpPromise; // resolves with OAuth response
 
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           idpPromise = addIDPPopupLisenter(sdk, options.timeout, options.channel!, tokenParams.state!);
 
           // Redirect for authorization
-          // popupWindown can be null when popup is blocked
+          // popupWindow can be null when popup is blocked
           if (popupWindow) { 
             popupWindow.location.assign(requestUrl);
           }

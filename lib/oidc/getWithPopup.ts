@@ -34,7 +34,11 @@ export function getWithPopup(sdk: OktaAuthOAuthInterface, options: TokenParams):
   return getToken(sdk, options);
 }
 
-export function getWithIDPPopup(sdk: OktaAuthOAuthInterface, options: TokenParams): { cancel: () => void, promise: Promise<TokenResponse> } {
+export function getWithIDPPopup(
+  sdk: OktaAuthOAuthInterface,
+  options: TokenParams
+): { cancel: () => void, promise: Promise<TokenResponse> } {
+  // eslint-disable-next-line compat/compat
   if (!BroadcastChannel) {
     throw new AuthSdkError('Modern browser with `BroadcastChannel` support is required to use this method');
   }
@@ -47,6 +51,7 @@ export function getWithIDPPopup(sdk: OktaAuthOAuthInterface, options: TokenParam
   // here we create the popup window immediately after user interaction
   // then redirect to the /authorize endpoint when the requestUrl is available
   const popupWindow = loadPopup('/', options);
+  // eslint-disable-next-line compat/compat
   const channel = new BroadcastChannel(`popup-callback:${options.state}`);
 
   options = clone(options) || {};
