@@ -16,7 +16,8 @@
 import {
   getOAuthUrls,
   loadFrame,
-  addPostMessageListener
+  addPostMessageListener,
+  addIDPPopupLisenter
 } from './util';
 
 import AuthSdkError from '../errors/AuthSdkError';
@@ -28,7 +29,7 @@ import {
   OAuthResponse,
 } from './types';
 
-import { prepareTokenParams } from './util/prepareTokenParams';
+import { prepareTokenParams, } from './util/prepareTokenParams';
 import { buildAuthorizeParams } from './endpoints/authorize';
 import { handleOAuthResponse } from './handleOAuthResponse';
 /*
@@ -124,12 +125,14 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
       requestUrl = endpoint + buildAuthorizeParams(tokenParams);
 
       // Determine the flow type
-      var flowType;
+      var flowType: 'IFRAME' | 'POPUP' | 'IDP_POPUP' | 'IMPLICIT' = 'IMPLICIT';
       if (tokenParams.sessionToken || tokenParams.display === null) {
         flowType = 'IFRAME';
-      } else if (tokenParams.display === 'popup') {
-        flowType = 'POPUP';
-      } else {
+      }
+      else if (tokenParams.display === 'popup') {
+        flowType = options.idpPopup ? 'IDP_POPUP' : 'POPUP';
+      }
+      else {
         flowType = 'IMPLICIT';
       }
 
@@ -161,8 +164,8 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
           }
 
           // Redirect for authorization
-          // popupWindown can be null when popup is blocked
-          if (popupWindow) { 
+          // popupWindow can be null when popup is blocked
+          if (popupWindow) {
             popupWindow.location.assign(requestUrl);
           }
 
@@ -196,6 +199,23 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
                 popupWindow.close();
               }
             });
+
+        case 'IDP_POPUP':
+          var idpPromise; // resolves with OAuth response
+
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          idpPromise = addIDPPopupLisenter(sdk, options.timeout, options.channel!, tokenParams.state!);
+
+          // Redirect for authorization
+          // popupWindow can be null when popup is blocked
+          if (popupWindow) { 
+            popupWindow.location.assign(requestUrl);
+          }
+
+          return idpPromise
+          .then(function (res) {
+            return handleOAuthResponse(sdk, tokenParams, res as OAuthResponse, urls);
+          });
 
         default:
           throw new AuthSdkError('The full page redirect flow is not supported');
