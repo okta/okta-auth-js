@@ -11,6 +11,7 @@ import {
 import { AuthStateManager } from './AuthStateManager';
 import { ServiceManager } from './ServiceManager';
 import { OktaAuthCoreInterface, OktaAuthCoreOptions } from './types';
+import { AuthSdkError } from '../errors';
 
 export function mixinCore
 <
@@ -93,6 +94,18 @@ export function mixinCore
         await restoreOriginalUri(this, originalUri);
       } else if (originalUri) {
         window.location.replace(originalUri);
+      }
+    }
+
+    handleIDPPopupRedirect (url = window.location.href) {
+      const res = parseOAuthResponseFromUrl(this, { responseMode: 'query', url });
+      if (res.state) {
+        const channel = new BroadcastChannel(`popup-callback:${res.state}`);
+        channel.postMessage(res);
+        channel.close();
+      }
+      else {
+        throw new AuthSdkError('Unable to parse auth code params');
       }
     }
   };
