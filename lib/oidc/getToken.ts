@@ -209,6 +209,9 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
           if (popupWindow) {
             popupWindow.location.assign(requestUrl);
           }
+          else {
+            throw new AuthSdkError('Unable to open popup window');
+          }
 
           return idpPromise
           .then(function (res) {

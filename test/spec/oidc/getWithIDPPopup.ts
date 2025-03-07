@@ -161,4 +161,24 @@ describe('token.getWithIDPPopup', () => {
     await expect(promise).rejects.toEqual(new AuthSdkError('OAuth flow timed out'));
     expect(window.open).toHaveBeenCalled();
   });
+
+  it('will throw if popup is blocked', async () => {
+    jest.spyOn(window, 'open').mockImplementation(() => {
+      return null;
+    });
+
+    const state = 'state';
+    mocked.addIDPPopupLisenter.mockResolvedValue({ code: 'code', state });
+
+    const { promise } = authClient.token.getWithIDPPopup({
+      redirectUri: 'http://localhost:8080/popup/callback',
+      state
+    });
+
+    await expect(promise).rejects.toEqual(new AuthSdkError('Unable to open popup window'));
+    expect(window.open).toHaveBeenCalled();
+    expect(window.open).toHaveReturnedWith(null);
+  });
+
+
 });
