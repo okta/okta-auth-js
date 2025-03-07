@@ -99,9 +99,9 @@ export function mixinCore
 
     handleIDPPopupRedirect (url = window.location.href) {
       const res = parseOAuthResponseFromUrl(this, { responseMode: 'query', url });
-      if (res.state && res.code) {
+      if (res.state) {
         const channel = new BroadcastChannel(`popup-callback:${res.state}`);
-        channel.postMessage(res.code);
+        channel.postMessage(res);
         channel.close();
       }
       else {

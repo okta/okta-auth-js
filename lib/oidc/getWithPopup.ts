@@ -67,9 +67,8 @@ export function getWithIDPPopup(
   const promise = new Promise<TokenResponse>((resolve, reject) => {
     cancelPromise = reject;
     return getToken(sdk, options)
-    .then((res) => {
-      return resolve(res);
-    });
+    .then((res) => resolve(res))
+    .catch(err => reject(err));
   });
 
   const cancel = () => {

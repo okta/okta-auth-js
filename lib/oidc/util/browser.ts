@@ -98,9 +98,8 @@ export function addIDPPopupLisenter (
         return;
       }
 
-      // the auth code is expected to be passed directly via bc.postMessage as a simple string
-      if (typeof event.data === 'string') {
-        return resolve({ state, code: event.data });
+      if (typeof event.data === 'object' && state === event.data.state) {
+        return resolve({ ...event.data });
       }
 
       reject(new AuthSdkError('Unable to complete auth code exchange'));
