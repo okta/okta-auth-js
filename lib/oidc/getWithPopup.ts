@@ -38,9 +38,14 @@ export function getWithIDPPopup(
   sdk: OktaAuthOAuthInterface,
   options: TokenParams
 ): { cancel: () => void, promise: Promise<TokenResponse> } {
-  // eslint-disable-next-line compat/compat
-  if (!BroadcastChannel) {
+ try {
+   // eslint-disable-next-line compat/compat
+   if (!BroadcastChannel) {
     throw new AuthSdkError('Modern browser with `BroadcastChannel` support is required to use this method');
+  }
+
+  if (!options.redirectUri) {
+    throw new AuthSdkError('`redirectUri` is a required param for `getWithIDPPopup`');
   }
 
   if (!options.state) {
@@ -80,4 +85,11 @@ export function getWithIDPPopup(
     promise,
     cancel
   };
+ }
+ catch (err) {
+  return {
+    promise: Promise.reject(err),
+    cancel: () => {}    // noop, no need to for method when error is thrown
+  }
+ }
 }

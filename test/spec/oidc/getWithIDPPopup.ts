@@ -13,7 +13,7 @@ jest.mock('../../../lib/oidc/endpoints/well-known', () => {
       code_challenge_methods_supported: ['S256']
     }),
     getKey: async () => ({})
-  }
+  };
 });
 
 jest.mock('lib/oidc/verifyToken', () => {
@@ -59,12 +59,13 @@ describe('token.getWithIDPPopup', () => {
       postMessage = jest.fn;
       onmessage = jest.fn;
       close = jest.fn;
-    }
+    };
     global.BroadcastChannel = MockBC;
 
     authParams = {
       issuer: 'https://auth-js-test.okta.com',
       clientId: 'clientId',
+      redirectUri: 'http://localhost:8080/login/callback',
       pkce: true
     };
     authClient = new OktaAuth(authParams);
@@ -75,7 +76,7 @@ describe('token.getWithIDPPopup', () => {
           accessToken: tokens.standardAccessTokenParsed,
         },
         state: (params as TokenParams).state
-      })
+      });
     });
   });
 
@@ -106,7 +107,7 @@ describe('token.getWithIDPPopup', () => {
     // response_type
     expect(popupUrl.searchParams.get('response_type')).toBe('code');
     // code
-    expect(popupUrl.searchParams.get('code')).toBeDefined()
+    expect(popupUrl.searchParams.get('code')).toBeDefined();
     // state
     expect(popupUrl.searchParams.get('state')).toBe(state);
     // nonce
@@ -134,7 +135,7 @@ describe('token.getWithIDPPopup', () => {
     expect(window.open).toHaveBeenCalled();
   });
 
-  it('can throw oauth errors', async () => {
+  it('will throw oauth errors', async () => {
     const state = 'state';
     mocked.addIDPPopupLisenter.mockResolvedValue({
       state, error: 'invalid grant', error_description: 'something went wrong'
@@ -180,5 +181,30 @@ describe('token.getWithIDPPopup', () => {
     expect(window.open).toHaveReturnedWith(null);
   });
 
+  it('will throw if `redirect_uri` is not provided', async () => {
+    const state = 'state';
+    mocked.addIDPPopupLisenter.mockResolvedValue({ code: 'code', state });
+    
+    const { promise } = authClient.token.getWithIDPPopup({
+      state
+    });
 
+    await expect(promise).rejects.toEqual(new AuthSdkError('`redirectUri` is a required param for `getWithIDPPopup`'));
+    expect(window.open).not.toHaveBeenCalled();
+  });
+
+  it('will throw if BroadcastChannel is not supported', async () => {
+    // @ts-expect-error forcing window object
+    global.BroadcastChannel = undefined;
+
+    const state = 'state';
+    mocked.addIDPPopupLisenter.mockResolvedValue({ code: 'code', state });
+    
+    const { promise } = authClient.token.getWithIDPPopup({
+      state
+    });
+
+    await expect(promise).rejects.toEqual(new AuthSdkError('Modern browser with `BroadcastChannel` support is required to use this method'));
+    expect(window.open).not.toHaveBeenCalled();
+  });
 });

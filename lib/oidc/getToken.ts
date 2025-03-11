@@ -202,7 +202,7 @@ export function getToken(sdk: OktaAuthOAuthInterface, options: TokenParams & Pop
 
         case 'IDP_POPUP':
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const idpPromise = addIDPPopupLisenter(sdk, options.timeout, options.channel!, tokenParams.state!);
+          var idpPromise = addIDPPopupLisenter(sdk, options.timeout, options.channel!, tokenParams.state!);
 
           // Redirect for authorization
           // popupWindow can be null when popup is blocked
