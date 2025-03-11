@@ -735,7 +735,7 @@ class TestApp {
       const res = await promise;
       console.log('res', res);
       this.oktaAuth.tokenManager.setTokens(res.tokens);
-      this.render();
+      this.renderCallback(res);
     }
     finally {
       document.getElementById('handle-popup-cancel').remove();
