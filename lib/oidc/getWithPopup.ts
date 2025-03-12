@@ -36,7 +36,7 @@ export function getWithPopup(sdk: OktaAuthOAuthInterface, options: TokenParams):
 
 export function getWithIDPPopup(
   sdk: OktaAuthOAuthInterface,
-  options: TokenParams
+  options: Omit<TokenParams, 'redirectUri'> & { redirectUri: string }
 ): { cancel: () => void, promise: Promise<TokenResponse> } {
  try {
    // eslint-disable-next-line compat/compat
