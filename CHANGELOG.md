@@ -1,5 +1,13 @@
 # Changelog
 
+# 7.12.0
+
+### Features
+
+- [#1573](https://github.com/okta/okta-auth-js/pull/1573) feat: adds `token.getWithIDPPopup()` method
+  - A [`Cross-Origin-Opener-Policy`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy) resilient method of acquiring tokens using via external IDPs.
+  - See [documentation](https://github.com/okta/okta-auth-js?tab=readme-ov-file#tokengetwithidppopupoptions) for more detailed explanation
+
 # 7.11.1
 
 ### Fixes

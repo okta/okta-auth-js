@@ -29,7 +29,7 @@ import {
   OAuthResponse,
 } from './types';
 
-import { prepareTokenParams, } from './util/prepareTokenParams';
+import { prepareTokenParams } from './util/prepareTokenParams';
 import { buildAuthorizeParams } from './endpoints/authorize';
 import { handleOAuthResponse } from './handleOAuthResponse';
 /*
