@@ -47,11 +47,13 @@ class TestApp {
   get loginWidgetBtn() { return $('#login-widget'); }
   get loginRedirectBtn() { return $('#login-redirect'); }
   get loginPopupBtn() { return $('#login-popup'); }
+  get loginIDPPopupBtn() { return $('#login-idp-popup'); }
   get loginDirectBtn() { return $('#login-direct'); }
   get username() { return $('#username'); }
   get password() { return $('#password'); }
   get testConcurrentLoginBtn() { return $('#test-concurrent-login'); }
   get navigateToProtectedBtn() { return $('#nav-to-protected'); }
+  get handleIDPPopupCancelBtn() { return $('#handle-popup-cancel'); }
 
   // Form
   get responseModeQuery() { return $('#f_responseMode [value="query"]'); }
@@ -77,6 +79,7 @@ class TestApp {
   get subscribeTokenEventsBtn() { return $('#subscribe-token-events'); }
   get startServiceBtn() { return $('#start-service'); }
   get handleCallbackBtn() { return $('#handle-callback'); }
+  get handleIDPPopupCallbackBtn() { return $('#handle-popup-callback'); }
   get callbackResult() { return $('#callback-result'); }
   get returnHomeBtn() { return $('#return-home'); }
   get accessToken() { return $('#access-token'); }
@@ -124,6 +127,17 @@ class TestApp {
   async loginDirect() {
     await this.waitForLoginBtn();
     await this.loginDirectBtn.then(el => el.click());
+  }
+
+  async loginIDPPopup() {
+    await this.waitForLoginBtn();
+    var btn = await this.loginIDPPopupBtn;
+    await btn.click();
+  }
+
+  async handleIDPPopupCallback() {
+    await browser.waitUntil(async () => this.handleIDPPopupCallbackBtn.then(el => el.isDisplayed()), 5000, 'wait for handle callback btn');
+    await this.handleIDPPopupCallbackBtn.then(el => el.click());
   }
 
   async navigateToProtectedPage() {
