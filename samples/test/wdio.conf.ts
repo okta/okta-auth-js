@@ -201,10 +201,10 @@ export const config: WebdriverIO.Config = {
     // resolved to continue.
     /**
      * Gets executed once before all workers get launched.
-     * @param {Object} config wdio configuration object
-     * @param {Array.<Object>} capabilities list of capabilities details
+     * param {Object} config wdio configuration object
+     * param {Array.<Object>} capabilities list of capabilities details
      */
-    onPrepare: async function (config, capabilities) {
+    onPrepare: async function () {
       if (CI) {
         await fs.mkdir(process.env.E2E_LOG_DIR, { recursive: true });
       }
@@ -259,7 +259,7 @@ export const config: WebdriverIO.Config = {
     /**
      * Function to be executed after a test (in Mocha/Jasmine).
      */
-    afterTest: async function(test, context, { error, result, duration, passed }) {
+    afterTest: async function(test, context, { error }) {
       if (CI && error) {
         failureCount += 1;
         await browser.saveScreenshot(`${process.env.E2E_LOG_DIR}/failure-${failureCount}.png`);

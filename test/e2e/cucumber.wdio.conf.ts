@@ -2,7 +2,7 @@
 import type { Options } from '@wdio/types';
 import { WebDriverLogTypes } from '@wdio/types/build/Options';
 
-const fs = require('fs');
+const fs = require('node:fs/promises');
 const path = require('path');
 const { mergeFiles } = require('junit-report-merger');
 
@@ -255,10 +255,10 @@ export const config: Options.Testrunner = {
     // resolved to continue.
     /**
      * Gets executed once before all workers get launched.
-     * @param {Object} config wdio configuration object
-     * @param {Array.<Object>} capabilities list of capabilities details
+     * param {Object} config wdio configuration object
+     * param {Array.<Object>} capabilities list of capabilities details
      */
-    onPrepare: async function (config, capabilities) {
+    onPrepare: async function () {
       if (CI) {
         await fs.mkdir(process.env.E2E_LOG_DIR, { recursive: true });
       }
@@ -344,9 +344,9 @@ export const config: Options.Testrunner = {
      * @param {boolean}            result.passed    true if scenario has passed
      * @param {string}             result.error     error stack if scenario failed
      * @param {number}             result.duration  duration of scenario in milliseconds
-     * @param {Object}             context          Cucumber World object
+     * param {Object}             context          Cucumber World object
      */
-    afterStep: async function (step, scenario, result, context) {
+    afterStep: async function (step, scenario, result) {
       if (CI && result.error) {
         failureCount += 1;
         await browser.saveScreenshot(`${process.env.E2E_LOG_DIR}/failure-${failureCount}.png`);
