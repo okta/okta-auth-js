@@ -21,6 +21,8 @@ const firefoxOptions = {
   args: []
 };
 
+let failureCount = 0;
+
 if (CI) {
   if (process.env.CHROME_BINARY) {
     chromeOptions.binary = process.env.CHROME_BINARY;
@@ -256,8 +258,11 @@ export const config: Options.Testrunner = {
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-    // onPrepare: function (config, capabilities) {
-    // },
+    onPrepare: async function (config, capabilities) {
+      if (CI) {
+        await fs.mkdir(process.env.E2E_LOG_DIR, { recursive: true });
+      }
+    },
     /**
      * Gets executed before a worker process is spawned and can be used to initialise specific service
      * for that worker as well as modify runtime environments in an async fashion.
@@ -341,8 +346,26 @@ export const config: Options.Testrunner = {
      * @param {number}             result.duration  duration of scenario in milliseconds
      * @param {Object}             context          Cucumber World object
      */
-    // afterStep: function (step, scenario, result, context) {
-    // },
+    afterStep: async function (step, scenario, result, context) {
+      if (CI && result.error) {
+        failureCount += 1;
+        await browser.saveScreenshot(`${process.env.E2E_LOG_DIR}/failure-${failureCount}.png`);
+        const logs = await browser.getLogs('browser');
+        let log;
+        try {
+          log = JSON.parse(logs, null, 4);
+        }
+        catch (err) {
+          log = logs;
+        }
+        await fs.writeFile(
+          `${process.env.E2E_LOG_DIR}/failure-${failureCount}-console.log`,
+          `Console Log Failure #${failureCount}:\n${log}`
+        );
+        console.log('CONSOLE LOGS: ');
+        console.log(logs);
+      }
+    },
     /**
      *
      * Runs after a Cucumber Scenario.
@@ -401,10 +424,10 @@ export const config: Options.Testrunner = {
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     onComplete: async function(exitCode, config, capabilities, results) {
       const outputDir = path.join(__dirname, '../../build2/reports/e2e');
-      fs.mkdirSync(outputDir, { recursive: true });
+      await fs.mkdir(outputDir, { recursive: true });
       const reportsDir = path.resolve(__dirname, 'reports');
       await mergeFiles(path.resolve(outputDir, 'junit-results.xml'), ['./reports/*.xml']);
-      fs.rmdirSync(reportsDir, { recursive: true });
+      await fs.rmdir(reportsDir, { recursive: true });
     },
     /**
     * Gets executed when a refresh happens.
