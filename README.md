@@ -1662,6 +1662,8 @@ const { tokens } = await promise;
 authClient.tokenManager.setTokens(tokens);
 ```
 
+> The `redirectUri` must be a registered callback route. See [Login redirect URIs](#login-redirect-uris)
+
 #### Tradeoffs
 1. Since [`window.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) can no longer be relied upon, the popup window's flow needs to end on the same origin as the application requesting tokens. After successful authentication, the popup window will be redirect to the provided `redirectUri`, which needs to call `authClient.handleIDPPopupRedirect()`. In Single Page Apps (with a router), it's recommended to host a dedicated route, but this logic can be performed on the main page as well.
 
