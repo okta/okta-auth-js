@@ -14,14 +14,7 @@
 import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import { flows, openImplicit, openPKCE } from '../util/appUtils';
-import {
-  loginWidget,
-  loginRedirect,
-  loginPopup,
-  loginDirect,
-  loginIDPPopup,
-  loginWidgetFacebook
-} from '../util/loginUtils';
+import { loginWidget, loginRedirect, loginPopup, loginDirect, loginWidgetFacebook } from '../util/loginUtils';
 
 describe('E2E login', () => {
 
@@ -33,14 +26,6 @@ describe('E2E login', () => {
     });
     await TestApp.interactionCodeOption.then(el => el.click());
     await loginRedirect('pkce', 'fragment');
-    await TestApp.getUserInfo();
-    await TestApp.assertUserInfo();
-    await TestApp.logoutRedirect();
-  });
-
-  it('PKCE: can login using IDP popup', async () => {
-    await openPKCE();
-    await loginIDPPopup();
     await TestApp.getUserInfo();
     await TestApp.assertUserInfo();
     await TestApp.logoutRedirect();

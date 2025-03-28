@@ -85,8 +85,6 @@ expect(tokenRes.tokens.idToken!).type.toEqual<IDToken>();
 expect(tokenRes.tokens.refreshToken!).type.toEqual<RefreshToken>();
 
 expect(await authClient.token.getWithPopup(authorizeOptions)).type.toEqual<TokenResponse>();
-expect(authClient.token.getWithIDPPopup(authorizeOptions))
-  .type.toEqual<{ cancel: () => void; promise: Promise<TokenResponse>}>();
 expect(await authClient.token.getWithRedirect(authorizeOptions)).type.toEqual<void>();
 expect(await authClient.token.parseFromUrl()).type.toEqual<TokenResponse>();
 

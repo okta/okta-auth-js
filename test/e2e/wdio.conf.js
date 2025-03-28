@@ -14,7 +14,6 @@
 require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 require('@babel/register'); // Allows use of import module syntax
 require('regenerator-runtime'); // Allows use of async/await
-const fs = require('node:fs/promises');
 
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
@@ -27,8 +26,6 @@ const browserOptions = {
 if (process.env.CHROME_BINARY) {
     browserOptions.binary = process.env.CHROME_BINARY;
 }
-
-let failureCount = 0;
 
 if (CI) {
   browserOptions.args = browserOptions.args.concat([
@@ -203,14 +200,11 @@ exports.config = {
     // resolved to continue.
     /**
      * Gets executed once before all workers get launched.
-     * param {Object} config wdio configuration object
-     * param {Array.<Object>} capabilities list of capabilities details
+     * @param {Object} config wdio configuration object
+     * @param {Array.<Object>} capabilities list of capabilities details
      */
-    onPrepare: async function () {
-      if (CI) {
-        await fs.mkdir(process.env.E2E_LOG_DIR, { recursive: true });
-      }
-    },
+    // onPrepare: function (config, capabilities) {
+    // },
     /**
      * Gets executed just before initialising the webdriver session and test framework. It allows you
      * to manipulate configurations depending on the capability or spec.
@@ -261,26 +255,8 @@ exports.config = {
     /**
      * Function to be executed after a test (in Mocha/Jasmine).
      */
-    afterTest: async function(test, context, { error }) {
-      if (CI && error) {
-        failureCount += 1;
-        await browser.saveScreenshot(`${process.env.E2E_LOG_DIR}/failure-${failureCount}.png`);
-        const logs = await browser.getLogs('browser');
-        let log;
-        try {
-          log = JSON.parse(logs, null, 4);
-        }
-        catch (err) {
-          log = logs;
-        }
-        await fs.writeFile(
-          `${process.env.E2E_LOG_DIR}/failure-${failureCount}-console.log`,
-          `Console Log Failure #${failureCount}:\n${log}`
-        );
-        console.log('CONSOLE LOGS: ');
-        console.log(logs);
-      }
-    },
+    // afterTest: function(test, context, { error, result, duration, passed }) {
+    // },
 
 
     /**

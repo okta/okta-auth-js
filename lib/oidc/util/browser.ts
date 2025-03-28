@@ -15,8 +15,6 @@
 import { AuthSdkError } from '../../errors';
 import { OktaAuthOAuthInterface } from '../types';
 
-const DEFAULT_TIMEOUT = 120000;
-
 export function addListener(eventTarget, name, fn) {
   if (eventTarget.addEventListener) {
     eventTarget.addEventListener(name, fn);
@@ -73,7 +71,7 @@ export function addPostMessageListener(sdk: OktaAuthOAuthInterface, timeout, sta
 
     timeoutId = setTimeout(function () {
       reject(new AuthSdkError('OAuth flow timed out'));
-    }, timeout || DEFAULT_TIMEOUT);
+    }, timeout || 120000);
   });
 
   return msgReceivedOrTimeout
@@ -81,38 +79,4 @@ export function addPostMessageListener(sdk: OktaAuthOAuthInterface, timeout, sta
       clearTimeout(timeoutId);
       removeListener(window, 'message', responseHandler);
     });
-}
-
-export function addIDPPopupLisenter (
-  sdk: OktaAuthOAuthInterface,
-  timeout: number | undefined,
-  channel: BroadcastChannel,
-  state: string
-) {
-  let timeoutId;
-
-  const promise = new Promise((resolve, reject) => {
-    channel.onmessage = (event) => {
-      // ignore invalid or untrusted events
-      if (!event.isTrusted || !event.data) {
-        return;
-      }
-
-      if (typeof event.data === 'object' && state === event.data.state) {
-        return resolve({ ...event.data });
-      }
-
-      reject(new AuthSdkError('Unable to complete auth code exchange'));
-    };
-
-    timeoutId = setTimeout(function () {
-      reject(new AuthSdkError('OAuth flow timed out'));
-    }, timeout || DEFAULT_TIMEOUT);
-  });
-
-  return promise
-  .finally(() => {
-    clearTimeout(timeoutId);
-    channel.close();
-  });
 }

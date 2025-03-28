@@ -14,7 +14,7 @@
 import assert from 'assert';
 import TestApp from '../pageobjects/TestApp';
 import OktaLogin from '../pageobjects/OktaLogin';
-import { switchToPopupWindow, switchToLastFocusedWindow, switchToMainWindow } from './browserUtils';
+import { switchToPopupWindow, switchToLastFocusedWindow } from './browserUtils';
 
 const USERNAME = process.env.USERNAME;
 const PASSWORD = process.env.PASSWORD;
@@ -43,16 +43,6 @@ export async function handleCallback(flow, responseMode) {
   return url;
 }
 
-export async function handleIDPPopupCallback () {
-  await TestApp.waitForCallback();
-  const url = await browser.getUrl();
-  await TestApp.handleIDPPopupCallback();
-  await switchToMainWindow();
-  await TestApp.assertCallbackSuccess();
-  await TestApp.returnHome();
-  return url;
-}
-
 export async function loginPopup() {
   const existingHandlesCount = (await browser.getWindowHandles()).length;
   await TestApp.loginPopup();
@@ -65,22 +55,6 @@ export async function loginPopup() {
   }
 
   await switchToLastFocusedWindow();
-  await TestApp.assertLoggedIn();
-}
-
-export async function loginIDPPopup() {
-  const existingHandlesCount = (await browser.getWindowHandles()).length;
-  await TestApp.loginIDPPopup();
-  await switchToPopupWindow(existingHandlesCount);
-
-  if (process.env.ORG_OIE_ENABLED) {
-    await OktaLogin.signinOIE(USERNAME, PASSWORD);
-  } else {
-    await OktaLogin.signinLegacy(USERNAME, PASSWORD);
-  }
-
-  await handleIDPPopupCallback();
-  await switchToMainWindow();
   await TestApp.assertLoggedIn();
 }
 
