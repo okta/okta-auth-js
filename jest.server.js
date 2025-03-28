@@ -20,7 +20,6 @@ const config = Object.assign({}, baseConfig, {
     'oidc/util/loginRedirect',
     'oidc/parseFromUrl',
     'oidc/getWithPopup',
-    'oidc/getWithIDPPopup',
     'oidc/getWithRedirect',
     'oidc/getWithoutPrompt',
     'oidc/renewToken.ts',

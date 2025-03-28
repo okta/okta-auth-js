@@ -86,9 +86,6 @@ function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
           <a id="login-popup" href="/" onclick="loginPopup(event)" class="pure-menu-link">Login using POPUP</a>
         </li>
         <li class="pure-menu-item">
-          <a id="login-idp-popup" href="/" onclick="loginIDPPopup(event)" class="pure-menu-link">Login using IDP POPUP</a>
-        </li>
-        <li class="pure-menu-item">
         <a id="get-token" href="/" onclick="getToken(event)" class="pure-menu-link">Get Token (without prompt)</a>
         </li>
         <li class="pure-menu-item">
@@ -168,7 +165,6 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     loginWidget: testApp.loginWidget.bind(testApp),
     loginRedirect: testApp.loginRedirect.bind(testApp, {}),
     loginPopup: testApp.loginPopup.bind(testApp, {}),
-    loginIDPPopup: testApp.loginIDPPopup.bind(testApp, {}),
     loginDirect: testApp.loginDirect.bind(testApp),
     activateUser: testApp.activateUser.bind(testApp),
     activateUserWithWidget: testApp.activateUserWithWidget.bind(testApp),
@@ -182,8 +178,7 @@ function bindFunctions(testApp: TestApp, window: Window): void {
     renewTokens: testApp.renewTokens.bind(testApp),
     revokeToken: testApp.revokeToken.bind(testApp),
     revokeRefreshToken: testApp.revokeRefreshToken.bind(testApp),
-    handleLoginCallback: testApp.handleLoginCallback.bind(testApp),
-    handleIDPCallback: testApp.handleIDPCallback.bind(testApp),
+    handleLoginCallback: testApp.handleLoginCallback.bind(testApp), 
     getUserInfo: testApp.getUserInfo.bind(testApp),
     testConcurrentGetToken: testApp.testConcurrentGetToken.bind(testApp),
     testConcurrentLogin: testApp.testConcurrentLogin.bind(testApp),
@@ -488,16 +483,6 @@ class TestApp {
     this._afterRender('callback');
   }
 
-  bootstrapIDPPopupCallback (): void {
-    const content = `
-      <a id="handle-popup-callback" href="/" onclick="handleIDPCallback(event)">Handle popup callback (Continue Login)</a>
-    `;
-
-    this.getSDKInstance(/*{ subscribeAuthStateChange: false }*/);
-    this._setContent(content);
-    this._afterRender('callback');
-  }
-
   async bootstrapHome(): Promise<void> {
     // Default home page
     this.getSDKInstance();
@@ -712,36 +697,6 @@ class TestApp {
     });
   }
 
-  async loginIDPPopup (options?: TokenParams): Promise<void> {
-    options = Object.assign({}, {
-      responseType: this.config.responseType,
-      scopes: this.config.defaultScopes ? [] : this.config.scopes,
-      redirectUri: 'http://localhost:8080/popup/callback'
-    }, options);
-
-    const { promise, cancel } = this.oktaAuth.token.getWithIDPPopup(options);
-
-    // @ts-expect-error binds handler to window object for access
-    window.cancelPopup = makeClickHandler(cancel.bind(this));
-
-    const content = `
-      <a id="handle-popup-cancel" href="/" onclick="cancelPopup(event)">Cancel popup login</a>
-    `;
-    const elem = document.createElement('div');
-    elem.innerHTML = content;
-    this.contentElem.prepend(elem);
-
-    try {
-      const res = await promise;
-      console.log('res', res);
-      this.oktaAuth.tokenManager.setTokens(res.tokens);
-      this.renderCallback(res);
-    }
-    finally {
-      document.getElementById('handle-popup-cancel').remove();
-    }
-  }
-
   async getToken(options?: OktaAuthOptions): Promise<void> {
     options = Object.assign({}, {
       responseType: this.config.responseType,
@@ -846,11 +801,6 @@ class TestApp {
         this.renderError(e);
         throw e;
       });
-  }
-
-  async handleIDPCallback (): Promise<void> {
-    this.oktaAuth.handleIDPPopupRedirect();
-    window.close();
   }
 
   async renderCallback(res: TokenResponse): Promise<void> {

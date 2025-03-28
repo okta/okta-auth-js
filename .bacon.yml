@@ -36,7 +36,7 @@ test_suites:
       sort_order: '4'
       timeout: '20'
       script_name: e2e
-      criteria: OPTIONAL
+      criteria: MERGE
       queue_name: small
     - name: e2e-cucumber
       script_path: ../okta-auth-js/scripts/e2e
@@ -64,7 +64,7 @@ test_suites:
       sort_order: '6'
       timeout: '30'
       script_name: e2e-express-embedded-auth-with-sdk
-      criteria: OPTIONAL
+      criteria: MERGE
       queue_name: small
     - name: sample-express-web-no-oidc
       script_path: ../okta-auth-js/scripts/samples
@@ -85,7 +85,7 @@ test_suites:
       sort_order: '9'
       timeout: '15'
       script_name: e2e-static-spa
-      criteria: OPTIONAL
+      criteria: MERGE
       queue_name: small
     - name: sample-webpack-spa
       script_path: ../okta-auth-js/scripts/samples
