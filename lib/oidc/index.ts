@@ -31,7 +31,7 @@ export { handleOAuthResponse } from './handleOAuthResponse';
 export { exchangeCodeForTokens } from './exchangeCodeForTokens';
 export { getToken } from './getToken';
 export { getWithoutPrompt } from './getWithoutPrompt';
-export { getWithPopup, getWithIDPPopup } from './getWithPopup';
+export { getWithPopup } from './getWithPopup';
 export { getWithRedirect } from './getWithRedirect';
 export { parseFromUrl } from './parseFromUrl';
 export { oidcIntrospect } from './introspect';

@@ -12,7 +12,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-const fs = require('node:fs/promises');
+const fs = require('fs');
 const path = require('path');
 const { mergeFiles } = require('junit-report-merger');
 
@@ -37,7 +37,7 @@ const firefoxOptions = {
   args: []
 };
 const maxInstances = process.env.MAX_INSTANCES ? +process.env.MAX_INSTANCES : 1;
-let failureCount = 0;
+let screenshotCount = 0;
 
 if (CI) {
     if (process.env.CHROME_BINARY) {
@@ -265,10 +265,10 @@ export const config: WebdriverIO.Config = {
     // resolved to continue.
     /**
      * Gets executed once before all workers get launched.
-     * param {Object} config wdio configuration object
-     * param {Array.<Object>} capabilities list of capabilities details
+     * @param {Object} config wdio configuration object
+     * @param {Array.<Object>} capabilities list of capabilities details
      */
-    onPrepare: async function () {
+    onPrepare: async function (config, capabilities) {
       if (CI) {
         await fs.mkdir(process.env.E2E_LOG_DIR, { recursive: true });
       }
@@ -323,24 +323,10 @@ export const config: WebdriverIO.Config = {
     /**
      * Function to be executed after a test (in Mocha/Jasmine).
      */
-    afterStep: async function (step, scenario, result) {
-      if (CI && result.error) {
-        failureCount += 1;
-        await browser.saveScreenshot(`${process.env.E2E_LOG_DIR}/failure-${failureCount}.png`);
-        const logs = await browser.getLogs('browser');
-        let log;
-        try {
-          log = JSON.parse(logs, null, 4);
-        }
-        catch (err) {
-          log = logs;
-        }
-        await fs.writeFile(
-          `${process.env.E2E_LOG_DIR}/failure-${failureCount}-console.log`,
-          `Console Log Failure #${failureCount}:\n${log}`
-        );
-        console.log('CONSOLE LOGS: ');
-        console.log(logs);
+    afterTest: async function(test, context, { error, result, duration, passed }) {
+      if (CI && error) {
+        screenshotCount += 1;
+        await browser.saveScreenshot(`${process.env.E2E_LOG_DIR}/screeshot${screenshotCount}.png`);
       }
     },
 
@@ -388,10 +374,10 @@ export const config: WebdriverIO.Config = {
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     onComplete: async function(exitCode, config, capabilities, results) {
       const outputDir = path.join(__dirname, '../../build2/reports/e2e');
-      await fs.mkdir(outputDir, { recursive: true });
+      fs.mkdirSync(outputDir, { recursive: true });
       const reportsDir = path.resolve(__dirname, 'reports');
       await mergeFiles(path.resolve(outputDir, 'junit-results.xml'), ['./reports/*.xml']);
-      await fs.rmdir(reportsDir, { recursive: true });
+      fs.rmdirSync(reportsDir, { recursive: true });
     },
     /**
     * Gets executed when a refresh happens.
