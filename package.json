@@ -149,7 +149,7 @@
     "yarn": "^1.7.0"
   },
   "dependencies": {
-    "@babel/runtime": "^7.12.5",
+    "@babel/runtime": "^7.22.10",
     "@peculiar/webcrypto": "^1.4.0",
     "Base64": "1.1.0",
     "atob": "^2.1.2",
@@ -234,7 +234,8 @@
     "**/cacheable-request/http-cache-semantics": "^4.0.0",
     "**/has-ansi/ansi-regex": "^4.1.1",
     "**/strip-ansi/ansi-regex": "^3.0.1",
-    "**/download/got": "^11.8.5"
+    "**/download/got": "^11.8.5",
+    "**/@babel/runtime": "^7.22.10"
   },
   "workspaces": {
     "packages": [
