@@ -203,10 +203,11 @@ exports.config = {
     // resolved to continue.
     /**
      * Gets executed once before all workers get launched.
-     * param {Object} config wdio configuration object
-     * param {Array.<Object>} capabilities list of capabilities details
+     * @param {Object} config wdio configuration object
+     * @param {Array.<Object>} capabilities list of capabilities details
      */
-    onPrepare: async function () {
+    /* eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars */
+    onPrepare: async function (config, capabilities) {
       if (CI) {
         await fs.mkdir(process.env.E2E_LOG_DIR, { recursive: true });
       }

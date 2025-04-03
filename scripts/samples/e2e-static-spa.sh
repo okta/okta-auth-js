@@ -6,7 +6,4 @@ setup_sample_tests
 
 export SAMPLE_NAME=@okta/samples.static-spa
 
-whoami
-ls -al ./build/dist
-
 run_sample_tests

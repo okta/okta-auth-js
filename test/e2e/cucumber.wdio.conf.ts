@@ -255,10 +255,11 @@ export const config: Options.Testrunner = {
     // resolved to continue.
     /**
      * Gets executed once before all workers get launched.
-     * param {Object} config wdio configuration object
-     * param {Array.<Object>} capabilities list of capabilities details
+     * @param {Object} config wdio configuration object
+     * @param {Array.<Object>} capabilities list of capabilities details
      */
-    onPrepare: async function () {
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars */
+    onPrepare: async function (config, capabilities) {
       if (CI) {
         await fs.mkdir(process.env.E2E_LOG_DIR, { recursive: true });
       }
@@ -344,8 +345,9 @@ export const config: Options.Testrunner = {
      * @param {boolean}            result.passed    true if scenario has passed
      * @param {string}             result.error     error stack if scenario failed
      * @param {number}             result.duration  duration of scenario in milliseconds
-     * param {Object}             context          Cucumber World object
+     * @param {Object}             context          Cucumber World object
      */
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     afterStep: async function (step, scenario, result) {
       if (CI && result.error) {
         failureCount += 1;

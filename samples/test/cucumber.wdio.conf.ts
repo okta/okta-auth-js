@@ -268,7 +268,8 @@ export const config: WebdriverIO.Config = {
      * param {Object} config wdio configuration object
      * param {Array.<Object>} capabilities list of capabilities details
      */
-    onPrepare: async function () {
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    onPrepare: async function (config, capabilities) {
       if (CI) {
         await fs.mkdir(process.env.E2E_LOG_DIR, { recursive: true });
       }
@@ -323,6 +324,7 @@ export const config: WebdriverIO.Config = {
     /**
      * Function to be executed after a test (in Mocha/Jasmine).
      */
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     afterStep: async function (step, scenario, result) {
       if (CI && result.error) {
         failureCount += 1;
