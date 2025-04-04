@@ -83,6 +83,10 @@ export interface RenewTokensParams extends TokenParams {
   tokens?: Tokens
 }
 
+export interface DPoPOptions {
+  allowBearerTokens: boolean;
+}
+
 export interface OktaAuthOAuthOptions extends
   OktaAuthHttpOptions,
   CustomUrls,
@@ -108,6 +112,7 @@ export interface OktaAuthOAuthOptions extends
   maxClockSkew?: number;
   restoreOriginalUri?: (oktaAuth: OktaAuthOAuthInterface, originalUri?: string) => Promise<void>;
   dpop?: boolean;
+  dpopOptions?: DPoPOptions;
 
   transactionManager?: TransactionManagerOptions;
 

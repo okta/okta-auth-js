@@ -39,12 +39,6 @@ function validateResponse(res: OAuthResponse, oauthParams: TokenParams) {
   if (res.state !== oauthParams.state) {
     throw new AuthSdkError('OAuth flow response state doesn\'t match request state');
   }
-
-  // https://datatracker.ietf.org/doc/html/rfc9449#token-response
-  // "A token_type of DPoP MUST be included in the access token response to signal to the client"
-  if (oauthParams.dpop && res.token_type !== 'DPoP') {
-    throw new AuthSdkError('Unable to parse OAuth flow response: DPoP was configured but "token_type" was not DPoP');
-  }
 }
 
 export async function handleOAuthResponse(
@@ -82,6 +76,16 @@ export async function handleOAuthResponse(
 
   // Handling the result from implicit flow or PKCE token exchange
   validateResponse(res, tokenParams);
+
+  if (tokenParams.dpop) {
+    const { allowBearerTokens } = sdk.options?.dpopOptions ?? { allowBearerTokens: false };
+
+    // https://datatracker.ietf.org/doc/html/rfc9449#token-response
+    // "A token_type of DPoP MUST be included in the access token response to signal to the client"
+    if (!allowBearerTokens && res.token_type !== 'DPoP') {
+      throw new AuthSdkError('Unable to parse OAuth flow response: DPoP was configured but "token_type" was not DPoP');
+    }
+  }
 
   const tokenDict = {} as Tokens;
   const expiresIn = res.expires_in;
