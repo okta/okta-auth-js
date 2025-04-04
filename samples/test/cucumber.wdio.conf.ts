@@ -265,10 +265,10 @@ export const config: WebdriverIO.Config = {
     // resolved to continue.
     /**
      * Gets executed once before all workers get launched.
-     * param {Object} config wdio configuration object
-     * param {Array.<Object>} capabilities list of capabilities details
+     * @param {Object} config wdio configuration object
+     * @param {Array.<Object>} capabilities list of capabilities details
      */
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars */
     onPrepare: async function (config, capabilities) {
       if (CI) {
         await fs.mkdir(process.env.E2E_LOG_DIR, { recursive: true });
