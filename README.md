@@ -415,6 +415,10 @@ const config = {
   // other configurations
   pkce: true,     // required
   dpop: true,
+  dpopOptions: {
+    // skips validition the resulting token response includes `token_type: DPoP`
+    allowBearerTokens: false
+  }
 };
 
 const authClient = new OktaAuth(config);
@@ -575,6 +579,20 @@ Default value is `false`. Set to `true` to enable `DPoP` (Demonstrating Proof-of
 
 See Guide: [Enabling DPoP](#enabling-dpop)
 
+#### `dpopOptions`
+
+Default value:
+```javascript
+dpopOptions: {
+  allowBearerTokens: false
+}
+```
+
+See Guide: [Enabling DPoP](#enabling-dpop)
+
+#### `dpopOptions.allowBearerTokens`
+
+Skips validiating whether the token response contains `token_type: Bearer`. This can be useful during a migration, to avoid needing to update a web application simutaneously with Okta Org configurations
 
 #### responseMode
 
