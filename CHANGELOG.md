@@ -1,5 +1,17 @@
 # Changelog
 
+# 7.11.3
+
+### Fixes
+
+- [#1583](https://github.com/okta/okta-auth-js/pull/1583) fix: corrects `@babel/runtime` version
+
+# 7.11.2
+
+### Fixes
+
+- [#1581](https://github.com/okta/okta-auth-js/pull/1581) fix: bumps `@babel/runtime` version
+
 # 7.11.1
 
 ### Fixes
