@@ -1036,6 +1036,7 @@ The amount of time, in seconds, a tab needs to be inactive for the `RenewOnTabAc
 * [token](#token)
   * [token.getWithoutPrompt](#tokengetwithoutpromptoptions)
   * [token.getWithPopup](#tokengetwithpopupoptions)
+  * [token.getWithIDPPopup](#tokengetwithidppopupoptions)
   * [token.getWithRedirect](#tokengetwithredirectoptions)
   * [token.parseFromUrl](#tokenparsefromurloptions)
   * [token.decode](#tokendecodeidtokenstring)
@@ -1342,6 +1343,13 @@ Stores tokens from redirect url into storage (for login flow), then redirect use
 
 > **Note:** `handleRedirect` throws `OAuthError` or `AuthSdkError` in case there are errors during token retrieval or authenticator enrollment.
 
+### `handleIDPPopupRedirect(url?)`
+
+> :link: web browser only <br>
+> :hourglass: async
+
+Used in conjunction with [`token.getWithIDPPopup`](#tokengetwithidppopupoptions). Handles the redirect from the Authorization Server back to the web application. This method relays the resulting OAuth2 response from the popup window to the main window.
+
 ### `setHeaders()`
 
 Can set (or unset) request headers after construction.
@@ -1620,6 +1628,59 @@ authClient.token.getWithPopup(options)
   // handle OAuthError or AuthSdkError (AuthSdkError will be thrown if app is in OAuthCallback state)
 });
 ```
+
+#### `token.getWithIDPPopup(options)`
+
+> :exclamation: Read tradeoffs carefully, this method has user experience implications
+
+> :link: web browser only <br>
+> :hourglass: async
+
+Using [External Identity Providers](https://developer.okta.com/docs/concepts/identity-providers/) in conjunction with [`token.getWithPopup`](#tokengetwithpopupoptions) can fail when an external (non-Okta) IDP sets their [`Cross-Origin-Opener-Policy`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy) to something other than `unsafe-none` on _any_ document loaded in the authentication flow. This causes the spawned popup window and main browser window to run in isolated `Browser Context Groups` ([BCG](https://developer.mozilla.org/en-US/docs/Glossary/Browsing_context)); this results in the following
+
+1. The popup and main window can no longer communicate via [`window.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage)
+2. The main window can no longer detect if the popup window is closed
+
+[`token.getWithIDPPopup`](#tokengetwithidppopupoptions) is designed for deployments which require the use of a popup window _and_ rely on external IDPs. This method can authenticate a user regardless of the IDP's [`Cross-Origin-Opener-Policy`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy), however it does come with some tradeoffs (see [Tradeoffs](#tradeoffs) below)
+
+##### Comparison of `token.getWithPopup(options)` vs `token.getWithIDPPopup(options)`
+
+Both methods invoke the [`/authorize`](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/CustomAS/#tag/CustomAS/operation/authorizeCustomAS) endpoint of the target authorization server in a popup window, however they differ in their [`responseMode`](https://developer.okta.com/docs/api/openapi/okta-oauth/oauth/tag/CustomAS/#tag/CustomAS/operation/authorizeCustomAS!in=query&path=response_mode&t=request) parameter
+* [`token.getWithPopup`](#tokengetwithpopupoptions) utilizes `okta_post_message`, which enables cross-origin communication via [`window.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage). After successful authentication, the resulting authorization code is broadcast from the popup window to the main window to complete the authentication flow.
+    * This approach requires the main and popup windows to share a [BCG](https://developer.mozilla.org/en-US/docs/Glossary/Browsing_context)
+* [`token.getWithIDPPopup`](#tokengetwithidppopupoptions) utilizes `query` instead. After successful authentication, a redirect to the provided `redirectUri` is performed. In order for the authentication flow to complete, the `redirectUri` must relay the OAuth2 response from the popup to the main window via [`handleIDPPopupRedirect`](#handleidppopupredirecturl).
+    * This approach does not require a shared [BCG](https://developer.mozilla.org/en-US/docs/Glossary/Browsing_context) and therefore is resilient to stricter [`Cross-Origin-Opener-Policy`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy) policies, however the lack of communication capabilities between the main and popup windows may result in an awkward user experience (see [Tradeoffs](#tradeoffs) below)
+
+> :exclamation: [`token.getWithPopup`](#tokengetwithpopupoptions) is always the preferred method. [`token.getWithIDPPopup`](#tokengetwithidppopupoptions) should only be used if your Okta configuration includes external IDPs
+
+##### Usage
+```javascript
+const { promise, cancel } = authClient.token.getWithIDPPopup({
+  redirectUri: 'http://localhost:8080/popup/callback',
+});
+const { tokens } = await promise;
+authClient.tokenManager.setTokens(tokens);
+```
+
+> The `redirectUri` must be a registered callback route. See [Login redirect URIs](#login-redirect-uris)
+
+#### Tradeoffs
+1. Since [`window.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) can no longer be relied upon, the popup window's flow needs to end on the same origin as the application requesting tokens. After successful authentication, the popup window will be redirect to the provided `redirectUri`, which needs to call `authClient.handleIDPPopupRedirect()`. In Single Page Apps (with a router), it's recommended to host a dedicated route, but this logic can be performed on the main page as well.
+
+> NOTE: this will _not_ use the same value as `redirectUri` passed via the `OktaAuth` constructor
+
+```javascript
+// example implementation
+// (loaded within popup as result of redirect to the `redirectUri`)
+authClient.handleIDPPopupRedirect();
+window.close();     // recommended, closes the popup window
+```
+
+2. As mentioned above, the main window cannot detect when the popup window is closed. If a user manually closes the popup window before completing authentication, the resulting `promise` variable will still be `pending` (until a configurable timeout). A `cancel` method is provided to prevent awaiting for the promise to timeout, however this may still result in an awkward user experience.
+    1. It's important to provide a button on the page to invoke `cancel`. If the user closes the popup window without invoking `cancel`, the `promise` will eventually timeout. This could result in a poor user experience.
+    2. However, assuming a `cancel` button is available on the page, it's possible for a user to select the `cancel` action on the main window without closing the popup window. If the user _then_ completes the authentication flow in the popup window, this will _not_ result in tokens being issued to the main window (application). This may also result in a poor user experience.
+
+> Carefully consider these user experience tradeoffs before choosing to implement this method!
 
 #### `token.getWithRedirect(options)`
 
