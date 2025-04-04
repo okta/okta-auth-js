@@ -1001,7 +1001,7 @@
     pirates "^4.0.5"
     source-map-support "^0.5.16"
 
-"@babel/runtime@7.22.10", "@babel/runtime@^7.1.2", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.0", "@babel/runtime@^7.22.10", "@babel/runtime@^7.6.2", "@babel/runtime@^7.8.4", "@babel/runtime@^7.9.2":
+"@babel/runtime@7.22.10", "@babel/runtime@^7.1.2", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.0", "@babel/runtime@^7.27.0", "@babel/runtime@^7.6.2", "@babel/runtime@^7.8.4", "@babel/runtime@^7.9.2":
   version "7.27.0"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.27.0.tgz#fbee7cf97c709518ecc1f590984481d5460d4762"
   integrity sha512-VtPOkrdPHZsKc/clNqyi9WUA8TINkZ4cGk63UUE3u4pmB2k+ZMQRDuIOagv8UVd6j7k0T3+RRIb7beKTebNbcw==
