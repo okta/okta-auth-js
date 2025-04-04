@@ -21,7 +21,8 @@ import {
   OktaAuthOAuthOptions,
   SetLocationFunction,
   TokenManagerOptions,
-  TransactionManagerOptions
+  TransactionManagerOptions,
+  DPoPOptions
 } from '../types';
 import { enableSharedStorage } from './node';
 import AuthSdkError from '../../errors/AuthSdkError';
@@ -82,6 +83,7 @@ export function createOAuthOptionsConstructor() {
     acrValues: string;
     maxAge: string | number;
     dpop: boolean;
+    dpopOptions: DPoPOptions;
 
     // Additional options
     tokenManager: TokenManagerOptions;
@@ -128,6 +130,9 @@ export function createOAuthOptionsConstructor() {
       this.acrValues = options.acrValues;
       this.maxAge = options.maxAge;
       this.dpop = options.dpop === true; // dpop defaults to false
+      this.dpopOptions = {
+        allowBearerTokens: false
+      };
 
       this.tokenManager = options.tokenManager;
       this.postLogoutRedirectUri = options.postLogoutRedirectUri;
