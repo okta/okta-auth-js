@@ -8,6 +8,8 @@
   - A [`Cross-Origin-Opener-Policy`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy) resilient method of acquiring tokens using via external IDPs.
   - See [documentation](https://github.com/okta/okta-auth-js?tab=readme-ov-file#tokengetwithidppopupoptions) for more detailed explanation
 
+- [#1584](https://github.com/okta/okta-auth-js/pull/1584) feat: adds `dpopOptions.allowBearerTokens` configuration
+
 # 7.11.3
 
 ### Fixes

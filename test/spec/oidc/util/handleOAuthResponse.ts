@@ -222,6 +222,29 @@ describe('handleOAuthResponse', () => {
         }, undefined);
         expect(res).toBe(mockTokens);
       });
+
+      it('allows Bearer tokens to be returned when DPoP token was requested', async () => {
+        sdk = mockOktaAuth({
+          dpopOptions: { allowBearerTokens: true }
+        });
+        const tokenParams: TokenParams = {
+          responseType: ['token', 'id_token', 'refresh_token'],
+          dpop: true,
+          extraParams: { foo: 'bar' }
+        };
+        const oauthRes = { id_token: 'foo', access_token: 'blar', refresh_token: 'bloo', token_type: 'Bearer' };
+        const res = await handleOAuthResponse(sdk, tokenParams, oauthRes, undefined as unknown as CustomUrls);
+        expect(res.tokens).toBeTruthy();
+        expect(res.tokens.accessToken).toBeTruthy();
+        expect(res.tokens.accessToken!.accessToken).toBe('blar');
+        expect(res.tokens.accessToken!.extraParams).toEqual({ foo: 'bar' });
+        expect(res.tokens.idToken).toBeTruthy();
+        expect(res.tokens.idToken!.idToken).toBe('foo');
+        expect(res.tokens.idToken!.extraParams).toEqual({ foo: 'bar' });
+        expect(res.tokens.refreshToken).toBeTruthy();
+        expect(res.tokens.refreshToken!.refreshToken).toBe('bloo');
+        expect(res.tokens.refreshToken!.extraParams).toEqual({ foo: 'bar' });
+      });
     });
 
     describe('Interaction code flow', () => {
