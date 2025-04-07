@@ -417,7 +417,7 @@ const config = {
   dpop: true,
   dpopOptions: {
     // set to `true` to skip the validation to check the resulting token response includes `token_type: DPoP`
-    allowBearerTokens: false    // defaults to `false`, performs validation
+    allowBearerTokens: false    // defaults to `false`, tokens are validated to include `token_type: DPoP`
   }
 };
 
@@ -592,7 +592,7 @@ See Guide: [Enabling DPoP](#enabling-dpop)
 
 #### `dpopOptions.allowBearerTokens`
 
-Set to `true` to skip validiating whether the token response contains `token_type: Bearer`. This can be useful during a migration, to avoid needing to update a web application simutaneously with Okta Org configurations. Defaults to `false`
+When `false`, dpop-enabled token requests are validated to contain `token_type: DPoP` and will throw otherwise. Set to `true` to skip this validation and allow `Bearer` tokens as a possible `token_type`. This can be useful during a migration, to avoid needing to update a web application simutaneously with Okta Org configurations. Defaults to `false`
 
 #### responseMode
 

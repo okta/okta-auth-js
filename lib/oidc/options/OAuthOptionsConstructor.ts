@@ -131,7 +131,8 @@ export function createOAuthOptionsConstructor() {
       this.maxAge = options.maxAge;
       this.dpop = options.dpop === true; // dpop defaults to false
       this.dpopOptions = {
-        allowBearerTokens: false
+        allowBearerTokens: false,
+        ...options.dpopOptions,
       };
 
       this.tokenManager = options.tokenManager;
