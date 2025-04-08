@@ -21,8 +21,11 @@ import { getSavedTransactionMeta } from './transactionMeta';
 import { warn } from '../util';
 
 export async function poll(authClient: OktaAuthIdxInterface, options: IdxPollOptions = {}): Promise<IdxTransaction> {
+  const { withCredentials, exchangeCodeForTokens } = options;
   let transaction = await proceed(authClient, {
-    startPolling: true
+    startPolling: true,
+    withCredentials,
+    exchangeCodeForTokens
   });
 
   const meta = getSavedTransactionMeta(authClient);

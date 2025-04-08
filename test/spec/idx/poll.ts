@@ -159,6 +159,33 @@ describe('idx/poll', () => {
     expect(mocked.proceed.proceed).toHaveBeenCalledTimes(1);
   });
 
+  it('passes RunOptions through to `procced`', async () => {
+    const {
+      authClient,
+      enrollPollResponse
+    } = testContext;
+
+    chainResponses([
+      enrollPollResponse,
+      enrollPollResponse,
+    ]);
+
+    jest.spyOn(mocked.introspect, 'introspect')
+      .mockResolvedValue(enrollPollResponse);
+    const proccedSpy = jest.spyOn(mocked.proceed, 'proceed');
+
+    await poll(authClient, {
+      exchangeCodeForTokens: false,
+      withCredentials: false
+    });
+    expect(proccedSpy).toHaveBeenCalledTimes(1);
+    expect(proccedSpy).toHaveBeenLastCalledWith(authClient, expect.objectContaining({
+      startPolling: true,
+      exchangeCodeForTokens: false,
+      withCredentials: false
+    }));
+  });
+
   it('polls until completion when refresh parameter is passed', async () => {
     const {
       authClient,

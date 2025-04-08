@@ -36,6 +36,7 @@ import {
   ActivationData,
 } from './idx-js';
 import {
+  IdxOptions,
   AccountUnlockOptions,
   AuthenticationOptions,
   CancelOptions,
@@ -91,7 +92,7 @@ export type Input = {
 }
 
 
-export interface IdxPollOptions {
+export interface IdxPollOptions extends Pick<IdxOptions, 'exchangeCodeForTokens' | 'withCredentials' > {
   required?: boolean;
   refresh?: number;
 }
