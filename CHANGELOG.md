@@ -1,5 +1,11 @@
 # Changelog
 
+# 7.12.1
+
+### Fixes
+
+- [#1585](https://github.com/okta/okta-auth-js/pull/1585) fix: `idx.poll` now respects `exchangeCodeForTokens` and `withCredentials` options
+
 # 7.12.0
 
 ### Features
