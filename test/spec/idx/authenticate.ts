@@ -865,6 +865,8 @@ describe('idx/authenticate', () => {
           const res = await authenticate(authClient, {
             authenticators: [AuthenticatorKey.PHONE_NUMBER] // will remediate select authenticator
           });
+          console.log(res);
+          console.log(res.nextStep?.inputs);
           expect(selectAuthenticatorResponse.proceed).toHaveBeenCalledWith('select-authenticator-authenticate', { authenticator: { id: 'id-phone' } });
           expect(res).toMatchObject({
             status: IdxStatus.PENDING,
@@ -890,7 +892,8 @@ describe('idx/authenticate', () => {
                     { label: 'SMS', value: 'sms' },
                     { label: 'Voice call', value: 'voice' },
                   ]
-                }
+                },
+                { name: 'phoneNumber', required: true }
               ],
             }
           });

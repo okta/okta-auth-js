@@ -68,11 +68,14 @@ export class AuthenticatorData<T extends AuthenticatorDataValues = Authenticator
     }
     
     const { id, enrollmentId } = this.authenticator;
-    const data = { 
+    const form = this.getFormValuesFromRemediation();
+
+    const data = {
+      ...form,
       id,
       enrollmentId,
       ...(authenticatorData && authenticatorData),
-      ...(methodType && { methodType }) 
+      ...(methodType && { methodType })
     };
 
     return data.methodType ? data : null;
@@ -82,6 +85,28 @@ export class AuthenticatorData<T extends AuthenticatorDataValues = Authenticator
     const authenticator = this.remediation.value!
       .find(({ name }) => name === 'authenticator') as IdxRemediationValue;
     return authenticator;
+  }
+
+  protected getFormValuesFromRemediation (): Record<string, unknown> {
+    const values = {};
+    const authenticator = this.getAuthenticatorFromRemediation();
+
+    if (authenticator.form) {
+      for (const field of authenticator.form.value) {
+        const { name, value, mutable } = field;
+        if (value) {
+          // set property to default value, if one exists
+          values[name] = value;
+        }
+
+        // TODO: set form values from provided values
+        // if (mutable) {
+        //   values[name] = this.values[name];
+        // }
+      }
+    }
+
+    return values;
   }
 
   getValuesAfterProceed(): T {

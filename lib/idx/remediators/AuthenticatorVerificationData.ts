@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { IdxRemediationValue } from '../types/idx-js';
 import { AuthenticatorData, AuthenticatorDataValues } from './Base/AuthenticatorData';
 
 export type AuthenticatorVerificationDataValues = AuthenticatorDataValues;
@@ -24,18 +25,29 @@ export class AuthenticatorVerificationData extends AuthenticatorData<Authenticat
 
   getInputAuthenticator() {
     const authenticator = this.getAuthenticatorFromRemediation();
-    const methodType = authenticator.form!.value.find(({ name }) => name === 'methodType');
-    // if has methodType in form, let user select the methodType
-    if (methodType && methodType.options) {
-      return { 
-        name: 'methodType', 
-        type: 'string', 
-        required: true, 
-        options: methodType.options 
-      };
+    // const methodType = authenticator.form!.value.find(({ name }) => name === 'methodType');
+    // // if has methodType in form, let user select the methodType
+    // if (methodType && methodType.options) {
+    //   return { 
+    //     name: 'methodType', 
+    //     type: 'string', 
+    //     required: true, 
+    //     options: methodType.options 
+    //   };
+    // }
+    // // no methodType, then return form values
+    // const inputs = [...authenticator.form!.value];
+    // return inputs;
+
+
+    const inputs: IdxRemediationValue[] = [];
+    if (authenticator.form) {
+      for (const field of authenticator.form.value) {
+        if (field.mutable !== false) {
+          inputs.push(field);
+        }
+      }
     }
-    // no methodType, then return form values
-    const inputs = [...authenticator.form!.value];
     return inputs;
   }
 

@@ -47,12 +47,14 @@ export const AuthenticatorValueFactory = IdxValueFactory.params({
 export const IdValueFactory = IdxValueFactory.params({
   name: 'id',
   required: true,
-  value: 'unknown-id-value'
+  value: 'unknown-id-value',
+  mutable: false
 });
 
 export const PhoneMethodTypeValueFactory = IdxValueFactory.params({
   name: 'methodType',
   required: true,
+  type: 'string',
   options: [{
     label: 'SMS',
     value: 'sms'
