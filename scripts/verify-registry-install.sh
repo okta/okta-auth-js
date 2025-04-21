@@ -34,7 +34,8 @@ mkdir npm-test
 pushd npm-test
 npm init -y
 
-if ! npm i ${published_tarball}; then
+# if ! npm i ${published_tarball}; then
+if ! npm i @okta/okta-auth-js/${artifact_name}; then
   echo "npm install ${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
