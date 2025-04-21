@@ -26,16 +26,15 @@ fi
 
 # NOTE: hyphen rather than '@'
 artifact_version="$(ci-pkginfo -t pkgsemver)"
-artifact_name="$(ci-pkginfo -t pkgname)-$artifact_version"
-published_tarball=${REGISTRY}/@okta/okta-auth-js/-/${artifact_version}.tgz
+artifact_name="$(ci-pkginfo -t pkgname)-$$(ci-pkginfo -t pkgsemver)"
+published_tarball=${REGISTRY}/@okta/okta-auth-js/-/${artifact_name}.tgz
 
 # verify npm install
 mkdir npm-test
 pushd npm-test
 npm init -y
 
-# if ! npm i ${published_tarball}; then
-if ! npm i @okta/okta-auth-js/${artifact_name}; then
+if ! npm i ${published_tarball}; then
   echo "npm install ${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
