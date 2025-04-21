@@ -25,7 +25,8 @@ if ! ci-append-sha; then
 fi
 
 # NOTE: hyphen rather than '@'
-artifact_version="$(ci-pkginfo -t pkgname)-$(ci-pkginfo -t pkgsemver)"
+artifact_version="$(ci-pkginfo -t pkgsemver)"
+artifact_name="$(ci-pkginfo -t pkgname)-$artifact_version"
 published_tarball=${REGISTRY}/@okta/okta-auth-js/-/${artifact_version}.tgz
 
 # verify npm install
@@ -45,11 +46,12 @@ mkdir yarn-classic-test
 pushd yarn-classic-test
 yarn init -y
 cp /root/.npmrc .npmrc
-npm config delete registry registry
-npm config delete registry @okta:registry
+npm config set registry $REGISTRY
+npm config set @okta/registry $REGISTRY
 yarn config list
 
-if ! yarn --verbose add ${published_tarball}; then
+# if ! yarn --verbose add ${published_tarball}; then
+if ! yarn --verbose add @okta/okta-auth-js/${artifact_version}; then
   echo "yarn-classic install ${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
@@ -64,8 +66,8 @@ yarn set version stable
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn init -y
 cp /root/.npmrc .npmrc
-npm config delete registry registry
-npm config delete registry @okta:registry
+npm config set registry $REGISTRY
+npm config set @okta/registry $REGISTRY
 yarn config list
 # add empty lock file, so this dir can be a isolated project
 touch yarn.lock
