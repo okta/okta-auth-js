@@ -26,7 +26,7 @@ fi
 
 # NOTE: hyphen rather than '@'
 artifact_version="$(ci-pkginfo -t pkgsemver)"
-artifact_name="$(ci-pkginfo -t pkgname)-$$(ci-pkginfo -t pkgsemver)"
+artifact_name="$(ci-pkginfo -t pkgname)-$(ci-pkginfo -t pkgsemver)"
 published_tarball=${REGISTRY}/@okta/okta-auth-js/-/${artifact_name}.tgz
 
 # verify npm install
