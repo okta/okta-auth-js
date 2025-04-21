@@ -44,6 +44,8 @@ popd
 mkdir yarn-classic-test
 pushd yarn-classic-test
 yarn init -y
+echo ${REGISTRY}
+npm set ${REGISTRY}:_authToken $NPM_TOKEN
 
 if ! yarn add ${published_tarball}; then
   echo "yarn-classic install ${published_tarball} failed! Exiting..."
@@ -59,6 +61,7 @@ pushd yarn-v3-test
 yarn set version stable
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn init -y
+yarn config set npmAuthToken $NPM_TOKEN
 # add empty lock file, so this dir can be a isolated project
 touch yarn.lock
 
