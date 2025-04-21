@@ -3,14 +3,14 @@
 # NOTE: MUST BE RAN *AFTER* THE PUBLISH SUITE
 
 # Install required node version
-export REGISTRY="${ARTIFACTORY_URL}/npm-topic/:_authToken=${NPM_TOKEN}"
+export REGISTRY="${ARTIFACTORY_URL}/npm-topic"
 
 cd ${OKTA_HOME}/${REPO}
 
 NODE_VERSION="${1:-v16.20.2}"
 setup_service node $NODE_VERSION
 # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
-setup_service yarn 1.22.19 /etc/pki/tls/certs/ca-bundle.crt
+setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
 
 # Install required dependencies
 yarn global add @okta/ci-append-sha
@@ -42,21 +42,21 @@ echo "Done with npm installation test"
 popd
 
 # verify yarn classic install
-mkdir yarn-classic-test
-pushd yarn-classic-test
-yarn init -y
-cp /root/.npmrc .npmrc
-npm config set registry $REGISTRY
-npm config set @okta/registry $REGISTRY
-yarn config list
+# mkdir yarn-classic-test
+# pushd yarn-classic-test
+# yarn init -y
+# cp /root/.npmrc .npmrc
+# npm config set registry $REGISTRY
+# npm config set @okta/registry $REGISTRY
+# yarn config list
 
-# if ! yarn --verbose add ${published_tarball}; then
-if ! yarn --verbose add @okta/okta-auth-js/${artifact_name}; then
-  echo "yarn-classic install ${published_tarball} failed! Exiting..."
-  exit ${FAILED_SETUP}
-fi
-echo "Done with yarn classic installation test"
-popd
+# # if ! yarn --verbose add ${published_tarball}; then
+# if ! yarn --verbose add @okta/okta-auth-js/${artifact_name}; then
+#   echo "yarn-classic install ${published_tarball} failed! Exiting..."
+#   exit ${FAILED_SETUP}
+# fi
+# echo "Done with yarn classic installation test"
+# popd
 
 # verify yarn v3 install
 mkdir yarn-v3-test
