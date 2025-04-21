@@ -51,7 +51,7 @@ npm config set @okta/registry $REGISTRY
 yarn config list
 
 # if ! yarn --verbose add ${published_tarball}; then
-if ! yarn --verbose add @okta/okta-auth-js/${artifact_version}; then
+if ! yarn --verbose add @okta/okta-auth-js/${artifact_name}; then
   echo "yarn-classic install ${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
