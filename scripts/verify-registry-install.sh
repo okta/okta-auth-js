@@ -3,7 +3,7 @@
 # NOTE: MUST BE RAN *AFTER* THE PUBLISH SUITE
 
 # Install required node version
-export REGISTRY="${ARTIFACTORY_URL}/npm-topic"
+export REGISTRY="${ARTIFACTORY_URL}/npm-topic/:_authToken=${NPM_TOKEN}"
 
 cd ${OKTA_HOME}/${REPO}
 
