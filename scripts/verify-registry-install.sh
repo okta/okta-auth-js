@@ -44,7 +44,8 @@ popd
 # installs package locally (yarn 1 struggles with registry authentication requirements)
 mkdir okta-auth-js
 cd okta-auth-js
-wget --header="Authorization: Bearer ${NPM_TOKEN}" ${published_tarball} -O ${artifact_name}.tgz
+wget --header="Authorization: Bearer ${NPM_TOKEN}" ${published_tarball} -O ${artifact_version}.tgz
+ls -al
 cd ..
 
 # verify yarn classic install
@@ -54,7 +55,7 @@ yarn init -y
 cp /root/.npmrc .npmrc
 yarn config list
 
-if ! yarn --verbose add ../okta-auth-js/${artifact_name}; then
+if ! yarn --verbose add ../okta-auth-js/${artifact_version}; then
   echo "yarn-classic install ${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
