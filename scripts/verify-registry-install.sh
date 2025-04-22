@@ -55,7 +55,7 @@ yarn init -y
 cp /root/.npmrc .npmrc
 yarn config list
 
-if ! yarn --verbose add ../okta-auth-js/${artifact_version}; then
+if ! yarn --verbose add ../okta-auth-js/${artifact_version}.tgz; then
   echo "yarn-classic install ${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
