@@ -46,8 +46,8 @@ mkdir yarn-classic-test
 pushd yarn-classic-test
 yarn init -y
 cp /root/.npmrc .npmrc
-npm config set registry $REGISTRY
-npm config set @okta/registry $REGISTRY
+# npm config set registry $REGISTRY
+# npm config set @okta/registry $REGISTRY
 yarn config list
 
 # if ! yarn --verbose add ${published_tarball}; then
@@ -66,8 +66,8 @@ yarn set version stable
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn init -y
 cp /root/.npmrc .npmrc
-npm config set registry $REGISTRY
-npm config set @okta/registry $REGISTRY
+# npm config set registry $REGISTRY
+# npm config set @okta/registry $REGISTRY
 yarn config list
 # add empty lock file, so this dir can be a isolated project
 touch yarn.lock
