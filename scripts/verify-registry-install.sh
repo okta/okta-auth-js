@@ -55,7 +55,7 @@ yarn init -y
 cp /root/.npmrc .npmrc
 yarn config list
 
-if ! yarn --verbose add ../okta-auth-js/${artifact_version}.tgz; then
+if ! yarn add ../okta-auth-js/${artifact_version}.tgz; then
   echo "yarn-classic install ${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
@@ -70,13 +70,11 @@ yarn set version stable
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn init -y
 cp /root/.npmrc .npmrc
-# npm config set registry $REGISTRY
-# npm config set @okta/registry $REGISTRY
 yarn config list
 # add empty lock file, so this dir can be a isolated project
 touch yarn.lock
 
-if ! yarn --verbose add @okta/okta-auth-js@${published_tarball}; then
+if ! yarn add ../okta-auth-js/${artifact_version}.tgz; then
   echo "yarn-v3 install @okta/okta-auth-js@${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
