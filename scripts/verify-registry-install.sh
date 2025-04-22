@@ -41,22 +41,22 @@ fi
 echo "Done with npm installation test"
 popd
 
-# verify yarn classic install
-# mkdir yarn-classic-test
-# pushd yarn-classic-test
-# yarn init -y
-# cp /root/.npmrc .npmrc
-# npm config set registry $REGISTRY
-# npm config set @okta/registry $REGISTRY
-# yarn config list
+verify yarn classic install
+mkdir yarn-classic-test
+pushd yarn-classic-test
+yarn init -y
+cp /root/.npmrc .npmrc
+npm config set registry $REGISTRY
+npm config set @okta/registry $REGISTRY
+yarn config list
 
-# # if ! yarn --verbose add ${published_tarball}; then
-# if ! yarn --verbose add @okta/okta-auth-js/${artifact_name}; then
-#   echo "yarn-classic install ${published_tarball} failed! Exiting..."
-#   exit ${FAILED_SETUP}
-# fi
-# echo "Done with yarn classic installation test"
-# popd
+# if ! yarn --verbose add ${published_tarball}; then
+if ! yarn --verbose add @okta/okta-auth-js@${published_tarball}; then
+  echo "yarn-classic install ${published_tarball} failed! Exiting..."
+  exit ${FAILED_SETUP}
+fi
+echo "Done with yarn classic installation test"
+popd
 
 # verify yarn v3 install
 mkdir yarn-v3-test
