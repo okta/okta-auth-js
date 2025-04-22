@@ -41,7 +41,7 @@ fi
 echo "Done with npm installation test"
 popd
 
-verify yarn classic install
+# verify yarn classic install
 mkdir yarn-classic-test
 pushd yarn-classic-test
 yarn init -y
