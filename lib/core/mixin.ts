@@ -69,7 +69,7 @@ export function mixinCore
       } else if (this.isLoginRedirect()) {
         try {
           // For redirect flow, get state from the URL and use it to retrieve the originalUri
-          const oAuthResponse = await parseOAuthResponseFromUrl(this, {});
+          const oAuthResponse = parseOAuthResponseFromUrl(this, {});
           state = oAuthResponse.state;
           originalUri = originalUri || this.getOriginalUri(state);
           await this.storeTokensFromRedirect();
