@@ -10,6 +10,7 @@ If running from the workspace directory: `yarn workspace @okta/samples.static-sp
 
 | Command               | Description                    |
 | --------------------- | ------------------------------ |
+| `yarn`                | Installs the required dependencies|
 | `yarn start`          | Starts the app server |
 
 ## Configuring
