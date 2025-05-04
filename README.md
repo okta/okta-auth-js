@@ -20,6 +20,7 @@
 * [Need help?](#need-help)
   * [Browser compatibility / polyfill](#browser-compatibility--polyfill)
   * [Third party cookies](#third-party-cookies)
+  * [Okta Application Setup for SPAs vs Node Apps](#okta-application-setup-for-spas-vs-node-apps)
 * [Getting started](#getting-started)
 * [Usage guide](#usage-guide)
 * [Strategies for Obtaining Tokens](#strategies-for-obtaining-tokens)
@@ -122,6 +123,21 @@ Many browsers have started blocking cross-origin or "third party" cookies by def
   * [token.renew](#tokenrenewtokentorenew) uses [token.getWithoutPrompt](#tokengetwithoutpromptoptions) and is subject to the same limitations.
 
 If your application depends on any of these methods, you should try to either rewrite your application to avoid using these methods or communicate to your users that they must enable third party cookies. Okta engineers are currently working on a better long-term solution to this problem.
+
+### Okta Application Setup for SPAs vs Node Apps
+
+If utilizing this library directly to support a client-side web application, you will need the underlying Okta Application (referenced via `clientId`) to be set up as an "SPA". You can read more about the difference between an SPA and Web App here: [Okta Developer: Sign Into SPA](https://developer.okta.com/docs/guides/sign-into-spa/react/before-you-begin/)
+
+Furthermore, if you are using one of the following web frameworks, there are Okta offerings built on top of this SDK which may suit your needs more accurately:
+
+* Angular: [Okta OIDC: Angular](https://github.com/okta/okta-oidc-js/blob/master/packages/okta-angular)
+* React: [Okta OIDC: React](https://github.com/okta/okta-oidc-js/blob/master/packages/okta-react)
+* React Native: [Okta OIDC: React Native](https://github.com/okta/okta-oidc-js/blob/master/packages/okta-react-native)
+* Vue: [Okta Vue](https://github.com/okta/okta-vue)
+
+If using OIDC with a Node application ([reference](https://developer.okta.com/docs/guides/sign-into-web-app/nodeexpress/before-you-begin/)), the following library is also available:
+
+* Node: [Okta OIDC Middleware](https://github.com/okta/okta-oidc-js/blob/master/packages/oidc-middleware)
 
 ## Getting started
 
