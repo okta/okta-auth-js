@@ -22,11 +22,13 @@ export interface ChallengeData {
   extensions?: {
     appid: string;
   };
+  rpId?: string;
 }
 export interface ActivationData {
   challenge: string;
   rp: {
     name: string;
+    id?: string;
   };
   user: {
     id: string;
