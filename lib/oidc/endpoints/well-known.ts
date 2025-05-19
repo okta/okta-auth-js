@@ -47,7 +47,10 @@ export function getKey(sdk: OktaAuthOAuthInterface, issuer: string, kid: string)
 
     // Pull the latest keys if the key wasn't in the cache
     return get(sdk, jwksUri, {
-      cacheResponse: true
+      cacheResponse: true,
+      headers: {
+        'Cache-Control': 'no-cache, no-store, max-age=0'
+      }
     })
     .then(function(res) {
       var key = find(res.keys, {
