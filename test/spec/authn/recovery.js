@@ -34,6 +34,38 @@ describe('RECOVERY', function () {
         });
       }
     });
+
+    util.itMakesCorrectRequestResponse({
+      title: 'it passes `multiOptionalFactorEnroll` flag when provided',
+      setup: {
+        status: 'recovery', // make sure this stateToken isn't passed
+        request: {
+          uri: '/api/v1/authn/recovery/token',
+          data: {
+            recoveryToken: 'VBQ0gwBp5LyJJFdbmWCM',
+            options: { multiOptionalFactorEnroll: true }
+          }
+        },
+        response: 'success'
+      },
+      execute: function (test) {
+        return test.oa.verifyRecoveryToken({
+          recoveryToken: 'VBQ0gwBp5LyJJFdbmWCM',
+          multiOptionalFactorEnroll: true
+        });
+      },
+      expectations: function () {
+        const recoveryRequest = fetch.mock.calls[1];
+        expect(recoveryRequest).toBeDefined();
+        expect(recoveryRequest[0]).toEqual('https://auth-js-test.okta.com/api/v1/authn/recovery/token');
+        expect(recoveryRequest[1].body).toBeDefined();
+        const parsedBody = JSON.parse(recoveryRequest[1].body);
+        expect(parsedBody).toBeDefined();
+        expect(parsedBody.recoveryToken).toEqual('VBQ0gwBp5LyJJFdbmWCM');
+        expect(parsedBody.options).toEqual({ multiOptionalFactorEnroll: true });
+      }
+    });
+
   });
 
   describe('trans.answer', function () {
