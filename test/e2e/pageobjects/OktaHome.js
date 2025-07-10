@@ -21,7 +21,7 @@ class OktaHome {
   // OIE org
   get mainContent() { return $('#main-content'); }
   get userProfileButton() { return $('[data-se="dropdown-menu--button-toggle-svg"]');}
-  get signOutLink() { return $('a[data-se="topbar--sign-out"]'); }
+  get signOutLink() { return $('a[href="/login/signout"]'); }
 
   async signOut() {
     if (process.env.ORG_OIE_ENABLED) {
