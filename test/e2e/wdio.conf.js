@@ -262,7 +262,7 @@ exports.config = {
     /**
      * Function to be executed after a test (in Mocha/Jasmine).
      */
-    afterTest: async function(test, context, { error }) {
+    afterTest: async function(test, context, { error, result }) {
       if (CI && error) {
         failureCount += 1;
         await browser.saveScreenshot(`${process.env.E2E_LOG_DIR}/failure-${failureCount}.png`);
@@ -278,6 +278,9 @@ exports.config = {
           `${process.env.E2E_LOG_DIR}/failure-${failureCount}-console.log`,
           `Console Log Failure #${failureCount}:\n${log}`
         );
+        console.log('ERRORS: ');
+        console.log(error);
+        console.log(result);
         console.log('CONSOLE LOGS: ');
         console.log(logs);
       }
