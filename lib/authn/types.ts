@@ -110,6 +110,7 @@ export interface ForgotPasswordOptions {
 
 export interface VerifyRecoveryTokenOptions {
   recoveryToken: string;
+  multiOptionalFactorEnroll?: boolean;
 }
 
 export interface AuthnAPI extends SigninAPI {
@@ -118,7 +119,7 @@ export interface AuthnAPI extends SigninAPI {
   // { username, (relayState) }
   unlockAccount(opts: ForgotPasswordOptions): Promise<AuthnTransaction>;
 
-  // { recoveryToken }
+  // { recoveryToken, (multiOptionalFactorEnroll) }
   verifyRecoveryToken(opts: VerifyRecoveryTokenOptions): Promise<AuthnTransaction>;
 }
 

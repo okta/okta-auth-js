@@ -10,6 +10,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { getBaseUrl } from '../util/browserUtils';
+
 
 /* eslint-disable max-len */
 class OktaHome {
@@ -25,10 +27,14 @@ class OktaHome {
 
   async signOut() {
     if (process.env.ORG_OIE_ENABLED) {
-      await browser.waitUntil(async () => this.userProfileButton.then(el => el.isDisplayed()), 5000, 'wait for user profile');
-      await this.userProfileButton.then(el => el.click());
-      await browser.waitUntil(async () => this.signOutLink.then(el => el.isDisplayed()), 5000, 'wait for signout link');
-      await this.signOutLink.then(el => el.click());
+      // await browser.waitUntil(async () => this.userProfileButton.then(el => el.isDisplayed()), 5000, 'wait for user profile');
+      // await this.userProfileButton.then(el => el.click());
+      // await browser.waitUntil(async () => this.signOutLink.then(el => el.isDisplayed()), 5000, 'wait for signout link');
+      // await this.signOutLink.then(el => el.click());
+
+      // NOTE: clicking the signOut link seems to be causing test failures - "element not interactable"
+      // possibly related to recent UI changes?
+      await browser.url(getBaseUrl() + '/login/signout');
     } else {
       await browser.waitUntil(async () => this.userMenu.then(el => el.isDisplayed()), 5000, 'wait for user menu');
       await this.userMenu.then(el => el.click());

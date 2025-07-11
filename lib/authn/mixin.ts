@@ -92,7 +92,12 @@ export function mixinAuthn
 
     // { recoveryToken }
     verifyRecoveryToken(opts: VerifyRecoveryTokenOptions): Promise<AuthnTransaction> {
-      return this.tx.postToTransaction('/api/v1/authn/recovery/token', opts);
+      const { multiOptionalFactorEnroll, ...args } = opts;
+      if (multiOptionalFactorEnroll) {
+        // see https://developer.okta.com/docs/reference/api/authn/#options-object
+        (args as any).options = { multiOptionalFactorEnroll };
+      }
+      return this.tx.postToTransaction('/api/v1/authn/recovery/token', args);
     }
 
   };

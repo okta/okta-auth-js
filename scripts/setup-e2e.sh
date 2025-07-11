@@ -77,11 +77,13 @@ run_e2e () {
   if [ -n "${RUN_CUCUMBER}" ]; then
     if ! yarn test:e2e:cucumber; then
       echo "Cucumber tests failed! Exiting..."
+      log_extra_dir_as_zip ${E2E_LOG_DIR} "e2e-logs.zip"
       exit ${TEST_FAILURE}
     fi
   else
     if ! yarn test:e2e; then
       echo "OIE e2e tests failed! Exiting..."
+      log_extra_dir_as_zip ${E2E_LOG_DIR} "e2e-logs.zip"
       exit ${TEST_FAILURE}
     fi
   fi
