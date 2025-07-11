@@ -16,22 +16,27 @@ import { clone } from '../util';
 import { getToken } from './getToken';
 import { loadPopup, generateState } from './util';
 
-export function getWithPopup(sdk: OktaAuthOAuthInterface, options: TokenParams): Promise<TokenResponse> {
+export function getWithPopup(
+  sdk: OktaAuthOAuthInterface,
+  options: TokenParams & { initialPath?: string }
+): Promise<TokenResponse> {
   if (arguments.length > 2) {
     return Promise.reject(new AuthSdkError('As of version 3.0, "getWithPopup" takes only a single set of options'));
   }
 
+  const { initialPath, ...params } = options;
+
   // some browsers (safari, firefox) block popup if it's initialed from an async process
   // here we create the popup window immediately after user interaction
   // then redirect to the /authorize endpoint when the requestUrl is available
-  const popupWindow = loadPopup('/', options);
-  options = clone(options) || {};
-  Object.assign(options, {
+  const popupWindow = loadPopup(initialPath ?? '/', params);
+  options = clone(params) || {};
+  Object.assign(params, {
     display: 'popup',
     responseMode: 'okta_post_message',
     popupWindow
   });
-  return getToken(sdk, options);
+  return getToken(sdk, params);
 }
 
 export function getWithIDPPopup(
