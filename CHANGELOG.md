@@ -1,5 +1,13 @@
 # Changelog
 
+# 7.13.0
+
+### Features
+
+- [#1594](https://github.com/okta/okta-auth-js/pull/1594) feat: adds `initialPath` configuration to `token.getWithPopup`
+
+- [#1593](https://github.com/okta/okta-auth-js/pull/1593) feat: adds `multiOptionalFactorEnroll` support to `authn.verifyRecoveryToken`
+
 # 7.12.1
 
 ### Fixes
