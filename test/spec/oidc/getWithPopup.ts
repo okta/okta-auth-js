@@ -170,8 +170,8 @@ describe('token.getWithPopup', function() {
       });
   });
 
-  it('returns tokens using idp with authorization server', function() {
-      return oauthUtil.setupPopup({
+  it('returns tokens using idp with authorization server', async function() {
+      await oauthUtil.setupPopup({
         oktaAuthArgs: {
           pkce: false,
           issuer: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7',
@@ -179,7 +179,8 @@ describe('token.getWithPopup', function() {
           redirectUri: 'https://example.com/redirect'
         },
         getWithPopupArgs: {
-          idp: 'testIdp'
+          idp: 'testIdp',
+          initialPath: '?foo=1'
         },
         postMessageSrc: {
           baseUri: 'https://auth-js-test.okta.com/oauth2/aus8aus76q8iphupD0h7/v1/authorize',
@@ -207,6 +208,8 @@ describe('token.getWithPopup', function() {
           }
         }
       });
+      expect(window.open).toHaveBeenCalled();
+      expect(window.open).toHaveBeenCalledWith('?foo=1', expect.any(String), expect.any(String));
   });
 
   it('allows passing issuer through getWithPopup, which takes precedence', function() {
