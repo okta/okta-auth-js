@@ -371,7 +371,13 @@ describe('getKey', function() {
         {
           request: {
             method: 'get',
-            uri: '/oauth2/v1/keys'
+            uri: '/oauth2/v1/keys',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, max-age=0',
+              'Accept': 'application/json',
+              "Content-Type": "application/json",
+              'X-Okta-User-Agent-Extended': global['USER_AGENT'],
+            }
           },
           response: 'keys'
         }
@@ -411,7 +417,13 @@ describe('getKey', function() {
         {
           request: {
             method: 'get',
-            uri: '/oauth2/v1/keys'
+            uri: '/oauth2/v1/keys',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, max-age=0',
+              'Accept': 'application/json',
+              "Content-Type": "application/json",
+              'X-Okta-User-Agent-Extended': global['USER_AGENT'],
+            }
           },
           response: 'keys'
         }
@@ -467,7 +479,13 @@ describe('getKey', function() {
         {
           request: {
             method: 'get',
-            uri: '/oauth2/v1/keys'
+            uri: '/oauth2/v1/keys',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, max-age=0',
+              'Accept': 'application/json',
+              "Content-Type": "application/json",
+              'X-Okta-User-Agent-Extended': global['USER_AGENT'],
+            }
           },
           response: 'keys'
         }
