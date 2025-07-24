@@ -1633,6 +1633,8 @@ authClient.token.getWithoutPrompt({
 Create token with a popup.
 
 * `options` - See [Authorize options](#authorize-options)
+* `options.initialPath` - `string` _(optional)_ 
+To reduce the likelihood of the popup being blocked, the popup window first loads the web app before redirecting to the authorization server. Customize the path which is loaded by setting this value. (This must be an unauthenticated path). Defaults to `'/'`
 
 ```javascript
 authClient.token.getWithPopup(options)
