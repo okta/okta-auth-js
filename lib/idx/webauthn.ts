@@ -65,6 +65,7 @@ export const buildCredentialRequestOptions = (
       challenge: base64UrlToBuffer(challengeData.challenge),
       userVerification: challengeData.userVerification,
       allowCredentials: getEnrolledCredentials(authenticatorEnrollments),
+      rpId: challengeData.rpId,
     }
   } as CredentialRequestOptions;
 };
