@@ -363,7 +363,7 @@ async function main() {
   authClient.authStateManager.subscribe(function(authState) {
     // Logic based on authState is done here.
     if (!authState.isAuthenticated) {
-      // render unathenticated view
+      // render unauthenticated view
       return;
     }
 
@@ -551,7 +551,7 @@ The URL for your Okta organization or an Okta authentication server. [About the 
 
 #### `clientId`
 
-Client Id pre-registered with Okta for the OIDC authentication flow. [Creating your Okta application](#creating-your-okta-appliation)
+Client Id pre-registered with Okta for the OIDC authentication flow. [Creating your Okta application](#creating-your-okta-application)
 
 #### `redirectUri`
 
@@ -592,7 +592,7 @@ See Guide: [Enabling DPoP](#enabling-dpop)
 
 #### `dpopOptions.allowBearerTokens`
 
-When `false`, dpop-enabled token requests are validated to contain `token_type: DPoP` and will throw otherwise. Set to `true` to skip this validation and allow `Bearer` tokens as a possible `token_type`. This can be useful during a migration, to avoid needing to update a web application simutaneously with Okta Org configurations. Defaults to `false`
+When `false`, dpop-enabled token requests are validated to contain `token_type: DPoP` and will throw otherwise. Set to `true` to skip this validation and allow `Bearer` tokens as a possible `token_type`. This can be useful during a migration, to avoid needing to update a web application simultaneously with Okta Org configurations. Defaults to `false`
 
 #### responseMode
 
@@ -1109,7 +1109,7 @@ See [authn API](docs/authn.md#signinwithcredentials).
 > :link: web browser only <br>
 > :hourglass: async
 
-Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a originalUri parameter in options to track the route before the user signIn, and the addtional params are mapped to the [Authorize options](#authorize-options).
+Starts the full-page redirect to Okta with [optional request parameters](#authorize-options). In this flow, there is a originalUri parameter in options to track the route before the user signIn, and the additional params are mapped to the [Authorize options](#authorize-options).
 You can use [storeTokensFromRedirect](#storetokensfromredirect) to store tokens and [getOriginalUri](#getoriginaluristate) to clear the intermediate state (the originalUri) after successful authentication.
 
 ```javascript
@@ -1347,7 +1347,7 @@ if (authClient.isLoginRedirect()) {
 > :hourglass: async <br>
 > :warning: Deprecated, this method could be removed in next major release, use [sdk.handleRedirect](#handleredirectoriginaluri) instead.
 
-Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options). By default, [originalUri](#getoriginaluristate) will be retrieved from storage, but this can be overridden by passing a value fro `originalUri` to this function in the 2nd parameter.
+Stores passed in tokens or tokens from redirect url into storage, then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overridden by providing [options.restoreOriginalUri](#configuration-options). By default, [originalUri](#getoriginaluristate) will be retrieved from storage, but this can be overridden by passing a value fro `originalUri` to this function in the 2nd parameter.
 
 > **Note:** `handleLoginRedirect` throws `OAuthError` or `AuthSdkError` in case there are errors during token retrieval.
 
@@ -1357,7 +1357,7 @@ Stores passed in tokens or tokens from redirect url into storage, then redirect 
 > :hourglass: async
 
 Handle a redirect to the configured [redirectUri](#configuration-options) that happens on the end of [login](#signInWithRedirectoptions) flow, [enroll authenticator](#endpointsauthorizeenrollauthenticatoroptions) flow or on an error.  
-Stores tokens from redirect url into storage (for login flow), then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overrided by providing [options.restoreOriginalUri](#configuration-options). By default, [originalUri](#getoriginaluristate) will be retrieved from storage, but this can be overridden by specifying `originalUri` in the first parameter to this function.
+Stores tokens from redirect url into storage (for login flow), then redirect users back to the [originalUri](#setoriginaluriuri). When using `PKCE` authorization code flow, this method also exchanges authorization code for tokens. By default it calls `window.location.replace` for the redirection. The default behavior can be overridden by providing [options.restoreOriginalUri](#configuration-options). By default, [originalUri](#getoriginaluristate) will be retrieved from storage, but this can be overridden by specifying `originalUri` in the first parameter to this function.
 
 > **Note:** `handleRedirect` throws `OAuthError` or `AuthSdkError` in case there are errors during token retrieval or authenticator enrollment.
 
@@ -2084,7 +2084,7 @@ Gets latest evaluated `authState` from the `authStateManager`. The `authState` (
 
 #### `authStateManager.getPreviousAuthState()`
 
-Gets the previous evaluated `authState` from the `authStateManager`. This state can be used to tell when the new authState is evaluated. For example, the `authState` is evaluated duing app initialization if the `previousAuthState` is `null`, and the `authState` is evaluated during tokens auto renew process if the `previousAuthState` exists.
+Gets the previous evaluated `authState` from the `authStateManager`. This state can be used to tell when the new authState is evaluated. For example, the `authState` is evaluated during app initialization if the `previousAuthState` is `null`, and the `authState` is evaluated during tokens auto renew process if the `previousAuthState` exists.
 
 #### `authStateManager.updateAuthState()`
 
@@ -2217,7 +2217,7 @@ Before running the E2E tests, you will need to setup a test environment. See [te
 
 #### Test App
 
-We have implemented a small SPA app, located at `./test/app/` which is used internally as a test harness for the E2E tests. The app can be run manually using `yarn start`. This will start a webpack dev server and open a new browser window at `http://localhost:8080`. The app provides a high level of feedback and configurability which make it useful as a tool for troubleshooting and manual testing scenarios. See [test/app/README](test/app/README.md) for more information on the test app.
+We have implemented a small SPA app, located at `./test/apps/app` which is used internally as a test harness for the E2E tests. The app can be run manually using `yarn start`. This will start a webpack dev server and open a new browser window at `http://localhost:8080`. The app provides a high level of feedback and configurability which make it useful as a tool for troubleshooting and manual testing scenarios. See [test/apps/app/README](test/apps/app/README.md) for more information on the test app.
 
 > :warning: Because this test app is set up to dynamically change configuration and leak internal information, users should not use source in the test app as the basis for their own applications. Instead, use the example usage outlined elsewhere in this README.
 
@@ -2232,7 +2232,7 @@ The [CHANGELOG](CHANGELOG.md) contains details for all changes and links to the 
 * If using direct authentication with the IDX API:
   * Server responses with a non-200 status code will not be thrown as exceptions. If a request results in an error response from the server, the `requestDidSucceed` property on the returned `IdxTransaction` will be set to `false`. [#1205](https://github.com/okta/okta-auth-js/pull/1205)
   * `options` field is removed from the `nextStep` property of `IdxTransaction`. [#1271](https://github.com/okta/okta-auth-js/pull/1271)
-  * `shoudldProceedWithEmailAuthenticator` option is removed. [#1274](https://github.com/okta/okta-auth-js/pull/1274)
+  * `shouldProceedWithEmailAuthenticator` option is removed. [#1274](https://github.com/okta/okta-auth-js/pull/1274)
 
 ### From 5.x to 6.x
 
