@@ -177,7 +177,7 @@ module.exports = {
     "no-unused-expressions": [2, { allowShortCircuit: true, allowTernary: true }],
     "no-unused-vars": 2,
     "max-depth": [2, 3],
-    "max-len": [2, 120],
+    "max-len": [2, { code: 120, ignoreUrls: true }],
     "max-params": [2, 5],
     "max-statements": [2, 25],
     quotes: [2, "single", { allowTemplateLiterals: true }],
