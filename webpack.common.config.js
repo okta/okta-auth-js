@@ -31,7 +31,10 @@ if (process.env.NODE_ENV === 'development') {
     '@babel/plugin-transform-runtime'
   ]);
 }
-var babelExclude = /node_modules\/(?!p-cancelable)/;
+
+// oblivious-set is dependency of broadcast-channel and as of v1.4.0 uses es6 class syntax, which needs to be transpiled
+// https://github.com/pubkey/broadcast-channel/commit/190aeac0c6c20ad960131f66ba53c7a8af4535e9#diff-215536be822837c5fa02bf4c92ff56c279505685a6a1c5bc10807ee1acda37fcL1652
+var babelExclude = /node_modules\/(?!(p-cancelable|oblivious-set)\/)/;
 
 module.exports = {
   module: {
@@ -47,7 +50,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts'],
     alias: {
-      './node$': './browser', // use browser built-in objects and functions
+      './node$': './browser', // use browser built-in objects and functions,
     }
   },
   plugins: [
