@@ -1,5 +1,11 @@
 # Changelog
 
+# 7.13.1
+
+### Fixes
+
+- [#1600](https://github.com/okta/okta-auth-js/pull/1600) fix: removes `class` syntax from UMD bundle
+
 # 7.13.0
 
 ### Features
