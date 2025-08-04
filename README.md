@@ -1,5 +1,5 @@
 [devforum]: https://devforum.okta.com/
-[lang-landing]: https://developer.okta.com/code/javascript
+[lang-landing]: https://developer.okta.com/docs/guides/auth-js-redirect/main/
 [github-issues]: https://github.com/okta/okta-auth-js/issues
 [github-releases]: https://github.com/okta/okta-auth-js/releases
 [social-login]: https://developer.okta.com/docs/concepts/social-login/
