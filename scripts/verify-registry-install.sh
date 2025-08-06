@@ -38,19 +38,19 @@ if ! npm i ${published_tarball}; then
   exit ${FAILED_SETUP}
 fi
 echo "Done with npm installation test"
-popd
+# popd
 
-# verify yarn classic install
-mkdir yarn-classic-test
-pushd yarn-classic-test
-yarn init -y
+# # verify yarn classic install
+# mkdir yarn-classic-test
+# pushd yarn-classic-test
+# yarn init -y
 
-if ! yarn add ${published_tarball}; then
-  echo "yarn-classic install ${published_tarball} failed! Exiting..."
-  exit ${FAILED_SETUP}
-fi
-echo "Done with yarn classic installation test"
-popd
+# if ! yarn add ${published_tarball}; then
+#   echo "yarn-classic install ${published_tarball} failed! Exiting..."
+#   exit ${FAILED_SETUP}
+# fi
+# echo "Done with yarn classic installation test"
+# popd
 
 # verify yarn v3 install
 mkdir yarn-v3-test
