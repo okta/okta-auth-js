@@ -56,8 +56,9 @@ popd
 mkdir yarn-v3-test
 pushd yarn-v3-test
 # use yarn v3
-# https://github.com/yarnpkg/yarn/issues/7847#issuecomment-1225000565
-GITHUB_TOKEN="" yarn set version 3.8
+
+npm i -g yarn@3.x
+yarn --version
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn init -y
 # add empty lock file, so this dir can be a isolated project
