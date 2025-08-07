@@ -57,7 +57,9 @@ mkdir yarn-v3-test
 pushd yarn-v3-test
 # use yarn v3
 
-npm i -g yarn@latest
+which corepack
+corepack enable
+corepack prepare yarn@3.x --activate
 yarn --version
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn init -y
