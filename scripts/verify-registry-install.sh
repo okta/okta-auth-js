@@ -16,7 +16,9 @@ setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
 yarn global add @okta/ci-append-sha
 yarn global add @okta/ci-pkginfo
 
+which yarn
 export PATH="${PATH}:$(yarn global bin)"
+which yarn
 
 # Append a SHA to the version in package.json 
 if ! ci-append-sha; then
@@ -64,6 +66,9 @@ which corepack
 corepack enable
 corepack prepare yarn@3.8.7 --activate
 which yarn
+yarn --version
+
+yarn set version 3.8.7
 yarn --version
 
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
