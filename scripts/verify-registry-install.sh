@@ -57,10 +57,15 @@ mkdir yarn-v3-test
 pushd yarn-v3-test
 # use yarn v3
 
+which yarn
+# removes yarn-classic from PATH
+export PATH="${PATH%:*}"
 which corepack
 corepack enable
 corepack prepare yarn@3.8.7 --activate
+which yarn
 yarn --version
+
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn init -y
 # add empty lock file, so this dir can be a isolated project
