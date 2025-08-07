@@ -10,7 +10,11 @@ cd ${OKTA_HOME}/${REPO}
 NODE_VERSION="${1:-v16.20.2}"
 setup_service node $NODE_VERSION
 # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
-setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
+# setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
+
+npm i -g yarn
+yarn --version
+yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 
 # Install required dependencies
 yarn global add @okta/ci-append-sha
