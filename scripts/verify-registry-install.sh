@@ -59,7 +59,7 @@ pushd yarn-v3-test
 
 which corepack
 corepack enable
-corepack prepare yarn@3.x --activate
+corepack prepare yarn@3.8.7 --activate
 yarn --version
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn init -y
