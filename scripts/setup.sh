@@ -18,7 +18,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # setup_service node "${1:-v14.18.0}"
   setup_service node "${1:-v16.20.2}"
   # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
-  setup_service yarn 1.21.1 /etc/pki/tls/certs/ca-bundle.crt
+  setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
 else
   # bacon defines OKTA_HOME and REPO, define these relative to this file
   export OKTA_HOME=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd)
