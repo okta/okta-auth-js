@@ -76,8 +76,8 @@ yarn set version 3.8.7
 yarn --version
 
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
-yarn config set alwaysAuth true
-yarn config set authToken $NPM_TOKEN
+yarn config set npmAlwaysAuth true
+yarn config set npmAuthToken $NPM_TOKEN
 
 yarn init -y
 # add empty lock file, so this dir can be a isolated project
