@@ -10,7 +10,11 @@ cd ${OKTA_HOME}/${REPO}
 NODE_VERSION="${1:-v16.20.2}"
 setup_service node $NODE_VERSION
 # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
-setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
+# setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
+
+npm i -g yarn
+yarn --version
+yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 
 # Install required dependencies
 yarn global add @okta/ci-append-sha
@@ -65,8 +69,16 @@ popd
 # verify yarn v3 install
 mkdir yarn-v3-test
 pushd yarn-v3-test
+
 # use yarn v3
-yarn set version stable
+# removes yarn-classic from PATH
+export PATH="${PATH%:*}"
+corepack enable
+corepack prepare yarn@3.8.7 --activate
+which yarn
+yarn set version 3.8.7
+yarn --version
+
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn init -y
 cp /root/.npmrc .npmrc
@@ -79,6 +91,7 @@ if ! yarn add ../okta-auth-js/${artifact_version}.tgz; then
   exit ${FAILED_SETUP}
 fi
 echo "Done with yarn v3 installation test"
+
 popd
 
 exit $SUCCESS
