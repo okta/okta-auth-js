@@ -51,10 +51,7 @@ mkdir yarn-classic-test
 pushd yarn-classic-test
 yarn init -y
 
-npm pack ${published_tarball}
-ls -al
-
-filename="$(echo $published_tarball | tr '/' '-' | cut -c 2-).tgz"
+filename=$(npm pack $published_tarball --json | jq .[0].filename)
 echo $filename
 
 if ! yarn add ${filename}; then
@@ -85,10 +82,7 @@ yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn config set npmAlwaysAuth true
 yarn config set npmAuthToken $NPM_TOKEN
 
-npm pack ${published_tarball}
-ls -al
-
-filename="$(echo $published_tarball | tr '/' '-' | cut -c 2-).tgz"
+filename=$(npm pack $published_tarball --json | jq .[0].filename)
 echo $filename
 
 yarn init -y
