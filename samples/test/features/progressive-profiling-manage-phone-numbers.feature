@@ -15,6 +15,7 @@ Feature: Managing Phone Numbers
       And a user named "Mary"
       And she has an account with "active" state in the org
   
+  @smstest
   Scenario: Mary Adds a phone number
     Given she is on the Root View in an AUTHENTICATED state with ACR value "urn:okta:loa:2fa:any:ifpossible"
     Then she sees a table with her profile info
