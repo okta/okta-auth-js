@@ -82,7 +82,7 @@ yarn --version
 yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn init -y
 cp /root/.npmrc .npmrc
-yarn config list
+yarn config --json
 # add empty lock file, so this dir can be a isolated project
 touch yarn.lock
 
