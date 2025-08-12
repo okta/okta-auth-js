@@ -54,8 +54,11 @@ yarn init -y
 npm pack ${published_tarball}
 ls -al
 
-if ! yarn add ${published_tarball}; then
-  echo "yarn-classic install ${published_tarball} failed! Exiting..."
+filename="$(echo $published_tarball | tr '/' '-' | cut -c 2-).tgz"
+echo $filename
+
+if ! yarn add ${filename}; then
+  echo "yarn-classic install ${filename} failed! Exiting..."
   # exit ${FAILED_SETUP}
 fi
 echo "Done with yarn classic installation test"
@@ -82,11 +85,18 @@ yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
 yarn config set npmAlwaysAuth true
 yarn config set npmAuthToken $NPM_TOKEN
 
+npm pack ${published_tarball}
+ls -al
+
+filename="$(echo $published_tarball | tr '/' '-' | cut -c 2-).tgz"
+echo $filename
+
 yarn init -y
 # add empty lock file, so this dir can be a isolated project
 touch yarn.lock
 
-if ! yarn add @okta/okta-auth-js@${published_tarball}; then
+# if ! yarn add @okta/okta-auth-js@${published_tarball}; then
+if ! yarn add ${filename}; then
   echo "yarn-v3 install @okta/okta-auth-js@${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
