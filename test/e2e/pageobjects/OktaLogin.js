@@ -169,6 +169,7 @@ class OktaLogin {
     await browser.waitUntil(async () => {
       return (await this.code).isDisplayed();
     }, 5000, 'wait for verify code input');
+    console.log('### Setting code to value', code);
     (await this.code).setValue(code);
   }
 
