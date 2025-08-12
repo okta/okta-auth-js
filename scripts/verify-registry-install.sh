@@ -51,10 +51,10 @@ mkdir yarn-classic-test
 pushd yarn-classic-test
 yarn init -y
 
-filename=$(npm pack ./$published_tarball --json | jq .[0].filename)
+filename=$(npm pack $published_tarball --json | jq .[0].filename)
 echo $filename
 
-if ! yarn add ${filename}; then
+if ! yarn add ./${filename}; then
   echo "yarn-classic install ${filename} failed! Exiting..."
   # exit ${FAILED_SETUP}
 fi
