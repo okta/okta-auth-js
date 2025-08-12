@@ -125,6 +125,7 @@ export default class A18nClient {
       await waitForOneSecond();
       response = await this.getOnURL(LATEST_SMS_URL.replace(':profileId', profileId)) as Record<string, string>;
     }
+
     console.log('### got response', response)
     const match = response?.content?.match(/Your verification code is (?<code>\d+)/);
     console.log('### got match', match)

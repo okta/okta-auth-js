@@ -53,8 +53,9 @@ yarn init -y
 
 filename=$(npm pack $published_tarball --json | jq .[0].filename | tr -d \")
 echo $filename
+ls -al
 
-if ! yarn add ./${filename}; then
+if ! yarn add ./${filename | cut -c 2-}; then
   echo "yarn-classic install ${filename} failed! Exiting..."
   # exit ${FAILED_SETUP}
 fi
