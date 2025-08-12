@@ -86,7 +86,8 @@ cp /root/.npmrc .npmrc
 # add empty lock file, so this dir can be a isolated project
 touch yarn.lock
 
-if ! yarn add ../okta-auth-js/${artifact_version}.tgz; then
+echo "installing"
+if ! yarn --verbose add ../okta-auth-js/${artifact_version}.tgz; then
   echo "yarn-v3 install @okta/okta-auth-js@${published_tarball} failed! Exiting..."
   exit ${FAILED_SETUP}
 fi

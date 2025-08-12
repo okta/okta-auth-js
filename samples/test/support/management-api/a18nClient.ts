@@ -126,10 +126,14 @@ export default class A18nClient {
       response = await this.getOnURL(LATEST_SMS_URL.replace(':profileId', profileId)) as Record<string, string>;
     }
 
-    console.log('### got response', response)
     const match = response?.content?.match(/Your verification code is (?<code>\d+)/);
-    console.log('### got match', match)
     const code = match?.groups?.code;
+
+    if (!code) {
+      console.log('Response', response);
+      throw new Error('No SMS Code returned');
+    }
+
     return code;
   }
 
