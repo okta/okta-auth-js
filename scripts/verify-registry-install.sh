@@ -51,6 +51,9 @@ mkdir yarn-classic-test
 pushd yarn-classic-test
 yarn init -y
 
+npm pack ${published_tarball}
+ls -al
+
 if ! yarn add ${published_tarball}; then
   echo "yarn-classic install ${published_tarball} failed! Exiting..."
   # exit ${FAILED_SETUP}
