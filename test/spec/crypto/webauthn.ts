@@ -102,7 +102,8 @@ describe('buildCredentialRequestOptions', () => {
   it('builds options for navigator.credentials.get', () => {
     const challengeData: ChallengeData = {
       challenge: 'G7bIvwrJJ33WCEp6GGSH',
-      userVerification: 'preferred'
+      userVerification: 'preferred',
+      rpId: 'acme.com'
     };
     const authenticatorEnrollments: IdxAuthenticator[] = [{
       id: 'AUTHENTICATOR-ID-1',
@@ -119,6 +120,7 @@ describe('buildCredentialRequestOptions', () => {
       publicKey: {
         challenge: base64UrlToBuffer('G7bIvwrJJ33WCEp6GGSH'),
         userVerification: 'preferred',
+        rpId: 'acme.com',
         allowCredentials: [{
           type: 'public-key',
           id: base64UrlToBuffer('vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt')
