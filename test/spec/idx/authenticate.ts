@@ -2475,7 +2475,8 @@ describe('idx/authenticate', () => {
             contextualData: {
               challengeData: {
                 challenge: 'CHALLENGE',
-                userVerification: 'preferred'
+                userVerification: 'preferred',
+                rpId: 'acme.com'
               }
             }
           },
