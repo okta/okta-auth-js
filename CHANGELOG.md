@@ -1,5 +1,9 @@
 # Changelog
 
+# 7.14.0
+
+[#1602](https://github.com/okta/okta-auth-js/pull/1602) fix: reverses `broadcast-channel` upgrade that raised minimum node engine requirement
+
 # 7.13.1
 
 ### Fixes
