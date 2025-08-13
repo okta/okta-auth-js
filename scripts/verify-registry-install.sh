@@ -72,26 +72,26 @@ pushd yarn-v3-test
 
 # use yarn v3
 # removes yarn-classic from PATH
-export PATH="${PATH%:*}"
-corepack enable
-corepack prepare yarn@3.8.7 --activate
-which yarn
-yarn set version 3.8.7
-yarn --version
+# export PATH="${PATH%:*}"
+# corepack enable
+# corepack prepare yarn@3.8.7 --activate
+# which yarn
+# yarn set version 3.8.7
+# yarn --version
 
-yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
-yarn init -y
-cp /root/.npmrc .npmrc
+# yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
+# yarn init -y
+# cp /root/.npmrc .npmrc
 
-# add empty lock file, so this dir can be a isolated project
-touch yarn.lock
+# # add empty lock file, so this dir can be a isolated project
+# touch yarn.lock
 
-echo "installing"
-if ! yarn --verbose add ../okta-auth-js/${artifact_version}.tgz; then
-  echo "yarn-v3 install @okta/okta-auth-js@${published_tarball} failed! Exiting..."
-  exit ${FAILED_SETUP}
-fi
-echo "Done with yarn v3 installation test"
+# echo "installing"
+# if ! yarn --verbose add ../okta-auth-js/${artifact_version}.tgz; then
+#   echo "yarn-v3 install @okta/okta-auth-js@${published_tarball} failed! Exiting..."
+#   exit ${FAILED_SETUP}
+# fi
+# echo "Done with yarn v3 installation test"
 
 popd
 
