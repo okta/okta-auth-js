@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+import { getBaseUrl } from '../util/browserUtils';
 
 /* eslint-disable max-len */
 class OktaHome {
