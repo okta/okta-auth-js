@@ -2241,7 +2241,8 @@ describe('idx/register', () => {
           contextualData: {
             activationData: {
               rp: {
-                name: 'Javascript IDX SDK Test Org'
+                name: 'Javascript IDX SDK Test Org',
+                id: 'acme.com'
               },
               user: {
                 id: '000000001',
@@ -2339,7 +2340,8 @@ describe('idx/register', () => {
           contextualData: {
             activationData: {
               rp: {
-                name: 'Javascript IDX SDK Test Org'
+                name: 'Javascript IDX SDK Test Org',
+                id: 'acme.com'
               },
               user: {
                 id: '000000001',
@@ -2400,7 +2402,8 @@ describe('idx/register', () => {
           contextualData: {
             activationData: {
               rp: {
-                name: 'Javascript IDX SDK Test Org'
+                name: 'Javascript IDX SDK Test Org',
+                id: 'acme.com'
               },
               user: {
                 id: '000000001',

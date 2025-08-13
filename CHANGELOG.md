@@ -1,5 +1,15 @@
 # Changelog
 
+# 7.14.0
+
+### Features
+
+- [#1588](https://github.com/okta/okta-auth-js/pull/1588) feat: adds `rpId` to credentials to add support for custom relying party id
+
+### Fixes
+
+- backports [#1601](https://github.com/okta/okta-auth-js/pull/1601) fix: reverses broadcast-channel upgrade that raised minimum node engine requirement
+
 # 7.13.1
 
 ### Fixes

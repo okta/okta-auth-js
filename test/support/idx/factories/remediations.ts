@@ -256,7 +256,8 @@ export const VerifyWebauthnAuthenticatorRemediationFactory = ChallengeAuthentica
       contextualData: {
         challengeData: {
           challenge: 'CHALLENGE',
-          userVerification: 'preferred'
+          userVerification: 'preferred',
+          rpId: 'acme.com'
         }
       }
     })
@@ -270,7 +271,8 @@ export const EnrollWebauthnAuthenticatorRemediationFactory = EnrollAuthenticator
       contextualData: {
         activationData: {
           rp: {
-            name: 'Javascript IDX SDK Test Org'
+            name: 'Javascript IDX SDK Test Org',
+            id: 'acme.com'
           },
           user: {
             id: '000000001',
