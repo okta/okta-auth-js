@@ -4,7 +4,7 @@
 
 ### Fixes
 
-- [#1601](https://github.com/okta/okta-auth-js/pull/1601) fix: reverses `broadcast-channel` upgrade to fix breaking change
+- [#1601](https://github.com/okta/okta-auth-js/pull/1601) fix: reverses `broadcast-channel` upgrade that raised minimum node engine requirement
 
 # 7.11.3
 
