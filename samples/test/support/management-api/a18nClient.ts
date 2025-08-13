@@ -128,6 +128,12 @@ export default class A18nClient {
 
     const match = response?.content?.match(/Your verification code is (?<code>\d+)/);
     const code = match?.groups?.code;
+
+    if (!code) {
+      console.log('Response', response);
+      throw new Error('No SMS Code returned');
+    }
+
     return code;
   }
 
