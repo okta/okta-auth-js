@@ -6,9 +6,11 @@
 
 - [#1588](https://github.com/okta/okta-auth-js/pull/1588) feat: adds `rpId` to credentials to add support for custom relying party id
 
+# 7.13.2
+
 ### Fixes
 
-- backports [#1601](https://github.com/okta/okta-auth-js/pull/1601) fix: reverses broadcast-channel upgrade that raised minimum node engine requirement
+- backports 7.11.4 ([#1601](https://github.com/okta/okta-auth-js/pull/1601))
 
 # 7.13.1
 
@@ -23,6 +25,12 @@
 - [#1594](https://github.com/okta/okta-auth-js/pull/1594) feat: adds `initialPath` configuration to `token.getWithPopup`
 
 - [#1593](https://github.com/okta/okta-auth-js/pull/1593) feat: adds `multiOptionalFactorEnroll` support to `authn.verifyRecoveryToken`
+
+# 7.12.2
+
+### Fixes
+
+- backports 7.11.4 ([#1601](https://github.com/okta/okta-auth-js/pull/1601))
 
 # 7.12.1
 
