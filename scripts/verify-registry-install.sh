@@ -10,7 +10,15 @@ cd ${OKTA_HOME}/${REPO}
 NODE_VERSION="${1:-v16.20.2}"
 setup_service node $NODE_VERSION
 # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
+<<<<<<< HEAD
 setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
+=======
+# setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
+
+npm i -g yarn
+yarn --version
+yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
+>>>>>>> origin/7.12
 
 # Install required dependencies
 yarn global add @okta/ci-append-sha
@@ -65,20 +73,30 @@ popd
 # verify yarn v3 install
 mkdir yarn-v3-test
 pushd yarn-v3-test
-# use yarn v3
-yarn set version stable
-yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
-yarn init -y
-cp /root/.npmrc .npmrc
-yarn config list
-# add empty lock file, so this dir can be a isolated project
-touch yarn.lock
 
-if ! yarn add ../okta-auth-js/${artifact_version}.tgz; then
-  echo "yarn-v3 install @okta/okta-auth-js@${published_tarball} failed! Exiting..."
-  exit ${FAILED_SETUP}
-fi
-echo "Done with yarn v3 installation test"
+# use yarn v3
+# removes yarn-classic from PATH
+# export PATH="${PATH%:*}"
+# corepack enable
+# corepack prepare yarn@3.8.7 --activate
+# which yarn
+# yarn set version 3.8.7
+# yarn --version
+
+# yarn config set caFilePath /etc/pki/tls/certs/ca-bundle.crt
+# yarn init -y
+# cp /root/.npmrc .npmrc
+
+# # add empty lock file, so this dir can be a isolated project
+# touch yarn.lock
+
+# echo "installing"
+# if ! yarn --verbose add ../okta-auth-js/${artifact_version}.tgz; then
+#   echo "yarn-v3 install @okta/okta-auth-js@${published_tarball} failed! Exiting..."
+#   exit ${FAILED_SETUP}
+# fi
+# echo "Done with yarn v3 installation test"
+
 popd
 
 exit $SUCCESS

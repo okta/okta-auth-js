@@ -12,7 +12,6 @@
 
 import { getBaseUrl } from '../util/browserUtils';
 
-
 /* eslint-disable max-len */
 class OktaHome {
   get userMenu() { return $('[data-se="user-menu"] > a.link-button');}

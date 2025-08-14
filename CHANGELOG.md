@@ -1,5 +1,11 @@
 # Changelog
 
+# 7.13.2
+
+### Fixes
+
+- backports 7.11.4 ([#1601](https://github.com/okta/okta-auth-js/pull/1601))
+
 # 7.13.1
 
 ### Fixes
@@ -13,6 +19,12 @@
 - [#1594](https://github.com/okta/okta-auth-js/pull/1594) feat: adds `initialPath` configuration to `token.getWithPopup`
 
 - [#1593](https://github.com/okta/okta-auth-js/pull/1593) feat: adds `multiOptionalFactorEnroll` support to `authn.verifyRecoveryToken`
+
+# 7.12.2
+
+### Fixes
+
+- backports 7.11.4 ([#1601](https://github.com/okta/okta-auth-js/pull/1601))
 
 # 7.12.1
 
@@ -29,6 +41,12 @@
   - See [documentation](https://github.com/okta/okta-auth-js?tab=readme-ov-file#tokengetwithidppopupoptions) for more detailed explanation
 
 - [#1584](https://github.com/okta/okta-auth-js/pull/1584) feat: adds `dpopOptions.allowBearerTokens` configuration
+
+# 7.11.4
+
+### Fixes
+
+- [#1601](https://github.com/okta/okta-auth-js/pull/1601) fix: reverses `broadcast-channel` upgrade that raised minimum node engine requirement
 
 # 7.11.3
 
@@ -66,12 +84,18 @@
 
 - [#1552](https://github.com/okta/okta-auth-js/pull/1552) fix: start poll request when document is visible and awaken in Mobile Safari 18.x
 
+# 7.9.0
+
+### Bug Fix
+
+- [#1551](https://github.com/okta/okta-auth-js/pull/1551) fix: authn polling on iOS18 devices
+
 # 7.8.1
 
 ### Bug Fix
 
 - [#1547](https://github.com/okta/okta-auth-js/pull/1547) fix: replaces `jsonpath-plus` module
-  - Address https://security.snyk.io/vuln/SNYK-JS-JSONPATHPLUS-7945884
+  - Addresses https://security.snyk.io/vuln/SNYK-JS-JSONPATHPLUS-7945884
 
 # 7.8.0
 
