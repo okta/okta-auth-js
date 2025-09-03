@@ -42,7 +42,7 @@ export function mixinHttp
     getIssuerOrigin(): string {
       // Infer the URL from the issuer URL, omitting the /oauth2/{authServerId}
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return this.options.issuer!.split('/oauth2/')[0];
+      return this.options.issuer!.split('/').slice(0, 3).join('/');
     }
   
     webfinger(opts): Promise<object> {
