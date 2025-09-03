@@ -87,7 +87,7 @@ This module provides an entrypoint that implements all required polyfills.
 
 If you are using the JS on a web page from the browser, you can copy the `node_modules/@okta/okta-auth-js/dist` contents to publicly hosted directory, and include a reference to the `okta-auth-js.polyfill.js` file in a `<script>` tag. It should be loaded before any other scripts which depend on the polyfill.  
 
-If you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import import or require `@okta/okta-auth-js/polyfill` at or near the beginning of your application's code:
+If you're using a bundler like [Webpack](https://webpack.github.io/) or [Browserify](http://browserify.org/), you can simply import or require `@okta/okta-auth-js/polyfill` at or near the beginning of your application's code:
 
 ```javascript
 import '@okta/okta-auth-js/polyfill';
