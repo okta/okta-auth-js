@@ -13,6 +13,7 @@ get_terminus_secret "/" password PASSWORD
 # for myaccount password API testing
 export PASSWORDLESS_USERNAME=password.optional@mailinator.com
 get_terminus_secret "/" a18n_api_key A18N_API_KEY
+export A18N_API_KEY='foo'
 
 # These clients have refresh token enabled and password optional
 export CLIENT_ID=0oa3b5fp4h02UIrjZ697

@@ -17,5 +17,6 @@ export MFA_ENABLED=true
 
 get_terminus_secret "/" security_question_answer SECURITY_QUESTION_ANSWER
 get_terminus_secret "/" a18n_api_key A18N_API_KEY
+export A18N_API_KEY='foo'
 
 run_e2e

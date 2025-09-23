@@ -105,6 +105,7 @@ setup_sample_tests () {
 
   export ORG_OIE_ENABLED=true
   get_terminus_secret "/" a18n_api_key A18N_API_KEY
+  export A18N_API_KEY='foo'
   
 
   # If this script is run as a bacon task, run against trexcloud environment
