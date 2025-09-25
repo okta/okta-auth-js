@@ -5,14 +5,14 @@ test_suites:
       timeout: '60'
       script_name: publish
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     - name: lint
       script_path: ../okta-auth-js/scripts
       sort_order: '2'
       timeout: '60'
       script_name: lint
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
       log_files:
         - build2/reports/lint/eslint-checkstyle-result.xml
 
@@ -22,14 +22,14 @@ test_suites:
       timeout: '20'
       script_name: unit
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     - name: integration
       script_path: ../okta-auth-js/scripts
       sort_order: '3'
       timeout: '10'
       script_name: integration
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
 
     - name: e2e
       script_path: ../okta-auth-js/scripts/e2e
@@ -37,77 +37,77 @@ test_suites:
       timeout: '20'
       script_name: e2e
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     - name: e2e-cucumber
       script_path: ../okta-auth-js/scripts/e2e
       sort_order: '4'
       timeout: '20'
       script_name: e2e-cucumber
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     - name: e2e-mfa
       script_path: ../okta-auth-js/scripts/e2e
       sort_order: '5'
       timeout: '10'
       script_name: e2e-mfa
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     - name: e2e-dpop
       script_path: ../okta-auth-js/scripts/e2e
       sort_order: '5'
       timeout: '10'
       script_name: e2e-dpop
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     - name: sample-express-embedded-auth-with-sdk
       script_path: ../okta-auth-js/scripts/samples
       sort_order: '6'
       timeout: '30'
       script_name: e2e-express-embedded-auth-with-sdk
       criteria: OPTIONAL
-      queue_name: small
+      queue_name: al2023
     - name: sample-express-web-no-oidc
       script_path: ../okta-auth-js/scripts/samples
       sort_order: '7'
       timeout: '15'
       script_name: e2e-express-web-no-oidc
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     - name: sample-express-web-with-oidc
       script_path: ../okta-auth-js/scripts/samples
       sort_order: '8'
       timeout: '15'
       script_name: e2e-express-web-with-oidc
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     - name: sample-static-spa
       script_path: ../okta-auth-js/scripts/samples
       sort_order: '9'
       timeout: '15'
       script_name: e2e-static-spa
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     - name: sample-webpack-spa
       script_path: ../okta-auth-js/scripts/samples
       sort_order: '10'
       timeout: '15'
       script_name: e2e-webpack-spa
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     - name: sample-express-embedded-sign-in-widget
       script_path: ../okta-auth-js/scripts/samples
       sort_order: '11'
       timeout: '15'
       script_name: e2e-express-embedded-sign-in-widget
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     - name: sample-react-embedded-auth-with-sdk
       script_path: ../okta-auth-js/scripts/samples
       sort_order: '12'
       timeout: '20'
       script_name: e2e-react-embedded-auth-with-sdk
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
 
     - name: verify-registry-install
       prereq_test_suite_name: publish
@@ -116,7 +116,7 @@ test_suites:
       timeout: '20'
       script_name: verify-registry-install
       criteria: MERGE
-      queue_name: small
+      queue_name: al2023
     # Sauce labs tests are flaky due to the free account we are currently using
     # Re-enable this task on bacon once we have an paid account
     # - name: e2e-saucelabs 
@@ -125,4 +125,4 @@ test_suites:
     #   timeout: '60'
     #   script_name: e2e-saucelabs
     #   criteria: MERGE
-    #   queue_name: small
+    #   queue_name: al2023
