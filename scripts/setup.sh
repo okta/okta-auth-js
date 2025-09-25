@@ -26,7 +26,7 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   hash -d yarn
 
   export PATH="$PATH:$(npm config get prefix)/bin"
-  export NODE_OPTIONS="--max-old-space-size=2048"
+  export NODE_OPTIONS="--max-old-space-size=4096"
 else
   # bacon defines OKTA_HOME and REPO, define these relative to this file
   export OKTA_HOME=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd)
