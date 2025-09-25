@@ -245,8 +245,7 @@
     "**/cacheable-request/http-cache-semantics": "^4.0.0",
     "**/has-ansi/ansi-regex": "^4.1.1",
     "**/strip-ansi/ansi-regex": "^3.0.1",
-    "**/download/got": "^11.8.5",
-    "**/@babel/runtime": "^7.27.0"
+    "**/download/got": "^11.8.5"
   },
   "workspaces": {
     "packages": [
