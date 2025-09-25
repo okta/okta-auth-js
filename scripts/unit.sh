@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
 source ${OKTA_HOME}/${REPO}/scripts/setup.sh
-nvm install 14
+# nvm install 14
 
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/unit"

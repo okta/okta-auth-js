@@ -17,7 +17,8 @@
     "rootDir": "../",
     "baseUrl": "../",
     "lib": [
-      "ES2020.Promise"
+      "ES2020.Promise",
+      // "esnext.disposable"
     ],
     "paths": {
       "@okta/okta-auth-js": [
@@ -27,9 +28,9 @@
   },
   "include": [
     "../types/global.d.ts",
-    "spec/**/*.ts",
-    "integration/**/*.ts",
-    "support/**/*.ts",
+    // "spec/**/*.ts",
+    // "integration/**/*.ts",
+    // "support/**/*.ts",
     "types/**/*.ts"
   ],
   "exclude": [

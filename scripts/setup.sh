@@ -16,9 +16,15 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   export NVM_DIR="/root/.nvm"
 
   # setup_service node "${1:-v14.18.0}"
-  setup_service node "${1:-v16.20.2}"
+  setup_service node "${1:-v20.11.0}"
   # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
-  setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
+  # setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
+  if ! npm install -g yarn@1.22.22; then
+    echo "Failed to install yarn"
+    exit ${FAILED_SETUP}
+  fi
+
+  export PATH="$PATH:$(npm config get prefix)/bin"
 else
   # bacon defines OKTA_HOME and REPO, define these relative to this file
   export OKTA_HOME=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd)

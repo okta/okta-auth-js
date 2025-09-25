@@ -1,20 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`MFA_CHALLENGE trans.poll allows polling for push with transactionCallBack 1`] = `
-Object {
-  "_embedded": Object {
-    "factor": Object {
+{
+  "_embedded": {
+    "factor": {
       "factorType": "push",
       "id": "opf492vmb3s1blLTs0h7",
-      "profile": Object {
+      "profile": {
         "credentialId": "exampleUser@example.com",
         "deviceType": "SmartPhone_IPhone",
-        "keys": Array [
-          Object {
+        "keys": [
+          {
             "kid": "default",
             "kty": "PKIX",
             "use": "sig",
-            "x5c": Array [
+            "x5c": [
               "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwd3kkRHieZUwY2wRaufKLuKWBHzy6oj8JjuXVyQJHzHJHyAjAo1jhey21v8WtxWMkb8soR1cg7iSf9kM/MjRxQJFKWNNhZDSgrMs/nc8RIO3xX1dWOVhNf51z/82S/+Wgo0ZRzrfM9iOFUwKDt5PoGe3d8rPsY3F5sJaw8lwAw9HqgI95RmRovta99S5zgh9DD3D57ckECKdCbe8HxFd+lkRLz1nl85FxEKLMaPa0vh8/AN8j14GSjoVogyLnF1468LEff7i2VL81HbUpO2PRQ7LEqTQWzmfcB0BULd499WydFIuwpV68c91VcGXWPUKHyXxZVB5SXSHgAgR45p8nQIDAQAB",
             ],
           },
@@ -25,9 +25,9 @@ Object {
       },
       "provider": "OKTA",
     },
-    "user": Object {
+    "user": {
       "id": "00u492uyb0VqYtZiI0h7",
-      "profile": Object {
+      "profile": {
         "firstName": "Test",
         "lastName": "User",
         "locale": "en_US",
@@ -36,36 +36,36 @@ Object {
       },
     },
   },
-  "_links": Object {
-    "cancel": Object {
-      "hints": Object {
-        "allow": Array [
+  "_links": {
+    "cancel": {
+      "hints": {
+        "allow": [
           "POST",
         ],
       },
       "href": "https://auth-js-test.okta.com/api/v1/authn/cancel",
     },
-    "next": Object {
-      "hints": Object {
-        "allow": Array [
+    "next": {
+      "hints": {
+        "allow": [
           "POST",
         ],
       },
       "href": "https://auth-js-test.okta.com/api/v1/authn/factors/opf492vmb3s1blLTs0h7/verify",
       "name": "poll",
     },
-    "prev": Object {
-      "hints": Object {
-        "allow": Array [
+    "prev": {
+      "hints": {
+        "allow": [
           "POST",
         ],
       },
       "href": "https://auth-js-test.okta.com/api/v1/authn/previous",
     },
-    "resend": Array [
-      Object {
-        "hints": Object {
-          "allow": Array [
+    "resend": [
+      {
+        "hints": {
+          "allow": [
             "POST",
           ],
         },
@@ -76,7 +76,7 @@ Object {
   },
   "expiresAt": "2015-06-10T22:42:40.224Z",
   "factorResult": "WAITING",
-  "headers": Object {
+  "headers": {
     "Content-Type": "application/json",
     "X-Rate-Limit-Limit": 1000,
   },
