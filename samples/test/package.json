@@ -40,5 +40,8 @@
     "wait-on": "^8.0.1",
     "webdriverio": "^8.35.1",
     "junit-report-merger": "^3.0.5"
+  },
+  "devDependencies": {
+    "@wdio/types": "^8.32.4"
   }
 }

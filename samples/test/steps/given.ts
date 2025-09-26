@@ -71,6 +71,7 @@ Given(
     this.app = await createApp(this.config, { appType });
     const { 
       credentials: {
+        // @ts-expect-error
         oauthClient: {
           client_id: clientId,
           client_secret: clientSecret

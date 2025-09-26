@@ -137,8 +137,6 @@ if [ ! -z "$WIDGET_VERSION" ]; then
   finish_log_group $?
 fi
 
-echo "CPU USAGE:"
-top -n 1 -b
 create_log_group "Yarn Build"
 if ! yarn build; then
   echo "build failed! Exiting..."

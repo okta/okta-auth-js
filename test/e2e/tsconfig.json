@@ -7,13 +7,14 @@
             "webdriverio/async",
             "@wdio/cucumber-framework",
             "expect-webdriverio",
-            "@wdio/globals/types"
+            "@wdio/globals/types",
+            "@wdio/types"
         ],
         "esModuleInterop": true,
         "target": "es2019",
         "paths": {
           "support/*": ["../../samples/test/support/*"],
-          "management-api/*": ["../../samples/test/support/management-api/*"],
+          "management-api/*": ["../../samples/test/support/management-api/*"]
         }
     }
 }
