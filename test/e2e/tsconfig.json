@@ -6,7 +6,8 @@
             "node",
             "webdriverio/async",
             "@wdio/cucumber-framework",
-            "expect-webdriverio"
+            "expect-webdriverio",
+            "@wdio/globals/types"
         ],
         "esModuleInterop": true,
         "target": "es2019",
