@@ -16,7 +16,6 @@ import assert from 'assert';
 import toQueryString from '../util/toQueryString';
 import {
   Nav,
-  Selectors,
   Unauth,
   UserHome,
 } from  '../support/selectors';

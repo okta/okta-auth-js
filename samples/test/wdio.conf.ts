@@ -11,7 +11,7 @@
  */
 
 
-import type { ChromeOptions, FirefoxOptions } from '@wdio/types/build/Capabilities';
+import type { ChromeOptions } from '@wdio/types/build/Capabilities';
 import type { WebDriverLogTypes } from '@wdio/types/build/Options';
 
 require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
