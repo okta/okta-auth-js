@@ -10,20 +10,12 @@ if [ -n "${TEST_SUITE_ID}" ]; then
   # DO NOT MERGE ANY CHANGES TO THIS LINE!!
   export WIDGET_VERSION=""
 
-  # Add yarn to the $PATH so npm cli commands do not fail
-  # export PATH="${PATH}:$(yarn global bin)"
-  # Install required node version
   export NVM_DIR="/root/.nvm"
-
-  # setup_service node "${1:-v14.18.0}"
   setup_service node "${1:-v20.11.0}"
-  # Use the cacert bundled with centos as okta root CA is self-signed and cause issues downloading from yarn
-  # setup_service yarn 1.22.22 /etc/pki/tls/certs/ca-bundle.crt
   if ! npm install -g yarn@1.22.22; then
     echo "Failed to install yarn"
     exit ${FAILED_SETUP}
   fi
-  hash -d yarn
 
   export PATH="$PATH:$(npm config get prefix)/bin"
   export NODE_OPTIONS="--max-old-space-size=4096"
