@@ -38,7 +38,7 @@ const selectors = {
   submit
 };
 class SpaApp {
-  selectors: Selectors = selectors;
+  selectors = selectors;
   // Authenticated landing
   get logoutRedirectBtn() { return $('#logout-redirect'); }
   get getUserInfoBtn() { return $(UserHome.profileButton); }
@@ -61,7 +61,7 @@ class SpaApp {
   get idToken() { return $('#idToken'); }
   get error() { return $('#error'); }
 
-  async open(queryObj: Record<string, string>) {
+  async open(queryObj) {
     await browser.url(toQueryString(queryObj));
   }
 
@@ -132,7 +132,7 @@ class SpaApp {
 
   async assertUserInfo() {
     await waitForDisplayed(userEmail, false);
-    await checkEqualsText('element', userEmail, false, process.env.USERNAME as string);
+    await checkEqualsText('element', userEmail, false, process.env.USERNAME);
   }
 
   async assertNoUserInfo() {
