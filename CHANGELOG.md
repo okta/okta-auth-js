@@ -1,5 +1,11 @@
 # Changelog
 
+# 8.0.0
+
+### Breaking Changes
+
+- [#1607](https://github.com/okta/okta-auth-js/pull/1607) bumps minimum node version to 20
+
 # 7.14.0
 
 ### Features
