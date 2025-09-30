@@ -1,6 +1,14 @@
 # Changelog
 
+# 8.0.0
+
+### Breaking Changes
+
+- [#1607](https://github.com/okta/okta-auth-js/pull/1607) bumps minimum node version to 20
+
 # 7.14.1
+
+### Fixes
 
 - [#1611](https://github.com/okta/okta-auth-js/pull/1611) fix: improves regex for parsing Authorization Code Flow redirect urls
 

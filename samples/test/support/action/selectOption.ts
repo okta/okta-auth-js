@@ -62,5 +62,6 @@ export default async (
         }
     }
 
-    (await $(selector))[command](...commandArguments as string[]);
+    // @ts-expect-error - spreading arguments for function call
+    (await $(selector))[command](...commandArguments);
 };

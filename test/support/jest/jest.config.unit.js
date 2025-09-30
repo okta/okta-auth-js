@@ -11,11 +11,16 @@ const config = Object.assign({}, baseConfig, {
     '<rootDir>/test/support/disableFetch.js',
     '<rootDir>/test/support/jest/jest.setup.js'
   ],
-  globals: Object.assign({}, baseConfig.globals, {
-    'ts-jest': {
-      'tsconfig': '<rootDir>/test/spec/tsconfig.spec.json'
-    }
-  })
+  'transform': {
+    '^.+\\.(js)$': 'babel-jest',
+    '^.+\\.(ts|html)$': [
+      'ts-jest',
+      {
+        // ts-jest options
+        'tsconfig': '<rootDir>/test/spec/tsconfig.spec.json'
+      }
+    ]
+  },
 });
 
 

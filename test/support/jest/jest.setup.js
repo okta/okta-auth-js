@@ -10,6 +10,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+const crypto = require('node:crypto');
+const { TextEncoder, TextDecoder } = require('node:util');
+
+
 if (process.env.DETECT_LEAKS) {
   // detect open timeouts, network connections
   require('leaked-handles').set({
@@ -18,14 +22,15 @@ if (process.env.DETECT_LEAKS) {
   });
 }
 
-// crypto to mimic browser environment
-const Crypto = require('@peculiar/webcrypto').Crypto;
-global.crypto = new Crypto();
+Object.defineProperty(global, 'crypto', {
+  value: {
+    getRandomValues: arr => crypto.randomBytes(arr.length),
+    subtle: crypto.subtle
+  }
+});
 
-// TextEncoder
-const TextEncoder = require('util').TextEncoder;
-// eslint-disable-next-line node/no-unsupported-features/node-builtins
 global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
 // Suppress warning messages
 global.console.warn = function() {};

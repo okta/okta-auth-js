@@ -21,7 +21,7 @@ function dec2hex (dec) {
 
 function getRandomString(length) {
   var a = new Uint8Array(Math.ceil(length / 2));
-  webcrypto.getRandomValues(a);
+  a = webcrypto.getRandomValues(a);
   var str = Array.from(a, dec2hex).join('');
   return str.slice(0, length);
 }

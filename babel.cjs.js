@@ -13,7 +13,7 @@ module.exports = {
   ]],
   'plugins': [
     '@babel/plugin-transform-typescript',
-    '@babel/plugin-proposal-class-properties',
+    // '@babel/plugin-proposal-class-properties',
     // https://babeljs.io/docs/en/babel-plugin-transform-runtime#corejs
     '@babel/plugin-transform-runtime',
     ['@babel/plugin-transform-modules-commonjs', {

@@ -11,6 +11,9 @@
  */
 
 
+import type { ChromeOptions } from '@wdio/types/build/Capabilities';
+import type { WebDriverLogTypes } from '@wdio/types/build/Options';
+
 require('@okta/env').setEnvironmentVarsFromTestEnv(__dirname);
 require('@babel/register'); // Allows use of import module syntax
 require('regenerator-runtime'); // Allows use of async/await
@@ -23,8 +26,8 @@ const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
 const LOG = process.env.LOG;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 30000;
-const logLevel = (LOG || 'warn') as WebDriver.WebDriverLogTypes;
-const chromeOptions = {
+const logLevel = (LOG || 'warn') as WebDriverLogTypes;
+const chromeOptions: ChromeOptions = {
     args: []
 };
 
@@ -34,7 +37,7 @@ if (CI) {
     if (process.env.CHROME_BINARY) {
         chromeOptions.binary = process.env.CHROME_BINARY;
     }
-    chromeOptions.args = chromeOptions.args.concat([
+    chromeOptions.args = (chromeOptions.args ?? []).concat([
         '--headless',
         '--disable-gpu',
         '--window-size=1600x1200',
@@ -266,11 +269,13 @@ export const config: WebdriverIO.Config = {
         await browser.saveScreenshot(`${process.env.E2E_LOG_DIR}/failure-${failureCount}.png`);
         const logs = await browser.getLogs('browser');
         let log;
-        try {
-          log = JSON.parse(logs, null, 4);
-        }
-        catch (err) {
-          log = logs;
+        if (typeof logs === 'string') {
+          try {
+            log = JSON.parse(logs);
+          }
+          catch (err) {
+            log = logs;
+          }
         }
         await fs.writeFile(
           `${process.env.E2E_LOG_DIR}/failure-${failureCount}-console.log`,

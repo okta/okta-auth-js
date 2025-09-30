@@ -1,6 +1,7 @@
 // eslint-disable-next-line node/no-missing-import
 import type { Options } from '@wdio/types';
-import { WebDriverLogTypes } from '@wdio/types/build/Options';
+import type { ChromeOptions, FirefoxOptions } from '@wdio/types/build/Capabilities';
+import type { WebDriverLogTypes } from '@wdio/types/build/Options';
 
 const fs = require('node:fs/promises');
 const path = require('path');
@@ -14,10 +15,10 @@ const LOG = process.env.LOG as WebDriverLogTypes;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 10000;
 const logLevel: WebDriverLogTypes = LOG || 'warn';
 
-const chromeOptions = {
+const chromeOptions: ChromeOptions = {
   args: []
 };
-const firefoxOptions = {
+const firefoxOptions: FirefoxOptions = {
   args: []
 };
 
@@ -354,11 +355,13 @@ export const config: Options.Testrunner = {
         await browser.saveScreenshot(`${process.env.E2E_LOG_DIR}/failure-${failureCount}.png`);
         const logs = await browser.getLogs('browser');
         let log;
-        try {
-          log = JSON.parse(logs, null, 4);
-        }
-        catch (err) {
-          log = logs;
+        if (typeof logs === 'string') {
+          try {
+            log = JSON.parse(logs);
+          }
+          catch (err) {
+            log = logs;
+          }
         }
         await fs.writeFile(
           `${process.env.E2E_LOG_DIR}/failure-${failureCount}-console.log`,
