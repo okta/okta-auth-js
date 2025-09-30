@@ -27,7 +27,7 @@ export interface Config extends OktaAuthOptions {
   idps: string;
   clientSecret: string;
   forceRedirect: boolean;
-  useInteractionCodeFlow: boolean; // widget option
+  useClassicEngine: boolean; // widget option
   enableSharedStorage: boolean; // TransactionManager
   isTokenRenewPage?: boolean; // special lite /renew page to test cross-tab token renew
   crossTabsCount?: number;
@@ -43,7 +43,7 @@ export function getDefaultConfig(): Config {
     issuer: ISSUER,
     clientId: CLIENT_ID,
     redirectUri: REDIRECT_URI,
-    useInteractionCodeFlow: true,
+    useClassicEngine: false,
     responseType: ['token', 'id_token'],
     scopes: ['openid', 'email', 'offline_access'],
     pkce: true,
@@ -83,7 +83,7 @@ export function getConfigFromUrl(): Config {
   const siwVersion = url.searchParams.get('siwVersion') || DEFAULT_SIW_VERSION;
   const siwAuthClient = url.searchParams.get('siwAuthClient') === 'true'; // off by default
   const idps = url.searchParams.get('idps') || '';
-  const useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true'; // off by default
+  const useClassicEngine = url.searchParams.get('useClassicEngine') === 'true'; // off by default
   const forceRedirect = url.searchParams.get('forceRedirect') === 'true'; // off by default
   const enableSharedStorage = url.searchParams.get('enableSharedStorage') !== 'false'; // on by default
   const syncStorage = url.searchParams.get('syncStorage') !== 'false'; // on by default
@@ -99,7 +99,7 @@ export function getConfigFromUrl(): Config {
     issuer,
     clientId,
     redirectUri,
-    useInteractionCodeFlow,
+    useClassicEngine,
     pkce,
     dpop,
     defaultScopes,

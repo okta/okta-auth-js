@@ -31,7 +31,7 @@ describe('E2E login', () => {
     await TestApp.responseModeFragment.then(el => el.isSelected()).then(isSelected => {
       assert(isSelected === true);
     });
-    await TestApp.interactionCodeOption.then(el => el.click());
+    // await TestApp.useClassicEngineOption.then(el => el.click());
     await loginRedirect('pkce', 'fragment');
     await TestApp.getUserInfo();
     await TestApp.assertUserInfo();
@@ -55,7 +55,7 @@ describe('E2E login', () => {
       it('can login using signin widget (no redirect)', async () => {
         let options = {};
         if (process.env.ORG_OIE_ENABLED && flow === 'pkce') {
-          options = { useInteractionCodeFlow: true };
+          options = { useClassicEngine: false };
         }
         await bootstrap(options);
         await loginWidget(flow);
@@ -67,7 +67,7 @@ describe('E2E login', () => {
       it('can login using signin widget (with redirect)', async () => {
         let options = { forceRedirect: true };
         if (process.env.ORG_OIE_ENABLED && flow === 'pkce') {
-          options = Object.assign({ useInteractionCodeFlow: true }, options);
+          options = Object.assign({ useClassicEngine: false }, options);
         }
         await bootstrap(options);
         await loginWidget(flow, true);
@@ -133,7 +133,7 @@ describe('E2E login', () => {
           return;
         }
 
-        let options = { useInteractionCodeFlow: true };
+        let options = { useClassicEngine: false };
         await bootstrap(options);
         await loginWidgetFacebook(flow, true);
         await TestApp.getUserInfo();

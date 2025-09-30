@@ -69,6 +69,7 @@ module.exports = {
         loader: 'babel-loader',
         options: babelOptions
       }
-    ]
-  }
+    ],
+  },
+  ignoreWarnings: [/Failed to parse source map/]
 };
