@@ -18,7 +18,7 @@
     "yarn": "^1.7.0"
   },
   "dependencies": {
-    "@babel/register": "^7.8.2",
+    "@babel/register": "^7.28.3",
     "@okta/okta-sdk-nodejs": "^6.4.0",
     "cross-fetch": "^3.1.5",
     "cross-spawn-with-kill": "^1.0.0",
@@ -30,6 +30,7 @@
     "@babel/plugin-transform-async-to-generator": "^7.5.0",
     "@wdio/cli": "^8.35.1",
     "@wdio/cucumber-framework": "^8.35.0",
+    "@wdio/globals": "^8.35.1",
     "@wdio/jasmine-framework": "^8.35.1",
     "@wdio/junit-reporter": "^8.32.4",
     "@wdio/local-runner": "^8.35.1",
@@ -39,5 +40,8 @@
     "wait-on": "^8.0.1",
     "webdriverio": "^8.35.1",
     "junit-report-merger": "^3.0.5"
+  },
+  "devDependencies": {
+    "@wdio/types": "^8.32.4"
   }
 }

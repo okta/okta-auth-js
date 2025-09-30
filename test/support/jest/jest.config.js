@@ -23,10 +23,6 @@ module.exports = {
   'globals': {
     SDK_VERSION,
     NODE_VERSION,
-    'ts-jest': {
-      SDK_VERSION,
-      NODE_VERSION
-    }
   },
   'transform': {
     '^.+\\.(js)$': 'babel-jest',

@@ -12,6 +12,9 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import type { ChromeOptions, FirefoxOptions } from '@wdio/types/build/Capabilities';
+import type { WebDriverLogTypes } from '@wdio/types/build/Options';
+
 const fs = require('node:fs/promises');
 const path = require('path');
 const { mergeFiles } = require('junit-report-merger');
@@ -27,13 +30,13 @@ console.log('SPECS', specs);
 const USE_FIREFOX = !!process.env.USE_FIREFOX;
 const DEBUG = process.env.DEBUG;
 const CI = process.env.CI;
-const LOG = process.env.LOG;
+const LOG = process.env.LOG as WebDriverLogTypes;
 const defaultTimeoutInterval = DEBUG ? (24 * 60 * 60 * 1000) : 15000;
-const logLevel = LOG || 'warn';
-const chromeOptions = {
-    args: []
+const logLevel: WebDriverLogTypes = LOG || 'warn';
+const chromeOptions: ChromeOptions = {
+  args: []
 };
-const firefoxOptions = {
+const firefoxOptions: FirefoxOptions = {
   args: []
 };
 const maxInstances = process.env.MAX_INSTANCES ? +process.env.MAX_INSTANCES : 1;
@@ -43,7 +46,7 @@ if (CI) {
     if (process.env.CHROME_BINARY) {
       chromeOptions.binary = process.env.CHROME_BINARY;
     }
-    chromeOptions.args = chromeOptions.args.concat([
+    chromeOptions.args = (chromeOptions.args ?? []).concat([
         '--headless',
         '--disable-gpu',
         '--window-size=1600x1200',
@@ -52,7 +55,7 @@ if (CI) {
         '--disable-extensions',
         '--verbose'
     ]);
-    firefoxOptions.args = firefoxOptions.args.concat([
+    firefoxOptions.args = (firefoxOptions.args ?? []).concat([
         '-headless'
     ]);
 }
@@ -331,11 +334,13 @@ export const config: WebdriverIO.Config = {
         await browser.saveScreenshot(`${process.env.E2E_LOG_DIR}/failure-${failureCount}.png`);
         const logs = await browser.getLogs('browser');
         let log;
-        try {
-          log = JSON.parse(logs, null, 4);
-        }
-        catch (err) {
-          log = logs;
+        if (typeof logs === 'string') {
+          try {
+            log = JSON.parse(logs);
+          }
+          catch (err) {
+            log = logs;
+          }
         }
         await fs.writeFile(
           `${process.env.E2E_LOG_DIR}/failure-${failureCount}-console.log`,
