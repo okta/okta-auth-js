@@ -22,7 +22,7 @@ export interface AbstractToken {
 
 export interface AccessToken extends AbstractToken {
   accessToken: string;
-  claims: UserClaims;
+  // claims: UserClaims;
   tokenType: string;
   userinfoUrl: string;
   dpopPairId?: string;

@@ -96,10 +96,10 @@ export async function handleOAuthResponse(
   const now = Math.floor(Date.now()/1000);
 
   if (accessToken) {
-    const accessJwt = sdk.token.decode(accessToken);
+    // const accessJwt = sdk.token.decode(accessToken);
     tokenDict.accessToken = {
       accessToken: accessToken,
-      claims: accessJwt.payload,
+      // claims: accessJwt.payload,
       expiresAt: Number(expiresIn) + now,
       tokenType: tokenType!,
       scopes: scopes,

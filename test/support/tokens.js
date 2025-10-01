@@ -287,7 +287,7 @@ tokens.standardAccessTokenClaims = {
 
 tokens.standardAccessTokenParsed = {
   accessToken: tokens.standardAccessToken,
-  claims: tokens.standardAccessTokenClaims,
+  // claims: tokens.standardAccessTokenClaims,
   expiresAt: 1449703529, // assuming time = tokens.time
   scopes: ['openid', 'email'],
   tokenType: 'Bearer',
@@ -327,7 +327,7 @@ tokens.authServerAccessTokenClaims = {
 
 tokens.authServerAccessTokenParsed = {
   accessToken: tokens.authServerAccessToken,
-  claims: tokens.authServerAccessTokenClaims,
+  // claims: tokens.authServerAccessTokenClaims,
   expiresAt: 1449703529, // assuming time = tokens.time
   scopes: ['openid', 'email'],
   tokenType: 'Bearer',
