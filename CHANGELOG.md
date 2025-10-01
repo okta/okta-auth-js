@@ -4,7 +4,8 @@
 
 ### Breaking Changes
 
-- [#1607](https://github.com/okta/okta-auth-js/pull/1607) bumps minimum node version to 20
+- [#1607](https://github.com/okta/okta-auth-js/pull/1607) chore: bumps minimum node version to 20
+- [#1609](https://github.com/okta/okta-auth-js/pull/1609) fix: removes `claims` from `AccessToken`. ATs are no longer automatically decoded
 
 # 7.14.0
 

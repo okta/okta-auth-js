@@ -36,9 +36,6 @@ function setupSync(options?) {
 function createAccessToken(strValue): AccessToken {
   return {
     accessToken: strValue,
-    // claims: {
-    //   sub: ''
-    // },
     userinfoUrl: '',
     authorizeUrl: '',
     tokenType: 'accessToken',
