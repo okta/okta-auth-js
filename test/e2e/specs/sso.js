@@ -29,7 +29,7 @@ describe('SSO', () => {
       options: {
         scopes: ['openid', 'email'], // do not include "offline_access", refresh tokens change SSO behavior
         storage: 'sessionStorage', // do not share tokens between tabs
-        useInteractionCodeFlow: process.env.ORG_OIE_ENABLED
+        useClassicEngine: !process.env.ORG_OIE_ENABLED
       }
     };
   });

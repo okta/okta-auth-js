@@ -45,7 +45,7 @@ async function openImplicit(options) {
 
 async function openPKCE(options, openInNewWindow) {
   options = Object.assign({
-    useInteractionCodeFlow: !!ORG_OIE_ENABLED,
+    useClassicEngine: !ORG_OIE_ENABLED,
     issuer: ISSUER,
     clientId: CLIENT_ID,
     pkce: true

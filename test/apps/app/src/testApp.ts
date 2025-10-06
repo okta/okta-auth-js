@@ -63,7 +63,7 @@ function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
   if (!onProtectedPage) {
     protectedPageLink = protectedLink(app);
   }
-  const useActivationToken = app.config.useInteractionCodeFlow ? `
+  const useActivationToken = !app.config.useClassicEngine ? `
     <div class="box">
       <form>
         <input name="activationToken" id="activationToken" placeholder="activation token" type="text"/>
@@ -629,9 +629,9 @@ class TestApp {
     const username = (document.getElementById('username') as HTMLInputElement).value;
     const password = (document.getElementById('password') as HTMLInputElement).value;
 
-    const { useInteractionCodeFlow } = this.config;
+    const { useClassicEngine } = this.config;
     let tokens;
-    if (useInteractionCodeFlow) {
+    if (!useClassicEngine) {
       tokens = await this.getTokensDirectOIE(username, password);
     } else {
       // V1 flow

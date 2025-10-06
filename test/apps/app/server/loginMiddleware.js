@@ -28,7 +28,7 @@ module.exports = function loginMiddleware(req, res) {
   const scopes = config.scopes;
   const responseType = config.responseType;
   const clientSecret = config.clientSecret;
-  const useInteractionCodeFlow = config.useInteractionCodeFlow;
+  const useClassicEngine = config.useClassicEngine;
 
   let status = '';
   let sessionToken = '';
@@ -47,7 +47,7 @@ module.exports = function loginMiddleware(req, res) {
     scopes,
     responseType,
     clientSecret,
-    useInteractionCodeFlow
+    useClassicEngine
   });
 
   authClient.signIn({ username, password })

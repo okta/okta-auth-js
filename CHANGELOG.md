@@ -6,6 +6,10 @@
 
 - [#1607](https://github.com/okta/okta-auth-js/pull/1607) bumps minimum node version to 20
 
+### Fixes
+
+- [#1608](https://github.com/okta/okta-auth-js/pull/1608) chore: upgrades `broadcast-channel` and other dependencies
+
 # 7.14.0
 
 ### Features

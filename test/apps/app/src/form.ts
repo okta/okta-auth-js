@@ -33,9 +33,9 @@ const Form = `
   <label for="redirectUri">Redirect URI</label><input id="f_redirectUri" name="redirectUri" type="text" />
   </div>
   <div class="pure-control-group">
-  <label for="useInteractionCodeFlow">Use <strong>interaction_code</strong> grant (in signin widget flow)</label>
-  <input id="f_useInteractionCodeFlow-on" name="useInteractionCodeFlow" type="radio" value="true"/>YES
-  <input id="f_useInteractionCodeFlow-off" name="useInteractionCodeFlow" type="radio" value="false"/>NO
+  <label for="useClassicEngine"><strong>useClassicEngine</strong> (in signin widget flow)</label>
+  <input id="f_useClassicEngine-on" name="useClassicEngine" type="radio" value="true"/>YES
+  <input id="f_useClassicEngine-off" name="useClassicEngine" type="radio" value="false"/>NO
   </div>
   <div class="pure-control-group">
   <label for="clientSecret">Client Secret</label><input id="f_clientSecret" name="clientSecret" type="text" />
@@ -199,10 +199,10 @@ export function updateForm(origConfig: Config): void {
     (document.getElementById('f_scopes') as HTMLInputElement).disabled = false;
   }
 
-  if (config.useInteractionCodeFlow) {
-    (document.getElementById('f_useInteractionCodeFlow-on') as HTMLInputElement).checked = true;
+  if (config.useClassicEngine) {
+    (document.getElementById('f_useClassicEngine-on') as HTMLInputElement).checked = true;
   } else {
-    (document.getElementById('f_useInteractionCodeFlow-off') as HTMLInputElement).checked = true;
+    (document.getElementById('f_useClassicEngine-off') as HTMLInputElement).checked = true;
   }
 
   if (config.forceRedirect) {
