@@ -164,7 +164,7 @@
     "@peculiar/webcrypto": "^1.4.0",
     "Base64": "1.1.0",
     "atob": "^2.1.2",
-    "broadcast-channel": "~5.3.0",
+    "broadcast-channel": "~7.1.0",
     "btoa": "^1.2.1",
     "core-js": "^3.39.0",
     "cross-fetch": "^3.1.5",
@@ -179,14 +179,13 @@
   "devDependencies": {
     "@babel/cli": "^7.28.3",
     "@babel/core": "^7.28.4",
-    "@babel/plugin-proposal-class-properties": "^7.10.1",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.12.1",
     "@babel/plugin-transform-modules-commonjs": "^7.27.1",
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/plugin-transform-typescript": "^7.28.0",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@okta/okta-signin-widget": "6.0.0",
+    "@okta/okta-signin-widget": "^7.35.2",
     "@rollup/plugin-alias": "^3.1.8",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-replace": "^3.0.0",
@@ -233,7 +232,7 @@
     "webpack": "^5.78.0",
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.9.2"
+    "webpack-dev-server": "^5.2.2"
   },
   "jest-junit": {
     "outputDirectory": "./build2/reports/unit/",
@@ -245,7 +244,12 @@
     "**/cacheable-request/http-cache-semantics": "^4.0.0",
     "**/has-ansi/ansi-regex": "^4.1.1",
     "**/strip-ansi/ansi-regex": "^3.0.1",
-    "**/download/got": "^11.8.5"
+    "**/download/got": "^11.8.5",
+    "**/form-data": "^4.0.4",
+    "**/tar-fs": "^3.1.1",
+    "**/@okta/okta-sdk-nodejs/njwt": "^2.0.1",
+    "**/brace-expansion": "^2.0.2",
+    "**/tmp": "^0.2.4"
   },
   "workspaces": {
     "packages": [

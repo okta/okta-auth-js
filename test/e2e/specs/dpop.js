@@ -49,7 +49,7 @@ async function assertNoRemainingDPoPKeys () {
 }
 
 async function bootstrap(options = {}) {
-  await openPKCE({...options, dpop: true, useInteractionCodeFlow: true});
+  await openPKCE({...options, dpop: true, useClassicEngine: false});
   await TestApp.dpopOptionOn.then(el => el.isSelected()).then(isSelected => {
     assert(isSelected);
   });
@@ -63,7 +63,7 @@ describe('E2E login', () => {
     await TestApp.responseModeFragment.then(el => el.isSelected()).then(isSelected => {
       assert(isSelected === true);
     });
-    await TestApp.interactionCodeOption.then(el => el.click());
+    // await TestApp.useClassicEngineOption.then(el => el.click());
     await loginRedirect('pkce', 'fragment');
     await TestApp.getUserInfo();
     await TestApp.assertUserInfo();

@@ -45,7 +45,7 @@ var config = {
   clientId: '',
   scopes: ['openid','email','offline_access'],
   storage: 'sessionStorage',
-  useInteractionCodeFlow: true,
+  useClassicEngine: false,
   requireUserSession: 'true',
   authMethod: 'form',
   startService: false,
@@ -76,7 +76,7 @@ function loadConfig() {
   var startService;
   var requireUserSession;
   var scopes;
-  var useInteractionCodeFlow;
+  var useClassicEngine;
   var useDynamicForm;
 
   var idps;
@@ -97,7 +97,7 @@ function loadConfig() {
     startService = state.startService;
     requireUserSession = state.requireUserSession;
     scopes = state.scopes;
-    useInteractionCodeFlow = state.useInteractionCodeFlow;
+    useClassicEngine = state.useClassicEngine;
     useDynamicForm = state.useDynamicForm;
     config.uniq = state.uniq;
     idps = state.idps;
@@ -112,7 +112,7 @@ function loadConfig() {
     requireUserSession = url.searchParams.get('requireUserSession') ? 
       url.searchParams.get('requireUserSession')  === 'true' : config.requireUserSession;
     scopes = url.searchParams.get('scopes') ? url.searchParams.get('scopes').split(' ') : config.scopes;
-    useInteractionCodeFlow = url.searchParams.get('useInteractionCodeFlow') === 'true' || config.useInteractionCodeFlow;
+    useClassicEngine = url.searchParams.get('useClassicEngine') === 'true' || config.useClassicEngine;
     useDynamicForm = url.searchParams.get('useDynamicForm') === 'true' || config.useDynamicForm;
     idps = url.searchParams.get('idps') || config.idps;
   }
@@ -125,7 +125,7 @@ function loadConfig() {
     authMethod,
     startService,
     scopes: scopes.join(' '),
-    useInteractionCodeFlow,
+    useClassicEngine,
     useDynamicForm,
     idps,
   }).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
@@ -139,7 +139,7 @@ function loadConfig() {
     authMethod,
     startService,
     scopes,
-    useInteractionCodeFlow,
+    useClassicEngine,
     useDynamicForm,
     idps,
   };
@@ -193,10 +193,10 @@ function showForm() {
     document.querySelector(`#storage [value="${config.storage || ''}"]`).selected = true;
   } catch (e) { showError(e); }
 
-  if (config.useInteractionCodeFlow) {
-    document.getElementById('useInteractionCodeFlow-on').checked = true;
+  if (config.useClassicEngine) {
+    document.getElementById('useClassicEngine-on').checked = true;
   } else {
-    document.getElementById('useInteractionCodeFlow-off').checked = true;
+    document.getElementById('useClassicEngine-off').checked = true;
   }
   
   if (config.useDynamicForm) {
@@ -589,7 +589,7 @@ function showSigninWidget(options) {
     baseUrl: config.issuer.split('/oauth2')[0],
     clientId: config.clientId,
     redirectUri: config.redirectUri,
-    useInteractionCodeFlow: config.useInteractionCodeFlow,
+    useClassicEngine: config.useClassicEngine,
     state: JSON.stringify(config.state),
     authParams: {
       issuer: config.issuer
@@ -621,7 +621,7 @@ function showSigninWidget(options) {
   document.getElementById('authMethod-widget').style.display = 'block'; // show login UI
 }
 function resumeTransaction(options) {
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     // Authn
     if (authClient.tx.exists()) {
       return authClient.tx.resume()
@@ -643,7 +643,7 @@ function showSigninForm(options) {
   hideNewPasswordForm();
 
   // Authn must use static login form
-  if (config.useDynamicForm === false || !config.useInteractionCodeFlow) {
+  if (config.useDynamicForm === false || config.useClassicEngine) {
     // Is there an existing transaction we can resume? If so, we will be in MFA flow
     if (resumeTransaction(options)) {
       return;
@@ -670,7 +670,7 @@ function submitStaticSigninForm() {
   const username = document.querySelector('#static-signin-form input[name=username]').value;
   const password = document.querySelector('#static-signin-form input[name=password]').value;
 
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     // Authn
     return authClient.signIn({ username, password })
       .then(handleTransaction)
@@ -722,7 +722,7 @@ function submitDynamicSigninForm() {
 window._submitDynamicSigninForm = bindClick(submitDynamicSigninForm);
 
 function handleTransaction(transaction) {
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     // Authn
     return handleTransactionAuthn(transaction);
   }
@@ -814,7 +814,7 @@ function hideMfa() {
 
 function showMfa() {
   document.getElementById('mfa').style.display = 'block';
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     return showMfaAuthn();
   }
 
@@ -890,7 +890,7 @@ function hideCancelMfa() {
 }
 function cancelMfa() {
   hideMfa();
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     // https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#cancel
     return appState.transaction.cancel().finally(resetMfa);
   }
@@ -910,7 +910,7 @@ function hidePrevMfa() {
 }
 function prevMfa() {
   hideMfa();
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     // End current factor enrollment and return to MFA_ENROLL.
     // https://github.com/okta/okta-auth-js/blob/master/docs/authn.md#prev
     return appState.transaction.prev()
@@ -932,7 +932,7 @@ function hideSubmitMfa() {
   document.getElementById('mfa-submit').style.display = 'none';
 }
 function submitMfa() {
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     return submitMfaAuthn();
   }
 
@@ -972,7 +972,7 @@ function submitMfaAuthn() {
 
 function listMfaFactors() {
   const transaction = appState.transaction;
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     // Authn
     return transaction.factors.map(factor => factorName(factor));
   }
@@ -1021,7 +1021,7 @@ function hideMfaEnrollFactors() {
 function selectMfaFactorForEnrollment(index) {
   hideMfaEnroll();
   // Authn
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     return selectMfaFactorForEnrollmentAuthn(index);
   }
 
@@ -1247,7 +1247,7 @@ function hideMfaRequiredFactors() {
 function selectMfaFactorForVerification(index) {
   hideMfaRequired();
   // Authn
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     return selectMfaFactorForVerificationAuthn(index);
   }
 
@@ -1275,7 +1275,7 @@ function showMfaChallenge() {
   showPrevMfa();
 
   // Authn
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     return showMfaChallengeAuthn();
   }
 
@@ -1372,7 +1372,7 @@ function submitChallengeAuthenticator() {
 function showRecoverPassword() {
   // Copy username from login form to recover password form
   let username;
-  if (config.useDynamicForm && config.useInteractionCodeFlow) {
+  if (config.useDynamicForm && !config.useClassicEngine) {
     username = document.querySelector('#dynamic-signin-form input[name=username]').value;
   } else {
     username = document.querySelector('#static-signin-form input[name=username]').value;
@@ -1394,7 +1394,7 @@ function submitRecoverPasswordForm() {
   hideRecoverPassword();
   
   // Authn
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     // Supported factor types are  `SMS`, `EMAIL`, or `CALL`. This must be specified up-front.
     const factorType = 'email';
     return authClient.forgotPassword({ username, factorType })
@@ -1536,7 +1536,7 @@ function submitChallengePhone() {
   hideMfa();
   const passCode = document.querySelector('#mfa-challenge-phone input[name=passcode]').value;
 
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     // Authn
     return appState.transaction.verify({ passCode })
       .then(handleTransaction)
@@ -1604,7 +1604,7 @@ function enrollQuestion() {
 
 function getVerifyQuestionText() {
     // Authn
-    if (!config.useInteractionCodeFlow) {
+    if (config.useClassicEngine) {
       return appState.factor.profile.questionText;
     }
   // IDX
@@ -1628,7 +1628,7 @@ function submitChallengeQuestion() {
   const answer = document.querySelector('#mfa-challenge-question input[name=answer]').value;
 
   // Authn
-  if (!config.useInteractionCodeFlow) {
+  if (config.useClassicEngine) {
     return appState.factor.verify({
       answer
     })

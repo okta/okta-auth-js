@@ -27,7 +27,6 @@ if (process.env.NODE_ENV === 'development') {
 } else {
   babelOptions.presets.unshift('@babel/preset-env'); // must run after preset-typescript
   babelOptions.plugins = babelOptions.plugins.concat([
-    '@babel/plugin-proposal-class-properties',
     '@babel/plugin-transform-runtime'
   ]);
 }

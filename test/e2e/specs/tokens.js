@@ -137,7 +137,7 @@ describe('Token auto renew', () => {
 
   describe('implicit flow', () => {
     it('allows renewing an accessToken, without renewing idToken', async () => {
-      await openImplicit({ ...defaultOptions, responseType: 'token' });
+      await openImplicit({ ...defaultOptions, responseType: 'token', useClassicEngine: true });
       await loginDirect();
       await TestApp.startService();
       await TestApp.subscribeToAuthState();
@@ -147,7 +147,7 @@ describe('Token auto renew', () => {
     });
 
     it('allows renewing an idToken, without renewing accessToken', async () => {
-      await openImplicit({ ...defaultOptions, responseType: 'id_token' });
+      await openImplicit({ ...defaultOptions, responseType: 'id_token', useClassicEngine: true });
       await loginDirect();
       await TestApp.startService();
       await TestApp.subscribeToAuthState();

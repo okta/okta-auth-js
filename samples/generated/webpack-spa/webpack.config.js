@@ -41,10 +41,17 @@ module.exports = {
       SIW_DIR
     ],
     port: PORT,
-    onBeforeSetupMiddleware: function(devServer) {
+    // onBeforeSetupMiddleware: function(devServer) {
+    //   devServer.app.get('/login/callback', redirectToOrigin);
+    //   devServer.app.get('/login', redirectToOrigin);
+    //   devServer.app.get('/profile', redirectToOrigin);
+    // },
+    setupMiddlewares: (middlewares, devServer) => {
       devServer.app.get('/login/callback', redirectToOrigin);
       devServer.app.get('/login', redirectToOrigin);
       devServer.app.get('/profile', redirectToOrigin);
+
+      return middlewares;
     }
   },
   devtool: 'source-map',

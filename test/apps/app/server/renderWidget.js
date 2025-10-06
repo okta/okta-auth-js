@@ -24,7 +24,7 @@ module.exports = function widgetMiddleware(req, res) {
   const redirectUri = query.redirectUri;
   const scopes = query.scopes.split(',');
   const responseType = query.responseType;
-  const useInteractionCodeFlow = query.useInteractionCodeFlow;
+  const useClassicEngine = query.useClassicEngine;
   const clientSecret = query.clientSecret;
 
   const authClient = getAuthClient({
@@ -39,7 +39,7 @@ module.exports = function widgetMiddleware(req, res) {
     redirectUri,
     scopes,
     responseType,
-    useInteractionCodeFlow
+    useClassicEngine
   });
 
   console.log('OPTIONS', authClient.options);
