@@ -1,5 +1,9 @@
 # Changelog
 
+# 7.14.1
+
+- [#1611](https://github.com/okta/okta-auth-js/pull/1611) fix: improves regex for parsing Authorization Code Flow redirect urls
+
 # 7.14.0
 
 ### Features

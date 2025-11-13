@@ -15,21 +15,21 @@
 import { OktaAuthOAuthOptions, OktaAuthOAuthInterface, OAuthResponseType } from '../types';
 
 export function hasTokensInHash(hash: string): boolean {
-  return /[?&](id|access)_token=/.test(hash);
+  return /[?&#](id|access)_token=/.test(hash);
 }
 
 // authorization_code
 export function hasAuthorizationCode(hashOrSearch: string): boolean {
-  return /[?&]code=/.test(hashOrSearch);
+  return /[?&#]code=/.test(hashOrSearch);
 }
 
 // interaction_code
 export function hasInteractionCode(hashOrSearch: string): boolean {
-  return /[?&]interaction_code=/.test(hashOrSearch);
+  return /[?&#]interaction_code=/.test(hashOrSearch);
 }
 
 export function hasErrorInUrl(hashOrSearch: string): boolean {
-  return /[?&]error=/.test(hashOrSearch) || /[?&]error_description/.test(hashOrSearch);
+  return /[?&#]error=/.test(hashOrSearch) || /[?&#]error_description/.test(hashOrSearch);
 }
 
 export function isRedirectUri(uri: string, sdk: OktaAuthOAuthInterface): boolean {
