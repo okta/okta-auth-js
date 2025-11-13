@@ -86,9 +86,11 @@ function initializeData(authClient: OktaAuthIdxInterface, data: RunData): RunDat
     withCredentials,
     remediators,
     actions,
+    defaultToGenericRemediator
   } = options;
 
   const status = IdxStatus.PENDING;
+  defaultToGenericRemediator = defaultToGenericRemediator ?? true;
 
   // certain options can be set by the flow specification
   flow = flow || authClient.idx.getFlow?.() || 'default';
@@ -109,6 +111,7 @@ function initializeData(authClient: OktaAuthIdxInterface, data: RunData): RunDat
       withCredentials, 
       remediators, 
       actions,
+      defaultToGenericRemediator,
     },
     status
   };
@@ -167,6 +170,7 @@ async function getDataFromRemediate(authClient: OktaAuthIdxInterface, data: RunD
     values
   } = data;
 
+  console.log('opts', options)
   const {
     autoRemediate,
     remediators,
@@ -193,15 +197,11 @@ async function getDataFromRemediate(authClient: OktaAuthIdxInterface, data: RunD
     canceled,
   } = await remediate(
     authClient,
+    // TODO: determine this value
+    options.step ?? 'identify',
     idxResponse!, 
     values, 
-    {
-      remediators,
-      actions,
-      flow,
-      step,
-      useGenericRemediator,
-    }
+    options
   );
   idxResponse = idxResponseFromRemediation;
 

@@ -65,7 +65,8 @@ export interface IntrospectOptions extends IdxOptions {
 export interface RemediateOptions extends IdxOptions {
   remediators?: RemediationFlow;
   actions?: RemediateAction[];
-  useGenericRemediator?: boolean; // beta
+  useGenericRemediator?: boolean;
+  defaultToGenericRemediator?: boolean;
 }
 
 export interface RunOptions extends RemediateOptions, InteractOptions, IntrospectOptions {}

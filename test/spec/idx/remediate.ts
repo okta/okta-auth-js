@@ -1,4 +1,5 @@
 import { remediate } from '../../../lib/idx/remediate';
+import { GenericRemediator } from '../../../lib/idx/remediators/GenericRemediator';
 import { IdxResponse } from '../../../lib/idx/types';
 
 const util = require('../../../lib/idx/util');
@@ -611,6 +612,28 @@ describe('idx/remediate', () => {
         },
         terminal: true,
       });
+    });
+  });
+
+  describe('defaults to generic remediator', () => {
+    fit('foo', async () => {
+      expect.assertions(2);
+      const { authClient, idxResponse } = testContext;
+      const generic = new GenericRemediator();
+
+      jest.spyOn(util, 'getRemediator')
+        .mockReturnValueOnce(undefined)
+        .mockReturnValue();
+      jest.spyOn(util, 'isTerminalResponse').mockReturnValue(false);
+      const action = {
+        name: 'unknown-action'
+      };
+      try {
+        await remediate(authClient, idxResponse, {}, { actions: [action] });
+      } catch (err: any) {
+        expect(err.name).toEqual('AuthSdkError');
+        expect(err.errorSummary).toContain('No remediation can match current flow, check policy settings in your org');
+      }
     });
   });
 });

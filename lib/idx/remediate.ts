@@ -63,12 +63,15 @@ function removeActionFromOptions(options: RemediateOptions, actionName: string):
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
   authClient: OktaAuthIdxInterface,
+  remediationName: string,
   idxResponse: IdxResponse,
   values: RemediationValues,
   options: RemediateOptions
 ): Promise<RemediationResponse> {
   let { neededToProceed, interactionCode } = idxResponse;
-  const { flow } = options;
+  const { flow, useGenericRemediator } = options;
+  const defaultToGenericRemediator = options?.defaultToGenericRemediator ?? true;
+  console.log('called', useGenericRemediator)
 
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
@@ -103,12 +106,15 @@ export async function remediate(
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
         }
-        return remediate(
-          authClient, 
-          idxResponse, 
-          valuesWithoutExecutedAction, 
-          optionsWithoutExecutedAction
-        ); // recursive call
+
+        // NOTE: removes recursive call
+        return { idxResponse };
+        // return remediate(
+        //   authClient, 
+        //   idxResponse, 
+        //   valuesWithoutExecutedAction, 
+        //   optionsWithoutExecutedAction
+        // ); // recursive call
       }
 
       // search for action in remediation list
@@ -118,7 +124,9 @@ export async function remediate(
         if (idxResponse.requestDidSucceed === false) {
           return handleFailedResponse(authClient, idxResponse, options);
         }
-        return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
+        // NOTE: removes recursive call
+        return { idxResponse };
+        // return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
       }
     }
   }
@@ -129,21 +137,43 @@ export async function remediate(
     return { idxResponse, terminal };
   }
 
+  console.log('remediator: ', remediator)
   if (!remediator) {
     // With options.step, remediator is not required
-    if (options.step) {
-      values = filterValuesForRemediation(idxResponse, options.step, values); // include only requested values
-      idxResponse = await idxResponse.proceed(options.step, values);
-      if (idxResponse.requestDidSucceed === false) {
-        return handleFailedResponse(authClient, idxResponse, options);
-      }
-      return { idxResponse };
+    // NOTE: this condition would always be hit
+    // if (options.step) {
+    //   values = filterValuesForRemediation(idxResponse, options.step, values); // include only requested values
+    //   idxResponse = await idxResponse.proceed(options.step, values);
+    //   if (idxResponse.requestDidSucceed === false) {
+    //     return handleFailedResponse(authClient, idxResponse, options);
+    //   }
+    //   return { idxResponse };
+    // }
+
+    values = filterValuesForRemediation(idxResponse, remediationName, values); // include only requested values
+    idxResponse = await idxResponse.proceed(remediationName, values);
+    if (idxResponse.requestDidSucceed === false) {
+      return handleFailedResponse(authClient, idxResponse, options);
     }
+    return { idxResponse };
+
+
+    // NOTE: net new code, probably not needed if `step` is required
+    // console.log('here', defaultToGenericRemediator)
+    // if (defaultToGenericRemediator && !useGenericRemediator) {
+    //   return remediate(
+    //     authClient,
+    //     idxResponse,
+    //     values,
+    //     { ...options, useGenericRemediator: true }
+    //   );
+    // }
 
     // With default flow, remediator is not required
     if (flow === 'default') {
       return { idxResponse };
     }
+
     throw new AuthSdkError(`
       No remediation can match current flow, check policy settings in your org.
       Remediations: [${neededToProceed.reduce((acc, curr) => acc ? acc + ' ,' + curr.name : curr.name, '')}]
@@ -151,7 +181,9 @@ export async function remediate(
   }
 
   // Return next step to the caller
+  console.log('canRemeidate')
   if (!remediator.canRemediate()) {
+    console.log('false')
     const nextStep = getNextStep(authClient, remediator, idxResponse);
     return {
       idxResponse,
@@ -182,7 +214,9 @@ export async function remediate(
       nextStep,
     };
   }
+
+  return { idxResponse };
   
-  return remediate(authClient, idxResponse, values, options); // recursive call
+  // return remediate(authClient, idxResponse, values, options); // recursive call
 
 }
