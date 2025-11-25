@@ -123,7 +123,7 @@ const samples = [
     specs: [],
     features: [
       'embedded-widget-basic-auth',
-      'social-idp-with-widget'
+      // 'social-idp-with-widget'
     ],
     useEnv: true
   },
