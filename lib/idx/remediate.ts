@@ -63,12 +63,21 @@ function removeActionFromOptions(options: RemediateOptions, actionName: string):
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
   authClient: OktaAuthIdxInterface,
+<<<<<<< Updated upstream
+=======
+  // remediationName: string,
+>>>>>>> Stashed changes
   idxResponse: IdxResponse,
   values: RemediationValues,
   options: RemediateOptions
 ): Promise<RemediationResponse> {
   let { neededToProceed, interactionCode } = idxResponse;
+<<<<<<< Updated upstream
   const { flow } = options;
+=======
+  const { flow, useGenericRemediator } = options;
+  console.log('called', useGenericRemediator)
+>>>>>>> Stashed changes
 
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
@@ -118,7 +127,14 @@ export async function remediate(
         if (idxResponse.requestDidSucceed === false) {
           return handleFailedResponse(authClient, idxResponse, options);
         }
+<<<<<<< Updated upstream
         return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
+=======
+        // NOTE: removes recursive call
+        // TODO: getNexpStep here?
+        return { idxResponse };
+        // return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
+>>>>>>> Stashed changes
       }
     }
   }
@@ -131,6 +147,10 @@ export async function remediate(
 
   if (!remediator) {
     // With options.step, remediator is not required
+<<<<<<< Updated upstream
+=======
+    // NOTE: this condition would always be hit
+>>>>>>> Stashed changes
     if (options.step) {
       values = filterValuesForRemediation(idxResponse, options.step, values); // include only requested values
       idxResponse = await idxResponse.proceed(options.step, values);
@@ -139,6 +159,25 @@ export async function remediate(
       }
       return { idxResponse };
     }
+<<<<<<< Updated upstream
+=======
+
+    // values = filterValuesForRemediation(idxResponse, remediationName, values); // include only requested values
+    // idxResponse = await idxResponse.proceed(remediationName, values);
+    // if (idxResponse.requestDidSucceed === false) {
+    //   return handleFailedResponse(authClient, idxResponse, options);
+    // }
+   
+    // TODO: can we calculate next steps here? Need `Remediator` instance - maybe GenericRem?
+    // const nextStep = getNextStep(authClient, remediator, idxResponse);
+    // return {
+    //   idxResponse,
+    //   nextStep,
+    // };
+
+    // TODO: throw here if `step` isn't provided?
+    return { idxResponse };
+>>>>>>> Stashed changes
 
     // With default flow, remediator is not required
     if (flow === 'default') {

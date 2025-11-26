@@ -183,7 +183,7 @@ export interface MinimalIdxAPI {
 
   // flow control
   start: (options?: StartOptions) => Promise<IdxTransaction>;
-  canProceed(options?: ProceedOptions): boolean;
+  // proceed: (step: string, options?: ProceedOptions) => Promise<IdxTransaction>;
   proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
 
   // call `start` instead of `startTransaction`. `startTransaction` will be removed in next major version (7.0)
@@ -196,6 +196,7 @@ export interface MinimalIdxAPI {
   saveTransactionMeta: (meta: unknown) => void;
   clearTransactionMeta: () => void;
   isTransactionMetaValid: (meta: unknown) => boolean;
+  canContinue: (options?: IdxTransactionMetaOptions) => boolean;
 }
 
 export interface IdxAPI {
@@ -213,7 +214,7 @@ export interface IdxAPI {
 
   // flow control
   start: (options?: StartOptions) => Promise<IdxTransaction>;
-  canProceed(options?: ProceedOptions): boolean;
+  // proceed: (step: string, options?: ProceedOptions) => Promise<IdxTransaction>;
   proceed: (options?: ProceedOptions) => Promise<IdxTransaction>;
   cancel: (options?: CancelOptions) => Promise<IdxTransaction>;
   getFlow(): FlowIdentifier | undefined;
@@ -238,6 +239,7 @@ export interface IdxAPI {
   saveTransactionMeta: (meta: unknown) => void;
   clearTransactionMeta: () => void;
   isTransactionMetaValid: (meta: unknown) => boolean;
+  canContinue: (options?: IdxTransactionMetaOptions) => boolean;
 }
 
 export interface IdxTransactionManagerInterface extends TransactionManagerInterface {

@@ -11,37 +11,36 @@
  */
 
 
+import type { RemediateAction } from './remediate';
 import { 
   OktaAuthIdxInterface,
   IdxTransaction,
-  ProceedOptions,
+  ProceedOptions
 } from './types';
 import { run } from './run';
 import { getSavedTransactionMeta } from './transactionMeta';
 import { AuthSdkError } from '../errors';
 
-export function canProceed(authClient: OktaAuthIdxInterface, options: ProceedOptions = {}): boolean {
-  const meta = getSavedTransactionMeta(authClient, options);
-  return !!(meta || options.stateHandle);
-}
 
 export async function proceed(
   authClient: OktaAuthIdxInterface,
+  // step: string,
   options: ProceedOptions = {}
 ): Promise<IdxTransaction> {
+  const { state, stateHandle } = options;
+  let { flow } = options;
+  const meta = getSavedTransactionMeta(authClient, { state });
 
-  if (!canProceed(authClient, options)) {
+  // if there's no stored transaction nor provided `stateHandle`, we cannot proceed
+  if (!meta && !stateHandle) {
     throw new AuthSdkError('Unable to proceed: saved transaction could not be loaded');
   }
 
-  let { flow, state } = options;
-  if (!flow) {
-    const meta = getSavedTransactionMeta(authClient, { state });
-    flow = meta?.flow;
-  }
+  flow ??= meta?.flow;
 
   return run(authClient, { 
-    ...options, 
+    ...options,
+    // step,
     flow
   });
 }

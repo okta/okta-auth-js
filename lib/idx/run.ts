@@ -85,7 +85,11 @@ function initializeData(authClient: OktaAuthIdxInterface, data: RunData): RunDat
     flow,
     withCredentials,
     remediators,
+<<<<<<< Updated upstream
     actions,
+=======
+    actions
+>>>>>>> Stashed changes
   } = options;
 
   const status = IdxStatus.PENDING;
@@ -177,7 +181,7 @@ async function getDataFromRemediate(authClient: OktaAuthIdxInterface, data: RunD
   } = options;
   
   const shouldRemediate = (autoRemediate !== false && (remediators || actions || step));
-  if (!shouldRemediate) {
+  if (!shouldRemediate || !step) {
     return data;
   }
 
@@ -193,6 +197,10 @@ async function getDataFromRemediate(authClient: OktaAuthIdxInterface, data: RunD
     canceled,
   } = await remediate(
     authClient,
+<<<<<<< Updated upstream
+=======
+    // step,
+>>>>>>> Stashed changes
     idxResponse!, 
     values, 
     {

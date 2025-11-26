@@ -22,7 +22,7 @@ export {
 export { interact } from './interact';
 export { introspect } from './introspect';
 export { poll } from './poll';
-export { proceed, canProceed } from './proceed';
+export { proceed } from './proceed';
 export { register } from './register';
 export { recoverPassword } from './recoverPassword';
 export { handleInteractionCodeRedirect } from './handleInteractionCodeRedirect';

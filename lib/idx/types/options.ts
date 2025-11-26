@@ -38,7 +38,6 @@ export interface IdxOptions {
   flow?: FlowIdentifier;
   exchangeCodeForTokens?: boolean;
   autoRemediate?: boolean;
-  step?: string;
   withCredentials?: boolean;
 }
 
@@ -63,9 +62,14 @@ export interface IntrospectOptions extends IdxOptions {
 }
 
 export interface RemediateOptions extends IdxOptions {
+  step?: string;
   remediators?: RemediationFlow;
   actions?: RemediateAction[];
+<<<<<<< Updated upstream
   useGenericRemediator?: boolean; // beta
+=======
+  useGenericRemediator?: boolean;
+>>>>>>> Stashed changes
 }
 
 export interface RunOptions extends RemediateOptions, InteractOptions, IntrospectOptions {}
@@ -110,7 +114,7 @@ export interface AccountUnlockOptions extends
   AuthenticatorVerificationDataValues
 {}
 
-export interface ProceedOptions extends
+interface _ProceedOptions extends
   AuthenticationOptions,
   RegistrationOptions,
   PasswordRecoveryOptions,
@@ -118,6 +122,9 @@ export interface ProceedOptions extends
   EnrollPollOptions,
   SelectEnrollmentChannelOptions
 {}
+
+// export type ProceedOptions = Omit<_ProceedOptions, 'step' | 'actions'>;
+export type ProceedOptions = _ProceedOptions;
 
 export type CancelOptions = IdxOptions
 

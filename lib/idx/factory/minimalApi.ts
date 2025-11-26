@@ -12,9 +12,10 @@
  */
 
 import { makeIdxState } from '../idxState';
-import { canProceed, proceed } from '../proceed';
+import { proceed } from '../proceed';
 import { startTransaction } from '../startTransaction';
 import {
+  canContinue,
   clearTransactionMeta,
   createTransactionMeta,
   getSavedTransactionMeta,
@@ -34,7 +35,6 @@ export function createMinimalIdxAPI(minimalSdk: MinimalOktaAuthIdxInterface): Mi
     start: boundStartTransaction,
     startTransaction: boundStartTransaction, // Use `start` instead. `startTransaction` will be removed in 7.0
     proceed: proceed.bind(null, sdk),
-    canProceed: canProceed.bind(null, sdk),
     
     getSavedTransactionMeta: getSavedTransactionMeta.bind(null, sdk),
     createTransactionMeta: createTransactionMeta.bind(null, sdk),
@@ -42,6 +42,7 @@ export function createMinimalIdxAPI(minimalSdk: MinimalOktaAuthIdxInterface): Mi
     saveTransactionMeta: saveTransactionMeta.bind(null, sdk),
     clearTransactionMeta: clearTransactionMeta.bind(null, sdk),
     isTransactionMetaValid,
+    canContinue: canContinue.bind(null, sdk),
   };
   return idx;
 }

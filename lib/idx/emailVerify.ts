@@ -17,6 +17,7 @@ import CustomError from '../errors/CustomError';
 import { urlParamsToObject  } from '../oidc/util/urlParams';
 import { EmailVerifyCallbackResponse } from './types/api';
 
+
 export class EmailVerifyCallbackError extends CustomError {
   state: string;
   otp: string;
@@ -46,12 +47,18 @@ export function parseEmailVerifyCallback(urlPath: string): EmailVerifyCallbackRe
 export async function handleEmailVerifyCallback(authClient: OktaAuthIdxInterface, search: string) {
   if (isEmailVerifyCallback(search)) {
     const { state, otp } = parseEmailVerifyCallback(search);
-    if (authClient.idx.canProceed({ state })) {
+    if (authClient.idx.canContinue({ state })) {
       // same browser / device
       return await authClient.idx.proceed({ state, otp });
-    } else {
-      // different browser or device
-      throw new EmailVerifyCallbackError(state, otp);
+
+      // // TODO: test this logic - unclear if this will work
+      // const transaction = await authClient.idx.start({ state });
+      // if (transaction.nextStep) {
+      //   return authClient.idx.proceed(transaction.nextStep.name, { otp });
+      // }
     }
+
+    // different browser or device
+    throw new EmailVerifyCallbackError(state, otp);
   }
 }

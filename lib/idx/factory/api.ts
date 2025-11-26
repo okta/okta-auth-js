@@ -25,11 +25,12 @@ import { makeIdxState } from '../idxState';
 import { interact } from '../interact';
 import { introspect } from '../introspect';
 import { poll } from '../poll';
-import { canProceed, proceed } from '../proceed';
+import { proceed } from '../proceed';
 import { recoverPassword } from '../recoverPassword';
 import { register } from '../register';
 import { startTransaction } from '../startTransaction';
 import {
+  canContinue,
   clearTransactionMeta,
   createTransactionMeta,
   getSavedTransactionMeta,
@@ -83,13 +84,13 @@ export function createIdxAPI(sdk: OktaAuthIdxInterface): IdxAPI {
     saveTransactionMeta: saveTransactionMeta.bind(null, sdk),
     clearTransactionMeta: clearTransactionMeta.bind(null, sdk),
     isTransactionMetaValid,
+    canContinue: canContinue.bind(null, sdk),
     setFlow: (flow: FlowIdentifier) => {
       sdk.options.flow = flow;
     },
     getFlow: (): FlowIdentifier | undefined => {
       return sdk.options.flow;
     },
-    canProceed: canProceed.bind(null, sdk),
     unlockAccount: unlockAccount.bind(null, sdk),
   };
   return idx;

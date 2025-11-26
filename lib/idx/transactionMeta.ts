@@ -155,3 +155,14 @@ export function isTransactionMetaValidForOptions(meta, options, keys) {
   });
   return !mismatch;
 }
+
+export function canContinue(
+  authClient: OktaAuthIdxInterface,
+  options?: IdxTransactionMetaOptions
+): boolean {
+  const savedMeta = getSavedTransactionMeta(authClient, options);
+  if (savedMeta) {
+    return true;
+  }
+  return false;
+}
