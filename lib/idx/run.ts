@@ -174,6 +174,7 @@ async function getDataFromRemediate(authClient: OktaAuthIdxInterface, data: RunD
     flow,
     step,
     useGenericRemediator,
+    enableLegacyMode
   } = options;
   
   const shouldRemediate = (autoRemediate !== false && (remediators || actions || step));
@@ -201,6 +202,7 @@ async function getDataFromRemediate(authClient: OktaAuthIdxInterface, data: RunD
       flow,
       step,
       useGenericRemediator,
+      enableLegacyMode
     }
   );
   idxResponse = idxResponseFromRemediation;

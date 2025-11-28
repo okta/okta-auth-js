@@ -40,6 +40,7 @@ export interface IdxOptions {
   autoRemediate?: boolean;
   step?: string;
   withCredentials?: boolean;
+  enableLegacyMode?: boolean;
 }
 
 export interface InteractOptions extends IdxOptions {
