@@ -68,7 +68,9 @@ export interface RemediateOptions extends IdxOptions {
   useGenericRemediator?: boolean; // beta
 }
 
-export interface RunOptions extends RemediateOptions, InteractOptions, IntrospectOptions {}
+export interface RunOptions extends RemediateOptions, InteractOptions, IntrospectOptions {
+  alwaysSaveResponse?: boolean;
+}
 
 export interface AuthenticationOptions extends
   RunOptions, 
@@ -147,7 +149,8 @@ export interface OktaAuthIdxOptions
     // BETA WARNING: configs in this section are subject to change without a breaking change notice
     idx?: Pick<RunOptions,
       'useGenericRemediator' |
-      'exchangeCodeForTokens'
+      'exchangeCodeForTokens' |
+      'alwaysSaveResponse'
     >;
 }
 
