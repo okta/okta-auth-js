@@ -67,6 +67,7 @@ function initializeValues(options: RunOptions) {
     'step',
     'useGenericRemediator',
     'exchangeCodeForTokens',
+    'alwaysSaveResponse'
   ];
   const values = { ...options };
   knownOptions.forEach(option => {
@@ -237,7 +238,7 @@ async function finalizeData(authClient: OktaAuthIdxInterface, data: RunData): Pr
     canceled,
     status,
   } = data;
-  const { exchangeCodeForTokens } = options;
+  const { exchangeCodeForTokens, alwaysSaveResponse } = options;
   let shouldSaveResponse = false;
   let shouldClearTransaction = false;
   let clearSharedStorage = true;
@@ -249,7 +250,7 @@ async function finalizeData(authClient: OktaAuthIdxInterface, data: RunData): Pr
   let terminal;
 
   if (idxResponse) {
-    shouldSaveResponse = !!(idxResponse.requestDidSucceed || idxResponse.stepUp);
+    shouldSaveResponse = (alwaysSaveResponse === true) || !!(idxResponse.requestDidSucceed || idxResponse.stepUp);
     enabledFeatures = getEnabledFeatures(idxResponse);
     availableSteps = getAvailableSteps(authClient, idxResponse, options.useGenericRemediator);
     messages = getMessagesFromResponse(idxResponse, options);

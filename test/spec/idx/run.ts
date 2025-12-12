@@ -380,6 +380,14 @@ describe('idx/run', () => {
         await run(authClient);
         expect(authClient.transactionManager.saveIdxResponse).not.toHaveBeenCalled();
       });
+
+      it('saves idxResponse when `options.alwaysSaveResponse=true`', async () => {
+        const { authClient, idxResponse } = testContext;
+        idxResponse.requestDidSucceed = false;
+        jest.spyOn(authClient.transactionManager, 'saveIdxResponse');
+        await run(authClient, { alwaysSaveResponse: true });
+        expect(authClient.transactionManager.saveIdxResponse).toHaveBeenCalled();
+      });
   
       // an error response does not clear the transaction. options may be valid on previous response
       it('does not clear the last transaction or idx response', async () => {
