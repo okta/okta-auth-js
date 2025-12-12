@@ -148,7 +148,8 @@ export interface OktaAuthIdxOptions
     // BETA WARNING: configs in this section are subject to change without a breaking change notice
     idx?: Pick<RunOptions,
       'useGenericRemediator' |
-      'exchangeCodeForTokens'
+      'exchangeCodeForTokens' |
+      'enableLegacyMode'
     >;
 }
 

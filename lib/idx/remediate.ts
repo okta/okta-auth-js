@@ -60,6 +60,23 @@ function removeActionFromOptions(options: RemediateOptions, actionName: string):
   return { ...options, actions };
 }
 
+function getGenericNextStep (
+  authClient: OktaAuthIdxInterface,
+  idxResponse: IdxResponse,
+  options: RemediateOptions
+) {
+  if (options.enableLegacyMode) {
+    return { idxResponse };
+  }
+
+  const gr = new GenericRemediator(idxResponse.neededToProceed[0], {}, options);
+  const nextStep = getNextStep(authClient, gr, idxResponse);
+  return {
+    idxResponse,
+    nextStep,
+  };
+}
+
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
   authClient: OktaAuthIdxInterface,
@@ -69,6 +86,8 @@ export async function remediate(
 ): Promise<RemediationResponse> {
   let { neededToProceed, interactionCode } = idxResponse;
   const { flow, useGenericRemediator, enableLegacyMode } = options;
+  // references to the "new" defaut paradigm in v8.x - requires step/actions are provided
+  const isStepMode = enableLegacyMode !== true;
 
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
@@ -106,6 +125,12 @@ export async function remediate(
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
         }
+
+        // don't recursively call `remediate` in non-legacy mode
+        if (isStepMode) {
+          return getGenericNextStep(authClient, idxResponse, options);
+        }
+
         return remediate(
           authClient, 
           idxResponse, 
@@ -121,13 +146,20 @@ export async function remediate(
         if (idxResponse.requestDidSucceed === false) {
           return handleFailedResponse(authClient, idxResponse, options);
         }
+
+        // don't recursively call `remediate` in non-legacy mode
+        if (isStepMode) {
+          return getGenericNextStep(authClient, idxResponse, options);
+        }
+
         return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
       }
     }
   }
 
   // "non-legacy mode" requires either `actions` or `step` to be provided
-  if (!options.step && enableLegacyMode !== true) {
+  // skip this condition if `GenericRemediator` is configured
+  if (!useGenericRemediator && isStepMode && !options.step) {
     throw new AuthSdkError('No `step` or `action` provided');
   }
 
@@ -140,8 +172,10 @@ export async function remediate(
       if (idxResponse.requestDidSucceed === false) {
         return handleFailedResponse(authClient, idxResponse, options);
       }
-      return { idxResponse };
+      return getGenericNextStep(authClient, idxResponse, options);
     }
+
+    // implied `isStepMode=false` at this point, step cannot be undefined otherwise
 
     // With default flow, remediator is not required
     if (flow === 'default') {
@@ -178,18 +212,11 @@ export async function remediate(
   // NOTE: useGenericRemediator
   // generic remediator should not auto proceed in pending status
   // return nextStep directly
-  // NOTE: enableLegacyMode
+  // NOTE: enableLegacyMode (via isStepMode)
   // "non-legacy mode" should not auto remediate, therefore leverage the
   // `GenericRemediator` to determine `nextStep` and return
-  if (useGenericRemediator || !enableLegacyMode) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    // const gr = getRemediator(idxResponse, values, options)!;
-    const gr = new GenericRemediator(idxResponse.neededToProceed[0], {}, options);
-    const nextStep = getNextStep(authClient, gr, idxResponse);
-    return {
-      idxResponse,
-      nextStep,
-    };
+  if (useGenericRemediator || isStepMode) {
+    return getGenericNextStep(authClient, idxResponse, options);
   }
 
   // We may want to trim the values bag for the next remediation

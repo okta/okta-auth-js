@@ -67,6 +67,7 @@ function initializeValues(options: RunOptions) {
     'step',
     'useGenericRemediator',
     'exchangeCodeForTokens',
+    'enableLegacyMode',
   ];
   const values = { ...options };
   knownOptions.forEach(option => {
