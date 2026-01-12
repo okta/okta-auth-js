@@ -155,6 +155,11 @@ export async function remediate(
         return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
       }
     }
+
+    // if `actions` were provided and no match was found after full loop iteration, throw to provide a more specific error
+    if (isStepMode && !options.step) {
+      throw new AuthSdkError('Unable to proceed with provided actions');
+    }
   }
 
   // "non-legacy mode" requires either `actions` or `step` to be provided
