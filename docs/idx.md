@@ -83,16 +83,29 @@ const response = await idx.proceed({ step: 'identify', username: 'foo@bar.com' }
 
 The `step` (or `actions`) property refers to the name of the remediation which should be used to proceed within the flow. The `IDX` client will proceed with the specified remediation and return the response, it will no longer recursively remediate.
 
+A handful of features will no longer work in "Step Mode", including:
+* Recursively calling remediations
+* [`flow`](#flow)
+* [Up-front](#up-front-approach)
+
 ##### Legacy Mode
 
-"Legacy Mode" maintains the behavior of the `IDX` client prior to `auth-js@8.x`, but is on a deprecation path. It can be useful to those who need to upgrade their `auth-js` package, but cannot migrate their customized IDX-drived login experience at the same time.
+"Legacy Mode" maintains the behavior of the `IDX` client prior to `auth-js@8.x`, but is on a deprecation path. It can be useful to those who need to upgrade their `@okta/okta-auth-js` installation, but cannot migrate their customized IDX-driven login experience at the same time.
 
-Legacy Mode enables other features, which no longer work in [Step Mode](#step-mode), like [`flow`](#flow) or the [Up-front](#up-front-approach) or recursively calling remediations. However these patterns can be a bit inconsistent (which ultimately led to the decision to phase them out)
+Legacy Mode enables other features, which no longer work in [Step Mode](#step-mode), including:
+* Recursively calling remediations
+* [`flow`](#flow)
+* [Up-front](#up-front-approach)
+
+However these patterns can be a bit inconsistent (which ultimately led to the decision to phase them out).
 
 Legacy Mode can be enabled when constructing `OktaAuth` or per each `idx.proceed` call
 
 ```javascript
-const oktaAuth = new OktaAuth({ ...config, idx: { enableLegacyMode: true }})
+const oktaAuth = new OktaAuth({
+  ...config,
+  idx: { enableLegacyMode: true }
+})
 // OR
 const response = await idx.proceed({
   username: 'foo@bar.com',
@@ -100,11 +113,25 @@ const response = await idx.proceed({
 })
 ```
 
-> :warning: __NOTICE:__ Bug reported with `enableLegacyMode: true` will be de-prioritized, but we will still accept community contributions
+> :warning: __NOTICE:__ Bugs reported with `enableLegacyMode: true` will be de-prioritized, but we will still accept community contributions
 
 #### Flow
 
-> :warning: As of `auth-js@8.x`, `flow` is only supported in [Legacy Mode](#legacy-mode)
+> :warning: As of `auth-js@8.x`, `flow` is not supported in the default `IDX` client
+
+Prior to `authjs@8.x`, the [`flow`](#flow) feature could be used to "bootstrap" a given IDX transaction to a specific user experience. For example providing `{ flow: unlock-account }` would bootstrap to the Unlock Account flow. Under the hood, this is achieved by proceeding with specific remediations; ultimately this required hardcoding specific remediation names per `flow` every value. This pattern was acceptable when OIE (and `IDX`) were first launched, however as `IDX` has evolved overtime this pattern has proved to be untenable and contradicts our goals of a small bundle size. As a result, `flow` is on a deprecation path and is not unsupported in the `auth-js@8.x` `IDX` client (with default configuration). Instead of `flow`, simply use `idx.proceed({ step: '???' })` to drive the `IDX` client into the desired state (or "flow"). __NOTE:__ The steps needed will depend on your Okta Org configuration
+
+```javascript
+async function bootstrapUnlockAccount () {
+  await idx.start();
+  // NOTE: The steps needed will depend on your Okta Org configuration
+  const response = await idx.proceed({ step: 'unlock-account' });
+}
+```
+
+Alternatively, [Legacy Mode](#legacy-mode) can be used to re-enable `flow`, however this approach is not recommended long term
+
+> Prior to `auth-js@8.x` or [Legacy Mode](#legacy-mode)
 
 In addition to the default authentication flow, this SDK supports several pre-defined flows, such as [register](#idxregister), [recoverPassword](#idxrecoverpassword) and [unlockAccount](#idxunlockaccount). A flow can be started by calling one of the available [flow entrypoints](#flow-entrypoints) or by passing a valid flow identifier string to [`startTransaction`](#idxstarttransaction). The `flow` is saved with the transaction which enables the [proceed](#idxproceed) method to corrrectly handle remediations without additional context. Starting a new flow discards any existing in-progress transaction of a different type. For example, if an authentication flow is in-progress, a call to [authenticate](#idxauthenticate) or [proceed](#idxproceed) will continue using the current transaction but a call to a [flow entrypoint](#flow-entrypoints) will start a new transaction.
 
