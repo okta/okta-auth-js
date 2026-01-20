@@ -26,6 +26,7 @@ import {
   isAuthorizationCodeError,
   IdxStatus,
   IdxTransaction,
+  AuthenticatorKey
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
@@ -646,7 +647,12 @@ class TestApp {
   }
 
   async getTokensDirectOIE(username: string, password: string): Promise<Tokens>  {
-    const idxTransaction: IdxTransaction = await this.oktaAuth.idx.authenticate({ username, password });
+    await this.oktaAuth.idx.start();
+    await this.oktaAuth.idx.proceed({ step: 'identify', username });
+    await this.oktaAuth.idx.proceed({ step: 'select-authenticator-authenticate', authenticator: AuthenticatorKey.OKTA_PASSWORD });
+    const idxTransaction: IdxTransaction =
+      await this.oktaAuth.idx.proceed({ step: 'challenge-authenticator', password });
+
     const { status, tokens, nextStep, error } = idxTransaction;
     if (status !== IdxStatus.SUCCESS) {
       const e = new Error(JSON.stringify({ status, nextStep, error }));

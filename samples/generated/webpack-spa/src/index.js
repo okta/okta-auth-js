@@ -677,10 +677,18 @@ function submitStaticSigninForm() {
       .catch(showError);
   }
 
-  return authClient.idx.authenticate({ username, password })
-    .then(handleTransaction)
-    .catch(showError);
-
+  return authClient.idx.start()
+  .then(() => {
+    return authClient.idx.proceed({ step: 'identify', username });
+  })
+  .then(() => {
+    return authClient.idx.proceed({ step: 'select-authenticator-authenticate', authenticator: 'okta_password' });
+  })
+  .then(() => {
+    return authClient.idx.proceed({ step: 'challenge-authenticator', password });
+  })
+  .then(handleTransaction)
+  .catch(showError);
 }
 window._submitStaticSigninForm = bindClick(submitStaticSigninForm);
 
