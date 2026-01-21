@@ -178,6 +178,7 @@ async function getDataFromRemediate(authClient: OktaAuthIdxInterface, data: RunD
     enableLegacyMode
   } = options;
   
+  // const shouldRemediate = enableLegacyMode && (autoRemediate !== false && (remediators || actions || step));
   const shouldRemediate = (autoRemediate !== false && (remediators || actions || step));
   if (!shouldRemediate) {
     return data;

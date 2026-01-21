@@ -682,8 +682,10 @@ function submitStaticSigninForm() {
   .then(() => {
     return authClient.idx.proceed({ step: 'identify', username });
   })
-  .then(() => {
-    return authClient.idx.proceed({ step: 'select-authenticator-authenticate', authenticator: 'okta_password' });
+  .then((idxResponse) => {
+    if (idxResponse.nextStep.name === 'select-authenticator-authenticate') {
+      return authClient.idx.proceed({ step: 'select-authenticator-authenticate', authenticator: 'okta_password' });
+    }
   })
   .then(() => {
     return authClient.idx.proceed({ step: 'challenge-authenticator', password });
