@@ -65,6 +65,11 @@ function getGenericNextStep (
   idxResponse: IdxResponse,
   options: RemediateOptions
 ) {
+  // If the response contains an interaction code, there is no need to remediate
+  if (idxResponse.interactionCode) {
+    return { idxResponse };
+  }
+
   if (options.enableLegacyMode) {
     return { idxResponse };
   }

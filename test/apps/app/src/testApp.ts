@@ -649,7 +649,7 @@ class TestApp {
   async getTokensDirectOIE(username: string, password: string): Promise<Tokens>  {
     await this.oktaAuth.idx.start();
     const idxResponse = await this.oktaAuth.idx.proceed({ step: 'identify', username });
-    if (idxResponse.nextStep.name === 'select-authenticator-authenticate') {
+    if (idxResponse?.nextStep?.name === 'select-authenticator-authenticate') {
       await this.oktaAuth.idx.proceed({ step: 'select-authenticator-authenticate', authenticator: AuthenticatorKey.OKTA_PASSWORD });
     }
     const idxTransaction: IdxTransaction =
