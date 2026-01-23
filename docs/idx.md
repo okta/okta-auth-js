@@ -69,37 +69,37 @@ This module provides convenience methods to support popular scenarios to communi
 
 #### Step Mode vs Legacy Mode
 
-> :grey_exclamation: This distinction is only relevant in `auth-js@8.x`. Previous versions always execute in (what is now known as) "Legacy Mode".
+> :grey_exclamation: This distinction is only relevant in `auth-js@8.x`. Previous versions always execute in, what is now known as, "Legacy Mode".
 
-The `IDX` client was developed to be flexible and to enable a couple different invocation patterns to ease use. Over time (and as the IDX API has evolved), we have seen inconsistency in these various patterns. As of `auth-js@8.x`, each step (remediation) in a given flow will need to be explicitly. This will likely result in "more code", however the behavior of the client will be consistent.
+The `IDX` client was developed to be flexible and to enable a couple different invocation patterns to ease use. Over time (and as the IDX API has evolved), we have seen inconsistency in these various patterns. As of `auth-js@8.x`, each step (remediation) in a given flow will need to be explicitly specificed. This may required more code, but it makes client behavior consistent.
 
 ##### Step Mode
 
-"Step Mode" is the new default mode as of `auth-js@8.x`. It requires each call to `idx.proceed` to provide either an `actions` or `step` property, like so
+Step Mode is the new default mode as of `auth-js@8.x`. Step Mode requires each call to `idx.proceed` to include either an `actions` or `step` property, like so
 
 ```javascript
 const response = await idx.proceed({ step: 'identify', username: 'foo@bar.com' })
 ```
 
-The `step` (or `actions`) property refers to the name of the remediation which should be used to proceed within the flow. The `IDX` client will proceed with the specified remediation and return the response, it will no longer recursively remediate.
+The `step` (or `actions`) property names the remediation to run. The `IDX` client will execute that remediation and return the response; it will not automatically perform subsequent (recursive) remediations. You must call `idx.proceed` for each step.
 
-A handful of features will no longer work in "Step Mode", including:
-* Recursively calling remediations
+A handful of features will no longer work in Step Mode, including:
+* Recursive remediation (automatic recursive calls)
 * [`flow`](#flow)
 * [Up-front](#up-front-approach)
 
 ##### Legacy Mode
 
-"Legacy Mode" maintains the behavior of the `IDX` client prior to `auth-js@8.x`, but is on a deprecation path. It can be useful to those who need to upgrade their `@okta/okta-auth-js` installation, but cannot migrate their customized IDX-driven login experience at the same time.
+Legacy Mode preserves pre-8.x behavior and is on a deprecation path. Use it only as a temporary migration aid.
 
 Legacy Mode enables other features, which no longer work in [Step Mode](#step-mode), including:
-* Recursively calling remediations
+* Recursive remediation (automatic recursive calls)
 * [`flow`](#flow)
 * [Up-front](#up-front-approach)
 
 However these patterns can be a bit inconsistent (which ultimately led to the decision to phase them out).
 
-Legacy Mode can be enabled when constructing `OktaAuth` or per each `idx.proceed` call
+Legacy Mode can be enabled when constructing `OktaAuth` or on a per-call basis when calling `idx.proceed`.
 
 ```javascript
 const oktaAuth = new OktaAuth({
@@ -113,13 +113,13 @@ const response = await idx.proceed({
 })
 ```
 
-> :warning: __NOTICE:__ Bugs reported with `enableLegacyMode: true` will be de-prioritized, but we will still accept community contributions
+> :warning: Issues reported while using Legacy Mode will be lower priority, but we will still accept community contributions.
 
 #### Flow
 
-> :warning: As of `auth-js@8.x`, `flow` is not supported in the default `IDX` client
+> :warning: As of `auth-js@8.x`, `flow` is not supported in the default `IDX` client.
 
-Prior to `authjs@8.x`, the [`flow`](#flow) feature could be used to "bootstrap" a given IDX transaction to a specific user experience. For example providing `{ flow: unlock-account }` would bootstrap to the Unlock Account flow. Under the hood, this is achieved by proceeding with specific remediations; ultimately this required hardcoding specific remediation names per `flow` every value. This pattern was acceptable when OIE (and `IDX`) were first launched, however as `IDX` has evolved overtime this pattern has proved to be untenable and contradicts our goals of a small bundle size. As a result, `flow` is on a deprecation path and is not unsupported in the `auth-js@8.x` `IDX` client (with default configuration). Instead of `flow`, simply use `idx.proceed({ step: '???' })` to drive the `IDX` client into the desired state (or "flow"). __NOTE:__ The steps needed will depend on your Okta Org configuration
+Prior to auth-js@8.x, the flow feature allowed bootstrapping an IDX transaction to a specific user experience (for example, { flow: 'unlock-account' }). Internally this worked by proceeding with a sequence of specific remediations, which required hardcoding remediation names for each flow value. As IDX evolved, that approach became brittle and increased bundle size. As a result, flow is deprecated and is not enabled in the default auth-js@8.x IDX client. Instead of flow, call idx.proceed({ step: '...' }) to drive the IDX client into the desired state; the exact steps depend on your Okta org configuration. (You can re-enable the old behavior by using Legacy Mode, but that is not recommended long-term.)
 
 ```javascript
 async function bootstrapUnlockAccount () {
@@ -220,7 +220,7 @@ You can work with these methods with `Up-Front` and `On-Demand` approaches, norm
 
 ##### Up-Front approach
 
-> :warning: As of `auth-js@8.x`, the Up-Front approach is no longer recommended and is only supported in [Legacy Mode](#legacy-mode)
+> :warning: As of `auth-js@8.x`, the Up-Front approach is no longer recommended and is only supported in [Legacy Mode](#legacy-mode).
 
 You can provide parameters based on your app's policy configuration and user inputs to drive the methods to communicate with [Okta's Identity Engine][].
 
