@@ -21,6 +21,12 @@ export async function startTransaction(
   // Clear IDX response cache and saved transaction meta (if any)
   authClient.transactionManager.clear();
 
+  // TODO: add tests
+  // force .start calls not to proceed
+  if (!options.enableLegacyMode) {
+    options.autoRemediate = false;
+  }
+
   return run(authClient, {
     exchangeCodeForTokens: false,
     ...options

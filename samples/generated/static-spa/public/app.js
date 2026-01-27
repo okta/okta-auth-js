@@ -678,9 +678,12 @@ function submitStaticSigninForm() {
       .catch(showError);
   }
 
-  return authClient.idx.authenticate({ username, password })
-    .then(handleTransaction)
-    .catch(showError);
+  authClient.idx.start()
+  .then(() => {
+    return authClient.idx.proceed({ step: 'identify', username, password });
+  })
+  .then(handleTransaction)
+  .catch(showError);
 
 }
 window._submitStaticSigninForm = bindClick(submitStaticSigninForm);
@@ -1252,8 +1255,9 @@ function selectMfaFactorForVerification(index) {
     return selectMfaFactorForVerificationAuthn(index);
   }
 
+  const step = appState.transaction.nextStep.name;
   const authenticator = appState.transaction.nextStep.options[index].value;
-  authClient.idx.proceed({ authenticator })
+  authClient.idx.proceed({ authenticator, step })
     .then(handleTransaction)
     .catch(showError);
 }
@@ -1456,7 +1460,7 @@ function submitChallengeEmail() {
 
   // IDX
   // email can be used for authentication or recovery
-  authClient.idx.proceed({ verificationCode: passCode })
+  authClient.idx.proceed({ step: 'challenge-authenticator', verificationCode: passCode })
   .then(handleTransaction)
   .catch(showError);
 }

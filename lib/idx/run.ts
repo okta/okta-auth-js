@@ -67,6 +67,7 @@ function initializeValues(options: RunOptions) {
     'step',
     'useGenericRemediator',
     'exchangeCodeForTokens',
+    'enableLegacyMode',
   ];
   const values = { ...options };
   knownOptions.forEach(option => {
@@ -174,8 +175,9 @@ async function getDataFromRemediate(authClient: OktaAuthIdxInterface, data: RunD
     flow,
     step,
     useGenericRemediator,
+    enableLegacyMode
   } = options;
-  
+
   const shouldRemediate = (autoRemediate !== false && (remediators || actions || step));
   if (!shouldRemediate) {
     return data;
@@ -201,6 +203,7 @@ async function getDataFromRemediate(authClient: OktaAuthIdxInterface, data: RunD
       flow,
       step,
       useGenericRemediator,
+      enableLegacyMode
     }
   );
   idxResponse = idxResponseFromRemediation;

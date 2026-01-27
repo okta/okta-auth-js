@@ -18,5 +18,8 @@ export default {
     // 'okta.myAccount.password.read', 
     // 'okta.myAccount.password.manage',
   ],
-  pkce: true
+  pkce: true,
+  idx: {
+    enableLegacyMode: true
+  }
 };
