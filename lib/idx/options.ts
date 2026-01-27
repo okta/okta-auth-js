@@ -29,6 +29,7 @@ export function createIdxOptionsConstructor() {
     idx: {
       useGenericRemediator?: boolean;
       exchangeCodeForTokens?: boolean;
+      enableLegacyMode?: boolean;
     };
   
     constructor(options: any) {

@@ -60,6 +60,9 @@ module.exports = function getAuthClient(req, options = {}) {
           storageProvider
         }
       },
+      idx: {
+        enableLegacyMode: true,
+      },
       ...options
     });
     

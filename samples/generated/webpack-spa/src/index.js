@@ -677,10 +677,12 @@ function submitStaticSigninForm() {
       .catch(showError);
   }
 
-  return authClient.idx.authenticate({ username, password })
-    .then(handleTransaction)
-    .catch(showError);
-
+  return authClient.idx.start()
+  .then(() => {
+    return authClient.idx.proceed({ step: 'identify', username, password });
+  })
+  .then(handleTransaction)
+  .catch(showError);
 }
 window._submitStaticSigninForm = bindClick(submitStaticSigninForm);
 
