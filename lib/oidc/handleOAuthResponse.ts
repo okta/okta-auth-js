@@ -96,16 +96,20 @@ export async function handleOAuthResponse(
   const now = Math.floor(Date.now()/1000);
 
   if (accessToken) {
-    const accessJwt = sdk.token.decode(accessToken);
     tokenDict.accessToken = {
       accessToken: accessToken,
-      claims: accessJwt.payload,
       expiresAt: Number(expiresIn) + now,
       tokenType: tokenType!,
       scopes: scopes,
       authorizeUrl: urls.authorizeUrl!,
       userinfoUrl: urls.userinfoUrl!
     };
+
+    // backwards compat for < authjs@8.x
+    if (sdk.options.decodeAccessTokens) {
+      const accessJwt = sdk.token.decode(accessToken);
+      tokenDict.accessToken.claims =  accessJwt.payload;
+    }
 
     if (tokenParams.dpopPairId) {
       tokenDict.accessToken.dpopPairId = tokenParams.dpopPairId;
