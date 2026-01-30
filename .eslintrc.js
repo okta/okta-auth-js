@@ -38,7 +38,7 @@ module.exports = {
         // https://typescript-eslint.io/docs/linting/troubleshooting/#i-am-using-a-rule-from-eslint-core-and-it-doesnt-work-correctly-with-typescript-code
         "no-undef": "off",
         "no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars": "error",
+        "@typescript-eslint/no-unused-vars": ["error", { ignoreRestSiblings: true }]
       }
     },
     {
