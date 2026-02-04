@@ -85,6 +85,8 @@ export function createOAuthOptionsConstructor() {
     dpop: boolean;
     dpopOptions: DPoPOptions;
 
+    decodeAccessTokens: boolean;
+
     // Additional options
     tokenManager: TokenManagerOptions;
     postLogoutRedirectUri: string;
@@ -134,6 +136,9 @@ export function createOAuthOptionsConstructor() {
         allowBearerTokens: false,
         ...options.dpopOptions,
       };
+
+      // backwards compatibility option - not recommended
+      this.decodeAccessTokens = options.decodeAccessTokens === true;   // defaults to false
 
       this.tokenManager = options.tokenManager;
       this.postLogoutRedirectUri = options.postLogoutRedirectUri;

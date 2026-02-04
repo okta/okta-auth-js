@@ -41,10 +41,20 @@ describe('handleOAuthResponse', () => {
     describe('baseline', () => {
     
       it('returns access_token from the response', async () => {
+        const decodeSpy = jest.spyOn(sdk.token, 'decode');
         const res = await handleOAuthResponse(sdk, { responseType: 'token' }, { access_token: 'foo' }, undefined as unknown as CustomUrls);
         expect(res.tokens).toBeTruthy();
         expect(res.tokens.accessToken).toBeTruthy();
         expect(res.tokens.accessToken!.accessToken).toBe('foo');
+        expect(decodeSpy).not.toHaveBeenCalled();
+
+        sdk.options = { ...sdk.options, decodeAccessTokens: true };
+        const res2 = await handleOAuthResponse(sdk, { responseType: 'token' }, { access_token: 'foo' }, undefined as unknown as CustomUrls);
+        expect(res2.tokens).toBeTruthy();
+        expect(res2.tokens.accessToken).toBeTruthy();
+        expect(res2.tokens.accessToken!.accessToken).toBe('foo');
+        expect(decodeSpy).toHaveBeenCalled();
+
       });
       it('returns id_token from the response', async () => {
         const res = await handleOAuthResponse(sdk, { responseType: 'id_token' }, { id_token: 'foo' }, undefined as unknown as CustomUrls);

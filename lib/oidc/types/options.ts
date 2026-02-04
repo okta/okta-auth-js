@@ -106,6 +106,7 @@ export interface OktaAuthOAuthOptions extends
     'acrValues'
   >
 {
+  decodeAccessTokens?: boolean;
   ignoreLifetime?: boolean;
   tokenManager?: TokenManagerOptions;
   postLogoutRedirectUri?: string;

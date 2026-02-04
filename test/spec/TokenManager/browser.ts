@@ -430,6 +430,7 @@ describe('TokenManager (browser)', function() {
     });
 
     it('automatically renews a token by default', function() {
+      const { claims, ...renewed } = tokens.standardAccessTokenParsed;
       const expiresAt = tokens.standardAccessTokenParsed.expiresAt;
       return oauthUtil.setupFrame({
         authClient: client,
@@ -445,7 +446,7 @@ describe('TokenManager (browser)', function() {
       .then(function() {
         oauthUtil.expectTokenStorageToEqual(localStorage, {
           'test-accessToken': { 
-            ...tokens.standardAccessTokenParsed, 
+            ...renewed,
             expiresAt: expiresAt + 1 + 3600
           }
         });

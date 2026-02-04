@@ -77,6 +77,7 @@ describe('token.renew', function() {
   });
 
   it('returns access_token', function() {
+    const { claims, ...renewned } = tokens.standardAccessTokenParsed;
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         pkce: false,
@@ -105,11 +106,12 @@ describe('token.renew', function() {
         'expires_in': 3600,
         'state': oauthUtil.mockedState
       },
-      expectedResp: tokens.standardAccessTokenParsed
+      expectedResp: renewned
     });
   });
 
   it('returns access_token with authorization server', function() {
+    const { claims, ...renewned } = tokens.authServerAccessTokenParsed;
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         pkce: false,
@@ -138,7 +140,7 @@ describe('token.renew', function() {
         'expires_in': 3600,
         'state': oauthUtil.mockedState
       },
-      expectedResp: tokens.authServerAccessTokenParsed
+      expectedResp: renewned
     });
   });
 
@@ -168,6 +170,7 @@ describe('token.renew', function() {
   });
 
   it('renews access token via authorize with dpop enabled', function () {
+    const { claims, ...renewed } = tokens.standardAccessTokenParsed;
     return oauthUtil.setupFrame({
       oktaAuthArgs: {
         pkce: false,
@@ -200,7 +203,7 @@ describe('token.renew', function() {
         'state': oauthUtil.mockedState
       },
       expectedResp: {
-        ...tokens.standardAccessTokenParsed,
+        ...renewed,
         tokenType: 'DPoP'
       }
     });
