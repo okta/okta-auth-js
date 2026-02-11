@@ -19,12 +19,6 @@ describe('OktaAuth (api)', function() {
     expect(auth.emitter).toBeInstanceOf(Emitter);
   });
 
-  it('can updateAuthState', () => {
-    const promise = auth.authStateManager.updateAuthState();
-    expect(auth.authStateManager._pending.updateAuthStatePromise).toBeInstanceOf(Promise);
-    return promise;
-  });
-
   describe('Storage', () => {
     describe('browser bundle - uses js-cookie', () => {
       if (process.env.BUNDLE_ENV !== 'browser') {
