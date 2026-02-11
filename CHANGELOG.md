@@ -13,6 +13,7 @@
 
 - [#1608](https://github.com/okta/okta-auth-js/pull/1608) chore: upgrades `broadcast-channel` and other dependencies
 - [#1619](https://github.com/okta/okta-auth-js/pull/1619) chore: removes `p-cancelable` dependency
+- [#1620](https://github.com/okta/okta-auth-js/pull/1620) chore: removes `atob` and `btoa` dependencies
 
 # 7.14.1
 

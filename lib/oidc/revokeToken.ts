@@ -17,7 +17,6 @@ import { toQueryString } from '../util';
 import {
   getOAuthUrls,
 } from './util/oauth';
-import { btoa } from '../crypto';
 import AuthSdkError from '../errors/AuthSdkError';
 import {
   OktaAuthOAuthInterface,

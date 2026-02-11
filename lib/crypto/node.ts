@@ -11,31 +11,11 @@
  */
 
 
-/* global atob, btoa */
-
 // Ponyfill for NodeJS
 // Webpack config excludes this file
 
-import atobModule from 'atob';
-import btoaModule from 'btoa';
 import { Crypto } from '@peculiar/webcrypto';
 
-let a;
-if (typeof atob !== 'undefined') {
-  a = atob;
-} else {
-  a = atobModule;
-}
-export { a as atob };
-
-
-let b;
-if (typeof btoa !== 'undefined') {
-  b = btoa;
-} else {
-  b = btoaModule;
-}
-export { b as btoa };
 
 const crypto = (async () => {
   try {

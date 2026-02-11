@@ -7,8 +7,7 @@ import {
   stringToBase64Url,
   stringToBuffer,
   bufferToBase64Url,
-  base64ToBase64Url,
-  btoa
+  base64ToBase64Url
 } from '../crypto';
 import { AuthSdkError, OAuthError, WWWAuthError, isOAuthError, isWWWAuthError } from '../errors';
 import { Tokens } from './types';

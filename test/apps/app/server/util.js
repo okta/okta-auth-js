@@ -11,7 +11,6 @@
  */
 
 
-const btoa = require('btoa');
 const crypto = require('crypto');
 
 // converts a standard base64-encoded string to a "url/filename safe" variant
