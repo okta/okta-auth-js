@@ -2,7 +2,6 @@
 import { jest } from '@jest/globals';
 import Cookies from 'js-cookie';
 import Emitter from 'tiny-emitter';
-import PCancelable from 'p-cancelable';
 import { OktaAuth } from '@okta/okta-auth-js';
 import NodeCache from 'node-cache';
 
@@ -22,7 +21,7 @@ describe('OktaAuth (api)', function() {
 
   it('can updateAuthState', () => {
     const promise = auth.authStateManager.updateAuthState();
-    expect(auth.authStateManager._pending.updateAuthStatePromise).toBeInstanceOf(PCancelable);
+    expect(auth.authStateManager._pending.updateAuthStatePromise).toBeInstanceOf(Promise);
     return promise;
   });
 

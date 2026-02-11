@@ -65,7 +65,7 @@ module.exports = {
       },
       {
         test: /\.[jt]s$/,
-        exclude:/node_modules\/(?!p-cancelable)/,
+        exclude: /node_modules/,
         loader: 'babel-loader',
         options: babelOptions
       }

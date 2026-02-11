@@ -10,10 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
  
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore 
-// Do not use this type in code, so it won't be emitted in the declaration output
-import PCancelable from 'p-cancelable';
+
 import { AuthSdkError } from '../errors';
 import {
   EVENT_ADDED,
@@ -50,6 +47,92 @@ const isSameAuthState = (prevState: AuthState | null, state: AuthState) => {
     && prevState.error === state.error;
 };
 
+/**
+ * Based on https://www.npmjs.com/package/p-cancelable, which was used in previous versions of authjs
+ * `p-cancelable` has been deprecated in favor of `AbortController` and is sometimes flagged on dependency scans
+ * as not being supported. Unfortunately, `AbortController` is not supported in IE11
+ *
+ * tldr; This class aims to replace `p-cancelable` to maintain IE11 support
+ */
+class CancelablePromise<T = any> implements PromiseLike<T> {
+  #state: 'PENDING' | 'CANCELED' | 'SETTLED' = 'PENDING';
+  #promise: Promise<T>;
+  #cancelHandlers: Parameters<Parameters<ConstructorParameters<typeof CancelablePromise>[0]>[2]>[0][] = [];
+
+  // defaults to no-op to satisfy TS, will be re-set in `executor` when construct is invoked
+  #rejector: Parameters<ConstructorParameters<typeof Promise<T>>[0]>[1] = () => {};
+
+  constructor (
+    executor: (
+      ...args: [
+        ...Parameters<ConstructorParameters<typeof Promise<T>>[0]>,
+        (callback: () => void) => void
+      ]
+    ) => void
+  ) {
+
+    this.#promise = new Promise((resolve, reject) => {
+      this.#rejector = reject;
+
+      const onResolve = (result) => {
+        if (this.#state !== 'CANCELED') {
+          resolve(result);
+          this.#state = 'SETTLED';
+        }
+      };
+
+      const onReject = (error) => {
+        if (this.#state !== 'CANCELED') {
+          reject(error);
+          this.#state = 'SETTLED';
+        }
+      };
+
+      const onCancel = handler => {
+        this.#cancelHandlers.push(handler);
+      }
+
+      executor(onResolve, onReject, onCancel);
+    });
+  }
+
+  // @ts-expect-error - the type for `Promise.then` is unnecessarily complex
+  then (...args: Parameters<Promise<T>['then']>): ReturnType<Promise<T>['then']> {
+    return this.#promise.then(...args);
+  }
+
+  catch (...args: Parameters<Promise<T>['catch']>): ReturnType<Promise<T>['catch']> {
+    return this.#promise.catch(...args);
+  }
+
+  finally (...args: Parameters<Promise<T>['finally']>): ReturnType<Promise<T>['finally']> {
+    return this.#promise.finally(...args);
+  }
+
+  cancel () {
+    if (this.#state !== 'PENDING') {
+      return;
+    }
+
+    this.#state = 'CANCELED';
+
+    if (this.#cancelHandlers.length > 0) {
+      try {
+				for (const handler of this.#cancelHandlers) {
+					handler();
+				}
+			}
+      catch (error) {
+				this.#rejector(error);
+				return;
+			}
+    }
+  }
+
+  get isCanceled (): boolean {
+    return this.#state === 'CANCELED';
+  }
+}
 
 export class AuthStateManager
 <
@@ -155,8 +238,7 @@ export class AuthStateManager
     }
 
     /* eslint-disable complexity */
-    const cancelablePromise = new PCancelable((resolve, _, onCancel) => {
-      onCancel.shouldReject = false;
+    const cancelablePromise = new CancelablePromise((resolve, _, onCancel) => {
       onCancel(() => {
         this._pending.updateAuthStatePromise = null;
         this._pending.canceledTimes = this._pending.canceledTimes + 1;
@@ -165,12 +247,12 @@ export class AuthStateManager
 
       const emitAndResolve = (authState) => {
         if (cancelablePromise.isCanceled) {
-          resolve();
+          resolve(undefined);
           return;
         }
         // emit event and resolve promise 
         emitAuthStateChange(authState);
-        resolve();
+        resolve(undefined);
 
         // clear pending states after resolve
         this._pending = { ...DEFAULT_PENDING };
@@ -179,7 +261,7 @@ export class AuthStateManager
       this._sdk.isAuthenticated()
         .then(() => {
           if (cancelablePromise.isCanceled) {
-            resolve();
+            resolve(undefined);
             return;
           }
 
