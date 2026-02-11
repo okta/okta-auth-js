@@ -46,7 +46,7 @@ export default class BaseTransaction {
   }
 }
 
-export interface TransactionType<T extends BaseTransaction = BaseTransaction> extends Function {
+export interface TransactionType<T extends BaseTransaction = BaseTransaction> {
   new (oktaAuth: OktaAuthHttpInterface, options: TransactionOptions): T;
   prototype: T;
 }

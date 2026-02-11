@@ -57,6 +57,7 @@ const isSameAuthState = (prevState: AuthState | null, state: AuthState) => {
 class CancelablePromise<T = any> implements PromiseLike<T> {
   #state: 'PENDING' | 'CANCELED' | 'SETTLED' = 'PENDING';
   #promise: Promise<T>;
+  // eslint-disable-next-line no-use-before-define
   #cancelHandlers: Parameters<Parameters<ConstructorParameters<typeof CancelablePromise>[0]>[2]>[0][] = [];
 
   // defaults to no-op to satisfy TS, will be re-set in `executor` when construct is invoked
@@ -90,7 +91,7 @@ class CancelablePromise<T = any> implements PromiseLike<T> {
 
       const onCancel = handler => {
         this.#cancelHandlers.push(handler);
-      }
+      };
 
       executor(onResolve, onReject, onCancel);
     });
