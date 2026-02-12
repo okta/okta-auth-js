@@ -11,8 +11,6 @@
  */
 
 
-const fetch = require('cross-fetch');
-
 const PROFILE_URL = 'https://api.a18n.help/v1/profile';
 const LATEST_EMAIL_URL = `https://api.a18n.help/v1/profile/:profileId/email/latest`;
 const LATEST_SMS_URL = `https://api.a18n.help/v1/profile/:profileId/sms/latest`;

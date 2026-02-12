@@ -12,7 +12,6 @@
 
 
 
-import fetch from 'cross-fetch';
 import waitForOneSecond from '../wait/waitForOneSecond';
 
 const PROFILE_URL = 'https://api.a18n.help/v1/profile';
