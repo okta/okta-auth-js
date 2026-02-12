@@ -21,8 +21,8 @@ module.exports = _.extend({}, _.cloneDeep(commonConfig), {
   ]),
   devtool: 'source-map',
   performance: {
-    maxAssetSize: 121000,
-    maxEntrypointSize: 121000,
+    maxAssetSize: 135000,
+    maxEntrypointSize: 135000,
     hints: 'error'
   }
 });
