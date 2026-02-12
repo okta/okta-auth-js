@@ -5,6 +5,9 @@
 ### Breaking Changes
 
 - [#1607](https://github.com/okta/okta-auth-js/pull/1607) bumps minimum node version to 20
+- [#1621](https://github.com/okta/okta-auth-js/pull/1621)
+  * (BREAKING) removes `cross-fetch` dependency (adds `fetch` to polyfill)
+  * moves polyfill dependencies to separate `yarn workspace`
 
 ### Fixes
 
