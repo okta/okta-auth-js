@@ -141,8 +141,7 @@ describe('getAttestation', () => {
       id: 'CRED-ID',
       type: 'public-key',
       response,
-      getClientExtensionResults: () => ({} as AuthenticationExtensionsClientOutputs),
-      authenticatorAttachment: null
+      getClientExtensionResults: () => ({} as AuthenticationExtensionsClientOutputs)
     };
     const attestation = getAttestation(credential);
     expect(attestation).toEqual({
@@ -166,8 +165,7 @@ describe('getAssertion', () => {
       id: 'CRED-ID',
       type: 'public-key',
       response,
-      getClientExtensionResults: () => ({} as AuthenticationExtensionsClientOutputs),
-      authenticatorAttachment: null
+      getClientExtensionResults: () => ({} as AuthenticationExtensionsClientOutputs)
     };
     const assertion = getAssertion(credential);
     expect(assertion).toEqual({
