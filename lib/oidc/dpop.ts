@@ -3,7 +3,6 @@
 // https://datatracker.ietf.org/doc/html/rfc9449
 
 import {
-  webcrypto,
   stringToBase64Url,
   stringToBuffer,
   bufferToBase64Url,
@@ -47,14 +46,14 @@ export function isDPoPNonceError(obj: any): obj is OAuthError | WWWAuthError {
 export async function createJwt(header: object, claims: object, signingKey: CryptoKey): Promise<string> {
   const head = stringToBase64Url(JSON.stringify(header));
   const body = stringToBase64Url(JSON.stringify(claims));
-  const signature = await webcrypto.subtle.sign(
+  const signature = await crypto.subtle.sign(
     { name: signingKey.algorithm.name }, signingKey, stringToBuffer(`${head}.${body}`)
   );
   return `${head}.${body}.${base64ToBase64Url(bufferToBase64Url(signature))}`;
 }
 
 export function cryptoRandomValue (byteLen = 32) {
-  return [...webcrypto.getRandomValues(new Uint8Array(byteLen))].map(v => v.toString(16)).join('');
+  return [...crypto.getRandomValues(new Uint8Array(byteLen))].map(v => v.toString(16)).join('');
 }
 
 export async function generateKeyPair (): Promise<CryptoKeyPair> {
@@ -67,12 +66,12 @@ export async function generateKeyPair (): Promise<CryptoKeyPair> {
 
   // The "false" here makes it non-exportable
   // https://caniuse.com/mdn-api_subtlecrypto_generatekey
-  return webcrypto.subtle.generateKey(algorithm, false, ['sign', 'verify']);
+  return crypto.subtle.generateKey(algorithm, false, ['sign', 'verify']);
 }
 
 async function hashAccessToken (accessToken: string): Promise<string> {
   const buffer = new TextEncoder().encode(accessToken);
-  const hash = await webcrypto.subtle.digest('SHA-256', buffer);
+  const hash = await crypto.subtle.digest('SHA-256', buffer);
 
   return btoa(String.fromCharCode.apply(null, new Uint8Array(hash) as unknown as number[]))
     .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -201,7 +200,7 @@ export async function clearDPoPKeyPairAfterRevoke (revokedToken: 'access' | 'ref
 /////////// proof generation methods ///////////
 
 export async function generateDPoPProof ({ keyPair, url, method, nonce, accessToken }: DPoPProofParams): Promise<string> {
-  const { kty, crv, e, n, x, y } = await webcrypto.subtle.exportKey('jwk', keyPair.publicKey);
+  const { kty, crv, e, n, x, y } = await crypto.subtle.exportKey('jwk', keyPair.publicKey);
   const header = {
     alg: 'RS256',
     typ: 'dpop+jwt',

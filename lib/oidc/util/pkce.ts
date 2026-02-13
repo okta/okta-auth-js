@@ -12,7 +12,7 @@
  */
 
  /* eslint-disable complexity, max-statements */
-import { stringToBase64Url, webcrypto } from '../../crypto';
+import { stringToBase64Url } from '../../crypto';
 import { MIN_VERIFIER_LENGTH, MAX_VERIFIER_LENGTH, DEFAULT_CODE_CHALLENGE_METHOD } from '../../constants';
 
 function dec2hex (dec) {
@@ -21,7 +21,7 @@ function dec2hex (dec) {
 
 function getRandomString(length) {
   var a = new Uint8Array(Math.ceil(length / 2));
-  a = webcrypto.getRandomValues(a);
+  a = crypto.getRandomValues(a);
   var str = Array.from(a, dec2hex).join('');
   return str.slice(0, length);
 }
@@ -36,7 +36,7 @@ function generateVerifier(prefix?: string): string {
 
 function computeChallenge(str: string): PromiseLike<any> {  
   var buffer = new TextEncoder().encode(str);
-  return webcrypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
+  return crypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
     var hash = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer) as unknown as number[]);
     var b64u = stringToBase64Url(hash); // url-safe base64 variant
     return b64u;

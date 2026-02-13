@@ -12,12 +12,11 @@
 
 import { clone } from '../util';
 import { stringToBuffer, base64UrlDecode } from './base64';
-import { webcrypto } from './webcrypto';
+
 
 export function verifyToken(idToken, key) {
   key = clone(key);
 
-  var format = 'jwk';
   var algo = {
     name: 'RSASSA-PKCS1-v1_5',
     hash: { name: 'SHA-256' }
@@ -30,10 +29,8 @@ export function verifyToken(idToken, key) {
   // It's not necessary to properly verify the jwt's signature.
   delete key.use;
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return webcrypto.subtle.importKey(
-    format,
+  return crypto.subtle.importKey(
+    'jwk',
     key,
     algo,
     extractable,
@@ -45,7 +42,7 @@ export function verifyToken(idToken, key) {
     var b64Signature = base64UrlDecode(jwt[2]);
     var signature = stringToBuffer(b64Signature);
 
-    return webcrypto.subtle.verify(
+    return crypto.subtle.verify(
       algo,
       cryptoKey,
       signature,
