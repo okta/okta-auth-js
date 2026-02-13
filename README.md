@@ -70,6 +70,9 @@ Users migrating from previous versions of this SDK should see [Migrating Guide](
 
 ### Browser compatibility / polyfill
 
+> :warning: The dependencies required to generate the polyfill file included with this library are no longer listed in the main `package.json`.
+Please see `./polyfill/package.json` to review the included packages.
+
 This SDK is known to work with current versions of Chrome, Firefox, and Safari on desktop and mobile.
 
 Compatibility with IE 11 / Edge can be accomplished by adding polyfill/shims for the following objects:

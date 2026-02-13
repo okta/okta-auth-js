@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch';
 import waitFor from '@okta/test.support/waitFor';
 import { AuthnTransaction } from '../../../lib/authn';
 import { getWithRedirect, handleOAuthResponse, CustomUrls } from '../../../lib/oidc';

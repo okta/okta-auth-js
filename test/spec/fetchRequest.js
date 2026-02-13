@@ -12,14 +12,6 @@
 
 
 /* global window */
-const mocked = {
-  crossFetch: jest.fn()
-};
-
-jest.mock('cross-fetch', () => {
-  return mocked.crossFetch;
-});
-
 describe('fetchRequest', function () {
   let fetchSpy;
 
@@ -42,10 +34,6 @@ describe('fetchRequest', function () {
   };
 
   beforeEach(function() {
-    mocked.crossFetch.mockReset();
-    mocked.crossFetch.mockImplementation(() => {
-      return Promise.resolve(response);
-    });
     fetchSpy = jest.spyOn(global, 'fetch').mockImplementation(() => {
       return Promise.resolve(response);
     });
@@ -98,12 +86,6 @@ describe('fetchRequest', function () {
         window.fetch = fetchObj;
       }
     }
-    it('uses cross-fetch if no native fetch', () => {
-      return fetchRequest(requestMethod, requestUrl, {})
-      .then(() => {
-        expect(mocked.crossFetch).toHaveBeenCalled();
-      });
-    });
     it('uses native fetch if available', () => {
       const globalFetch = jest.fn(() => {
         return Promise.resolve(response);

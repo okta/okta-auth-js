@@ -20,6 +20,7 @@ const config = Object.assign({}, baseConfig, {
     ISSUER: process.env.ISSUER,
     USERNAME: process.env.USERNAME,
     PASSWORD: process.env.PASSWORD,
+    fetch: global.fetch
   }),
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
     // ingore tests by filename
