@@ -136,14 +136,14 @@ describe('getAttestation', () => {
       clientDataJSON: stringToBuffer('{}'),
       attestationObject: stringToBuffer('{}'),
     } as AuthenticatorResponse;
-    const credential = {
+    const credential: PublicKeyCredential = {
       rawId: base64UrlToBuffer('CRED-ID'),
       id: 'CRED-ID',
       type: 'public-key',
       response,
       getClientExtensionResults: () => ({} as AuthenticationExtensionsClientOutputs)
     };
-    const attestation = getAttestation(credential as PublicKeyCredential);
+    const attestation = getAttestation(credential);
     expect(attestation).toEqual({
       id: 'CRED-ID',
       clientData: btoa('{}'),
@@ -160,14 +160,14 @@ describe('getAssertion', () => {
       signature: stringToBuffer('SIG'),
       userHandle: null
     } as AuthenticatorAssertionResponse;
-    const credential = {
+    const credential: PublicKeyCredential = {
       rawId: base64UrlToBuffer('CRED-ID'),
       id: 'CRED-ID',
       type: 'public-key',
       response,
       getClientExtensionResults: () => ({} as AuthenticationExtensionsClientOutputs)
     };
-    const assertion = getAssertion(credential as PublicKeyCredential);
+    const assertion = getAssertion(credential);
     expect(assertion).toEqual({
       id: 'CRED-ID',
       clientData: btoa('{}'),

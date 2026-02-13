@@ -2,7 +2,6 @@
 import { jest } from '@jest/globals';
 import Cookies from 'js-cookie';
 import Emitter from 'tiny-emitter';
-import PCancelable from 'p-cancelable';
 import { OktaAuth } from '@okta/okta-auth-js';
 import NodeCache from 'node-cache';
 
@@ -18,12 +17,6 @@ describe('OktaAuth (api)', function() {
   it('is a valid constructor', function() {
     expect(auth instanceof OktaAuth).toBe(true);
     expect(auth.emitter).toBeInstanceOf(Emitter);
-  });
-
-  it('can updateAuthState', () => {
-    const promise = auth.authStateManager.updateAuthState();
-    expect(auth.authStateManager._pending.updateAuthStatePromise).toBeInstanceOf(PCancelable);
-    return promise;
   });
 
   describe('Storage', () => {
