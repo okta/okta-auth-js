@@ -20,6 +20,7 @@ const config = Object.assign({}, baseConfig, {
     ISSUER: process.env.ISSUER,
     USERNAME: process.env.USERNAME,
     PASSWORD: process.env.PASSWORD,
+    fetch: global.fetch
   }),
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
     // ingore tests by filename
@@ -35,7 +36,6 @@ const config = Object.assign({}, baseConfig, {
 
 if (process.env.USE_DPOP == '1') {
   config.setupFiles.unshift('fake-indexeddb/auto');
-  config.setupFiles.push('<rootDir>/test/support/jest/jest.setup.integ.js');
   config.testEnvironment = 'jsdom';
   config.moduleNameMapper = Object.assign({}, baseConfig.moduleNameMapper, {
     '^./node$': './browser'
