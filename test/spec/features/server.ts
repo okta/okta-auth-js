@@ -11,20 +11,6 @@
  */
 
 
-const modulesToMock = {
-  crypto: '../../../lib/crypto'
-};
-
-const mocked = {
-  crypto: {
-    webcrypto: null
-  }
-};
-
-jest.doMock(modulesToMock.crypto, () => {
-  return mocked.crypto;
-});
-
 import { OktaAuth } from '@okta/okta-auth-js';
 
 describe('features (server)', function() {

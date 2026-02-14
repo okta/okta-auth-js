@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+
 import { clone } from '../util';
 import { stringToBuffer, base64UrlDecode } from './base64';
 
@@ -21,8 +22,6 @@ export function verifyToken(idToken, key) {
     name: 'RSASSA-PKCS1-v1_5',
     hash: { name: 'SHA-256' }
   };
-  var extractable = true;
-  var usages = ['verify'];
 
   // https://connect.microsoft.com/IE/feedback/details/2242108/webcryptoapi-importing-jwk-with-use-field-fails
   // This is a metadata tag that specifies the intent of how the key should be used.
@@ -33,8 +32,8 @@ export function verifyToken(idToken, key) {
     'jwk',
     key,
     algo,
-    extractable,
-    usages
+    true,
+    ['verify']
   )
   .then(function(cryptoKey) {
     var jwt = idToken.split('.');

@@ -3,6 +3,7 @@
     "composite": false,
     "module": "es2020",
     "target": "es6",
+    "types": ["node"],
     "allowJs": true,
     "checkJs": true,
     "moduleResolution": "node",
@@ -22,11 +23,11 @@
     "allowSyntheticDefaultImports": false,
     "skipLibCheck": false,
     "rootDir": "./",
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "lib": [
+      "dom"
+    ],
   },
-  "lib": [
-    "dom"
-  ],
   "files": [
     "package.json"
   ],

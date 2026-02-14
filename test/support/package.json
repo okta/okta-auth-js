@@ -10,7 +10,6 @@
     "yarn": "^1.7.0"
   },
   "dependencies": {
-    "@peculiar/webcrypto": "^1.1.4",
     "lodash": "4.17.21",
     "promise.allsettled": "^1.0.1",
     "tiny-emitter": "1.1.0"
