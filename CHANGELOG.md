@@ -16,6 +16,7 @@
 - [#1608](https://github.com/okta/okta-auth-js/pull/1608) chore: upgrades `broadcast-channel` and other dependencies
 - [#1619](https://github.com/okta/okta-auth-js/pull/1619) chore: removes `p-cancelable` dependency
 - [#1620](https://github.com/okta/okta-auth-js/pull/1620) chore: removes `atob`, `btoa` and `@peculiar/webcrypto` dependencies
+- [#1623](https://github.com/okta/okta-auth-js/pull/1623) chore: bumps `tiny-emitter` dependency to leverage ESM export
 
 # 7.14.1
 
