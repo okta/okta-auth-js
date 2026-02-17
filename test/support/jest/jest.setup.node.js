@@ -15,3 +15,9 @@
 if (typeof window !== 'undefined') {
   throw new Error('server tests should be run in a node environment');
 }
+
+// this is required to test on lower versions of Node
+if (!global.crypto) {
+  const crypto = require('node:crypto');
+  global.crypto = crypto;
+}

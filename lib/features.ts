@@ -13,7 +13,6 @@
 /* eslint-disable node/no-unsupported-features/node-builtins */
 /* global document, window, TextEncoder, navigator */
 
-import { webcrypto } from './crypto';
 
 const isWindowsPhone = /windows phone|iemobile|wpdesktop/i;	
 
@@ -51,9 +50,9 @@ export function isPopupPostMessageSupported() {
 }
 
 function isWebCryptoSubtleSupported () {
-  return typeof webcrypto !== 'undefined'
-    && webcrypto !== null
-    && typeof webcrypto.subtle !== 'undefined'
+  return typeof crypto !== 'undefined'
+    && crypto !== null
+    && typeof crypto.subtle !== 'undefined'
     && typeof Uint8Array !== 'undefined';
 }
 

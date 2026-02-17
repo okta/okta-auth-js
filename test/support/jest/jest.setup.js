@@ -23,9 +23,10 @@ if (process.env.DETECT_LEAKS) {
 }
 
 Object.defineProperty(global, 'crypto', {
+  writable: true,
   value: {
     getRandomValues: arr => crypto.randomBytes(arr.length),
-    subtle: crypto.subtle
+    subtle: crypto.subtle,
   }
 });
 

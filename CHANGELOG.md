@@ -4,15 +4,18 @@
 
 ### Breaking Changes
 
-- [#1607](https://github.com/okta/okta-auth-js/pull/1607) bumps minimum node version to 20
+- [#1607](https://github.com/okta/okta-auth-js/pull/1607) breaking: bumps minimum node version to 20
 - [#1621](https://github.com/okta/okta-auth-js/pull/1621)
-  * (BREAKING) removes `cross-fetch` dependency (adds `fetch` to polyfill)
-  * moves polyfill dependencies to separate `yarn workspace`
+  * breaking: removes `cross-fetch` dependency (adds `fetch` to polyfill)
+  * fix: moves polyfill dependencies to separate `yarn workspace`
+- [#1617](https://github.com/okta/okta-auth-js/pull/1617) breaking: access tokens are no longer decoded by default
+- [#1615](https://github.com/okta/okta-auth-js/pull/1615) breaking: `step` is now a required parameter for `idx.proceed`
 
 ### Fixes
 
 - [#1608](https://github.com/okta/okta-auth-js/pull/1608) chore: upgrades `broadcast-channel` and other dependencies
 - [#1619](https://github.com/okta/okta-auth-js/pull/1619) chore: removes `p-cancelable` dependency
+- [#1620](https://github.com/okta/okta-auth-js/pull/1620) chore: removes `atob`, `btoa` and `@peculiar/webcrypto` dependencies
 
 # 7.14.1
 

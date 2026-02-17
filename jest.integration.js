@@ -29,6 +29,15 @@ const config = Object.assign({}, baseConfig, {
   transformIgnorePatterns: [
     'node_modules/(?!(data-uri-to-buffer|formdata-polyfill|fetch-blob|node-fetch)/)',
   ],
+  'transform': {
+    '^.+\\.(ts)$': [
+      'ts-jest',
+      {
+        // ts-jest options
+        'tsconfig': '<rootDir>/test/spec/tsconfig.spec.json'
+      }
+    ]
+  },
   // integration tests need to make network request 
   // extend timeout to 10s for
   testTimeout: 15 * 1000 

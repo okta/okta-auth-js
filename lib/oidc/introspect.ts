@@ -15,7 +15,6 @@ import { AuthSdkError } from '../errors';
 import { getWellKnown } from './endpoints/well-known';
 import { post } from '../http';
 import { toQueryString } from '../util';
-import { btoa } from '../crypto';
 import { Token, TokenKind } from './types';
 
 const hintMap = {

@@ -15,4 +15,3 @@ export * from './base64';
 export * from './oidcHash';
 export * from './types';
 export * from './verifyToken';
-export * from './webcrypto';

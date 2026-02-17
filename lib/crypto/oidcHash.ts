@@ -12,11 +12,11 @@
 
 /* global TextEncoder */
 import { stringToBase64Url } from './base64';
-import { webcrypto } from './webcrypto';
+
 
 export function getOidcHash(str) {  
   var buffer = new TextEncoder().encode(str);
-  return webcrypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
+  return crypto.subtle.digest('SHA-256', buffer).then(function(arrayBuffer) {
     var intBuffer = new Uint8Array(arrayBuffer);
     var firstHalf = intBuffer.slice(0, 16);
     var hash = String.fromCharCode.apply(null, firstHalf as unknown as number[]);

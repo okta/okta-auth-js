@@ -11,7 +11,7 @@
  */
 
 import { AuthSdkError } from '../errors';
-import { atob, btoa } from './webcrypto';
+
 
 // converts a string to base64 (url/filename safe variant)
 export function stringToBase64Url(str) {

@@ -10,34 +10,30 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
+
 import { clone } from '../util';
 import { stringToBuffer, base64UrlDecode } from './base64';
-import { webcrypto } from './webcrypto';
+
 
 export function verifyToken(idToken, key) {
   key = clone(key);
 
-  var format = 'jwk';
   var algo = {
     name: 'RSASSA-PKCS1-v1_5',
     hash: { name: 'SHA-256' }
   };
-  var extractable = true;
-  var usages = ['verify'];
 
   // https://connect.microsoft.com/IE/feedback/details/2242108/webcryptoapi-importing-jwk-with-use-field-fails
   // This is a metadata tag that specifies the intent of how the key should be used.
   // It's not necessary to properly verify the jwt's signature.
   delete key.use;
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return webcrypto.subtle.importKey(
-    format,
+  return crypto.subtle.importKey(
+    'jwk',
     key,
     algo,
-    extractable,
-    usages
+    true,
+    ['verify']
   )
   .then(function(cryptoKey) {
     var jwt = idToken.split('.');
@@ -45,7 +41,7 @@ export function verifyToken(idToken, key) {
     var b64Signature = base64UrlDecode(jwt[2]);
     var signature = stringToBuffer(b64Signature);
 
-    return webcrypto.subtle.verify(
+    return crypto.subtle.verify(
       algo,
       cryptoKey,
       signature,
