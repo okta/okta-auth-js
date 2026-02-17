@@ -164,7 +164,7 @@
     "broadcast-channel": "~7.1.0",
     "js-cookie": "^3.0.5",
     "node-cache": "^5.1.2",
-    "tiny-emitter": "1.1.0"
+    "tiny-emitter": "2.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
