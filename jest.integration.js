@@ -20,6 +20,7 @@ const config = Object.assign({}, baseConfig, {
     ISSUER: process.env.ISSUER,
     USERNAME: process.env.USERNAME,
     PASSWORD: process.env.PASSWORD,
+    fetch: global.fetch
   }),
   testPathIgnorePatterns: baseConfig.testPathIgnorePatterns.concat([
     // ingore tests by filename
@@ -28,6 +29,15 @@ const config = Object.assign({}, baseConfig, {
   transformIgnorePatterns: [
     'node_modules/(?!(data-uri-to-buffer|formdata-polyfill|fetch-blob|node-fetch)/)',
   ],
+  'transform': {
+    '^.+\\.(ts)$': [
+      'ts-jest',
+      {
+        // ts-jest options
+        'tsconfig': '<rootDir>/test/spec/tsconfig.spec.json'
+      }
+    ]
+  },
   // integration tests need to make network request 
   // extend timeout to 10s for
   testTimeout: 15 * 1000 

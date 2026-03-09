@@ -62,7 +62,8 @@ describe('idx/poll', () => {
       options: {
         issuer,
         clientId,
-        redirectUri
+        redirectUri,
+        idx: { enableLegacyMode: true }
       },
       transactionManager: {
         exists: () => true,

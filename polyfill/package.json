@@ -1,0 +1,13 @@
+{
+  "name": "@okta/auth-js.polyfill",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "core-js": "^3.48.0",
+    "fast-text-encoding": "^1.0.6",
+    "webcrypto-shim": "^0.1.5",
+    "whatwg-fetch": "^3.6.20"
+  }
+}

@@ -26,6 +26,7 @@ import {
   isAuthorizationCodeError,
   IdxStatus,
   IdxTransaction,
+  AuthenticatorKey
 } from '@okta/okta-auth-js';
 import { saveConfigToStorage, flattenConfig, Config } from './config';
 import { MOUNT_PATH } from './constants';
@@ -63,7 +64,7 @@ function loginLinks(app: TestApp, onProtectedPage?: boolean): string {
   if (!onProtectedPage) {
     protectedPageLink = protectedLink(app);
   }
-  const useActivationToken = app.config.useInteractionCodeFlow ? `
+  const useActivationToken = !app.config.useClassicEngine ? `
     <div class="box">
       <form>
         <input name="activationToken" id="activationToken" placeholder="activation token" type="text"/>
@@ -629,9 +630,9 @@ class TestApp {
     const username = (document.getElementById('username') as HTMLInputElement).value;
     const password = (document.getElementById('password') as HTMLInputElement).value;
 
-    const { useInteractionCodeFlow } = this.config;
+    const { useClassicEngine } = this.config;
     let tokens;
-    if (useInteractionCodeFlow) {
+    if (!useClassicEngine) {
       tokens = await this.getTokensDirectOIE(username, password);
     } else {
       // V1 flow
@@ -646,7 +647,17 @@ class TestApp {
   }
 
   async getTokensDirectOIE(username: string, password: string): Promise<Tokens>  {
-    const idxTransaction: IdxTransaction = await this.oktaAuth.idx.authenticate({ username, password });
+    let idxResponse = await this.oktaAuth.idx.start();
+    // provides `password` to `identify` in case org is not configured to identifier-first
+    idxResponse = await this.oktaAuth.idx.proceed({ step: 'identify', username, password });
+    if (idxResponse?.nextStep?.name === 'select-authenticator-authenticate') {
+      idxResponse = await this.oktaAuth.idx.proceed({ step: 'select-authenticator-authenticate', authenticator: AuthenticatorKey.OKTA_PASSWORD });
+    }
+    if (idxResponse?.nextStep?.name === 'challenge-authenticator') {
+      idxResponse = await this.oktaAuth.idx.proceed({ step: 'challenge-authenticator', password });
+    }
+
+    const idxTransaction: IdxTransaction = idxResponse;
     const { status, tokens, nextStep, error } = idxTransaction;
     if (status !== IdxStatus.SUCCESS) {
       const e = new Error(JSON.stringify({ status, nextStep, error }));

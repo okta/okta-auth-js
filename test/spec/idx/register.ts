@@ -115,7 +115,8 @@ describe('idx/register', () => {
       options: {
         issuer,
         clientId,
-        redirectUri
+        redirectUri,
+        idx: { enableLegacyMode: true }
       },
       transactionManager: {
         exists: () => true,

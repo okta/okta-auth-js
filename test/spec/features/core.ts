@@ -11,21 +11,8 @@
  */
 
 
-const modulesToMock = {
-  crypto: '../../../lib/crypto'
-};
-
-const mocked = {
-  crypto: {
-    webcrypto: undefined
-  }
-};
-
-jest.doMock(modulesToMock.crypto, () => {
-  return mocked.crypto;
-});
-
 import { OktaAuth } from '@okta/okta-auth-js';
+
 
 describe('features', function() {
 
@@ -68,7 +55,6 @@ describe('features', function() {
     beforeEach(() => {
       orig.Uint8Array = global.Uint8Array;
       orig.TextEncoder = global.TextEncoder;
-      (mocked.crypto as any).webcrypto = { subtle: {} };
     });
     afterEach(() => {
       global.Uint8Array = orig.Uint8Array as unknown  as Uint8ArrayConstructor;
@@ -83,13 +69,17 @@ describe('features', function() {
       });
 
       it('fails if no webcrypto', function() {
-        mocked.crypto.webcrypto = undefined;
+        const crypto = global.crypto;
+        (global.crypto as any) = undefined;
         expect(OktaAuth.features.isTokenVerifySupported()).toBe(false);
+        global.crypto = crypto;
       });
 
       it('fails if no webcrypto.subtle', function() {
-        (mocked.crypto as any).webcrypto = {};
+        const crypto = global.crypto;
+        (global.crypto as any) = undefined;
         expect(OktaAuth.features.isTokenVerifySupported()).toBe(false);
+        global.crypto = crypto;
       });
 
       it('fails if no Uint8Array', function() {
@@ -114,13 +104,17 @@ describe('features', function() {
       });
 
       it('fails if no webcrypto', function() {
-        mocked.crypto.webcrypto = undefined;
+        const crypto = global.crypto;
+        (global.crypto as any) = undefined;
         expect(OktaAuth.features.isPKCESupported()).toBe(false);
+        global.crypto = crypto;
       });
 
       it('fails if no webcrypto.subtle', function() {
-        (mocked.crypto as any).webcrypto = {};
+        const crypto = global.crypto;
+        (global.crypto as any) = undefined;
         expect(OktaAuth.features.isPKCESupported()).toBe(false);
+        global.crypto = crypto;
       });
 
       it('fails if no Uint8Array', function() {

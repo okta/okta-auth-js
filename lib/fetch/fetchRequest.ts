@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-import crossFetch from 'cross-fetch';
+
 import { FetchOptions, HttpResponse } from '../http/types';
 
 // content-type = application/json OR application/ion+json
@@ -69,7 +69,7 @@ function fetchRequest(method: string, url: string, args: FetchOptions) {
     }
   }
 
-  var fetch = global.fetch || crossFetch;
+  var fetch = global.fetch;
   var fetchPromise = fetch(url, {
     method: method,
     headers: args.headers,

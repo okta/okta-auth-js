@@ -30,7 +30,7 @@ Given(
     await openPKCE({
       ...(issuer && { issuer }),
       ...(clientId && { clientId }),
-      useInteractionCodeFlow: !!ORG_OIE_ENABLED,
+      useClassicEngine: !ORG_OIE_ENABLED,
     });
 
     await TestApp.assertLoggedOut();

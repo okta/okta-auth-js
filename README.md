@@ -70,6 +70,9 @@ Users migrating from previous versions of this SDK should see [Migrating Guide](
 
 ### Browser compatibility / polyfill
 
+> :warning: The dependencies required to generate the polyfill file included with this library are no longer listed in the main `package.json`.
+Please see `./polyfill/package.json` to review the included packages.
+
 This SDK is known to work with current versions of Chrome, Firefox, and Safari on desktop and mobile.
 
 Compatibility with IE 11 / Edge can be accomplished by adding polyfill/shims for the following objects:
@@ -2224,6 +2227,16 @@ We have implemented a small SPA app, located at `./test/apps/app` which is used 
 ## Migrating from previous versions
 
 The [CHANGELOG](CHANGELOG.md) contains details for all changes and links to the original PR.
+
+### From 7.x to 8.x
+
+* Requires Node version 20 or higher ([#1607](https://github.com/okta/okta-auth-js/pull/1607)).
+* `idx.proceed` now requires `step` or `actions` ([#1615](https://github.com/okta/okta-auth-js/pull/1615)).
+  * set `idx: { enableLegacyMode: false }` in `OktaAuth` options to opt-out (return to previous behavior).
+  * See [Concepts: Step Mode](./docs/idx.md#step-mode-vs-legacy-mode) docs for more details.
+* Access Tokens are no longer decoded by default, therefore claims will not be available ([#1617](https://github.com/okta/okta-auth-js/pull/1617)).
+  * set `decodeAccessTokens: true` in `OktaAuth` options to decode tokens (previous behavior).
+* __Not breaking but note worthy__, `@okta/okta-auth-js/polyfill` is still available, however the dependencies used to generate it have been moved into a separate workspace ([#1621](https://github.com/okta/okta-auth-js/pull/1621)).
 
 ### From 6.x to 7.x
 

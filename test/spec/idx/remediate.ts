@@ -80,16 +80,44 @@ describe('idx/remediate', () => {
               'something-resend': jest.fn().mockReturnValue(responseFromAction)
             },
           } as unknown as IdxResponse;
-          const res = await remediate(authClient, idxResponse, { resend: true }, {});
+          const res = await remediate(authClient, idxResponse, { resend: true }, { enableLegacyMode: true });
           expect(res).toEqual({
             idxResponse: {
               ...responseFromAction
             },
             nextStep: {}
           });
-          expect(util.getRemediator).toHaveBeenCalledTimes(2);
-          expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse, { resend: true }, {});
-          expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromAction, {}, { actions: [] });
+          expect(util.getRemediator).toHaveBeenCalledTimes(1);
+          expect(util.getRemediator).toHaveBeenNthCalledWith(1, responseFromAction, {}, { actions: [], enableLegacyMode: true });
+        });
+
+        it('[New Mode] execute resend action and return response', async () => {
+          let { authClient, idxResponse } = testContext;
+          const responseFromAction = {
+            ...idxResponse,
+            neededToProceed: [{
+              name: 'another-remediation'
+            }],
+          };
+          idxResponse = {
+            ...idxResponse,
+            neededToProceed: [{
+              name: 'some-remediation'
+            }],
+            actions: {
+              'something-resend': jest.fn().mockReturnValue(responseFromAction)
+            },
+          } as unknown as IdxResponse;
+          const res = await remediate(authClient, idxResponse, { resend: true }, {});
+          expect(res).toEqual({
+            idxResponse: {
+              ...responseFromAction
+            },
+            nextStep: {
+              name: 'another-remediation'
+            }
+          });
+          expect(util.getRemediator).toHaveBeenCalledTimes(0);
         });
 
         it('will handle exceptions', async () => {
@@ -137,17 +165,46 @@ describe('idx/remediate', () => {
               'some-action': jest.fn().mockReturnValue(responseFromAction)
             },
           } as unknown as IdxResponse;
-          const res = await remediate(authClient, idxResponse, {}, { actions: ['some-action'] });
+          const res = await remediate(authClient, idxResponse, {}, { actions: ['some-action'], enableLegacyMode: true });
           expect(res).toEqual({
             idxResponse: {
               ...responseFromAction
             },
             nextStep: {}
           });
-          expect(util.getRemediator).toHaveBeenCalledTimes(2);
-          expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse, {}, { actions: ['some-action'] });
-          expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromAction, {}, { actions: [] });
+          expect(util.getRemediator).toHaveBeenCalledTimes(1);
+          expect(util.getRemediator).toHaveBeenNthCalledWith(1, responseFromAction, {}, { actions: [], enableLegacyMode: true });
         });
+
+        it('[New Mode] executes the action specified by name and returns response', async () => {
+          let { authClient, idxResponse } = testContext;
+          const responseFromAction = {
+            ...idxResponse,
+            neededToProceed: [{
+              name: 'another-remediation'
+            }],
+          };
+          idxResponse = {
+            ...idxResponse,
+            neededToProceed: [{
+              name: 'some-remediation'
+            }],
+            actions: {
+              'some-action': jest.fn().mockReturnValue(responseFromAction)
+            },
+          } as unknown as IdxResponse;
+          const res = await remediate(authClient, idxResponse, {}, { actions: ['some-action'] });
+          expect(res).toEqual({
+            idxResponse: {
+              ...responseFromAction
+            },
+            nextStep: {
+              name: 'another-remediation'
+            }
+          });
+          expect(util.getRemediator).toHaveBeenCalledTimes(0);
+        });
+
         it('will handle exceptions', async () => {
           const { authClient } = testContext;
           const error = new Error('my test error');
@@ -187,17 +244,42 @@ describe('idx/remediate', () => {
               name: 'some-remediation'
             }],
           } as unknown as IdxResponse;
-          const res = await remediate(authClient, idxResponse, {}, { actions: ['some-remediation'] });
+          const res = await remediate(authClient, idxResponse, {}, { actions: ['some-remediation'], enableLegacyMode: true });
           expect(res).toEqual({
             idxResponse: {
               ...responseFromRemediation
             },
             nextStep: {}
           });
-          expect(util.getRemediator).toHaveBeenCalledTimes(2);
-          expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse, {}, { actions: ['some-remediation'] });
-          expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromRemediation, {}, { actions: [] });
+          expect(util.getRemediator).toHaveBeenCalledTimes(1);
+          expect(util.getRemediator).toHaveBeenNthCalledWith(1, responseFromRemediation, {}, { actions: [], enableLegacyMode: true });
         });
+
+        it('[NEW MODE] proceeds with a remediation with a matching name to provided action', async () => {
+          let { authClient, idxResponse } = testContext;
+          const responseFromRemediation = {
+            ...idxResponse,
+            neededToProceed: [{
+              name: 'another-remediation'
+            }],
+          };
+          idxResponse = {
+            ...idxResponse,
+            proceed: jest.fn().mockResolvedValue(responseFromRemediation),
+            neededToProceed: [{
+              name: 'some-remediation'
+            }],
+          } as unknown as IdxResponse;
+          const res = await remediate(authClient, idxResponse, {}, { actions: ['some-remediation'] });
+          expect(res).toEqual({
+            idxResponse: {
+              ...responseFromRemediation
+            },
+            nextStep: { name: 'another-remediation' }
+          });
+          expect(util.getRemediator).toHaveBeenCalledTimes(0);
+        });
+
         it('will handle exceptions', async () => {
           let { authClient, idxResponse } = testContext;
           const error = new Error('my test error');
@@ -224,11 +306,12 @@ describe('idx/remediate', () => {
           jest.spyOn(util, 'getRemediator').mockReturnValue(undefined);
           jest.spyOn(util, 'isTerminalResponse').mockReturnValue(false);
         });
+
         it('by default, it will throw an error', async () => {
           const { authClient, idxResponse } = testContext;
           let didThrow = false;
           try {
-            await remediate(authClient, idxResponse, {}, { actions: ['unknown-action'] });
+            await remediate(authClient, idxResponse, {}, { actions: ['unknown-action'], enableLegacyMode: true });
           } catch (err: any) {
             didThrow = true;
             expect(err.name).toEqual('AuthSdkError');
@@ -237,9 +320,22 @@ describe('idx/remediate', () => {
           expect(didThrow).toBe(true);
         });
 
+        it('[NEW MODE] by default, it will throw an error', async () => {
+          const { authClient, idxResponse } = testContext;
+          let didThrow = false;
+          try {
+            await remediate(authClient, idxResponse, {}, { actions: ['unknown-action'] });
+          } catch (err: any) {
+            didThrow = true;
+            expect(err.name).toEqual('AuthSdkError');
+            expect(err.errorSummary).toContain('Unable to proceed with provided actions');
+          }
+          expect(didThrow).toBe(true);
+        });
+
         it('if flow is default, it will return the idxResponse', async () => {
           const { authClient, idxResponse } = testContext;
-          const res = await remediate(authClient, idxResponse, {}, { flow: 'default', actions: ['unknown-action'] });
+          const res = await remediate(authClient, idxResponse, {}, { flow: 'default', actions: ['unknown-action'], enableLegacyMode: true });
           expect(res).toEqual({ idxResponse });
         });
       });
@@ -271,7 +367,7 @@ describe('idx/remediate', () => {
             name: 'some-action',
             params: { foo: 'bar' }
           };
-          const res = await remediate(authClient, idxResponse, {}, { actions: [action] });
+          const res = await remediate(authClient, idxResponse, {}, { actions: [action], enableLegacyMode: true });
           expect(actionFn).toHaveBeenCalledWith({ foo: 'bar' });
           expect(res).toEqual({
             idxResponse: {
@@ -279,10 +375,43 @@ describe('idx/remediate', () => {
             },
             nextStep: {}
           });
-          expect(util.getRemediator).toHaveBeenCalledTimes(2);
-          expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse, {}, { actions: [action] });
-          expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromAction, {}, { actions: [] });
+          expect(util.getRemediator).toHaveBeenCalledTimes(1);
+          expect(util.getRemediator).toHaveBeenNthCalledWith(1, responseFromAction, {}, { actions: [], enableLegacyMode: true });
         });
+
+        it('[NEW MODE] executes the action specified by name, passing the provided params and returns response', async () => {
+          let { authClient, idxResponse } = testContext;
+          const responseFromAction = {
+            ...idxResponse,
+            neededToProceed: [{
+              name: 'another-remediation'
+            }],
+          };
+          const actionFn = jest.fn().mockReturnValue(responseFromAction);
+          idxResponse = {
+            ...idxResponse,
+            neededToProceed: [{
+              name: 'some-remediation'
+            }],
+            actions: {
+              'some-action': actionFn
+            },
+          } as unknown as IdxResponse;
+          const action = {
+            name: 'some-action',
+            params: { foo: 'bar' }
+          };
+          const res = await remediate(authClient, idxResponse, {}, { actions: [action] });
+          expect(actionFn).toHaveBeenCalledWith({ foo: 'bar' });
+          expect(res).toEqual({
+            idxResponse: {
+              ...responseFromAction
+            },
+            nextStep: { name: 'another-remediation' }
+          });
+          expect(util.getRemediator).toHaveBeenCalledTimes(0);
+        });
+
         it('will handle exceptions', async () => {
           let { authClient, idxResponse } = testContext;
           const error = new Error('my test error');
@@ -331,17 +460,45 @@ describe('idx/remediate', () => {
           const action = {
             name: 'some-remediation'
           };
-          const res = await remediate(authClient, idxResponse, {}, { actions: [action] });
+          const res = await remediate(authClient, idxResponse, {}, { actions: [action], enableLegacyMode: true });
           expect(res).toEqual({
             idxResponse: {
               ...responseFromRemediation
             },
             nextStep: {}
           });
-          expect(util.getRemediator).toHaveBeenCalledTimes(2);
-          expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse, {}, { actions: [action] });
-          expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromRemediation, {}, { actions: [] });
+          expect(util.getRemediator).toHaveBeenCalledTimes(1);
+          expect(util.getRemediator).toHaveBeenNthCalledWith(1, responseFromRemediation, {}, { actions: [], enableLegacyMode: true });
         });
+
+        it('[NEW MODE] proceeds with a remediation with a matching name, passing the provided params', async () => {
+          let { authClient, idxResponse } = testContext;
+          const responseFromRemediation = {
+            ...idxResponse,
+            neededToProceed: [{
+              name: 'another-remediation'
+            }],
+          };
+          idxResponse = {
+            ...idxResponse,
+            proceed: jest.fn().mockResolvedValue(responseFromRemediation),
+            neededToProceed: [{
+              name: 'some-remediation'
+            }],
+          } as unknown as IdxResponse;
+          const action = {
+            name: 'some-remediation'
+          };
+          const res = await remediate(authClient, idxResponse, {}, { actions: [action] });
+          expect(res).toEqual({
+            idxResponse: {
+              ...responseFromRemediation
+            },
+            nextStep: { name: 'another-remediation' }
+          });
+          expect(util.getRemediator).toHaveBeenCalledTimes(0);
+        });
+
         it('will handle exceptions', async () => {
           let { authClient, idxResponse } = testContext;
           const error = new Error('my test error');
@@ -376,7 +533,7 @@ describe('idx/remediate', () => {
             name: 'unknown-action'
           };
           try {
-            await remediate(authClient, idxResponse, {}, { actions: [action] });
+            await remediate(authClient, idxResponse, {}, { actions: [action], enableLegacyMode: true });
           } catch (err: any) {
             didThrow = true;
             expect(err.name).toEqual('AuthSdkError');
@@ -384,9 +541,26 @@ describe('idx/remediate', () => {
           }
           expect(didThrow).toBe(true);
         });
+
+        it('[NEW MODE] it will throw an error', async () => {
+          const { authClient, idxResponse } = testContext;
+          let didThrow = false;
+          jest.spyOn(util, 'getRemediator').mockReturnValue(undefined);
+          jest.spyOn(util, 'isTerminalResponse').mockReturnValue(false);
+          const action = {
+            name: 'unknown-action'
+          };
+          try {
+            await remediate(authClient, idxResponse, {}, { actions: [action] });
+          } catch (err: any) {
+            didThrow = true;
+            expect(err.name).toEqual('AuthSdkError');
+            expect(err.errorSummary).toContain('Unable to proceed with provided actions');
+          }
+          expect(didThrow).toBe(true);
+        });
       });
     });
-
   });
 
   describe('no remediator matches', () => {
@@ -394,11 +568,12 @@ describe('idx/remediate', () => {
       jest.spyOn(util, 'getRemediator').mockReturnValue(undefined);
       jest.spyOn(util, 'isTerminalResponse').mockReturnValue(false);
     });
+
     it('by default, it throws an exception', async () => {
       const { authClient, idxResponse } = testContext;
       let didThrow = false;
       try {
-        await remediate(authClient, idxResponse, {}, { actions: ['unknown-action'] });
+        await remediate(authClient, idxResponse, {}, { actions: ['unknown-action'], enableLegacyMode: true });
       } catch (err: any) {
         didThrow = true;
         expect(err.name).toEqual('AuthSdkError');
@@ -406,8 +581,51 @@ describe('idx/remediate', () => {
       }
       expect(didThrow).toBe(true);
     });
+
+    it('[NEW MODE] by default, it throws an exception', async () => {
+      const { authClient, idxResponse } = testContext;
+      let didThrow = false;
+      try {
+        await remediate(authClient, idxResponse, {}, { actions: ['unknown-action'] });
+      } catch (err: any) {
+        didThrow = true;
+        expect(err.name).toEqual('AuthSdkError');
+        expect(err.errorSummary).toContain('Unable to proceed with provided actions');
+      }
+      expect(didThrow).toBe(true);
+    });
+
     describe('options.step was provided', () => {
       it('will execute the named remediation provided by options.step', async () => {
+        let { authClient, idxResponse } = testContext;
+        const responseFromRemediation = {
+          ...idxResponse,
+          neededToProceed: [{
+            name: 'another-remediation'
+          }],
+        };
+        idxResponse = {
+          ...idxResponse,
+          proceed: jest.fn().mockResolvedValue(responseFromRemediation),
+          neededToProceed: [{
+            name: 'some-remediation',
+            value: [{
+              name: 'foo'
+            }]
+          }],
+        } as unknown as IdxResponse;
+        const res = await remediate(authClient, idxResponse, {}, { step: 'some-remediation', enableLegacyMode: true });
+        expect(res).toEqual({
+          idxResponse: {
+            ...responseFromRemediation
+          },
+        });
+        expect(util.getRemediator).toHaveBeenCalledTimes(1);
+        expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse, {}, { step: 'some-remediation', enableLegacyMode: true });
+        expect(idxResponse.proceed).toHaveBeenCalledWith('some-remediation', {});
+      });
+
+      it('[NEW MODE] will execute the named remediation provided by options.step', async () => {
         let { authClient, idxResponse } = testContext;
         const responseFromRemediation = {
           ...idxResponse,
@@ -428,14 +646,42 @@ describe('idx/remediate', () => {
         const res = await remediate(authClient, idxResponse, {}, { step: 'some-remediation' });
         expect(res).toEqual({
           idxResponse: {
-            ...responseFromRemediation
+            ...responseFromRemediation,
           },
+          nextStep: {
+            name: 'another-remediation'
+          }
         });
         expect(util.getRemediator).toHaveBeenCalledTimes(1);
         expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse, {}, { step: 'some-remediation' });
         expect(idxResponse.proceed).toHaveBeenCalledWith('some-remediation', {});
       });
+
       it('will handle exceptions', async () => {
+        let { authClient, idxResponse } = testContext;
+        const error = new Error('my test error');
+        idxResponse = {
+          ...idxResponse,
+          proceed: jest.fn().mockRejectedValue(error),
+          neededToProceed: [{
+            name: 'some-remediation',
+            value: [{
+              name: 'foo'
+            }]
+          }],
+        } as unknown as IdxResponse;
+        let errorThrown = false;
+        try {
+          await remediate(authClient, idxResponse, {}, { step: 'some-remediation', enableLegacyMode: true });
+        } catch (e) {
+          errorThrown = true;
+          expect(e).toBe(error);
+        }
+        expect(errorThrown).toBe(true);
+        expect(idxResponse.proceed).toHaveBeenCalledWith('some-remediation', {});
+      });
+
+      it('[NEW MODE] will handle exceptions', async () => {
         let { authClient, idxResponse } = testContext;
         const error = new Error('my test error');
         idxResponse = {
@@ -459,10 +705,11 @@ describe('idx/remediate', () => {
         expect(idxResponse.proceed).toHaveBeenCalledWith('some-remediation', {});
       });
     });
+
     describe('flow is "default"', () => {
       it('returns the idxResponse', async () => {
         const { authClient, idxResponse } = testContext;
-        const res = await remediate(authClient, idxResponse, {}, { flow: 'default' });
+        const res = await remediate(authClient, idxResponse, {}, { flow: 'default', enableLegacyMode: true });
         expect(res).toEqual({ idxResponse });
       });
     });
@@ -482,16 +729,33 @@ describe('idx/remediate', () => {
         idxResponse
       };
     });
+
+    it('[NEW MODE] throws error is a `step` is not provided without legacyMode flag', async () => {
+      expect.assertions(3);   // ensures expected error is throw and `catch` is reached
+
+      const { authClient, idxResponse, remediator } = testContext;
+      remediator.canRemediate.mockReturnValue(false);
+      try {
+        await remediate(authClient, idxResponse, {}, {});
+      }
+      catch (err) {
+        expect((err as any).name).toEqual('AuthSdkError');
+        expect((err as any).errorSummary).toContain('No `step` or `action` provided');
+      }
+      expect(remediator.canRemediate).not.toHaveBeenCalled();
+    });
+
     it('if the Remediator cannot remediate, it returns early with nextStep information', async () => {
       const { authClient, idxResponse, remediator } = testContext;
       remediator.canRemediate.mockReturnValue(false);
-      const res = await remediate(authClient, idxResponse, {}, {});
+      const res = await remediate(authClient, idxResponse, {}, { enableLegacyMode: true });
       expect(res).toEqual({
         idxResponse,
         nextStep: {}
       });
       expect(remediator.canRemediate).toHaveBeenCalled();
     });
+
     describe('canRemediate', () => {
       beforeEach(() => {
         let { remediator } = testContext;
@@ -521,7 +785,7 @@ describe('idx/remediate', () => {
           }
         };
         idxResponse.proceed.mockResolvedValue(responseFromProceed);
-        const res = await remediate(authClient, idxResponse, {}, {});
+        const res = await remediate(authClient, idxResponse, {}, { enableLegacyMode: true });
         expect(res).toEqual({
           idxResponse: {
             ...responseFromProceed
@@ -530,8 +794,8 @@ describe('idx/remediate', () => {
         });
         expect(idxResponse.proceed).toHaveBeenCalledWith(name, data);
         expect(util.getRemediator).toHaveBeenCalledTimes(2);
-        expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse, {}, {});
-        expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromProceed, valuesAfterProceed, {});
+        expect(util.getRemediator).toHaveBeenNthCalledWith(1, idxResponse, {}, { enableLegacyMode: true });
+        expect(util.getRemediator).toHaveBeenNthCalledWith(2, responseFromProceed, valuesAfterProceed, { enableLegacyMode: true });
 
       });
 
@@ -549,7 +813,7 @@ describe('idx/remediate', () => {
         idxResponse.proceed.mockRejectedValue(errorFromProceed);
         let errorThrown;
         try {
-          await remediate(authClient, idxResponse, {}, {});
+          await remediate(authClient, idxResponse, {}, { enableLegacyMode: true });
         } catch (e) {
           errorThrown = e;
         }
@@ -578,12 +842,62 @@ describe('idx/remediate', () => {
       };
       idxResponse.proceed.mockResolvedValue(responseFromProceed);
       remediator.canRemediate.mockReturnValue(true);
+      await remediate(authClient, idxResponseInput, {}, { useGenericRemediator: true, enableLegacyMode: true });
+      expect(idxResponse.proceed).toHaveBeenCalledTimes(1);
+    });
+
+    it('[NEW MODE] returns nextStep without auto proceeding in pending status', async () => {
+      let { authClient, idxResponse, remediator } = testContext;
+      const idxResponseInput = {
+        ...idxResponse,
+        neededToProceed: [{
+          name: 'some-remediation'
+        }]
+      };
+      // response in pending status
+      const responseFromProceed = {
+        ...idxResponse,
+        neededToProceed: [{
+          name: 'some-new-remediation'
+        }]
+      };
+      idxResponse.proceed.mockResolvedValue(responseFromProceed);
+      remediator.canRemediate.mockReturnValue(true);
       await remediate(authClient, idxResponseInput, {}, { useGenericRemediator: true });
       expect(idxResponse.proceed).toHaveBeenCalledTimes(1);
-      expect(remediator.getNextStep).toHaveBeenCalledTimes(1);
     });
 
     it('returns terminal status with terminal response', async () => {
+      let { authClient, idxResponse, remediator } = testContext;
+      const idxResponseInput = {
+        ...idxResponse,
+        neededToProceed: [{
+          name: 'some-remediation'
+        }]
+      };
+      // response in terminal status
+      const responseFromProceed = {
+        ...idxResponse,
+        rawIdxState: {
+          messages: {
+            value: ['hello']
+          }
+        }
+      };
+      idxResponse.proceed.mockResolvedValue(responseFromProceed);
+      remediator.canRemediate.mockReturnValue(true);
+      const res = await remediate(authClient, idxResponseInput, {}, { useGenericRemediator: true, enableLegacyMode: true });
+      expect(idxResponse.proceed).toHaveBeenCalledTimes(1);
+      expect(remediator.getNextStep).toHaveBeenCalledTimes(0);
+      expect(res).toEqual({
+        idxResponse: {
+          ...responseFromProceed,
+        },
+        terminal: true,
+      });
+    });
+
+    it('[NEW MODE] returns terminal status with terminal response', async () => {
       let { authClient, idxResponse, remediator } = testContext;
       const idxResponseInput = {
         ...idxResponse,

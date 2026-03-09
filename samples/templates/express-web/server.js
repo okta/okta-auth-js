@@ -22,7 +22,7 @@ const querystring = require('querystring');
 {{#if oidc}}
 const uuid = require('uuid');
 const https = require('https');
-const btoa = require('btoa');
+
 
 const redirectUrl = `http://localhost:{{ port }}{{ redirectPath}}`;
 

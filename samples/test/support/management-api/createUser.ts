@@ -35,7 +35,7 @@ export default async (config: OktaClientConfig, {
   Promise<User> => {
   const oktaClient = getOktaClient({ ...config, scopes: ['okta.users.manage'] });
 
-  let user: User;
+  let user: User | null = null;
 
   try {
     const profile = {
@@ -63,8 +63,8 @@ export default async (config: OktaClientConfig, {
       if (key === 'age') {
         value = +value;
       }
-      (user.profile as any)[key] = value;
-    }); 
+      (user?.profile as any)[key] = value;
+    });
     user = await user.update();
     
     for (const groupId of assignToGroups) {

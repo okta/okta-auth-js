@@ -69,7 +69,8 @@ describe('idx/recoverPassword', () => {
       options: {
         issuer,
         clientId,
-        redirectUri
+        redirectUri,
+        idx: { enableLegacyMode: true }
       },
       transactionManager: {
         exists: () => true,

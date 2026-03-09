@@ -22,6 +22,7 @@ const FlowPage = () => {
     const idxStartOptions = {
       ...(maxAge && { maxAge }),
       ...(acrValues && { acrValues }),
+      enableLegacyMode: true,
     };
 
     let newTransaction;

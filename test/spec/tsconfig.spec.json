@@ -1,6 +1,11 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "types": ["node", "jest"],
     "noEmit": true
-  }
+  },
+  "lib": [
+    "dom",
+    "esnext.disposable"
+  ]
 }

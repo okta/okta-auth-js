@@ -36,3 +36,7 @@ require('webcrypto-shim');
 if (typeof window.TextEncoder !== 'function') {
   require('fast-text-encoding');
 }
+
+if (typeof window.fetch !== 'function') {
+  require('whatwg-fetch');
+}

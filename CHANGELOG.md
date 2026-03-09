@@ -1,6 +1,27 @@
 # Changelog
 
+# 8.0.0
+
+### Breaking Changes
+
+- [#1607](https://github.com/okta/okta-auth-js/pull/1607) breaking: bumps minimum node version to 20
+- [#1621](https://github.com/okta/okta-auth-js/pull/1621)
+  * breaking: removes `cross-fetch` dependency (adds `fetch` to polyfill)
+  * fix: moves polyfill dependencies to separate `yarn workspace`
+- [#1617](https://github.com/okta/okta-auth-js/pull/1617) breaking: access tokens are no longer decoded by default
+- [#1615](https://github.com/okta/okta-auth-js/pull/1615) breaking: `step` is now a required parameter for `idx.proceed`
+
+### Fixes
+
+- [#1608](https://github.com/okta/okta-auth-js/pull/1608) chore: upgrades `broadcast-channel` and other dependencies
+- [#1619](https://github.com/okta/okta-auth-js/pull/1619) chore: removes `p-cancelable` dependency
+- [#1620](https://github.com/okta/okta-auth-js/pull/1620) chore: removes `atob`, `btoa` and `@peculiar/webcrypto` dependencies
+- [#1623](https://github.com/okta/okta-auth-js/pull/1623) chore: bumps `tiny-emitter` dependency to leverage ESM export
+- [#1624](https://github.com/okta/okta-auth-js/pull/1624) chore: upgrades `broadcast-channel` and `@babel/runtime`
+
 # 7.14.1
+
+### Fixes
 
 - [#1611](https://github.com/okta/okta-auth-js/pull/1611) fix: improves regex for parsing Authorization Code Flow redirect urls
 

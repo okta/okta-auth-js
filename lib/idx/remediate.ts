@@ -13,7 +13,7 @@
 
 /* eslint-disable max-statements, max-depth, complexity */
 import { AuthSdkError } from '../errors';
-import { RemediationValues } from './remediators';
+import { RemediationValues, GenericRemediator } from './remediators';
 import { OktaAuthIdxInterface, RemediateOptions, RemediationResponse } from './types';
 import { 
   IdxResponse,
@@ -60,6 +60,28 @@ function removeActionFromOptions(options: RemediateOptions, actionName: string):
   return { ...options, actions };
 }
 
+function getGenericNextStep (
+  authClient: OktaAuthIdxInterface,
+  idxResponse: IdxResponse,
+  options: RemediateOptions
+) {
+  // If the response contains an interaction code, there is no need to remediate
+  if (idxResponse.interactionCode) {
+    return { idxResponse };
+  }
+
+  if (options.enableLegacyMode) {
+    return { idxResponse };
+  }
+
+  const gr = new GenericRemediator(idxResponse.neededToProceed[0], {}, options);
+  const nextStep = getNextStep(authClient, gr, idxResponse);
+  return {
+    idxResponse,
+    nextStep,
+  };
+}
+
 // This function is called recursively until it reaches success or cannot be remediated
 export async function remediate(
   authClient: OktaAuthIdxInterface,
@@ -68,14 +90,19 @@ export async function remediate(
   options: RemediateOptions
 ): Promise<RemediationResponse> {
   let { neededToProceed, interactionCode } = idxResponse;
-  const { flow } = options;
+  const { flow, useGenericRemediator, enableLegacyMode } = options;
+  // references to the "new" defaut paradigm in v8.x - requires step/actions are provided
+  const isStepMode = enableLegacyMode !== true;
 
   // If the response contains an interaction code, there is no need to remediate
   if (interactionCode) {
     return { idxResponse };
   }
 
-  const remediator = getRemediator(idxResponse, values, options);
+  // Do not attempt to remediate if response is in terminal state
+  if (isTerminalResponse(idxResponse)) {
+    return { idxResponse, terminal: true };
+  }
 
   // Try actions in idxResponse first
   const actionFromValues = getActionFromValues(values, idxResponse);
@@ -84,7 +111,7 @@ export async function remediate(
     ...actionFromOptions,
     ...(actionFromValues && [actionFromValues] || []),
   ];
-  if (actions) {
+  if (actions.length > 0) {
     for (let action of actions) {
       // Action can either be specified as a string, or as an object with name and optional params
       let params: IdxActionParams = {};
@@ -103,6 +130,12 @@ export async function remediate(
         if (action === 'cancel') {
           return { idxResponse, canceled: true };
         }
+
+        // don't recursively call `remediate` in non-legacy mode
+        if (isStepMode) {
+          return getGenericNextStep(authClient, idxResponse, options);
+        }
+
         return remediate(
           authClient, 
           idxResponse, 
@@ -118,17 +151,30 @@ export async function remediate(
         if (idxResponse.requestDidSucceed === false) {
           return handleFailedResponse(authClient, idxResponse, options);
         }
+
+        // don't recursively call `remediate` in non-legacy mode
+        if (isStepMode) {
+          return getGenericNextStep(authClient, idxResponse, options);
+        }
+
         return remediate(authClient, idxResponse, values, optionsWithoutExecutedAction); // recursive call
       }
     }
+
+    // if `actions` were provided and no match was found after full loop iteration
+    // throw to provide a more specific error
+    if (isStepMode && !options.step) {
+      throw new AuthSdkError('Unable to proceed with provided actions');
+    }
   }
 
-  // Do not attempt to remediate if response is in terminal state
-  const terminal = isTerminalResponse(idxResponse);
-  if (terminal) {
-    return { idxResponse, terminal };
+  // "non-legacy mode" requires either `actions` or `step` to be provided
+  // skip this condition if `GenericRemediator` is configured
+  if (!useGenericRemediator && isStepMode && !options.step) {
+    throw new AuthSdkError('No `step` or `action` provided');
   }
 
+  const remediator = getRemediator(idxResponse, values, options);
   if (!remediator) {
     // With options.step, remediator is not required
     if (options.step) {
@@ -137,8 +183,10 @@ export async function remediate(
       if (idxResponse.requestDidSucceed === false) {
         return handleFailedResponse(authClient, idxResponse, options);
       }
-      return { idxResponse };
+      return getGenericNextStep(authClient, idxResponse, options);
     }
+
+    // implied `isStepMode=false` at this point, step cannot be undefined otherwise
 
     // With default flow, remediator is not required
     if (flow === 'default') {
@@ -166,23 +214,26 @@ export async function remediate(
   if (idxResponse.requestDidSucceed === false) {
     return handleFailedResponse(authClient, idxResponse, options);
   }
+
+  // do not continue recursively looping if response is terminal
+  if (isTerminalResponse(idxResponse)) {
+    return { idxResponse, terminal: true };
+  }
+
+  // NOTE: useGenericRemediator
+  // generic remediator should not auto proceed in pending status
+  // return nextStep directly
+  // NOTE: enableLegacyMode (via isStepMode)
+  // "non-legacy mode" should not auto remediate, therefore leverage the
+  // `GenericRemediator` to determine `nextStep` and return
+  if (useGenericRemediator || isStepMode) {
+    return getGenericNextStep(authClient, idxResponse, options);
+  }
+
   // We may want to trim the values bag for the next remediation
   // Let the remediator decide what the values should be (default to current values)
   values = remediator.getValuesAfterProceed();
   options = { ...options, step: undefined }; // do not re-use the step
-
-  // generic remediator should not auto proceed in pending status
-  // return nextStep directly
-  if (options.useGenericRemediator && !idxResponse.interactionCode && !isTerminalResponse(idxResponse)) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const gr = getRemediator(idxResponse, values, options)!;
-    const nextStep = getNextStep(authClient, gr, idxResponse);
-    return {
-      idxResponse,
-      nextStep,
-    };
-  }
-  
   return remediate(authClient, idxResponse, values, options); // recursive call
 
 }

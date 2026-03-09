@@ -67,7 +67,71 @@ This module provides convenience methods to support popular scenarios to communi
 
 ### Concepts
 
+#### Step Mode vs Legacy Mode
+
+> :grey_exclamation: This distinction is only relevant in `auth-js@8.x`. Previous versions always execute in, what is now known as, "Legacy Mode".
+
+The `IDX` client was developed to be flexible and to enable a couple different invocation patterns to ease use. Over time (and as the IDX API has evolved), we have seen inconsistency in these various patterns. As of `auth-js@8.x`, each step (remediation) in a given flow will need to be explicitly specificed. This may required more code, but it makes client behavior consistent.
+
+##### Step Mode
+
+Step Mode is the new default mode as of `auth-js@8.x`. Step Mode requires each call to `idx.proceed` to include either an `actions` or `step` property, like so
+
+```javascript
+const response = await idx.proceed({ step: 'identify', username: 'foo@bar.com' })
+```
+
+The `step` (or `actions`) property names the remediation to run. The `IDX` client will execute that remediation and return the response; it will not automatically perform subsequent (recursive) remediations. You must call `idx.proceed` for each step.
+
+A handful of features will no longer work in Step Mode, including:
+* Recursive remediation (automatic recursive calls)
+* [`flow`](#flow)
+* [Up-front](#up-front-approach)
+
+##### Legacy Mode
+
+Legacy Mode preserves pre-8.x behavior and is on a deprecation path. Use it only as a temporary migration aid.
+
+Legacy Mode enables other features, which no longer work in [Step Mode](#step-mode), including:
+* Recursive remediation (automatic recursive calls)
+* [`flow`](#flow)
+* [Up-front](#up-front-approach)
+
+However these patterns can be a bit inconsistent (which ultimately led to the decision to phase them out).
+
+Legacy Mode can be enabled when constructing `OktaAuth` or on a per-call basis when calling `idx.proceed`.
+
+```javascript
+const oktaAuth = new OktaAuth({
+  ...config,
+  idx: { enableLegacyMode: true }
+})
+// OR
+const response = await idx.proceed({
+  username: 'foo@bar.com',
+  enableLegacyMode: true
+})
+```
+
+> :warning: Issues reported while using Legacy Mode will be lower priority, but we will still accept community contributions.
+
 #### Flow
+
+> :warning: As of `auth-js@8.x`, `flow` is not supported in the default `IDX` client.
+
+Prior to auth-js@8.x, the flow feature allowed bootstrapping an IDX transaction to a specific user experience (for example, { flow: 'unlock-account' }). Internally this worked by proceeding with a sequence of specific remediations, which required hardcoding remediation names for each flow value. As IDX evolved, that approach became brittle and increased bundle size. As a result, flow is deprecated and is not enabled in the default auth-js@8.x IDX client. Instead of flow, call idx.proceed({ step: '...' }) to drive the IDX client into the desired state; the exact steps depend on your Okta org configuration. (You can re-enable the old behavior by using Legacy Mode, but that is not recommended long-term.)
+
+```javascript
+async function bootstrapUnlockAccount () {
+  await idx.start();
+  // NOTE: The steps needed will depend on your Okta Org configuration
+  const response = await idx.proceed({ step: 'unlock-account' });
+}
+```
+
+Alternatively, [Legacy Mode](#legacy-mode) can be used to re-enable `flow`, however this approach is not recommended long term
+
+> Prior to `auth-js@8.x` or [Legacy Mode](#legacy-mode)
 
 In addition to the default authentication flow, this SDK supports several pre-defined flows, such as [register](#idxregister), [recoverPassword](#idxrecoverpassword) and [unlockAccount](#idxunlockaccount). A flow can be started by calling one of the available [flow entrypoints](#flow-entrypoints) or by passing a valid flow identifier string to [`startTransaction`](#idxstarttransaction). The `flow` is saved with the transaction which enables the [proceed](#idxproceed) method to corrrectly handle remediations without additional context. Starting a new flow discards any existing in-progress transaction of a different type. For example, if an authentication flow is in-progress, a call to [authenticate](#idxauthenticate) or [proceed](#idxproceed) will continue using the current transaction but a call to a [flow entrypoint](#flow-entrypoints) will start a new transaction.
 
@@ -155,6 +219,8 @@ if (authClient.idx.isEmailVerifyCallback(search)) {
 You can work with these methods with `Up-Front` and `On-Demand` approaches, normally a mix of both approaches will be needed when user inputs are required in the middle of the flow (e.g. multiple factors auth). Below are the general explanation of these two approaches, more code examples will be provided with the specific methods.
 
 ##### Up-Front approach
+
+> :warning: As of `auth-js@8.x`, the Up-Front approach is no longer recommended and is only supported in [Legacy Mode](#legacy-mode).
 
 You can provide parameters based on your app's policy configuration and user inputs to drive the methods to communicate with [Okta's Identity Engine][].
 

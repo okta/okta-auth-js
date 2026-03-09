@@ -1,37 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`idxResponseParser parseIdxResponse builds remediation for authenticator-verify-select-authenticator 1`] = `
-Object {
+{
   "accepts": "application/vnd.okta.v1+json",
   "action": undefined,
   "href": "http://localhost:3000/idp/idx/challenge",
   "method": "POST",
   "name": "select-authenticator-authenticate",
-  "rel": Array [
+  "rel": [
     "create-form",
   ],
-  "value": Array [
-    Object {
+  "value": [
+    {
       "name": "authenticator",
-      "options": Array [
-        Object {
+      "options": [
+        {
           "label": "Okta Password",
-          "relatesTo": Object {
+          "relatesTo": {
             "authenticatorId": "aidwboITrg4b4yAYd0g3",
             "displayName": "Okta Password",
             "id": "autwa6eD9o02iBbtv0g1",
             "type": "password",
           },
-          "value": Object {
-            "form": Object {
-              "value": Array [
-                Object {
+          "value": {
+            "form": {
+              "value": [
+                {
                   "mutable": false,
                   "name": "id",
                   "required": true,
                   "value": "aidwboITrg4b4yAYd0g3",
                 },
-                Object {
+                {
                   "mutable": false,
                   "name": "methodType",
                   "required": false,
@@ -41,25 +41,25 @@ Object {
             },
           },
         },
-        Object {
+        {
           "label": "FIDO2 (WebAuthn)",
-          "relatesTo": Object {
+          "relatesTo": {
             "authenticatorId": "aidtheidkwh282hv8g3",
             "displayName": "FIDO2 (WebAuthn)",
             "id": "autwa6eD9o02iBbtv0g2",
             "type": "security_key",
           },
-          "value": Object {
-            "form": Object {
-              "value": Array [
-                Object {
+          "value": {
+            "form": {
+              "value": [
+                {
                   "mutable": false,
                   "name": "id",
                   "required": true,
                   "value": "fwftheidkwh282hv8g3",
                   "visible": false,
                 },
-                Object {
+                {
                   "mutable": false,
                   "name": "methodType",
                   "required": false,
@@ -70,25 +70,25 @@ Object {
             },
           },
         },
-        Object {
+        {
           "label": "FIDO2 (WebAuthn)",
-          "relatesTo": Object {
+          "relatesTo": {
             "authenticatorId": "fwftheidkwh282hv8g3",
             "displayName": "FIDO2 (WebAuthn)",
             "id": "autwa6eD9o02iBbtv0g2",
             "type": "security_key",
           },
-          "value": Object {
-            "form": Object {
-              "value": Array [
-                Object {
+          "value": {
+            "form": {
+              "value": [
+                {
                   "mutable": false,
                   "name": "id",
                   "required": true,
                   "value": "aidtheidkwh282hv8g3",
                   "visible": false,
                 },
-                Object {
+                {
                   "mutable": false,
                   "name": "methodType",
                   "required": false,
@@ -99,30 +99,30 @@ Object {
             },
           },
         },
-        Object {
+        {
           "label": "Okta Email",
-          "relatesTo": Object {
+          "relatesTo": {
             "authenticatorId": "aidtm56L8gXXHI1SD0g3",
             "displayName": "Okta Email",
             "id": "autwa6eD9o02iBbtv0g3",
-            "methods": Array [
-              Object {
+            "methods": [
+              {
                 "methodType": "email",
               },
             ],
             "type": "email",
           },
-          "value": Object {
-            "form": Object {
-              "value": Array [
-                Object {
+          "value": {
+            "form": {
+              "value": [
+                {
                   "mutable": false,
                   "name": "id",
                   "required": true,
                   "value": "aidtm56L8gXXHI1SD0g3",
                   "visible": false,
                 },
-                Object {
+                {
                   "mutable": false,
                   "name": "methodType",
                   "required": false,
@@ -132,18 +132,18 @@ Object {
             },
           },
         },
-        Object {
+        {
           "label": "Okta Phone",
-          "relatesTo": Object {
+          "relatesTo": {
             "authenticatorId": "aid568g3mXgtID0X1SLH",
             "displayName": "Okta Phone",
             "id": "autwa6eD9o02iBbsta82",
             "type": "phone",
           },
-          "value": Object {
-            "form": Object {
-              "value": Array [
-                Object {
+          "value": {
+            "form": {
+              "value": [
+                {
                   "mutable": false,
                   "name": "id",
                   "required": true,
@@ -154,18 +154,18 @@ Object {
             },
           },
         },
-        Object {
+        {
           "label": "Okta Security Question",
-          "relatesTo": Object {
+          "relatesTo": {
             "authenticatorId": "aid568g3mXgtID0HHSLH",
             "displayName": "Okta Security Question",
             "id": "autwa6eD9o02iBbaaa82",
             "type": "security_question",
           },
-          "value": Object {
-            "form": Object {
-              "value": Array [
-                Object {
+          "value": {
+            "form": {
+              "value": [
+                {
                   "mutable": false,
                   "name": "id",
                   "required": true,
@@ -179,7 +179,7 @@ Object {
       ],
       "type": "object",
     },
-    Object {
+    {
       "mutable": false,
       "name": "stateHandle",
       "required": true,
@@ -191,34 +191,34 @@ Object {
 `;
 
 exports[`idxResponseParser parseIdxResponse builds remediation functions for authenticator-verify-password 1`] = `
-Object {
+{
   "accepts": "application/vnd.okta.v1+json",
   "action": undefined,
   "href": "http://localhost:3000/idp/idx/challenge/answer",
   "method": "POST",
   "name": "challenge-authenticator",
-  "rel": Array [
+  "rel": [
     "create-form",
   ],
-  "relatesTo": Object {
+  "relatesTo": {
     "type": "object",
-    "value": Object {
+    "value": {
       "authenticatorId": "autwa6eD9o02iBbtv0g1",
       "displayName": "Okta Password",
       "id": "aidwboITrg4b4yAYd0g3",
-      "profile": Object {
+      "profile": {
         "name": "Okta Password",
       },
-      "recover": Object {
+      "recover": {
         "accepts": "application/vnd.okta.v1+json",
         "href": "http://localhost:3000/idp/idx/recover",
         "method": "POST",
         "name": "recover",
-        "rel": Array [
+        "rel": [
           "create-form",
         ],
-        "value": Array [
-          Object {
+        "value": [
+          {
             "mutable": false,
             "name": "stateHandle",
             "required": true,
@@ -230,11 +230,11 @@ Object {
       "type": "password",
     },
   },
-  "value": Array [
-    Object {
-      "form": Object {
-        "value": Array [
-          Object {
+  "value": [
+    {
+      "form": {
+        "value": [
+          {
             "label": "Password",
             "name": "passcode",
             "secret": true,
@@ -243,7 +243,7 @@ Object {
       },
       "name": "credentials",
     },
-    Object {
+    {
       "mutable": false,
       "name": "stateHandle",
       "required": true,

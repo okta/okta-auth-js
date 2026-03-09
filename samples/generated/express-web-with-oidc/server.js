@@ -21,7 +21,7 @@ const express = require('express');
 const querystring = require('querystring');
 const uuid = require('uuid');
 const https = require('https');
-const btoa = require('btoa');
+
 
 const redirectUrl = `http://localhost:8080/authorization-code/callback`;
 

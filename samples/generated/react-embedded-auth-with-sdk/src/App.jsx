@@ -69,7 +69,7 @@ function App() {
   useEffect(() => {
     const resumeTransaction = async () => {
       setLoading(true);
-      const newTransaction = await oktaAuth.idx.proceed();
+      const newTransaction = await oktaAuth.idx.proceed({ enableLegacyMode: true });
       setTransaction(newTransaction);
       setLoading(false);
     };

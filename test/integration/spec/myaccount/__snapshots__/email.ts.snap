@@ -1,16 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`MyAccount Email API Email Management can manage email with SDK methods 1`] = `
-Object {
+{
   "challenge": [Function],
   "delete": [Function],
   "get": [Function],
   "headers": Any<Object>,
   "id": Any<String>,
-  "profile": Object {
+  "profile": {
     "email": Any<String>,
   },
-  "roles": Array [
+  "roles": [
     "SECONDARY",
   ],
   "status": "UNVERIFIED",
@@ -18,12 +18,12 @@ Object {
 `;
 
 exports[`MyAccount Email API Email Management can manage email with SDK methods 2`] = `
-Object {
+{
   "expiresAt": Any<String>,
   "headers": Any<Object>,
   "id": Any<String>,
   "poll": [Function],
-  "profile": Object {
+  "profile": {
     "email": Any<String>,
   },
   "status": "UNVERIFIED",
@@ -34,16 +34,16 @@ Object {
 exports[`MyAccount Email API Email Management can manage email with SDK methods 3`] = `BaseTransaction {}`;
 
 exports[`MyAccount Email API Email Management can manage email with Transaction functions 1`] = `
-Object {
+{
   "challenge": [Function],
   "delete": [Function],
   "get": [Function],
   "headers": Any<Object>,
   "id": Any<String>,
-  "profile": Object {
+  "profile": {
     "email": Any<String>,
   },
-  "roles": Array [
+  "roles": [
     "SECONDARY",
   ],
   "status": "UNVERIFIED",
@@ -51,16 +51,16 @@ Object {
 `;
 
 exports[`MyAccount Email API Email Management can manage email with Transaction functions 2`] = `
-Object {
+{
   "challenge": [Function],
   "delete": [Function],
   "get": [Function],
   "headers": Any<Object>,
   "id": Any<String>,
-  "profile": Object {
+  "profile": {
     "email": Any<String>,
   },
-  "roles": Array [
+  "roles": [
     "SECONDARY",
   ],
   "status": "UNVERIFIED",
@@ -68,12 +68,12 @@ Object {
 `;
 
 exports[`MyAccount Email API Email Management can manage email with Transaction functions 3`] = `
-Object {
+{
   "expiresAt": Any<String>,
   "headers": Any<Object>,
   "id": Any<String>,
   "poll": [Function],
-  "profile": Object {
+  "profile": {
     "email": Any<String>,
   },
   "status": "UNVERIFIED",
@@ -82,11 +82,11 @@ Object {
 `;
 
 exports[`MyAccount Email API Email Management can manage email with Transaction functions 4`] = `
-Object {
+{
   "expiresAt": Any<String>,
   "headers": Any<Object>,
   "id": Any<String>,
-  "profile": Object {
+  "profile": {
     "email": Any<String>,
   },
   "status": "UNVERIFIED",
@@ -96,13 +96,13 @@ Object {
 exports[`MyAccount Email API Email Management can manage email with Transaction functions 5`] = `BaseTransaction {}`;
 
 exports[`MyAccount Email API getEmail/s can get email/s 1`] = `
-Object {
+{
   "challenge": [Function],
   "delete": [Function],
   "get": [Function],
   "headers": Any<Object>,
   "id": Any<String>,
-  "profile": Object {
+  "profile": {
     "email": Any<String>,
   },
   "roles": Any<Array>,
@@ -111,13 +111,13 @@ Object {
 `;
 
 exports[`MyAccount Email API getEmail/s can get email/s 2`] = `
-Object {
+{
   "challenge": [Function],
   "delete": [Function],
   "get": [Function],
   "headers": Any<Object>,
   "id": Any<String>,
-  "profile": Object {
+  "profile": {
     "email": Any<String>,
   },
   "roles": Any<Array>,

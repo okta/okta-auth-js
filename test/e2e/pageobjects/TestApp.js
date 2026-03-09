@@ -64,7 +64,7 @@ class TestApp {
   get dpopOptionOff() { return $('#f_dpop-off'); }
   get clientId() { return $('#f_clientId'); }
   get issuer() { return $('#f_issuer'); }
-  get interactionCodeOption() { return $('#f_useInteractionCodeFlow-on'); }
+  get useClassicEngineOption() { return $('#f_useClassicEngine-on'); }
   get acrValues() { return $('#f_acrValues'); }
   get enrollAmrValues() { return $('#f_enroll_amr_values'); }
   get submit() { return $('#f_submit'); }

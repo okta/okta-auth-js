@@ -28,7 +28,8 @@ const mocked = {
   interact: require('../../../lib/idx/interact'),
   introspect: require('../../../lib/idx/introspect'),
   remediate: require('../../../lib/idx/remediate'),
-  transactionMeta: require('../../../lib/idx/transactionMeta')
+  transactionMeta: require('../../../lib/idx/transactionMeta'),
+  run: require('../../../lib/idx/run'),
 };
 
 describe('idx/startTransaction', () => {
@@ -109,7 +110,7 @@ describe('idx/startTransaction', () => {
 
   it('calls interact, introspect, and remediate', async () => {
     const { authClient, idxResponse } = testContext;
-    await startTransaction(authClient);
+    await startTransaction(authClient, { enableLegacyMode: true });
     expect(mocked.interact.interact).toHaveBeenCalledWith(authClient, { withCredentials: true });
     expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, { 
       withCredentials: true,
@@ -126,6 +127,45 @@ describe('idx/startTransaction', () => {
       // flowMonitor
       expect.any(Object)
     );
+  });
+
+  describe('enableLegacyMode', () => {
+    it('defaults to step mode (autoRemediate: false) when enableLegacyMode is not set', async () => {
+      const runSpy = jest.spyOn(mocked.run, 'run');
+      const { authClient } = testContext;
+      await startTransaction(authClient);
+      expect(mocked.remediate.remediate).not.toHaveBeenCalled();
+      expect(runSpy).toHaveBeenCalledWith(authClient, {
+        exchangeCodeForTokens: false,
+        autoRemediate: false,
+      });
+    });
+    it('does not set autoRemediate when enableLegacyMode is true', async () => {
+      const runSpy = jest.spyOn(mocked.run, 'run');
+      const { authClient } = testContext;
+      await startTransaction(authClient, { enableLegacyMode: true });
+      expect(mocked.remediate.remediate).toHaveBeenCalled();
+      expect(runSpy).toHaveBeenCalledWith(authClient, {
+        exchangeCodeForTokens: false,
+        enableLegacyMode: true,
+      });
+    });
+    it('sets autoRemediate: false when enableLegacyMode is explicitly false', async () => {
+      const runSpy = jest.spyOn(mocked.run, 'run');
+      const { authClient } = testContext;
+      await startTransaction(authClient, { enableLegacyMode: false });
+      expect(mocked.interact.interact).toHaveBeenCalledWith(authClient, { withCredentials: true });
+      expect(mocked.introspect.introspect).toHaveBeenCalledWith(authClient, {
+        withCredentials: true,
+        interactionHandle: 'meta-interactionHandle'
+      });
+      expect(mocked.remediate.remediate).not.toHaveBeenCalled();
+      expect(runSpy).toHaveBeenCalledWith(authClient, {
+        exchangeCodeForTokens: false,
+        autoRemediate: false,
+        enableLegacyMode: false
+      });
+    });
   });
 
   it('does not attempt to exchange code for tokens', async () => {
