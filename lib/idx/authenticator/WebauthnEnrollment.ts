@@ -1,9 +1,11 @@
 import { Authenticator, Credentials } from './Authenticator';
 
 export interface WebauthnEnrollValues {
+  id?: string;
   clientData?: string;
   attestation?: string;
   credentials?: Credentials;
+  transports?: string;
 }
 
 export class WebauthnEnrollment extends Authenticator<WebauthnEnrollValues> {
@@ -15,13 +17,14 @@ export class WebauthnEnrollment extends Authenticator<WebauthnEnrollValues> {
   }
 
   mapCredentials(values: WebauthnEnrollValues): Credentials | undefined {
-    const { credentials, clientData, attestation } = values;
+    const { credentials, clientData, attestation, transports } = values;
     if (!credentials && !clientData && !attestation) {
       return;
     }
     return credentials || ({
       clientData,
-      attestation
+      attestation,
+      ...(transports && { transports }),
     });
   }
 

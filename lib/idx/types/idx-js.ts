@@ -23,6 +23,7 @@ export interface ChallengeData {
     appid: string;
   };
   rpId?: string;
+  hints?: string[];
 }
 export interface ActivationData {
   challenge: string;
@@ -50,6 +51,7 @@ export interface ActivationData {
     id: string;
     type: string;
   }[];
+  hints?: string[];
 }
 export interface IdxAuthenticatorMethod {
   type: string;
@@ -85,6 +87,7 @@ export interface IdxAuthenticator {
     challengeData?: ChallengeData;
   };
   credentialId?: string;
+  transports?: string[];
   enrollmentId?: string;
   profile?: Record<string, unknown>;
   resend?: Record<string, unknown>;

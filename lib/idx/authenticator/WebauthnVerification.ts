@@ -1,6 +1,7 @@
 import { Authenticator, Credentials } from './Authenticator';
 
 export interface WebauthnVerificationValues {
+  id?: string;
   clientData?: string;
   authenticatorData?: string;
   signatureData?: string;

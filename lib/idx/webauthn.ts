@@ -15,6 +15,8 @@ import {
   ActivationData,
   ChallengeData,
   IdxAuthenticator,
+  WebauthnEnrollValues,
+  WebauthnVerificationValues,
 } from './types';
 
 
@@ -23,10 +25,17 @@ const getEnrolledCredentials = (authenticatorEnrollments: IdxAuthenticator[] = [
   const credentials: PublicKeyCredentialDescriptor[] = [];
   authenticatorEnrollments.forEach((enrollement) => {
     if (enrollement.key === 'webauthn') {
-      credentials.push({
+      const credential: PublicKeyCredentialDescriptor = {
         type: 'public-key',
         id: base64UrlToBuffer(enrollement.credentialId),
-      });
+      };
+      // transports may be at top-level or nested under profile
+      const transports = enrollement.transports
+        ?? (enrollement.profile as Record<string, unknown> | undefined)?.transports;
+      if (Array.isArray(transports)) {
+        credential.transports = transports as AuthenticatorTransport[];
+      }
+      credentials.push(credential);
     }
   });
   return credentials;
@@ -50,6 +59,7 @@ export const buildCredentialCreationOptions = (
       attestation: activationData.attestation,
       authenticatorSelection: activationData.authenticatorSelection,
       excludeCredentials: getEnrolledCredentials(authenticatorEnrollments),
+      ...(activationData.hints && { hints: activationData.hints }),
     }
   } as CredentialCreationOptions;
 };
@@ -66,27 +76,34 @@ export const buildCredentialRequestOptions = (
       userVerification: challengeData.userVerification,
       allowCredentials: getEnrolledCredentials(authenticatorEnrollments),
       ...(challengeData.rpId && { rpId: challengeData.rpId }),
+      ...(challengeData.hints && { hints: challengeData.hints }),
     }
   } as CredentialRequestOptions;
 };
 
 // Build attestation for webauthn enroll
 // https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse
-export const getAttestation = (credential: PublicKeyCredential) => {
+export const getAttestation = (credential: PublicKeyCredential): WebauthnEnrollValues => {
   const response = credential.response as AuthenticatorAttestationResponse;
   const id = credential.id;
   const clientData = bufferToBase64Url(response.clientDataJSON);
   const attestation = bufferToBase64Url(response.attestationObject);
-  return {
+  // getTransports() is a newer WebAuthn API not yet in all TS type definitions
+  const getTransportsFn = (response as any).getTransports;
+  const result: WebauthnEnrollValues = {
     id,
     clientData,
-    attestation
+    attestation,
   };
+  if (typeof getTransportsFn === 'function') {
+    result.transports = JSON.stringify(getTransportsFn.call(response));
+  }
+  return result;
 };
 
 // Build assertion for webauthn verification
 // https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAssertionResponse
-export const getAssertion = (credential: PublicKeyCredential) => {
+export const getAssertion = (credential: PublicKeyCredential): WebauthnVerificationValues => {
   const response = credential.response as AuthenticatorAssertionResponse;
   const id = credential.id;
   const clientData = bufferToBase64Url(response.clientDataJSON);

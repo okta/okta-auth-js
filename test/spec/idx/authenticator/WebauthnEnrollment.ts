@@ -54,6 +54,19 @@ describe('idx/authenticator/WebauthnEnrollment', () => {
         clientData: 'foo'
       });
     });
+    it('includes transports when provided', () => {
+      const { authenticator } = testContext;
+      expect(authenticator.mapCredentials({ attestation: 'foo', clientData: 'foo', transports: '["internal"]' })).toEqual({
+        attestation: 'foo',
+        clientData: 'foo',
+        transports: '["internal"]',
+      });
+    });
+    it('omits transports when not provided', () => {
+      const { authenticator } = testContext;
+      const result = authenticator.mapCredentials({ attestation: 'foo', clientData: 'foo' });
+      expect(result).not.toHaveProperty('transports');
+    });
   });
 
   describe('getInputs', () => {
