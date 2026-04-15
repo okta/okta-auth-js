@@ -235,7 +235,8 @@
     "**/has-ansi/ansi-regex": "^4.1.1",
     "**/strip-ansi/ansi-regex": "^3.0.1",
     "**/download/got": "^11.8.5",
-    "**/@babel/runtime": "^7.27.0"
+    "**/@babel/runtime": "^7.27.0",
+    "**/axios": "^1.15.0"
   },
   "workspaces": {
     "packages": [
