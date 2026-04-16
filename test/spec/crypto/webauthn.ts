@@ -96,6 +96,77 @@ describe('buildCredentialCreationOptions', () => {
       }
     });
   });
+
+  it('includes hints when present in activationData', () => {
+    const activationData: ActivationData = {
+      rp: { name: 'Test Org' },
+      user: { id: '00u123', name: 'user@test.com', displayName: 'User' },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+      challenge: 'G7bIvwrJJ33WCEp6GGSH',
+      hints: ['security-key'],
+    };
+    const options = buildCredentialCreationOptions(activationData, []);
+    expect((options.publicKey as any).hints).toEqual(['security-key']);
+  });
+
+  it('does not include hints when not present in activationData', () => {
+    const activationData: ActivationData = {
+      rp: { name: 'Test Org' },
+      user: { id: '00u123', name: 'user@test.com', displayName: 'User' },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+      challenge: 'G7bIvwrJJ33WCEp6GGSH',
+    };
+    const options = buildCredentialCreationOptions(activationData, []);
+    expect((options.publicKey as any).hints).toBeUndefined();
+  });
+
+  it('includes transports in excludeCredentials when present on enrollments', () => {
+    const activationData: ActivationData = {
+      rp: { name: 'Test Org' },
+      user: { id: '00u123', name: 'user@test.com', displayName: 'User' },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+      challenge: 'G7bIvwrJJ33WCEp6GGSH',
+    };
+    const authenticatorEnrollments: IdxAuthenticator[] = [{
+      id: 'AUTHENTICATOR-ID-1',
+      displayName: 'MacBook Touch ID',
+      key: 'webauthn',
+      type: 'security_key',
+      methods: [{ type: 'webauthn' }],
+      credentialId: 'vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt',
+      transports: ['internal'],
+    }];
+    const options = buildCredentialCreationOptions(activationData, authenticatorEnrollments);
+    expect(options.publicKey!.excludeCredentials).toEqual([{
+      type: 'public-key',
+      id: base64UrlToBuffer('vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt'),
+      transports: ['internal'],
+    }]);
+  });
+
+  it('includes transports from profile in excludeCredentials when not at top-level', () => {
+    const activationData: ActivationData = {
+      rp: { name: 'Test Org' },
+      user: { id: '00u123', name: 'user@test.com', displayName: 'User' },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+      challenge: 'G7bIvwrJJ33WCEp6GGSH',
+    };
+    const authenticatorEnrollments: IdxAuthenticator[] = [{
+      id: 'AUTHENTICATOR-ID-1',
+      displayName: 'MacBook Touch ID',
+      key: 'webauthn',
+      type: 'security_key',
+      methods: [{ type: 'webauthn' }],
+      credentialId: 'vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt',
+      profile: { transports: ['usb'] },
+    }];
+    const options = buildCredentialCreationOptions(activationData, authenticatorEnrollments);
+    expect(options.publicKey!.excludeCredentials).toEqual([{
+      type: 'public-key',
+      id: base64UrlToBuffer('vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt'),
+      transports: ['usb'],
+    }]);
+  });
 });
 
 describe('buildCredentialRequestOptions', () => {
@@ -128,6 +199,69 @@ describe('buildCredentialRequestOptions', () => {
       }
     });
   });
+
+  it('includes transports in allowCredentials when present on enrollments', () => {
+    const challengeData: ChallengeData = {
+      challenge: 'G7bIvwrJJ33WCEp6GGSH',
+      userVerification: 'preferred',
+    };
+    const authenticatorEnrollments: IdxAuthenticator[] = [{
+      id: 'AUTHENTICATOR-ID-1',
+      displayName: 'MacBook Touch ID',
+      key: 'webauthn',
+      type: 'security_key',
+      methods: [{ type: 'webauthn' }],
+      credentialId: 'vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt',
+      transports: ['internal'],
+    }];
+    const options = buildCredentialRequestOptions(challengeData, authenticatorEnrollments);
+    expect(options.publicKey!.allowCredentials).toEqual([{
+      type: 'public-key',
+      id: base64UrlToBuffer('vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt'),
+      transports: ['internal'],
+    }]);
+  });
+
+  it('includes transports from profile when not at top-level', () => {
+    const challengeData: ChallengeData = {
+      challenge: 'G7bIvwrJJ33WCEp6GGSH',
+      userVerification: 'preferred',
+    };
+    const authenticatorEnrollments: IdxAuthenticator[] = [{
+      id: 'AUTHENTICATOR-ID-1',
+      displayName: 'MacBook Touch ID',
+      key: 'webauthn',
+      type: 'security_key',
+      methods: [{ type: 'webauthn' }],
+      credentialId: 'vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt',
+      profile: { transports: ['usb'] },
+    }];
+    const options = buildCredentialRequestOptions(challengeData, authenticatorEnrollments);
+    expect(options.publicKey!.allowCredentials).toEqual([{
+      type: 'public-key',
+      id: base64UrlToBuffer('vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt'),
+      transports: ['usb'],
+    }]);
+  });
+
+  it('includes hints when present in challengeData', () => {
+    const challengeData: ChallengeData = {
+      challenge: 'G7bIvwrJJ33WCEp6GGSH',
+      userVerification: 'preferred',
+      hints: ['client-device'],
+    };
+    const options = buildCredentialRequestOptions(challengeData, []);
+    expect((options.publicKey as any).hints).toEqual(['client-device']);
+  });
+
+  it('does not include hints when not present in challengeData', () => {
+    const challengeData: ChallengeData = {
+      challenge: 'G7bIvwrJJ33WCEp6GGSH',
+      userVerification: 'preferred',
+    };
+    const options = buildCredentialRequestOptions(challengeData, []);
+    expect((options.publicKey as any).hints).toBeUndefined();
+  });
 });
 
 describe('getAttestation', () => {
@@ -135,8 +269,30 @@ describe('getAttestation', () => {
     const response = {
       clientDataJSON: stringToBuffer('{}'),
       attestationObject: stringToBuffer('{}'),
-    } as AuthenticatorResponse;
-    const credential: PublicKeyCredential = {
+      getTransports: () => ['usb', 'nfc'] as AuthenticatorTransport[],
+    } as AuthenticatorAttestationResponse;
+    const credential = {
+      rawId: base64UrlToBuffer('CRED-ID'),
+      id: 'CRED-ID',
+      type: 'public-key',
+      response,
+      getClientExtensionResults: () => ({} as AuthenticationExtensionsClientOutputs)
+    };
+    const attestation = getAttestation(credential as PublicKeyCredential);
+    expect(attestation).toEqual({
+      id: 'CRED-ID',
+      clientData: btoa('{}'),
+      attestation: btoa('{}'),
+      transports: '["usb","nfc"]',
+    });
+  });
+
+  it('omits transports when getTransports is not supported', () => {
+    const response = {
+      clientDataJSON: stringToBuffer('{}'),
+      attestationObject: stringToBuffer('{}'),
+    } as AuthenticatorAttestationResponse;
+    const credential = {
       rawId: base64UrlToBuffer('CRED-ID'),
       id: 'CRED-ID',
       type: 'public-key',
@@ -149,6 +305,7 @@ describe('getAttestation', () => {
       clientData: btoa('{}'),
       attestation: btoa('{}'),
     });
+    expect(attestation).not.toHaveProperty('transports');
   });
 });
 

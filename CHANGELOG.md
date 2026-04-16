@@ -19,6 +19,10 @@
 - [#1623](https://github.com/okta/okta-auth-js/pull/1623) chore: bumps `tiny-emitter` dependency to leverage ESM export
 - [#1624](https://github.com/okta/okta-auth-js/pull/1624) chore: upgrades `broadcast-channel` and `@babel/runtime`
 
+# 7.14.2
+
+- [#1629](https://github.com/okta/okta-auth-js/pull/1629) fix: properly handles WebAuthn hints and transports
+
 # 7.14.1
 
 ### Fixes

@@ -239,7 +239,9 @@
     "**/tar-fs": "^3.1.1",
     "**/@okta/okta-sdk-nodejs/njwt": "^2.0.1",
     "**/brace-expansion": "^2.0.2",
-    "**/tmp": "^0.2.4"
+    "**/tmp": "^0.2.4",
+    "**/@babel/runtime": "^7.27.0",
+    "**/axios": "^1.15.0"
   },
   "workspaces": {
     "packages": [
