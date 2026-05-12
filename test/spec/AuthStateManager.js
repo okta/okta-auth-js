@@ -310,6 +310,21 @@ describe('AuthStateManager', () => {
       auth.tokenManager.add('idToken', tokens.standardIdTokenParsed);
       expect(auth.authStateManager.updateAuthState).toHaveBeenCalledTimes(1);
     });
+
+    it('should not hang when isAuthenticated triggers a re-entrant updateAuthState', async () => {
+      let instance;
+
+      sdkMock.isAuthenticated = jest.fn()
+        .mockImplementationOnce(async () => {
+          await Promise.resolve(); // must yield
+          instance.updateAuthState();
+          return false;
+        })
+        .mockResolvedValueOnce(false);
+
+      instance = new AuthStateManager(sdkMock);
+      await instance.updateAuthState();
+    }, 2000);
   });
 
   describe('subscribe', () => {

@@ -255,6 +255,41 @@ describe('AutoRenewService', function() {
         expect(client.tokenManager.renew).toHaveBeenCalledTimes(19);
       });
     });
+
+    describe('[Browser Only] start() with expired tokens in storage', function () {
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      beforeEach(() => {
+        window.localStorage.clear();
+      });
+
+      afterEach(() => {
+        window.localStorage.removeItem('okta-token-storage');
+      });
+
+      it('resolves to an unauthenticated state when renewal fails', async function () {
+        window.localStorage.setItem('okta-token-storage', JSON.stringify({
+          accessToken: { ...tokens.standardAccessTokenParsed, expiresAt: 0 },
+          idToken: { ...tokens.standardIdTokenParsed, expiresAt: 0 }
+        }));
+
+        const auth = await setup({ tokenManager: { autoRenew: true } }, false);
+
+        const renewSpy = jest.spyOn(auth.tokenManager, 'renew').mockRejectedValue(new Error('some error'));
+        auth.tokenManager.on('error', () => {});
+
+        try {
+          await auth.start();
+          expect(renewSpy).toHaveBeenCalled();
+          expect(auth.authStateManager.getAuthState()!.isAuthenticated).toBe(false);
+        } finally {
+          await auth.serviceManager.stop();
+          auth.tokenManager.stop();
+        }
+      });
+    });
   });
 
   describe('autoRemove', () => {

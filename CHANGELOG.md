@@ -1,5 +1,15 @@
 # Changelog
 
+# 8.0.1
+
+### Fixes
+
+- [#1633](https://github.com/okta/okta-auth-js/pull/1633) fix: `CancelablePromise` no longer deadlocks when promise is canceled
+
+### Backported from `7.14.2`
+
+- [#1629](https://github.com/okta/okta-auth-js/pull/1629) fix: properly handles WebAuthn hints and transports
+
 # 8.0.0
 
 ### Breaking Changes

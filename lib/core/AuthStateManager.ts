@@ -47,6 +47,8 @@ const isSameAuthState = (prevState: AuthState | null, state: AuthState) => {
     && prevState.error === state.error;
 };
 
+type CancelablePromiseState = 'PENDING' | 'CANCELED' | 'SETTLED';
+
 /**
  * Based on https://www.npmjs.com/package/p-cancelable, which was used in previous versions of authjs
  * `p-cancelable` has been deprecated in favor of `AbortController` and is sometimes flagged on dependency scans
@@ -55,7 +57,7 @@ const isSameAuthState = (prevState: AuthState | null, state: AuthState) => {
  * tldr; This class aims to replace `p-cancelable` to maintain IE11 support
  */
 class CancelablePromise<T = any> implements PromiseLike<T> {
-  #state: 'PENDING' | 'CANCELED' | 'SETTLED' = 'PENDING';
+  #_state: CancelablePromiseState = 'PENDING';
   #promise: Promise<T>;
   // eslint-disable-next-line no-use-before-define
   #cancelHandlers: Parameters<Parameters<ConstructorParameters<typeof CancelablePromise>[0]>[2]>[0][] = [];
@@ -66,8 +68,9 @@ class CancelablePromise<T = any> implements PromiseLike<T> {
   constructor (
     executor: (
       ...args: [
-        ...Parameters<ConstructorParameters<typeof Promise<T>>[0]>,
-        (callback: () => void) => void
+        resolve: Parameters<ConstructorParameters<typeof Promise<T>>[0]>[0],
+        reject: Parameters<ConstructorParameters<typeof Promise<T>>[0]>[1],
+        onCancel: (callback: () => void) => void
       ]
     ) => void
   ) {
@@ -76,17 +79,13 @@ class CancelablePromise<T = any> implements PromiseLike<T> {
       this.#rejector = reject;
 
       const onResolve = (result) => {
-        if (this.#state !== 'CANCELED') {
-          resolve(result);
-          this.#state = 'SETTLED';
-        }
+        resolve(result);
+        this.#state = 'SETTLED';
       };
 
       const onReject = (error) => {
-        if (this.#state !== 'CANCELED') {
-          reject(error);
-          this.#state = 'SETTLED';
-        }
+        reject(error);
+        this.#state = 'SETTLED';
       };
 
       const onCancel = handler => {
@@ -95,6 +94,16 @@ class CancelablePromise<T = any> implements PromiseLike<T> {
 
       executor(onResolve, onReject, onCancel);
     });
+  }
+
+  get #state (): CancelablePromiseState {
+    return this.#_state;
+  }
+
+  set #state (state: CancelablePromiseState) {
+    if (this.#state === 'PENDING') {
+      this.#_state = state;
+    }
   }
 
   // @ts-expect-error - the type for `Promise.then` is unnecessarily complex
@@ -134,6 +143,9 @@ class CancelablePromise<T = any> implements PromiseLike<T> {
     return this.#state === 'CANCELED';
   }
 }
+
+// Used for `instanceof` checks
+Object.setPrototypeOf(CancelablePromise.prototype, Promise.prototype);
 
 export class AuthStateManager
 <
@@ -260,7 +272,7 @@ export class AuthStateManager
       };
 
       this._sdk.isAuthenticated()
-        .then(() => {
+        .then((isAuthenticated) => {
           if (cancelablePromise.isCanceled) {
             resolve(undefined);
             return;
@@ -271,7 +283,7 @@ export class AuthStateManager
             accessToken,
             idToken,
             refreshToken,
-            isAuthenticated: !!(accessToken && idToken)
+            isAuthenticated
           };
 
           // Enqueue transformAuthState so that it does not run concurrently
