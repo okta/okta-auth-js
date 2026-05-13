@@ -49,9 +49,11 @@ export async function handleOAuthResponse(
 ): Promise<TokenResponse> {
   const pkce = sdk.options.pkce !== false;
 
-  // The result contains an authorization_code and PKCE is enabled 
+  // The result contains an authorization_code and PKCE is enabled
   // `exchangeCodeForTokens` will call /token then call `handleOauthResponse` recursively with the result
   if (pkce && (res.code || res.interaction_code)) {
+    // Validate state BEFORE exchanging code (RFC 6749 section 10.12)
+    validateResponse(res, tokenParams);
     return sdk.token.exchangeCodeForTokens(Object.assign({}, tokenParams, {
       authorizationCode: res.code,
       interactionCode: res.interaction_code
