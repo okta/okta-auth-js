@@ -1,5 +1,9 @@
 # Changelog
 
+# 7.14.3
+
+- [#1635](https://github.com/okta/okta-auth-js/pull/1635) fix: guarantees `state` parameter is validated before token exchange is performed
+
 # 7.14.2
 
 - [#1629](https://github.com/okta/okta-auth-js/pull/1629) fix: properly handles WebAuthn hints and transports
