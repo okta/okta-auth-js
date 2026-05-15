@@ -223,6 +223,35 @@ describe('handleOAuthResponse', () => {
         expect(res).toBe(mockTokens);
       });
 
+      it('throws if state does not match during authorization code exchange', async () => {
+        const oauthResponse = { state: 'foo', code: 'foo' };
+
+        let errorThrown = false;
+        try {
+          await handleOAuthResponse(sdk, { state: 'bar' }, oauthResponse, undefined as unknown as CustomUrls);
+        } catch (err: any) {
+          errorThrown = true;
+          expect(err.name).toBe('AuthSdkError');
+          expect(err.errorSummary).toBe(`OAuth flow response state doesn't match request state`);
+        }
+        expect(errorThrown).toBe(true);
+      });
+
+      it('throws if OAuth error is returned during authorization code exchange', async () => {
+        const oauthResponse = { error: 'foo', error_description: 'bar' };
+
+        let errorThrown = false;
+        try {
+          await handleOAuthResponse(sdk, { state: 'bar' }, oauthResponse, undefined as unknown as CustomUrls);
+        } catch (err: any) {
+          errorThrown = true;
+          expect(err.name).toBe('OAuthError');
+          expect(err.error).toBe('foo');
+          expect(err.errorSummary).toBe('bar');
+        }
+        expect(errorThrown).toBe(true);
+      });
+
       it('allows Bearer tokens to be returned when DPoP token was requested', async () => {
         sdk = mockOktaAuth({
           dpopOptions: { allowBearerTokens: true }

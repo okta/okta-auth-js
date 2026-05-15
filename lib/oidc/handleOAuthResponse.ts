@@ -49,6 +49,9 @@ export async function handleOAuthResponse(
 ): Promise<TokenResponse> {
   const pkce = sdk.options.pkce !== false;
 
+  tokenParams = tokenParams || getDefaultTokenParams(sdk);
+  validateResponse(res, tokenParams);
+
   // The result contains an authorization_code and PKCE is enabled 
   // `exchangeCodeForTokens` will call /token then call `handleOauthResponse` recursively with the result
   if (pkce && (res.code || res.interaction_code)) {
@@ -58,7 +61,6 @@ export async function handleOAuthResponse(
     }), urls);
   }
 
-  tokenParams = tokenParams || getDefaultTokenParams(sdk);
   urls = urls || getOAuthUrls(sdk, tokenParams);
 
   let responseType = tokenParams.responseType || [];
@@ -73,9 +75,6 @@ export async function handleOAuthResponse(
     scopes = clone(tokenParams.scopes);
   }
   const clientId = tokenParams.clientId || sdk.options.clientId;
-
-  // Handling the result from implicit flow or PKCE token exchange
-  validateResponse(res, tokenParams);
 
   if (tokenParams.dpop) {
     const { allowBearerTokens } = sdk.options?.dpopOptions ?? { allowBearerTokens: false };
