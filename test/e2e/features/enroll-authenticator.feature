@@ -16,6 +16,7 @@ Background:
      And she has an account with "active" state in the org
      And she has enrolled in the "SMS" factor
 
+@smstest
 Scenario: Mary Enrolls into Security Question
   Given Mary is on the default view in an UNAUTHENTICATED state
     And she is not enrolled in the "question" factors

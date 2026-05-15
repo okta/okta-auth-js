@@ -60,6 +60,8 @@ setup_e2e () {
   export TEST_SUITE_TYPE="junit"
   export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
 
+  export SKIP_SMS=true
+
   export ISSUER=https://samples-javascript.okta.com/oauth2/default
   export USERNAME=george@acme.com
   get_terminus_secret "/" password PASSWORD
@@ -99,6 +101,8 @@ setup_sample_tests () {
   export DBUS_SESSION_BUS_ADDRESS=/dev/null
   export TEST_SUITE_TYPE="junit"
   export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/e2e"
+
+  export SKIP_SMS=true
 
   export USERNAME=mary@acme.com
   get_terminus_secret "/" password PASSWORD
