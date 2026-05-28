@@ -108,7 +108,6 @@ test_suites:
       script_name: e2e-react-embedded-auth-with-sdk
       criteria: MERGE
       queue_name: al2023
-
     - name: verify-registry-install
       prereq_test_suite_name: publish
       script_path: ../okta-auth-js/scripts
@@ -117,12 +116,11 @@ test_suites:
       script_name: verify-registry-install
       criteria: MERGE
       queue_name: al2023
-    # Sauce labs tests are flaky due to the free account we are currently using
-    # Re-enable this task on bacon once we have an paid account
-    # - name: e2e-saucelabs 
-    #   script_path: ../okta-auth-js/scripts
-    #   sort_order: '8'
-    #   timeout: '60'
-    #   script_name: e2e-saucelabs
-    #   criteria: MERGE
-    #   queue_name: al2023
+    - name: snyk
+      script_path: ../okta-auth-js/scripts
+      sort_order: '14'
+      timeout: '200'
+      script_name: snyk
+      queue_name: al2023
+      criteria: MAINLINE
+      trigger: AUTO
