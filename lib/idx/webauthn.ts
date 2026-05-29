@@ -21,13 +21,13 @@ import {
 
 
 // Coerce a transports value to an array. Accepts either an array (legacy server response)
-// or a JSON-encoded array string (current server response, where profile is Map<String, String>).
+// or a comma separated string (current server response, where profile is Map<String, String>).
 // Returns undefined for any other shape so the caller can omit transports from the descriptor.
 const coerceTransports = (value: unknown): AuthenticatorTransport[] | undefined => {
   let candidate = value;
   if (typeof candidate === 'string') {
     try {
-      candidate = JSON.parse(candidate);
+      candidate = candidate.split(',');
     } catch {
       return undefined;
     }

@@ -168,7 +168,7 @@ describe('buildCredentialCreationOptions', () => {
     }]);
   });
 
-  it('parses JSON-encoded string profile.transports in excludeCredentials', () => {
+  it('parses comma separated string profile.transports in excludeCredentials', () => {
     const activationData: ActivationData = {
       rp: { name: 'Test Org' },
       user: { id: '00u123', name: 'user@test.com', displayName: 'User' },
@@ -183,7 +183,7 @@ describe('buildCredentialCreationOptions', () => {
       methods: [{ type: 'webauthn' }],
       credentialId: 'vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt',
       // okta-core emits profile.transports as a JSON-encoded string so the entire profile is Map<String,String>
-      profile: { transports: '["usb","nfc"]' },
+      profile: { transports: 'usb,nfc' },
     }];
     const options = buildCredentialCreationOptions(activationData, authenticatorEnrollments);
     expect(options.publicKey!.excludeCredentials).toEqual([{
@@ -282,7 +282,7 @@ describe('buildCredentialRequestOptions', () => {
       methods: [{ type: 'webauthn' }],
       credentialId: 'vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt',
       // okta-core emits profile.transports as a JSON-encoded string so the entire profile is Map<String,String>
-      profile: { transports: '["usb","nfc"]' },
+      profile: { transports: 'usb,nfc' },
     }];
     const options = buildCredentialRequestOptions(challengeData, authenticatorEnrollments);
     expect(options.publicKey!.allowCredentials).toEqual([{
@@ -304,7 +304,7 @@ describe('buildCredentialRequestOptions', () => {
       type: 'security_key',
       methods: [{ type: 'webauthn' }],
       credentialId: 'vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt',
-      profile: { transports: 'not-json' },
+      profile: { transports: 123 },
     }];
     const options = buildCredentialRequestOptions(challengeData, authenticatorEnrollments);
     expect(options.publicKey!.allowCredentials).toEqual([{
