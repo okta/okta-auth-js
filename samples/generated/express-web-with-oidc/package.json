@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "uuid": "^8.3.0",
+    "uuid": "^14.0.0",
     "@okta/okta-auth-js": "*"
   }
 }
