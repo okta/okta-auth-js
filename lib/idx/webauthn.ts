@@ -20,6 +20,21 @@ import {
 } from './types';
 
 
+// Coerce a transports value to an array. Accepts either an array (legacy server response)
+// or a JSON-encoded array string (current server response, where profile is Map<String, String>).
+// Returns undefined for any other shape so the caller can omit transports from the descriptor.
+const coerceTransports = (value: unknown): AuthenticatorTransport[] | undefined => {
+  let candidate = value;
+  if (typeof candidate === 'string') {
+    try {
+      candidate = JSON.parse(candidate);
+    } catch {
+      return undefined;
+    }
+  }
+  return Array.isArray(candidate) ? candidate as AuthenticatorTransport[] : undefined;
+};
+
 // Get known credentials from list of enrolled authenticators
 const getEnrolledCredentials = (authenticatorEnrollments: IdxAuthenticator[] = []) => {
   const credentials: PublicKeyCredentialDescriptor[] = [];
@@ -29,11 +44,12 @@ const getEnrolledCredentials = (authenticatorEnrollments: IdxAuthenticator[] = [
         type: 'public-key',
         id: base64UrlToBuffer(enrollement.credentialId),
       };
-      // transports may be at top-level or nested under profile
-      const transports = enrollement.transports
-        ?? (enrollement.profile as Record<string, unknown> | undefined)?.transports;
-      if (Array.isArray(transports)) {
-        credential.transports = transports as AuthenticatorTransport[];
+      // transports may be at top-level or nested under profile, and either side may
+      // arrive as an array or a JSON-encoded string depending on server version.
+      const transports = coerceTransports(enrollement.transports)
+        ?? coerceTransports((enrollement.profile as Record<string, unknown> | undefined)?.transports);
+      if (transports) {
+        credential.transports = transports;
       }
       credentials.push(credential);
     }
