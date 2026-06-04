@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "typescript": "^4.7.3",
-    "vite": "^2.9.2",
+    "vite": "^6.4.2",
     "rollup-plugin-visualizer": "~5.5.4",
     "@okta/env": "*"
   }
