@@ -12,15 +12,19 @@
 
 
 import { RemediationFlow } from './RemediationFlow';
-import { 
+import {
   SelectEnrollProfile,
   EnrollPoll,
   SelectEnrollmentChannel,
   EnrollmentChannelData,
   EnrollProfile,
   SelectAuthenticatorEnroll,
+  SelectAuthenticatorAuthenticate,
   EnrollAuthenticator,
   AuthenticatorEnrollmentData,
+  AuthenticatorVerificationData,
+  ChallengeAuthenticator,
+  ChallengePoll,
   Skip,
 } from '../remediators';
 
@@ -29,9 +33,13 @@ export const RegistrationFlow: RemediationFlow = {
   'enroll-profile': EnrollProfile,
   'authenticator-enrollment-data': AuthenticatorEnrollmentData,
   'select-authenticator-enroll': SelectAuthenticatorEnroll,
+  'select-authenticator-authenticate': SelectAuthenticatorAuthenticate,
   'enroll-poll': EnrollPoll,
   'select-enrollment-channel': SelectEnrollmentChannel,
   'enrollment-channel-data': EnrollmentChannelData,
   'enroll-authenticator': EnrollAuthenticator,
+  'authenticator-verification-data': AuthenticatorVerificationData,
+  'challenge-authenticator': ChallengeAuthenticator,
+  'challenge-poll': ChallengePoll,
   'skip': Skip,
 };
