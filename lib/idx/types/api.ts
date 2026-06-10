@@ -75,6 +75,8 @@ export enum AuthenticatorKey {
   WEBAUTHN = 'webauthn',
 }
 
+export type InputFormat = 'numeric' | 'alphanumeric';
+
 export type Input = {
   name: string;
   key?: string;
@@ -88,7 +90,8 @@ export type Input = {
   options?: IdxOption[];
   mutable?: boolean;
   visible?: boolean;
-  customLabel?: boolean
+  customLabel?: boolean;
+  format?: InputFormat;
 }
 
 
