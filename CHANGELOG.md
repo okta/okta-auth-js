@@ -1,5 +1,10 @@
 # Changelog
 
+# 7.14.4
+
+- [#1638](https://github.com/okta/okta-auth-js/pull/1638) fix: handles WebAuthn transports as a comma separated string
+- [#1646](https://github.com/okta/okta-auth-js/pull/1646) fix: handles auth verification remediations in registration flow
+
 # 7.14.3
 
 - [#1635](https://github.com/okta/okta-auth-js/pull/1635) fix: guarantees `state` parameter is validated before token exchange is performed
