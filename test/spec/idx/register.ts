@@ -57,7 +57,10 @@ import {
   WebauthnAuthenticatorOptionFactory,
   EnrollWebauthnAuthenticatorRemediationFactory,
   SelectIdentifyRemediationFactory,
-  EnrollProfileWithPasswordRemediationFactory
+  EnrollProfileWithPasswordRemediationFactory,
+  EmailAuthenticatorVerificationDataRemediationFactory,
+  VerifyEmailRemediationFactory,
+  SelectAuthenticatorAuthenticateRemediationFactory,
 } from '@okta/test.support/idx';
 import util from '@okta/test.support/util';
 
@@ -2511,6 +2514,93 @@ describe('idx/register', () => {
         scopes: ['meta']
       }, {
         authorizeUrl: 'meta-authorizeUrl'
+      });
+    });
+  });
+
+  // OKTA-1197302: when the password authenticator policy has the
+  // "Send recovery email to user's primary and secondary email addresses
+  // even when the email authenticator has not been enrolled" recovery
+  // setting on, the IDX server returns auth-style remediations
+  // (authenticator-verification-data, challenge-authenticator,
+  // challenge-poll, select-authenticator-authenticate) during the
+  // registration flow. Without these mappings, RegistrationFlow could not
+  // match them and threw "No remediation can match current flow".
+  describe('post-password recovery-email verification (OKTA-1197302)', () => {
+    it('handles authenticator-verification-data during registration', async () => {
+      const { authClient } = testContext;
+
+      const verificationDataResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          EmailAuthenticatorVerificationDataRemediationFactory.build()
+        ]
+      });
+
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(verificationDataResponse);
+
+      const res = await register(authClient, {});
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toMatchObject({
+        name: 'authenticator-verification-data',
+      });
+    });
+
+    it('proceeds to challenge-authenticator and verifies with code', async () => {
+      const { authClient, successWithInteractionCodeResponse } = testContext;
+
+      const challengeAuthenticatorResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          VerifyEmailRemediationFactory.build()
+        ]
+      });
+
+      chainResponses([
+        challengeAuthenticatorResponse,
+        successWithInteractionCodeResponse
+      ]);
+      jest.spyOn(challengeAuthenticatorResponse, 'proceed');
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(challengeAuthenticatorResponse);
+
+      let res = await register(authClient, {});
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toMatchObject({
+        name: 'challenge-authenticator',
+      });
+
+      const verificationCode = 'test-code';
+      res = await register(authClient, { verificationCode });
+      expect(challengeAuthenticatorResponse.proceed).toHaveBeenCalledWith(
+        'challenge-authenticator',
+        { credentials: { passcode: 'test-code' } }
+      );
+    });
+
+    it('handles select-authenticator-authenticate during registration', async () => {
+      const { authClient } = testContext;
+
+      const selectAuthenticateResponse = IdxResponseFactory.build({
+        neededToProceed: [
+          SelectAuthenticatorAuthenticateRemediationFactory.build({
+            value: [
+              AuthenticatorValueFactory.build({
+                options: [
+                  EmailAuthenticatorOptionFactory.build()
+                ]
+              })
+            ]
+          })
+        ]
+      });
+
+      jest.spyOn(mocked.introspect, 'introspect')
+        .mockResolvedValue(selectAuthenticateResponse);
+
+      const res = await register(authClient, {});
+      expect(res.status).toBe(IdxStatus.PENDING);
+      expect(res.nextStep).toMatchObject({
+        name: 'select-authenticator-authenticate',
       });
     });
   });

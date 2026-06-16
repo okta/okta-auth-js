@@ -1,10 +1,21 @@
 # Changelog
 
+# 8.0.2
+
+### Backported from `7.14.4`
+
+- [#1638](https://github.com/okta/okta-auth-js/pull/1638) fix: handles WebAuthn transports as a comma separated string
+- [#1646](https://github.com/okta/okta-auth-js/pull/1646) fix: handles auth verification remediations in registration flow
+
 # 8.0.1
 
 ### Fixes
 
 - [#1633](https://github.com/okta/okta-auth-js/pull/1633) fix: `CancelablePromise` no longer deadlocks when promise is canceled
+
+### Backported from `7.14.3`
+
+- [#1635](https://github.com/okta/okta-auth-js/pull/1635) fix: guarantees `state` parameter is validated before token exchange is performed
 
 ### Backported from `7.14.2`
 
@@ -28,6 +39,11 @@
 - [#1620](https://github.com/okta/okta-auth-js/pull/1620) chore: removes `atob`, `btoa` and `@peculiar/webcrypto` dependencies
 - [#1623](https://github.com/okta/okta-auth-js/pull/1623) chore: bumps `tiny-emitter` dependency to leverage ESM export
 - [#1624](https://github.com/okta/okta-auth-js/pull/1624) chore: upgrades `broadcast-channel` and `@babel/runtime`
+
+# 7.14.4
+
+- [#1638](https://github.com/okta/okta-auth-js/pull/1638) fix: handles WebAuthn transports as a comma separated string
+- [#1646](https://github.com/okta/okta-auth-js/pull/1646) fix: handles auth verification remediations in registration flow
 
 # 7.14.3
 

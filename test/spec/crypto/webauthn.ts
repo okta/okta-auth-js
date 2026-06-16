@@ -167,6 +167,31 @@ describe('buildCredentialCreationOptions', () => {
       transports: ['usb'],
     }]);
   });
+
+  it('parses comma separated string profile.transports in excludeCredentials', () => {
+    const activationData: ActivationData = {
+      rp: { name: 'Test Org' },
+      user: { id: '00u123', name: 'user@test.com', displayName: 'User' },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+      challenge: 'G7bIvwrJJ33WCEp6GGSH',
+    };
+    const authenticatorEnrollments: IdxAuthenticator[] = [{
+      id: 'AUTHENTICATOR-ID-1',
+      displayName: 'MacBook Touch ID',
+      key: 'webauthn',
+      type: 'security_key',
+      methods: [{ type: 'webauthn' }],
+      credentialId: 'vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt',
+      // okta-core emits profile.transports as a JSON-encoded string so the entire profile is Map<String,String>
+      profile: { transports: 'usb,nfc' },
+    }];
+    const options = buildCredentialCreationOptions(activationData, authenticatorEnrollments);
+    expect(options.publicKey!.excludeCredentials).toEqual([{
+      type: 'public-key',
+      id: base64UrlToBuffer('vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt'),
+      transports: ['usb', 'nfc'],
+    }]);
+  });
 });
 
 describe('buildCredentialRequestOptions', () => {
@@ -241,6 +266,50 @@ describe('buildCredentialRequestOptions', () => {
       type: 'public-key',
       id: base64UrlToBuffer('vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt'),
       transports: ['usb'],
+    }]);
+  });
+
+  it('parses JSON-encoded string profile.transports in allowCredentials', () => {
+    const challengeData: ChallengeData = {
+      challenge: 'G7bIvwrJJ33WCEp6GGSH',
+      userVerification: 'preferred',
+    };
+    const authenticatorEnrollments: IdxAuthenticator[] = [{
+      id: 'AUTHENTICATOR-ID-1',
+      displayName: 'MacBook Touch ID',
+      key: 'webauthn',
+      type: 'security_key',
+      methods: [{ type: 'webauthn' }],
+      credentialId: 'vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt',
+      // okta-core emits profile.transports as a JSON-encoded string so the entire profile is Map<String,String>
+      profile: { transports: 'usb,nfc' },
+    }];
+    const options = buildCredentialRequestOptions(challengeData, authenticatorEnrollments);
+    expect(options.publicKey!.allowCredentials).toEqual([{
+      type: 'public-key',
+      id: base64UrlToBuffer('vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt'),
+      transports: ['usb', 'nfc'],
+    }]);
+  });
+
+  it('omits transports when profile.transports is malformed JSON', () => {
+    const challengeData: ChallengeData = {
+      challenge: 'G7bIvwrJJ33WCEp6GGSH',
+      userVerification: 'preferred',
+    };
+    const authenticatorEnrollments: IdxAuthenticator[] = [{
+      id: 'AUTHENTICATOR-ID-1',
+      displayName: 'MacBook Touch ID',
+      key: 'webauthn',
+      type: 'security_key',
+      methods: [{ type: 'webauthn' }],
+      credentialId: 'vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt',
+      profile: { transports: 123 },
+    }];
+    const options = buildCredentialRequestOptions(challengeData, authenticatorEnrollments);
+    expect(options.publicKey!.allowCredentials).toEqual([{
+      type: 'public-key',
+      id: base64UrlToBuffer('vdCxImCygaKmXS3S_2WwgqF1LLZ4i_2MKYfAbrNByJOOmSyRD_STj6VfhLQsLdLrIdgvdP5EmO1n9Tuw5BawZt'),
     }]);
   });
 
