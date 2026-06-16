@@ -1,5 +1,9 @@
 # Changelog
 
+# 7.14.5
+
+- [#1648](https://github.com/okta/okta-auth-js/pull/1648) fix: adds format property to IonField
+
 # 7.14.4
 
 - [#1638](https://github.com/okta/okta-auth-js/pull/1638) fix: handles WebAuthn transports as a comma separated string
