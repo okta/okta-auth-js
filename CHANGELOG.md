@@ -2,6 +2,10 @@
 
 # 8.0.2
 
+## Backported from  `7.14.5`
+
+- [#1648](https://github.com/okta/okta-auth-js/pull/1648) fix: adds format property to IonField
+
 ### Backported from `7.14.4`
 
 - [#1638](https://github.com/okta/okta-auth-js/pull/1638) fix: handles WebAuthn transports as a comma separated string
@@ -39,6 +43,10 @@
 - [#1620](https://github.com/okta/okta-auth-js/pull/1620) chore: removes `atob`, `btoa` and `@peculiar/webcrypto` dependencies
 - [#1623](https://github.com/okta/okta-auth-js/pull/1623) chore: bumps `tiny-emitter` dependency to leverage ESM export
 - [#1624](https://github.com/okta/okta-auth-js/pull/1624) chore: upgrades `broadcast-channel` and `@babel/runtime`
+
+# 7.14.5
+
+- [#1648](https://github.com/okta/okta-auth-js/pull/1648) fix: adds format property to IonField
 
 # 7.14.4
 
