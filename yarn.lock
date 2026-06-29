@@ -3768,13 +3768,14 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-axios@^1.15.0, axios@^1.7.7:
-  version "1.15.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-1.15.0.tgz#0fcee91ef03d386514474904b27863b2c683bf4f"
-  integrity sha512-wWyJDlAatxk30ZJer+GeCWS209sA42X+N5jU2jy6oHTp7ufw8uzUTVFBX9+wTfAlhiJXGS0Bq7X6efruWjuK9Q==
+axios@^1.16.0, axios@^1.7.7:
+  version "1.18.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.18.1.tgz#d63f9863bcd8938815c86f9e2abd380189d96dfe"
+  integrity sha512-3nTvFlvpn9Zu/RkHUqtc7/+al4UpRW5az71ap5zccp6e8RAYEzhMTecX8Dz1wWDYrPpUoB1HAQEGEAEvUr7S9g==
   dependencies:
-    follow-redirects "^1.15.11"
+    follow-redirects "^1.16.0"
     form-data "^4.0.5"
+    https-proxy-agent "^5.0.1"
     proxy-from-env "^2.1.0"
 
 b4a@^1.6.4:
@@ -3983,10 +3984,10 @@ baseline-browser-mapping@^2.8.3:
   resolved "https://registry.yarnpkg.com/baseline-browser-mapping/-/baseline-browser-mapping-2.8.7.tgz#4d3606fdb1738fd902da40c5fcc0595e87cec044"
   integrity sha512-bxxN2M3a4d1CRoQC//IqsR5XrLh0IJ8TCv2x6Y9N0nckNz/rTjZB3//GGscZziZOxmjP55rzxg/ze7usFI9FqQ==
 
-basic-ftp@^5.0.2:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/basic-ftp/-/basic-ftp-5.0.3.tgz#b14c0fe8111ce001ec913686434fe0c2fb461228"
-  integrity sha512-QHX8HLlncOLpy54mh+k/sWIFd0ThmRqwe9ZjELybGZK+tZ8rUb9VO0saKJUROTbE+KhzDUT7xziGpGrW8Kmd+g==
+basic-ftp@^5.0.2, basic-ftp@^5.3.0:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/basic-ftp/-/basic-ftp-5.3.1.tgz#3148ee9af43c0522514a4f973fecb1d3cbb6d71e"
+  integrity sha512-bopVNp6ugyA150DDuZfPFdt1KZ5a94ZDiwX4hMgZDzF+GttD80lEy8kj98kbyhLXnPvhtIo93mdnLIjpCAeeOw==
 
 batch@0.6.1:
   version "0.6.1"
@@ -6908,7 +6909,7 @@ follow-redirects@^1.0.0:
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
   integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
 
-follow-redirects@^1.15.11:
+follow-redirects@^1.16.0:
   version "1.16.0"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.16.0.tgz#28474a159d3b9d11ef62050a14ed60e4df6d61bc"
   integrity sha512-y5rN/uOsadFT/JfYwhxRS5R7Qce+g3zG97+JrtFZlC9klX/W5hD7iiLzScI4nZqUS7DNUdhPgw4xI8W2LuXlUw==
@@ -9700,10 +9701,10 @@ lodash.zip@^4.2.0:
   resolved "https://registry.yarnpkg.com/lodash.zip/-/lodash.zip-4.2.0.tgz#ec6662e4896408ed4ab6c542a3990b72cc080020"
   integrity sha512-C7IOaBBK/0gMORRBd8OETNx3kmOkgIWIPvyDpZSCTwUrpYmgZwJkjZeOD8ww4xbOUOs4/attY+pciKvadNfFbg==
 
-lodash@4.17.21, lodash@^4.17.11, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.7.0, lodash@~4.17.21:
-  version "4.17.21"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
-  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+lodash@4.18.1, lodash@^4.17.11, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.18.1, lodash@^4.7.0, lodash@~4.17.21:
+  version "4.18.1"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.18.1.tgz#ff2b66c1f6326d59513de2407bf881439812771c"
+  integrity sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==
 
 log-symbols@^4.1.0:
   version "4.1.0"
