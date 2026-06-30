@@ -22,7 +22,7 @@
     "@babel/preset-env": "^7.28.3",
     "babel-loader": "^9.1.2",
     "express": "^4.17.1",
-    "http-proxy-middleware": "^2.0.6",
+    "http-proxy-middleware": "^2.0.10",
     "js-cookie": "2.2.1",
     "source-map-loader": "^4.0.1",
     "webpack": "^5.78.0",
