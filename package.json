@@ -162,7 +162,7 @@
   "dependencies": {
     "@babel/runtime": "^7.28.6",
     "broadcast-channel": "~7.3.0",
-    "js-cookie": "^3.0.5",
+    "js-cookie": "^3.0.7",
     "node-cache": "^5.1.2",
     "tiny-emitter": "2.1.0"
   },
