@@ -1,0 +1,32 @@
+name: Create browserlist update db PR
+
+on: 
+  schedule:
+    - cron: "*/1 * * * *"
+  
+jobs:
+  update-browserlist:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+
+      - name: Update Browserlist
+        run: |
+          npx browserslist@latest --update-db
+
+      - name: Create Pull Request
+        id: create-pr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{secrets.OKTA_433527}}
+          commit-message: 'chore: browserlist update db'
+          branch: 'browserlist-update-db'
+          delete-branch: true
+          title: 'Generated: browserlist update db'
+          body: |
+            Auto Generated Pull Request
+            Changes come from `npx browserslist@latest --update-db`
