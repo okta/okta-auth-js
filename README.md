@@ -203,8 +203,8 @@ const authClient = new OktaAuth(/* configOptions */)
 
 ```javascript
 // CommonJS
-var OktaAuth = require('@okta/okta-auth-js').OktaAuth;
-var authClient = new OktaAuth(/* configOptions */);
+const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
+const authClient = new OktaAuth(/* configOptions */);
 ```
 
 ## Usage guide
@@ -223,13 +223,13 @@ You can also browse the full [API reference documentation](#api-reference).
 ### Example Client
 
 ```javascript
-var config = {
+const config = {
   issuer: 'https://{yourOktaDomain}/oauth2/default',
   clientId: 'GHtf9iJdr60A9IYrR0jw',
   redirectUri: 'https://acme.com/oauth2/callback/home',
 };
 
-var authClient = new OktaAuth(config);
+const authClient = new OktaAuth(config);
 ```
 
 ### Running as a service
@@ -237,7 +237,7 @@ var authClient = new OktaAuth(config);
 By default, creating a new instance of `OktaAuth` will not create any asynchronous side-effects. However, certain features such as [token auto renew](#autorenew), [token auto remove](#autoremove) and [cross-tab synchronization](#syncstorage) require `OktaAuth` to be running as a service. This means timeouts are set in the background which will continue working until the service is stopped.  To start the `OktaAuth` service, simply call the `start` method right after creation and before calling other methods like [handleRedirect](#handleredirectoriginaluri). To terminate all background processes, call `stop`. See [Service Configuration](#services) for more info.
 
 ```javascript
-  var authClient = new OktaAuth(config);
+  const authClient = new OktaAuth(config);
   await authClient.start(); // start the service
   await authClient.stop(); // stop the service
 ```
@@ -290,7 +290,7 @@ To solve this issue please install package `@types/webappsec-credential-manageme
 Web and native clients can obtain tokens using the `authorization_code` flow which uses a client secret stored in a secure location. (SPA applications should use the `PKCE` flow which does not use a client secret) To use the `authorization_code` flow, set `responseType` to `"code"` and `pkce` to `false`:
 
 ```javascript
-var config = {
+const config = {
   // Required config
   issuer: 'https://{yourOktaDomain}/oauth2/default',
   clientId: 'GHtf9iJdr60A9IYrR0jw',
@@ -301,7 +301,7 @@ var config = {
   pkce: false
 };
 
-var authClient = new OktaAuth(config);
+const authClient = new OktaAuth(config);
 ```
 
 #### PKCE OAuth 2.0 flow
@@ -322,14 +322,14 @@ Implicit flow can be enabled by setting the `pkce` option to `false`
 
 ```javascript
 
-var config = {
+const config = {
   pkce:  false,
 
   // other config
   issuer: 'https://{yourOktaDomain}/oauth2/default',
 };
 
-var authClient = new OktaAuth(config);
+const authClient = new OktaAuth(config);
 ```
 
 ### Redirects and Routing
@@ -355,7 +355,7 @@ Most applications will handle an OAuth callback using a special route/page, sepa
 
 async function main() {
   // create OktaAuth instance
-  var config = {
+  const config = {
     issuer: 'https://{yourOktaDomain}/oauth2/default',
     clientId: 'GHtf9iJdr60A9IYrR0jw',
     redirectUri: 'https://acme.com/oauth2/callback/home',
@@ -514,32 +514,32 @@ Whether you are using this SDK to implement an OIDC flow or for communicating wi
 You may use the URL for your Okta organization as the issuer. This will apply a default authorization policy and issue tokens scoped at the organization level.
 
 ```javascript
-var config = {
+const config = {
   issuer: 'https://{yourOktaDomain}'
 };
 
-var authClient = new OktaAuth(config);
+const authClient = new OktaAuth(config);
 ```
 
 Okta allows you to create multiple custom OAuth 2.0 authorization servers that you can use to protect your own resource servers. Within each authorization server you can define your own OAuth 2.0 scopes, claims, and access policies. Many organizations have a "default" authorization server.
 
 ```javascript
-var config = {
+const config = {
   issuer: 'https://{yourOktaDomain}/oauth2/default'
 };
 
-var authClient = new OktaAuth(config);
+const authClient = new OktaAuth(config);
 ```
 
 You may also create and customize additional authorization servers.
 
 ```javascript
 
-var config = {
+const config = {
   issuer: 'https://{yourOktaDomain}/oauth2/custom-auth-server-id'
 };
 
-var authClient = new OktaAuth(config);
+const authClient = new OktaAuth(config);
 ```
 
 ### Configuration options
@@ -716,7 +716,7 @@ The http request implementation. By default, this is implemented using [cross-fe
   2. Must return a Promise that resolves with a raw XMLHttpRequest response
 
 ```javascript
-var config = {
+const config = {
   url: 'https://{yourOktaDomain}',
   httpRequestClient: function(method, url, args) {
     // args is in the form:
@@ -738,7 +738,7 @@ The `storageManager` provides access to client storage for specific purposes. `s
 
 ```javascript
 
-var config = {
+const config = {
   storageManager: {
     token: {
       storageTypes: [
@@ -768,7 +768,7 @@ var config = {
 **Important:** If neither [localStorage][] nor [sessionStorage][] are available, the default storage provider may fall back to using [cookie][] storage on some clients, . If your site will always be served over a HTTPS connection, you may want to forcibly enable "secure" cookies. This option will prevent cookies from being stored on an HTTP connection.
 
 ```javascript
-var config = {
+const config = {
   cookies: {
     secure: true
   }
@@ -787,7 +787,7 @@ The following values for `storageType` are recognized:
 **Note:** If the specified `storageType` is not available, but matches an entry in `storageTypes`, then default fallback logic will be applied. To disable this behavior, set `storageTypes` to an empty array:
 
 ```javascript
-var config = {
+const config = {
   storageManager: {
     token: {
       storageType: 'sessionStorage',
@@ -800,7 +800,7 @@ var config = {
 or set the `storageTypes` property with only one entry:
 
 ```javascript
-var config = {
+const config = {
   storageManager: {
     token: {
       storageTypes: ['sessionStorage']
@@ -847,7 +847,7 @@ const storageProvider = {
   }
 }
 
-var config = {
+const config = {
   storageManager: {
     token: {
       storageProvider: storageProvider
@@ -861,7 +861,7 @@ var config = {
 If `cookie` storage is specified, it is possible to specify whether or not a session cookie is used by the cookie storage. This will automatically be configured if `sessionStorage` is specified and you fall back to `cookie` storage. If sessionCookie is not specified it will create a cookie with an expiry date of `2200-01-01T00:00:00.000Z`
 
 ```javascript
-var config = {
+const config = {
   cookies: {
     sessionCookie: true
   }
@@ -908,20 +908,20 @@ Specify the [storage type](#storagetype) for tokens. This will override any valu
 
 ```javascript
 
-var config = {
+const config = {
   url: 'https://{yourOktaDomain}',
   tokenManager: {
     storage: 'sessionStorage'
   }
 };
 
-var authClient = new OktaAuth(config);
+const authClient = new OktaAuth(config);
 ```
 
 A custom [storage provider](#storageprovider) instance can also be passed here. (This will override any `storageProvider` value set under the `token` section of the [storageManager](#storagemanager) configuration)
 
 ```javascript
-var myMemoryStore = {};
+let myMemoryStore = {};
 const storageProvider = {
   getItem: function(key) {
     // custom get
@@ -1167,7 +1167,7 @@ authClient.signOut({
 
 ```javascript
 // In this case, the ID token is stored under the 'myIdToken' key
-var idToken = await authClient.tokenManager.get('myIdToken');
+const idToken = await authClient.tokenManager.get('myIdToken');
 authClient.signOut({
   idToken: idToken
 });
@@ -1175,7 +1175,7 @@ authClient.signOut({
 
 ```javascript
 // In this case, the access token is stored under the 'myAccessToken' key
-var accessToken = await authClient.tokenManager.get('myAccessToken');
+const accessToken = await authClient.tokenManager.get('myAccessToken');
 authClient.signOut({
   accessToken: accessToken
 });
@@ -1618,7 +1618,7 @@ authClient.token.getWithoutPrompt({
   idp: '0oa62b57p7c8PaGpU0h7'
  })
 .then(function(res) {
-  var tokens = res.tokens;
+  const tokens = res.tokens;
 
   // Do something with tokens, such as
   authClient.tokenManager.setTokens(tokens);
@@ -1642,7 +1642,7 @@ To reduce the likelihood of the popup being blocked, the popup window first load
 ```javascript
 authClient.token.getWithPopup(options)
 .then(function(res) {
-  var tokens = res.tokens;
+  const tokens = res.tokens;
 
   // Do something with tokens, such as
   authClient.tokenManager.setTokens(tokens);
@@ -1742,10 +1742,10 @@ The `state` string which was passed to `getWithRedirect` will be also be availab
 ```javascript
 authClient.token.parseFromUrl()
 .then(function(res) {
-  var state = res.state; // passed to getWithRedirect(), can be any string
+  const state = res.state; // passed to getWithRedirect(), can be any string
 
   // manage token or tokens
-  var tokens = res.tokens;
+  const tokens = res.tokens;
 
   // Do something with tokens, such as
   authClient.tokenManager.setTokens(tokens);
@@ -1810,7 +1810,7 @@ Returns a new token if the Okta [session](https://developer.okta.com/docs/api/re
 
 ```javascript
 // this token is provided by Okta via getWithoutPrompt, getWithPopup, and parseFromUrl
-var tokenToRenew = {
+const tokenToRenew = {
   idToken: 'YOUR_ID_TOKEN_JWT',
   claims: { /* token claims */ },
   expiresAt: 1449699930,
@@ -1880,7 +1880,7 @@ Manually verify the validity of an ID token's claims and check the signature on 
 * `validationOptions` - Optional object to assert ID token claim values. Defaults to the configuration passed in during client instantiation.
 
 ```javascript
-var validationOptions = {
+const validationOptions = {
   issuer: 'https://{yourOktaDomain}/oauth2/{authorizationServerId}'
 }
 
@@ -2126,14 +2126,14 @@ To include this library in your project, you can follow the instructions in the 
 You only need to set the `issuer` for your Okta Domain:
 
 ```javascript
-var OktaAuth = require('@okta/okta-auth-js').OktaAuth;
+const OktaAuth = require('@okta/okta-auth-js').OktaAuth;
 
-var config = {
+const config = {
   // The URL for your Okta organization
   issuer: 'https://{yourOktaDomain}'
 };
 
-var authClient = new OktaAuth(config);
+const authClient = new OktaAuth(config);
 ```
 
 ### `http`
