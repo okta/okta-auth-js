@@ -66,7 +66,7 @@ This sample app follows classic ExpressJS routing structure and uses [mustache-e
 
 * Self Service Password Recovery ->  [routes/recover-password.js](./web-server/routes/recover-password.js)
 
-* Multifactor -> [routes/authenticators.js](./web-server/routes/authenticators.js)
+* Multifactor -> [routes/authenticator.js](./web-server/routes/authenticator.js)
 
 * Logout -> [routes/logout.js](./web-server/routes/logout.js)
 
